@@ -19,10 +19,14 @@
     return '<button data-open="' + esc(b.target) + '">' + esc(b.label) + "</button>";
   }).join("");
 
-  /* ---- About ---- */
+  /* ---- About (with education) ---- */
   el("about-body").innerHTML =
     "<h2>" + esc(C.about.title) + "</h2>" +
-    C.about.paragraphs.map(function (p) { return "<p>" + esc(p) + "</p>"; }).join("");
+    C.about.paragraphs.map(function (p) { return "<p>" + esc(p) + "</p>"; }).join("") +
+    "<h3>Education</h3><ul class=\"edu\">" +
+    C.work.education.map(function (e) {
+      return "<li><b>" + esc(e.school) + "</b> <span>(" + esc(e.year) + ")</span></li>";
+    }).join("") + "</ul>";
 
   /* ---- Work ---- */
   el("work-note").textContent = C.work.note;
@@ -32,9 +36,6 @@
       "<h4>" + esc(r.role) + "</h4>" +
       '<div class="employer">' + esc(r.company) + "</div>" +
       "<p>" + esc(r.detail) + "</p></div>";
-  }).join("");
-  el("edu-list").innerHTML = C.work.education.map(function (e) {
-    return "<li><b>" + esc(e.school) + "</b> <span>(" + esc(e.year) + ")</span></li>";
   }).join("");
 
   /* ---- Projects ---- */
@@ -146,19 +147,24 @@
   });
 
   /* ---- Window open / close (dock rail is static HTML) ---- */
+  function findWindow(name) {
+    return el("window-" + name) || el("widget-" + name);
+  }
   function openWindow(name) {
     if (name === "contact-note") {
       var note = el("contact-note");
       if (note) note.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
-    var win = el("window-" + name);
+    var win = findWindow(name);
     if (!win) return;
     win.classList.remove("hidden-window");
-    win.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    if (!win.classList.contains("overlay-window")) {
+      win.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
   }
   function closeWindow(name) {
-    var win = el("window-" + name);
+    var win = findWindow(name);
     if (win) win.classList.add("hidden-window");
   }
   document.addEventListener("click", function (e) {
@@ -174,7 +180,8 @@
     bar.addEventListener("pointerdown", function (e) {
       if (window.innerWidth <= 768) return;
       if (e.target.closest("button")) return;
-      var win = bar.closest(".window");
+      var win = bar.closest(".window, .widget");
+      if (!win || win.classList.contains("overlay-window")) return;
       dragWin = win;
       var rect = win.getBoundingClientRect();
       var desk = el("desktop").getBoundingClientRect();
