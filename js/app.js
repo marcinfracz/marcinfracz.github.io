@@ -49,7 +49,7 @@
   el("news-sub").textContent = C.widgets.newsSub || "";
   el("news-list").innerHTML = C.widgets.news.map(function (n) {
     return '<li><a href="' + esc(n.url) + '" target="_blank" rel="noopener">' +
-      '<span class="news-tag">' + esc(n.tag) + '</span>' +
+      '<span class="news-tag tag-' + esc(n.tag.toLowerCase()) + '">' + esc(n.tag) + '</span>' +
       '<span class="news-src">' + esc(n.source) + " · " + esc(n.date) + "</span>" +
       '<span class="news-title">' + esc(n.title) + "</span></a></li>";
   }).join("");
@@ -103,8 +103,11 @@
     dateFmt[c.timeZone] = new Intl.DateTimeFormat("en-US", { timeZone: c.timeZone, weekday: "short", month: "short", day: "numeric" });
     partsFmt[c.timeZone] = new Intl.DateTimeFormat("en-US", { timeZone: c.timeZone, hour: "numeric", minute: "numeric", second: "numeric", hour12: false });
   });
-  var topFmt = new Intl.DateTimeFormat("en-US", {
-    timeZone: "America/Detroit", weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit"
+  var topDateFmt = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Detroit", weekday: "short", month: "short", day: "numeric"
+  });
+  var topTimeFmt = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Detroit", hour: "numeric", minute: "2-digit"
   });
   function tickClocks() {
     var now = new Date();
@@ -121,7 +124,7 @@
       if (ss) ss.setAttribute("transform", "rotate(" + (s * 6) + " 32 32)");
     });
     var top = el("topbar-clock");
-    if (top) top.textContent = topFmt.format(now);
+    if (top) top.textContent = topDateFmt.format(now) + " · " + topTimeFmt.format(now);
   }
   tickClocks();
   setInterval(tickClocks, 1000);
@@ -293,10 +296,48 @@
     node.style.top = top + "px";
     node.style.transform = "";
     node.classList.remove("dragging");
+    document.body.classList.remove("is-dragging");
     positions[drag.id] = { left: left, top: top };
     savePositions();
     drag = null;
   }
+
+  /* ================= resize windows ================= */
+  var resize = null;
+  document.querySelectorAll(".overlay-window").forEach(function (w) {
+    var h = document.createElement("span");
+    h.className = "resize-handle";
+    h.setAttribute("data-resize", "");
+    w.appendChild(h);
+  });
+  document.addEventListener("pointerdown", function (e) {
+    if (window.innerWidth <= 1100) return;
+    var h = e.target.closest("[data-resize]");
+    if (!h) return;
+    var win = h.closest(".overlay-window");
+    if (!win) return;
+    if (win.classList.contains("maximised")) win.classList.remove("maximised");
+    var rect = win.getBoundingClientRect();
+    resize = { node: win, startX: e.clientX, startY: e.clientY, startW: rect.width, startH: rect.height };
+    document.body.classList.add("is-resizing");
+    bringToFront(win);
+    e.preventDefault();
+  });
+  document.addEventListener("pointermove", function (e) {
+    if (!resize) return;
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var w = Math.max(340, Math.min(resize.startW + (e.clientX - resize.startX), vw - 24));
+    var hgt = Math.max(260, Math.min(resize.startH + (e.clientY - resize.startY), vh - 48));
+    resize.node.style.width = w + "px";
+    resize.node.style.height = hgt + "px";
+  });
+  function endResize() {
+    if (!resize) return;
+    document.body.classList.remove("is-resizing");
+    resize = null;
+  }
+  document.addEventListener("pointerup", endResize);
+  document.addEventListener("pointercancel", endResize);
   document.addEventListener("pointerdown", function (e) {
     if (window.innerWidth <= 1100) return;
     var handle = e.target.closest("[data-drag]");
@@ -323,15 +364,21 @@
     bringToFront(target);
     target.classList.add("dragging");
     drag = { node: target, id: id, startX: e.clientX, startY: e.clientY, dx: 0, dy: 0 };
+    document.body.classList.add("is-dragging");
     var cap = handle || note;
     if (cap && cap.setPointerCapture) { try { cap.setPointerCapture(e.pointerId); } catch (err) {} }
   });
   document.addEventListener("pointermove", function (e) {
     if (!drag) return;
     if (e.pointerType === "mouse" && e.buttons === 0) { endDrag(); return; } /* release happened outside the page; stop following the mouse */
-    drag.dx = e.clientX - drag.startX;
-    drag.dy = e.clientY - drag.startY;
-    drag.node.style.transform = "translate(" + drag.dx + "px," + drag.dy + "px)";
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var startLeft = parseFloat(drag.node.style.left) || 0;
+    var startTop = parseFloat(drag.node.style.top) || 0;
+    var dx = Math.max(-startLeft, Math.min(e.clientX - drag.startX, vw - 120 - startLeft));
+    var dy = Math.max(40 - startTop, Math.min(e.clientY - drag.startY, vh - 80 - startTop));
+    drag.dx = dx;
+    drag.dy = dy;
+    drag.node.style.transform = "translate(" + dx + "px," + dy + "px)";
   });
   document.addEventListener("pointerup", endDrag);
   document.addEventListener("pointercancel", endDrag);
@@ -429,27 +476,45 @@
     savePrefs();
   }
   function renderWidgetPanel() {
-    var labels = { clocks: "World Clock", news: "AI Signals", weather: "Weather" };
+    var labels = {
+      clocks: { name: "World Clock", sub: "Detroit, Shanghai, Mexico City" },
+      news: { name: "AI Signals", sub: "What matters now" },
+      weather: { name: "Weather", sub: "A window, not a dashboard" }
+    };
+    var onCount = Object.keys(prefs.widgets).filter(function (k) { return prefs.widgets[k].on; }).length;
+    el("widget-panel-count").textContent = onCount + (onCount === 1 ? " widget visible" : " widgets visible");
     el("widget-panel-list").innerHTML = Object.keys(prefs.widgets).map(function (key) {
       var p = prefs.widgets[key];
-      return '<label class="widget-panel-row"><input type="checkbox" data-widget-toggle="' + key + '"' + (p.on ? " checked" : "") + "> " + labels[key] +
-        '<span class="wp-size">' + p.size + "</span></label>";
+      var seg = SIZE_ORDER.map(function (s) {
+        return '<button data-widget-size-set="' + key + ":" + s + '" class="' + (p.size === s ? "on" : "") + '">' + s + "</button>";
+      }).join("");
+      return '<div class="widget-panel-row">' +
+        '<button class="wp-switch" role="switch" aria-checked="' + p.on + '" data-widget-toggle="' + key + '" aria-label="' + labels[key].name + '"><span></span></button>' +
+        '<span class="wp-name">' + labels[key].name + '<span class="wp-sub">' + labels[key].sub + "</span></span>" +
+        '<span class="wp-seg">' + seg + "</span></div>";
     }).join("");
   }
-  document.addEventListener("change", function (e) {
+  document.addEventListener("click", function (e) {
     var t = e.target.closest("[data-widget-toggle]");
     if (t) {
-      prefs.widgets[t.getAttribute("data-widget-toggle")].on = t.checked;
+      var key = t.getAttribute("data-widget-toggle");
+      prefs.widgets[key].on = !prefs.widgets[key].on;
       applyWidgets();
-      if (t.getAttribute("data-widget-toggle") === "weather" && t.checked) loadWeather();
+      if (key === "weather" && prefs.widgets[key].on) loadWeather();
+      return;
     }
-  });
-  document.addEventListener("click", function (e) {
+    var ss = e.target.closest("[data-widget-size-set]");
+    if (ss) {
+      var parts = ss.getAttribute("data-widget-size-set").split(":");
+      prefs.widgets[parts[0]].size = parts[1];
+      applyWidgets();
+      return;
+    }
     var sz = e.target.closest("[data-widget-size]");
     if (sz) {
-      var key = sz.getAttribute("data-widget-size");
-      var cur = SIZE_ORDER.indexOf(prefs.widgets[key].size);
-      prefs.widgets[key].size = SIZE_ORDER[(cur + 1) % SIZE_ORDER.length];
+      var key2 = sz.getAttribute("data-widget-size");
+      var cur = SIZE_ORDER.indexOf(prefs.widgets[key2].size);
+      prefs.widgets[key2].size = SIZE_ORDER[(cur + 1) % SIZE_ORDER.length];
       applyWidgets();
       return;
     }
@@ -461,9 +526,13 @@
   });
   function openWidgetPanel() {
     el("widget-panel").classList.remove("hidden-window");
+    el("mb-widgets-btn").classList.add("active");
     renderWidgetPanel();
   }
-  function closeWidgetPanel() { el("widget-panel").classList.add("hidden-window"); }
+  function closeWidgetPanel() {
+    el("widget-panel").classList.add("hidden-window");
+    el("mb-widgets-btn").classList.remove("active");
+  }
   on("mb-widgets-btn", "click", function () {
     var p = el("widget-panel");
     if (p.classList.contains("hidden-window")) openWidgetPanel();
