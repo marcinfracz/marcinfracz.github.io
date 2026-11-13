@@ -413,13 +413,14 @@
   /* ================= preferences ================= */
   var PREF_KEY = "mf-site-prefs-v6";
   var prefs = {
-    wallpaper: "shanghai-mist", mode: "framed", dark: false,
+    wallpaper: "shanghai-mist", mode: "framed", dark: false, wallColor: null,
     widgets: { clocks: { on: true, size: "M" }, weather: { on: false, size: "S" } },
     welcome: true
   };
   try {
     var saved = JSON.parse(localStorage.getItem(PREF_KEY) || "{}");
     if (saved.wallpaper) prefs.wallpaper = saved.wallpaper;
+    if (saved.wallColor) prefs.wallColor = saved.wallColor;
     if (saved.mode) prefs.mode = saved.mode;
     if (typeof saved.dark === "boolean") prefs.dark = saved.dark;
     if (saved.widgets) {
@@ -461,20 +462,19 @@
   function applyWallpaper() {
     var art = wpFind(prefs.wallpaper);
     if (!art) { prefs.wallpaper = "shanghai-mist"; art = wpFind(prefs.wallpaper); } /* e.g. a removed pack id */
+    if (art.type === "color") prefs.wallColor = art.value; /* picking a colour sets the wall colour */
     WP_CATEGORIES.forEach(function (c) { c.items.forEach(function (it) { document.body.classList.remove("wp-" + it.id); }); });
     document.body.classList.remove("wp-solid", "wp-framed", "wp-full");
     document.body.classList.add("wp-" + prefs.wallpaper, "wp-" + prefs.mode);
     if (art.type === "color") document.body.classList.add("wp-solid");
     var wallEl = document.querySelector(".wallpaper");
-    if (wallEl) wallEl.style.background = art.type === "color" ? art.value : "";
+    if (wallEl) wallEl.style.background = art.type === "color" ? art.value : (prefs.wallColor || ""); /* the wall colour stays when an image is picked */
     var img = el("wallpaper-img");
     if (img) img.src = art.type === "image" ? art.src : "";
     var framedImg = el("framed-art-img");
     if (framedImg && art.type === "image") { framedImg.src = art.src; framedImg.alt = art.name; }
     var cap = el("framed-art-caption");
     if (cap) cap.textContent = art.type === "image" ? art.name : "";
-    var credit = el("wp-credit");
-    if (credit) credit.textContent = "";
     currentCategory = categoryOf(prefs.wallpaper);
     renderWallpaperPanel();
     document.querySelectorAll(".wp-mode").forEach(function (b) {
@@ -496,7 +496,7 @@
       var sw = w.type === "color"
         ? "background:" + w.value + ";border:1px solid #d6d3d1"
         : "background-image:url('" + esc(w.src) + "')";
-      var active = w.id === prefs.wallpaper;
+      var active = w.type === "color" ? (w.value === prefs.wallColor) : (w.id === prefs.wallpaper);
       return '<button class="wp-option' + (active ? " active" : "") + '" data-wp="' + w.id + '">' +
         '<span class="wp-swatch" style="' + sw + '"></span>' + esc(w.name) +
         '<span class="check">' + (active ? "✓" : "") + "</span></button>";
@@ -723,7 +723,7 @@
       });
       savePositions();
     }
-    else if (a === "reset-wallpaper") { prefs.wallpaper = "shanghai-mist"; prefs.mode = "framed"; applyWallpaper(); }
+    else if (a === "reset-wallpaper") { prefs.wallpaper = "shanghai-mist"; prefs.mode = "framed"; prefs.wallColor = null; applyWallpaper(); }
     else if (a === "reset-widgets") {
       markPanelClick();
       prefs.widgets = { clocks: { on: true, size: "M" }, weather: { on: false, size: "S" } };
