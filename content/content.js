@@ -103,11 +103,10 @@ window.SITE_CONTENT = {
   },
   wallpapers: [
     { id: "skyline", label: "Shanghai Skyline", type: "image", src: "assets/skyline.jpg" },
-    { id: "cream", label: "Solid Cream", type: "solid", src: "" },
-    { id: "wave", label: "The Great Wave", type: "image", src: "assets/wallpaper.jpg" }
+    { id: "cream", label: "Solid Cream", type: "solid", src: "" }
   ],
   notes: {
-    motto: "Build it, ship it, learn from it.",
+    motto: "Build it, ship it,\nlearn from it.",
     resumeNote: "Resume PDF coming soon.",
     contact: {
       email: "marcin.fracz@gmail.com",
