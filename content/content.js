@@ -84,15 +84,19 @@ window.SITE_CONTENT = {
   },
   widgets: {
     clocksTitle: "World Clock",
+    clocksSub: "Detroit · Shanghai · Mexico City",
     clocks: [
       { label: "Detroit", timeZone: "America/Detroit" },
       { label: "Shanghai", timeZone: "Asia/Shanghai" },
       { label: "Mexico City", timeZone: "America/Mexico_City" }
     ],
-    newsTitle: "Auto + AI News",
+    newsTitle: "AI Dispatch",
+    newsSub: "Updated Nov 13, 2026",
     news: [
-      { label: "Automotive news", url: "https://news.google.com/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNREZxT0dnb0FBUAE?hl=en-US&gl=US&ceid=US%3Aen" },
-      { label: "AI news", url: "https://news.google.com/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNREZ6Qm5qR0FBUAE?hl=en-US&gl=US&ceid=US%3Aen" }
+      { tag: "NEWS", source: "The Neuron", date: "Nov 13", title: "Google launches Gemini 4 Hydrogen, a fast low-cost model for coding and agents", url: "https://www.theneuron.ai/digest/everything-that-happened-in-ai-today-friday-november-13-2026/" },
+      { tag: "BUILD", source: "SXF Brief", date: "Nov 13", title: "Anthropic opens self-hosted Claude Managed Agents in private beta", url: "https://sxf.si/brief/" },
+      { tag: "OFFICIAL", source: "Claims Journal", date: "Nov 13", title: "Nonprofits sue OpenAI, Anthropic, Google, Meta and SpaceX to halt frontier AI development", url: "https://www.claimsjournal.com/news/national/2026/11/13/341283.htm" },
+      { tag: "NEWS", source: "The Neuron", date: "Nov 13", title: "Nvidia CEO Jensen Huang resigns amid scandal reports", url: "https://www.theneuron.ai/digest/everything-that-happened-in-ai-today-friday-november-13-2026/" }
     ],
     sizzleTitle: "Sizzle Reel",
     sizzleNote: "Video coming soon."
