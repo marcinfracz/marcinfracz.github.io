@@ -3,6 +3,7 @@
 window.SITE_CONTENT = {
   intro: {
     name: "Marcin Fracz",
+    title: "Automotive product & software strategy leader · GM · SAIC-GM Shanghai",
     headline: "Strategist transforming global software and AI ecosystems with high-velocity, cross-border execution. Exploring new leadership opportunities.",
     photo: "assets/profile.jpg",
     buttons: [
@@ -74,7 +75,7 @@ window.SITE_CONTENT = {
       },
       {
         name: "OpenAutoLink",
-        detail: "Open-source car connectivity project."
+        detail: "Testing OpenAutoLink, an open-source Android Automotive app, on my own EV"
       },
       {
         name: "3D Prints",
@@ -90,16 +91,6 @@ window.SITE_CONTENT = {
       { label: "Shanghai", timeZone: "Asia/Shanghai" },
       { label: "Mexico City", timeZone: "America/Mexico_City" }
     ],
-    newsTitle: "AI Signals",
-    newsSub: "What matters now",
-    news: [
-      { tag: "NEWS", source: "The Neuron", date: "Nov 13", title: "Google launches Gemini 4 Hydrogen, a fast low-cost model for coding and agents", url: "https://www.theneuron.ai/digest/everything-that-happened-in-ai-today-friday-november-13-2026/" },
-      { tag: "BUILD", source: "SXF Brief", date: "Nov 13", title: "Anthropic opens self-hosted Claude Managed Agents in private beta", url: "https://sxf.si/brief/" },
-      { tag: "OFFICIAL", source: "Claims Journal", date: "Nov 13", title: "Nonprofits sue OpenAI, Anthropic, Google, Meta and SpaceX to halt frontier AI development", url: "https://www.claimsjournal.com/news/national/2026/11/13/341283.htm" },
-      { tag: "NEWS", source: "The Neuron", date: "Nov 13", title: "Nvidia CEO Jensen Huang resigns amid scandal reports", url: "https://www.theneuron.ai/digest/everything-that-happened-in-ai-today-friday-november-13-2026/" }
-    ],
-    sizzleTitle: "Sizzle Reel",
-    sizzleNote: "Video coming soon."
   },
   wallpapers: [
     { id: "skyline", label: "Shanghai Skyline", type: "image", src: "assets/skyline.jpg" },
@@ -107,7 +98,7 @@ window.SITE_CONTENT = {
   ],
   notes: {
     motto: "Build it, ship it,\nlearn from it.",
-    resumeNote: "Resume PDF coming soon.",
+    resumeNote: "Resume (PDF)",
     contact: {
       email: "marcin.fracz@gmail.com",
       linkedin: "https://www.linkedin.com/in/marcinfracz/"
@@ -118,9 +109,9 @@ window.SITE_CONTENT = {
     { id: "projects", name: "Projects", icon: "📁", category: "projects", target: "projects", preview: "<b>Projects</b> — Marcin Hub, OpenAutoLink and 3D prints. Double-click to open." },
     { id: "work-index", name: "Work Index", icon: "📁", category: "work", target: "work", preview: "<b>Work Index</b> — Twenty-three years across engineering, product and software strategy, from powertrain to Shanghai. Double-click to open the timeline." },
     { id: "uses", name: "Uses", icon: "🛠️", category: "uses", target: null, preview: "<b>Uses</b> — The tools and setup behind the work. (Coming soon.)" },
-    { id: "colophon", name: "Colophon", icon: "📝", category: "start", target: null, preview: "<b>Colophon</b> — This site is a fake desktop: plain HTML, CSS and vanilla JavaScript, hosted on GitHub Pages. No framework, no build step." },
+    { id: "colophon", name: "Colophon", icon: "📝", category: "start", target: null, preview: "<b>Colophon</b> — This site is a fake desktop: plain HTML, CSS and vanilla JavaScript, hosted on GitHub Pages. No framework, no build step. Desktop concept inspired by Zain Haseeb. Built with AI." },
     { id: "marcin-hub", name: "Marcin Hub", icon: "🤖", category: "projects", target: "projects", preview: "<b>Marcin Hub</b> — AI-built portfolio tools. Double-click to open Projects." },
-    { id: "openautolink", name: "OpenAutoLink", icon: "🚗", category: "projects", target: "projects", preview: "<b>OpenAutoLink</b> — Open-source car connectivity project. Double-click to open Projects." },
+    { id: "openautolink", name: "OpenAutoLink", icon: "🚗", category: "projects", target: "projects", preview: "<b>OpenAutoLink</b> — Testing OpenAutoLink, an open-source Android Automotive app, on my own EV. Double-click to open Projects." },
     { id: "prints", name: "3D Prints", icon: "🖨️", category: "projects", target: "projects", preview: "<b>3D Prints</b> — Printed parts and prototypes. Double-click to open Projects." }
   ],
   quotes: [
