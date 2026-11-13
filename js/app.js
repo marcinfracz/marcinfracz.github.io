@@ -283,6 +283,20 @@
   restorePositions();
 
   var drag = null;
+  function endDrag() {
+    if (!drag) return;
+    var node = drag.node;
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var left = Math.max(0, Math.min(parseFloat(node.style.left) + drag.dx, vw - 120));
+    var top = Math.max(40, Math.min(parseFloat(node.style.top) + drag.dy, vh - 80));
+    node.style.left = left + "px";
+    node.style.top = top + "px";
+    node.style.transform = "";
+    node.classList.remove("dragging");
+    positions[drag.id] = { left: left, top: top };
+    savePositions();
+    drag = null;
+  }
   document.addEventListener("pointerdown", function (e) {
     if (window.innerWidth <= 1100) return;
     var handle = e.target.closest("[data-drag]");
@@ -309,27 +323,18 @@
     bringToFront(target);
     target.classList.add("dragging");
     drag = { node: target, id: id, startX: e.clientX, startY: e.clientY, dx: 0, dy: 0 };
-    if (handle && handle.setPointerCapture) { try { handle.setPointerCapture(e.pointerId); } catch (err) {} }
+    var cap = handle || note;
+    if (cap && cap.setPointerCapture) { try { cap.setPointerCapture(e.pointerId); } catch (err) {} }
   });
   document.addEventListener("pointermove", function (e) {
     if (!drag) return;
+    if (e.pointerType === "mouse" && e.buttons === 0) { endDrag(); return; } /* release happened outside the page; stop following the mouse */
     drag.dx = e.clientX - drag.startX;
     drag.dy = e.clientY - drag.startY;
     drag.node.style.transform = "translate(" + drag.dx + "px," + drag.dy + "px)";
   });
-  document.addEventListener("pointerup", function () {
-    if (!drag) return;
-    var node = drag.node;
-    var left = parseFloat(node.style.left) + drag.dx;
-    var top = parseFloat(node.style.top) + drag.dy;
-    node.style.left = Math.max(0, left) + "px";
-    node.style.top = Math.max(0, top) + "px";
-    node.style.transform = "";
-    node.classList.remove("dragging");
-    positions[drag.id] = { left: Math.max(0, left), top: Math.max(0, top) };
-    savePositions();
-    drag = null;
-  });
+  document.addEventListener("pointerup", endDrag);
+  document.addEventListener("pointercancel", endDrag);
 
   /* ================= preferences ================= */
   var PREF_KEY = "mf-site-prefs-v6";
@@ -556,6 +561,12 @@
     else if (a === "wallpaper-settings") openWindow("wallpaper");
     else if (a === "widget-settings") openWidgetPanel();
     else if (a === "toggle-welcome") { prefs.welcome = !prefs.welcome; applyWelcome(); }
+    else if (a === "reset-welcome") {
+      delete positions["window-intro"];
+      savePositions();
+      var n = el("window-intro");
+      if (n) { n.style.left = ""; n.style.top = ""; n.style.transform = ""; }
+    }
     else if (a === "reset-positions") {
       positions = {};
       savePositions();
@@ -704,18 +715,12 @@
     el("browser-back").disabled = browserIndex <= 0;
     el("browser-forward").disabled = browserIndex >= browserHistory.length - 1;
   }
+  var browserLoadTimer = null;
   function browserHideBlocked() { el("browser-blocked").classList.add("hidden-window"); }
   function browserShowBlocked() { el("browser-blocked").classList.remove("hidden-window"); }
-  function browserCheckBlocked() {
-    setTimeout(function () {
-      try {
-        var doc = frame.contentDocument;
-        if (!doc || (doc.URL === "about:blank" && browserCurrent !== "about:blank")) browserShowBlocked();
-        else browserHideBlocked();
-      } catch (e) {
-        browserHideBlocked(); /* cross-origin page loaded fine, we just cannot inspect it */
-      }
-    }, 700);
+  function browserArmTimer() {
+    clearTimeout(browserLoadTimer);
+    browserLoadTimer = setTimeout(function () { browserShowBlocked(); }, 8000);
   }
   function browserGo(url, push) {
     browserCurrent = url;
@@ -728,7 +733,7 @@
     }
     browserButtons();
     browserHideBlocked();
-    browserCheckBlocked();
+    browserArmTimer();
   }
   function browserNavigate(raw) { browserGo(browserNormalize(raw), true); }
   function browserInit() {
@@ -742,7 +747,7 @@
     if (browserIndex < browserHistory.length - 1) { browserIndex++; browserGo(browserHistory[browserIndex], false); }
   });
   on("browser-reload", "click", function () {
-    if (browserCurrent) { frame.src = browserCurrent; browserHideBlocked(); browserCheckBlocked(); }
+    if (browserCurrent) { frame.src = browserCurrent; browserHideBlocked(); browserArmTimer(); }
   });
   on("browser-open-tab", "click", function () {
     if (browserCurrent) window.open(browserCurrent, "_blank", "noopener");
@@ -755,7 +760,10 @@
     else if (e.key === "Escape") { urlBar.value = browserCurrent; urlBar.blur(); }
   });
   urlBar.addEventListener("focus", function () { urlBar.select(); });
-  frame.addEventListener("load", browserCheckBlocked);
+  frame.addEventListener("load", function () {
+    clearTimeout(browserLoadTimer);
+    browserHideBlocked(); /* the page loaded; a site that blocks embedding fires load too and shows its own refusal inside the frame */
+  });
 
   /* ================= search palette ================= */
   var PALETTE_ITEMS = [
