@@ -307,6 +307,12 @@
 
 <script>
 (function () {
+  /* when this page is shown inside the desktop's browser window,
+     "Back to desktop" breaks out of the frame to the real desktop */
+  if (window !== window.top) {
+    document.querySelectorAll('a[href="../"]').forEach(function (a) { a.target = '_top'; });
+  }
+
   /* accordion */
   document.querySelectorAll('.acc-head').forEach(function (btn) {
     btn.addEventListener('click', function () {
