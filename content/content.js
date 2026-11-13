@@ -90,8 +90,8 @@ window.SITE_CONTENT = {
       { label: "Shanghai", timeZone: "Asia/Shanghai" },
       { label: "Mexico City", timeZone: "America/Mexico_City" }
     ],
-    newsTitle: "AI Dispatch",
-    newsSub: "Updated Nov 13, 2026",
+    newsTitle: "AI Signals",
+    newsSub: "What matters now",
     news: [
       { tag: "NEWS", source: "The Neuron", date: "Nov 13", title: "Google launches Gemini 4 Hydrogen, a fast low-cost model for coding and agents", url: "https://www.theneuron.ai/digest/everything-that-happened-in-ai-today-friday-november-13-2026/" },
       { tag: "BUILD", source: "SXF Brief", date: "Nov 13", title: "Anthropic opens self-hosted Claude Managed Agents in private beta", url: "https://sxf.si/brief/" },
