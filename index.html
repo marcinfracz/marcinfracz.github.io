@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=10">
+<link rel="stylesheet" href="css/styles.css?v=11">
 </head>
 <body>
 <div class="wallpaper" aria-hidden="true"><img id="wallpaper-img" src="assets/skyline.jpg" alt=""></div>
@@ -131,7 +131,7 @@
   </section>
 
   <!-- Weather (off by default) -->
-  <section class="widget glass weather hidden-window" id="widget-weather" data-widget="weather" data-draggable="1">
+  <section class="widget glass weather" id="widget-weather" data-widget="weather" data-draggable="1">
     <div class="widget-bar" data-drag><span class="widget-title">Weather</span><span class="widget-sub">Detroit</span><span class="widget-actions"><button class="bar-btn" data-widget-hide="weather" title="Hide widget" aria-label="Hide widget">×</button></span></div>
     <div class="weather-body" id="weather-body">Loading…</div>
   </section>
@@ -271,12 +271,17 @@
 </section>
 
 <aside class="widget-panel hidden-window" id="widget-panel">
-  <h3>Widgets</h3>
-  <div id="widget-panel-list"></div>
-  <div class="widget-panel-actions">
-    <button class="pill-btn" data-action="reset-widgets">Reset</button>
-    <button class="pill-btn" data-action="close-widget-panel">Close</button>
+  <div class="wp-head">
+    <div>
+      <h3>Desktop Widgets</h3>
+      <span class="wp-count" id="widget-panel-count"></span>
+    </div>
+    <div class="wp-head-actions">
+      <button class="pill-btn wp-reset" data-action="reset-widgets">Reset</button>
+      <button class="bar-btn" data-action="close-widget-panel" title="Close" aria-label="Close">×</button>
+    </div>
   </div>
+  <div id="widget-panel-list"></div>
 </aside>
 
 <div class="palette hidden-window" id="palette">
@@ -284,7 +289,7 @@
   <ul id="palette-list"></ul>
 </div>
 
-<script src="content/content.js?v=10"></script>
-<script src="js/app.js?v=10"></script>
+<script src="content/content.js?v=11"></script>
+<script src="js/app.js?v=11"></script>
 </body>
 </html>
