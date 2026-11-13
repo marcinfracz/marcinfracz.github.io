@@ -697,6 +697,7 @@
     else if (a === "open-notes-win") openWindow("notes-win");
     else if (a === "open-terminal") openWindow("terminal");
     else if (a === "open-browser") openWindow("browser");
+    else if (a === "open-work-showcase") browserOpenTab(BROWSER_HOME, "Work Showcase");
     else if (a === "contact") openWindow("contact-win");
     else if (a === "search") openPalette();
     else if (a === "wallpaper-settings") openWindow("wallpaper");
@@ -846,6 +847,80 @@
   var BROWSER_HOME = "https://marcinfracz.github.io/work/";
   var browserHistory = [], browserIndex = -1, browserCurrent = "";
   var frame = el("browser-frame"), urlBar = el("browser-url");
+  var RESUME_URL = "https://marcinfracz.github.io/assets/resume.pdf";
+  var browserTabs = []; /* {id, title, url, history, index} — one history stack per tab */
+  var browserActiveId = null;
+  var browserTabSeq = 0;
+  function browserTitleFor(url) {
+    if (url === BROWSER_HOME) return "Work Showcase";
+    if (url === RESUME_URL) return "Resume";
+    try { return new URL(url).hostname.replace(/^www\./, ""); } catch (e) { return url; }
+  }
+  function browserActiveTab() {
+    for (var i = 0; i < browserTabs.length; i++) if (browserTabs[i].id === browserActiveId) return browserTabs[i];
+    return null;
+  }
+  function browserSyncTab() {
+    var t = browserActiveTab();
+    if (!t) return;
+    t.url = browserCurrent; t.history = browserHistory; t.index = browserIndex;
+    t.title = browserTitleFor(browserCurrent);
+  }
+  function browserLoadTab(t) {
+    browserActiveId = t.id;
+    browserHistory = t.history.slice();
+    browserIndex = t.index;
+    browserCurrent = t.url;
+    urlBar.value = t.url;
+    frame.src = t.url;
+    browserButtons();
+    browserHideBlocked();
+    browserArmTimer();
+    renderBrowserTabs();
+  }
+  function browserSwitchTab(id) {
+    var t = null;
+    browserTabs.forEach(function (x) { if (x.id === id) t = x; });
+    if (!t || t.id === browserActiveId) return;
+    browserSyncTab();
+    browserLoadTab(t);
+  }
+  function browserOpenTab(url, title) {
+    var existing = null;
+    browserTabs.forEach(function (t) { if (t.url === url) existing = t; });
+    if (existing) browserSwitchTab(existing.id);
+    else {
+      var t = { id: ++browserTabSeq, title: title || browserTitleFor(url), url: url, history: [url], index: 0 };
+      browserTabs.push(t);
+      browserSyncTab();
+      browserLoadTab(t);
+    }
+    openWindow("browser");
+  }
+  function browserCloseTab(id) {
+    var i = -1;
+    browserTabs.forEach(function (t, j) { if (t.id === id) i = j; });
+    if (i < 0) return;
+    var wasActive = (id === browserActiveId);
+    browserTabs.splice(i, 1);
+    if (!browserTabs.length) {
+      browserActiveId = null; browserHistory = []; browserIndex = -1; browserCurrent = "";
+      closeWindow("browser");
+      renderBrowserTabs();
+      return;
+    }
+    if (wasActive) browserLoadTab(browserTabs[Math.min(i, browserTabs.length - 1)]);
+    else renderBrowserTabs();
+  }
+  function renderBrowserTabs() {
+    var bar = el("browser-tabs");
+    if (!bar) return;
+    bar.innerHTML = browserTabs.map(function (t) {
+      return '<button class="browser-tab' + (t.id === browserActiveId ? " active" : "") + '" data-browser-tab="' + t.id + '">' +
+        '<span class="browser-tab-title">' + esc(t.title) + '</span>' +
+        '<span class="browser-tab-x" data-browser-tab-close="' + t.id + '" title="Close tab">×</span></button>';
+    }).join("");
+  }
   function browserNormalize(raw) {
     raw = (raw || "").trim();
     if (!raw) return BROWSER_HOME;
@@ -883,11 +958,20 @@
     browserButtons();
     browserHideBlocked();
     browserArmTimer();
+    browserSyncTab();
+    renderBrowserTabs();
   }
   function browserNavigate(raw) { browserGo(browserNormalize(raw), true); }
   function browserInit() {
-    if (browserIndex < 0) browserGo(BROWSER_HOME, true);
-    else urlBar.value = browserCurrent;
+    if (!browserTabs.length) {
+      var t = { id: ++browserTabSeq, title: "Work Showcase", url: BROWSER_HOME, history: [BROWSER_HOME], index: 0 };
+      browserTabs.push(t);
+      browserLoadTab(t);
+    } else {
+      urlBar.value = browserCurrent;
+      browserButtons();
+      renderBrowserTabs();
+    }
   }
   on("browser-back", "click", function () {
     if (browserIndex > 0) { browserIndex--; browserGo(browserHistory[browserIndex], false); }
@@ -913,13 +997,21 @@
     clearTimeout(browserLoadTimer);
     browserHideBlocked(); /* the page loaded; a site that blocks embedding fires load too and shows its own refusal inside the frame */
   });
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest('a[href$="resume.pdf"]');
+    if (a) { e.preventDefault(); browserOpenTab(RESUME_URL, "Resume"); return; }
+    var x = e.target.closest("[data-browser-tab-close]");
+    if (x) { e.stopPropagation(); browserCloseTab(parseInt(x.getAttribute("data-browser-tab-close"), 10)); return; }
+    var tb = e.target.closest("[data-browser-tab]");
+    if (tb) browserSwitchTab(parseInt(tb.getAttribute("data-browser-tab"), 10));
+  });
 
   /* ================= search palette ================= */
   var PALETTE_ITEMS = [
     { label: "About Marcin", hint: "Window", run: function () { openWindow("about"); } },
     { label: "Work", hint: "Window", run: function () { openWindow("work"); } },
     { label: "Browser", hint: "Window", run: function () { openWindow("browser"); } },
-    { label: "Work Showcase", hint: "Browser", run: function () { openWindow("browser"); } },
+    { label: "Work Showcase", hint: "Browser", run: function () { browserOpenTab(BROWSER_HOME, "Work Showcase"); } },
     { label: "Projects", hint: "Window", run: function () { openWindow("projects"); } },
     { label: "Marcin Hub", hint: "Project", run: function () { openWindow("projects"); } },
     { label: "OpenAutoLink", hint: "Project", run: function () { openWindow("projects"); } },
