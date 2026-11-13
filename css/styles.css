@@ -276,6 +276,7 @@ body.wp-solid .framed-art { display: none; }
   bottom: 24px !important;
   transform: none;
   width: auto !important;
+  height: auto !important;
   max-height: none;
 }
 .overlay-window.maximised .window-body { max-height: calc(100vh - 48px - 24px - 41px); }
