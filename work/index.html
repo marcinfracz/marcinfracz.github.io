@@ -4,7 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Marcin Fracz — Work</title>
-<meta name="description" content="The work of Marcin Fracz: global software strategy, connected services, and the cars he helped bring to market.">
+<meta name="description" content="Automotive product &amp; software strategy leader · GM · SAIC-GM Shanghai">
+<meta property="og:title" content="Marcin Fracz — Automotive product &amp; software strategy leader">
+<meta property="og:description" content="Automotive product &amp; software strategy leader · GM · SAIC-GM Shanghai">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://marcinfracz.github.io/work/">
+<meta property="og:image" content="https://marcinfracz.github.io/assets/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="../assets/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -24,6 +31,9 @@
   .mono { font-family: 'JetBrains Mono', monospace; }
   .label { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
   .muted { color: var(--muted); }
+  /* skip link: visually hidden until focused */
+  .skip-link { position: absolute; left: -9999px; top: 0; z-index: 100; background: var(--accent); color: #fff; font-weight: 700; font-size: 14px; padding: 10px 16px; border-radius: 0 0 10px 0; text-decoration: none; }
+  .skip-link:focus { left: 0; }
 
   /* scroll reveal */
   .reveal { opacity: 0; transform: translateY(26px); transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1); }
@@ -54,6 +64,24 @@
   .hero h1 { font-size: clamp(48px, 8vw, 96px); font-weight: 900; letter-spacing: -0.03em; line-height: 0.95; margin: 18px 0 10px; }
   .hero .sub { font-size: 20px; font-weight: 600; color: var(--muted); }
   .hero .tagline { font-size: 17px; line-height: 1.6; color: var(--muted); max-width: 640px; margin: 22px 0 28px; }
+  .hero .title-line { font-size: 19px; font-weight: 700; color: var(--ink); margin: 16px 0 0; }
+  .proof-strip { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 24px; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  .proof-cell { padding: 16px 18px; border-left: 1px solid var(--line); }
+  .proof-cell:first-child { border-left: none; }
+  .proof-cell .num { font-size: 32px; font-weight: 900; letter-spacing: -0.02em; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .proof-cell .cap { font-size: 13px; color: var(--muted); margin-top: 4px; line-height: 1.45; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { display: inline-block; font-size: 13.5px; font-weight: 700; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel2); }
+  .demo-table { width: 100%; border-collapse: collapse; font-size: 14.5px; margin-top: 16px; }
+  .demo-table th { text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  .demo-table td { padding: 10px; border-bottom: 1px solid var(--line); }
+  .demo-table tr:last-child td { border-bottom: none; }
+  .status { display: inline-block; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 999px; }
+  .status.on-track { background: rgba(34, 197, 94, 0.15); color: #4ade80; }
+  .status.at-risk { background: rgba(234, 179, 8, 0.15); color: #facc15; }
+  .status.delayed { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+  /* phone section menu (max-width 900px only) */
+  .phone-menu { display: none; }
   .hero .btns { display: flex; gap: 12px; flex-wrap: wrap; }
   .btn { display: inline-block; padding: 12px 20px; border-radius: 999px; font-size: 14px; font-weight: 700; text-decoration: none; border: 1px solid #3f3f46; color: var(--ink); transition: border-color 0.15s, background 0.15s, transform 0.15s; }
   .btn:hover { border-color: var(--accent); transform: translateY(-1px); }
@@ -110,15 +138,6 @@
   .demo-controls button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
   .demo-panel { font-size: 15px; line-height: 1.65; }
   .demo-panel .big { font-size: 26px; font-weight: 800; letter-spacing: -0.01em; }
-  .flow { display: flex; gap: 0; align-items: stretch; margin-top: 6px; flex-wrap: wrap; }
-  .flow-step { flex: 1; min-width: 120px; padding: 16px 12px; border: 1px solid var(--line); border-left: none; font-size: 13.5px; font-weight: 600; text-align: center; cursor: pointer; transition: background 0.2s, border-color 0.2s; background: transparent; color: var(--ink); font-family: inherit; }
-  .flow-step:first-child { border-left: 1px solid var(--line); border-radius: 10px 0 0 10px; }
-  .flow-step:last-child { border-radius: 0 10px 10px 0; }
-  .flow-step:hover { background: var(--panel2); }
-  .flow-step.active { background: rgba(59, 130, 246, 0.14); border-color: rgba(59, 130, 246, 0.6); }
-  .flow-step .arrow { display: block; color: var(--accent); font-size: 18px; }
-  .flow-detail { margin-top: 14px; font-size: 14.5px; line-height: 1.6; color: var(--muted); min-height: 44px; }
-  .flow-detail b { color: var(--ink); }
 
   /* projects */
   .proj-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 28px; }
@@ -199,7 +218,8 @@
   .res-pages { display: flex; gap: 6px; }
   .res-pages button { font: inherit; font-size: 13px; font-weight: 700; width: 30px; height: 30px; border-radius: 8px; border: 1px solid #3f3f46; background: transparent; color: var(--ink); cursor: pointer; }
   .res-pages button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .res-print { margin-left: auto; font: inherit; font-size: 13px; font-weight: 700; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--accent); background: transparent; color: var(--accent); cursor: pointer; transition: background 0.15s, color 0.15s; }
+  .res-print { margin-left: auto; font: inherit; font-size: 13px; font-weight: 700; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--accent); background: transparent; color: var(--accent); cursor: pointer; transition: background 0.15s, color 0.15s; text-decoration: none; }
+  .res-print + .res-print { margin-left: 0; }
   .res-print:hover { background: var(--accent); color: #fff; }
   .res-page { display: none; border-radius: 0 0 14px 14px; }
   .res-page.active { display: block; }
@@ -261,19 +281,28 @@
     .stats { grid-template-columns: repeat(3, 1fr); }
     .stat:nth-child(4) { border-left: none; }
     .stat:nth-child(n+4) { border-top: 1px solid var(--line); }
+    .phone-menu { display: flex; position: sticky; top: 56px; z-index: 45; gap: 6px; overflow-x: auto; padding: 10px 12px; background: rgba(14, 14, 14, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); scrollbar-width: none; }
+    .phone-menu::-webkit-scrollbar { display: none; }
+    .phone-menu a { flex: none; color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 700; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--line); }
+    .phone-menu a:hover { color: var(--ink); border-color: var(--accent); }
+    .route .city, .route .clock { display: none; }
+    .proof-strip { grid-template-columns: 1fr; }
+    .proof-cell { border-left: none; border-top: 1px solid var(--line); }
+    .proof-cell:first-child { border-top: none; }
     .map-table { grid-template-columns: 1fr; }
     .map-cell { border-left: none; border-top: 1px solid var(--line); }
     .map-cell:first-child { border-top: none; }
   }
   @media (prefers-reduced-motion: reduce) {
     .reveal { opacity: 1; transform: none; transition: none; }
-    .hero .anim { opacity: 1; animation: none; }
+    .anim { opacity: 1; animation: none; }
     .route .arc { animation: none; }
     html { scroll-behavior: auto; }
   }
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 <header class="topbar">
   <a class="brand" href="../">MARCIN FRACZ</a>
   <nav>
@@ -287,6 +316,16 @@
   <a class="back" href="../">Back to desktop ↗</a>
 </header>
 
+<nav class="phone-menu" aria-label="Sections">
+  <a href="#top">Top</a>
+  <a href="#work">Work</a>
+  <a href="#projects">Projects</a>
+  <a href="#wins">Wins</a>
+  <a href="#resume">Resume</a>
+  <a href="#timeline">Timeline</a>
+  <a href="#contact">Contact</a>
+</nav>
+
 <nav class="rail" id="rail">
   <a href="#top" data-sec="top">Top</a>
   <a href="#work" data-sec="work">Work</a>
@@ -298,9 +337,15 @@
 </nav>
 
 <main id="top">
-  <div class="wrap">
+  <div class="wrap" id="main" tabindex="-1">
 <section class="hero">
       <span class="label anim a1">Work Showcase</span>
+      <p class="title-line anim a2">Automotive product &amp; software strategy leader · GM · SAIC-GM Shanghai</p>
+      <div class="proof-strip anim a2">
+        <div class="proof-cell"><div class="num">$167M</div><div class="cap">L2++ ADAS development approved</div></div>
+        <div class="proof-cell"><div class="num">8</div><div class="cap">export regions with OnStar</div></div>
+        <div class="proof-cell"><div class="num">3</div><div class="cap">nameplates launched</div></div>
+      </div>
       <h1 class="statement anim a2">TWENTY-THREE YEARS.<br><span class="accent">TWO MARKETS.</span> ONE PLAYBOOK.</h1>
       <p class="tagline anim a3">Strategist transforming global software and AI ecosystems with high-velocity, cross-border execution. Twenty-three years in automotive, from powertrain engineering to software strategy in Shanghai.</p>
       <div class="btns anim a4">
@@ -406,7 +451,7 @@
 
           <circle class="node" cx="225" cy="232" r="4"/>
           <text class="city" x="225" y="256" text-anchor="middle" font-size="12">MEXICO CITY</text>
-          <text class="clock" x="475" y="36" text-anchor="middle">12 HOURS APART · ONE WORKING DAY</text>
+          <text class="clock" x="475" y="36" text-anchor="middle">HALF A WORLD APART · ONE WORKING DAY</text>
         </svg>
 
         <div class="map-table">
@@ -414,13 +459,13 @@
           <div class="map-cell"><div class="mc-city">SHANGHAI · China</div><div class="mc-sub">3 years leading software strategy for SAIC-GM, 2022–2025.</div></div>
           <div class="map-cell"><div class="mc-city">MEXICO CITY · Mexico</div><div class="mc-sub">The third clock on the desktop — the region in between.</div></div>
         </div>
-        <p class="route-note">Detroit to Shanghai, every working day — strategy set in Shanghai, aligned with Detroit. The three nameplates: Equinox, Encore GX, Trailblazer.</p>
+        <p class="route-note">Detroit to Shanghai, every working day — strategy set in Shanghai, aligned with Detroit.</p>
       </div>
 <div class="stats anim a6">
         <div class="stat"><div class="num">23</div><div class="cap">years in automotive, engineering to strategy</div></div>
         <div class="stat"><div class="num">3</div><div class="cap">nameplates — Equinox, Encore GX, Trailblazer</div></div>
         <div class="stat"><div class="num">2</div><div class="cap">markets — United States and China</div></div>
-        <div class="stat"><div class="num">11</div><div class="cap">years at General Motors, 2014–2025</div></div>
+        <div class="stat"><div class="num">11</div><div class="cap">years at General Motors, 2014–2026</div></div>
         <div class="stat"><div class="num">3</div><div class="cap">years in Shanghai, leading SAIC-GM software strategy</div></div>
         <div class="stat"><div class="num">6</div><div class="cap">roles, from the engineering floor to the strategy table</div></div>
       </div>
@@ -434,31 +479,46 @@
     <section id="work">
       <span class="label reveal">Work Index</span>
       <div class="index-grid">
-        <a class="index-card reveal d1" href="#w1"><span class="num">01</span><h3>Software Strategy — SAIC-GM</h3><p>Leading software strategy for a joint venture in Shanghai.</p></a>
-        <a class="index-card reveal d2" href="#w2"><span class="num">02</span><h3>Connected &amp; OTA Services</h3><p>Connected services and over-the-air updates at GM.</p></a>
-        <a class="index-card reveal d3" href="#w3"><span class="num">03</span><h3>Small SUVs — Trailblazer &amp; Encore GX</h3><p>Two small SUVs, from plan to launch.</p></a>
-        <a class="index-card reveal d4" href="#w4"><span class="num">04</span><h3>Equinox — Global Product Manager</h3><p>Compact and mid crossovers, led from the product side.</p></a>
+        <a class="index-card reveal d1" href="#w0"><span class="num">01</span><h3>OnStar International</h3><p>OnStar connectivity on China-sourced export vehicles, across 8 regions.</p></a>
+        <a class="index-card reveal d2" href="#w1"><span class="num">02</span><h3>Software Strategy — SAIC-GM</h3><p>Leading software strategy for a joint venture in Shanghai.</p></a>
+        <a class="index-card reveal d3" href="#w2"><span class="num">03</span><h3>Connected &amp; OTA Services</h3><p>Connected services and over-the-air updates at GM.</p></a>
+        <a class="index-card reveal d4" href="#w3"><span class="num">04</span><h3>Small SUVs — Trailblazer &amp; Encore GX</h3><p>Two small SUVs, from plan to launch.</p></a>
+        <a class="index-card reveal d4" href="#w4"><span class="num">05</span><h3>Equinox — Global Product Manager</h3><p>Compact and mid crossovers, led from the product side.</p></a>
+      </div>
+    </section>
+
+    <section class="work-sec reveal" id="w0">
+      <span class="label">01 · General Motors · 2025–2026</span>
+      <h2>OnStar International</h2>
+      <p class="one-line">Manager, Global Planning &amp; Joint Ventures — aligning OnStar, the vehicle brands and three Chinese JVs to bring OnStar connectivity to China-sourced export vehicles.</p>
+      <div class="blocks">
+        <div class="block reveal d1"><h4 class="label">Problem</h4><p>China-sourced export vehicles needed <b>OnStar connectivity in markets around the world</b> — and the work had to align OnStar US, Middle East and Mexico, the vehicle brands, and three Chinese JVs.</p></div>
+        <div class="block reveal d2"><h4 class="label">Built</h4><p>Aligned OnStar US, Middle East and Mexico, the vehicle brands and three Chinese JVs to deliver <b>OnStar connectivity on China-sourced export vehicles</b>.</p></div>
+        <div class="block reveal d3"><h4 class="label">Outcome</h4><p>OnStar connectivity delivered on China-sourced export vehicles <b>across 8 regions</b>.</p></div>
+      </div>
+      <div class="demo reveal">
+        <span class="label">The 8 export regions</span>
+        <div class="chips" style="margin-top:14px">
+          <span class="chip">Mexico</span>
+          <span class="chip">AMEO</span>
+          <span class="chip">South America</span>
+          <span class="chip">GMAP</span>
+          <span class="chip">South Korea</span>
+          <span class="chip">Israel</span>
+          <span class="chip">ANZ</span>
+          <span class="chip">Central Asia</span>
+        </div>
       </div>
     </section>
 
     <section class="work-sec reveal" id="w1">
-      <span class="label">01 · SAIC-GM, Shanghai · 2022–2025</span>
+      <span class="label">02 · SAIC-GM, Shanghai · 2022–2025</span>
       <h2>Software Strategy for a Joint Venture</h2>
       <p class="one-line">Deputy Director, Software Strategy at SAIC-GM — leading software strategy in China, with cross-border execution between Shanghai and the US.</p>
       <div class="blocks">
         <div class="block reveal d1"><h4 class="label">Problem</h4><p>A joint venture spanning two markets needed <b>one coherent software strategy</b>, built in China and aligned with a global organization.</p></div>
         <div class="block reveal d2"><h4 class="label">Built</h4><p>Led the software strategy function as Deputy Director, working across the JV and with GM globally — <b>strategy, alignment and execution</b>, not just slides.</p></div>
-        <div class="block reveal d3"><h4 class="label">Outcome</h4><p>Software strategy delivered across the joint venture, with the cross-border execution the role existed to do.</p></div>
-      </div>
-      <div class="demo reveal">
-        <span class="label">How the work ran</span>
-        <div class="flow" style="margin-top:14px" data-flow="w1">
-          <button class="flow-step active" data-detail="Listen in Shanghai first — what the market, the JV and the customer actually need.">Listen in Shanghai<span class="arrow">→</span></button>
-          <button class="flow-step" data-detail="Align with Detroit — one strategy both sides of the JV can execute.">Align with Detroit<span class="arrow">→</span></button>
-          <button class="flow-step" data-detail="Set the software strategy — priorities, sequencing, and what not to do.">Set the strategy<span class="arrow">→</span></button>
-          <button class="flow-step" data-detail="Execute across the JV — the strategy only counts once it ships.">Execute across the JV</button>
-        </div>
-        <div class="flow-detail" data-flow-detail="w1"><b>Listen in Shanghai.</b> Listen in Shanghai first — what the market, the JV and the customer actually need.</div>
+        <div class="block reveal d3"><h4 class="label">Outcome</h4><p>My China ADAS market research and pitch deck supported GM's approval of <b>$167M for L2++ ADAS development</b>. The work covered current and next-generation Cadillacs, redefining luxury for young Chinese buyers who expect experiences, technology and autonomy.</p></div>
       </div>
       <div class="demo reveal">
         <span class="label">Two markets, one day</span>
@@ -473,7 +533,7 @@
     </section>
 
     <section class="work-sec reveal" id="w2">
-      <span class="label">02 · General Motors · 2020–2022</span>
+      <span class="label">03 · General Motors · 2020–2022</span>
       <h2>Connected &amp; OTA Services</h2>
       <p class="one-line">Business Strategy Manager for Connected &amp; OTA Services — the strategy behind the services that keep cars connected and updated after they leave the factory.</p>
       <div class="blocks">
@@ -481,21 +541,10 @@
         <div class="block reveal d2"><h4 class="label">Built</h4><p>Business strategy for connected services and over-the-air updates — <b>what to offer, how to price it, how it ships</b>.</p></div>
         <div class="block reveal d3"><h4 class="label">Outcome</h4><p>A connected-services strategy that treated the car as a platform, not a one-time sale.</p></div>
       </div>
-      <div class="demo reveal">
-        <span class="label">How an update reaches the car</span>
-        <div class="flow" style="margin-top:14px" data-flow="w2">
-          <button class="flow-step active" data-detail="A new feature or fix is ready — the starting point of the whole loop.">Update ready<span class="arrow">→</span></button>
-          <button class="flow-step" data-detail="Sent to the car over the air, no dealer visit, no USB stick.">Delivered over the air<span class="arrow">→</span></button>
-          <button class="flow-step" data-detail="Installed in the vehicle, on the customer's schedule.">Installed in the vehicle<span class="arrow">→</span></button>
-          <button class="flow-step" data-detail="Confirmed and live — and the data comes back for the next update.">Confirmed &amp; live</button>
-        </div>
-        <div class="flow-detail" data-flow-detail="w2"><b>Update ready.</b> A new feature or fix is ready — the starting point of the whole loop.</div>
-        <p class="demo-note">The OTA loop, as a concept — the strategy work was deciding what flows through it and why.</p>
-      </div>
     </section>
 
     <section class="work-sec reveal" id="w3">
-      <span class="label">03 · General Motors · 2018–2020</span>
+      <span class="label">04 · General Motors · 2018–2020</span>
       <h2>Trailblazer &amp; Encore GX</h2>
       <p class="one-line">Product Manager for the Buick Encore GX and Chevrolet Trailblazer — small SUVs, from plan to launch.</p>
       <div class="blocks">
@@ -504,28 +553,17 @@
         <div class="block reveal d3"><h4 class="label">Outcome</h4><p>Both SUVs launched and on the road — two nameplates that are still selling today.</p></div>
       </div>
       <div class="demo reveal">
-        <span class="label">How a launch ran</span>
-        <div class="flow" style="margin-top:14px" data-flow="w3">
-          <button class="flow-step active" data-detail="The product plan — what the SUV is, who it is for, and why it wins.">Plan<span class="arrow">→</span></button>
-          <button class="flow-step" data-detail="Positioning — how each nameplate stands apart in a crowded segment.">Position<span class="arrow">→</span></button>
-          <button class="flow-step" data-detail="Pricing logic — where each one sits, and what the customer gets for it.">Price<span class="arrow">→</span></button>
-          <button class="flow-step" data-detail="Go-to-market — the launch itself, and the SUVs on the road.">Launch</button>
-        </div>
-        <div class="flow-detail" data-flow-detail="w3"><b>Plan.</b> The product plan — what the SUV is, who it is for, and why it wins.</div>
-      </div>
-      <div class="demo reveal">
         <span class="label">The nameplates</span>
         <div class="demo-controls" style="margin-top:14px">
           <button class="active" data-model="trailblazer">Chevrolet Trailblazer</button>
           <button data-model="encore">Buick Encore GX</button>
         </div>
         <div class="demo-panel" id="model-panel"></div>
-        <p class="demo-note">Role facts from the work record — no sales figures claimed here.</p>
       </div>
     </section>
 
     <section class="work-sec reveal" id="w4">
-      <span class="label">04 · General Motors · 2014–2018</span>
+      <span class="label">05 · General Motors · 2014–2018</span>
       <h2>Equinox — Global Product Manager</h2>
       <p class="one-line">Global Product Manager for compact and mid crossovers — the Chevrolet Equinox, one of GM's highest-volume nameplates.</p>
       <div class="blocks">
@@ -533,15 +571,37 @@
         <div class="block reveal d2"><h4 class="label">Built</h4><p>Global product management for the Equinox line — <b>product planning across markets</b>, from engineering roots into the product seat.</p></div>
         <div class="block reveal d3"><h4 class="label">Outcome</h4><p>Four years leading product for a flagship crossover, and the step from engineering into product leadership.</p></div>
       </div>
+    </section>
+
+    <section class="work-sec reveal" id="w5">
+      <span class="label">06 · AI Builder · Now</span>
+      <h2>Marcin Hub, rebuilt solo with AI</h2>
+      <p class="one-line">A vehicle-program portfolio tool — rebuilt solo with AI. The same tool once took a 7-developer team and about $3M a year to run.</p>
+      <div class="blocks">
+        <div class="block reveal d1"><h4 class="label">Problem</h4><p>A vehicle-program portfolio tool that once took <b>a 7-developer team and about $3M a year</b> to run.</p></div>
+        <div class="block reveal d2"><h4 class="label">Built</h4><p>Rebuilt it <b>solo with AI</b> — about 240k Copilot credits over about 5 months.</p></div>
+        <div class="block reveal d3"><h4 class="label">Outcome</h4><p>A working vehicle-program portfolio tool, <b>rebuilt by one person with AI</b>.</p></div>
+      </div>
       <div class="demo reveal">
-        <span class="label">How the product seat worked</span>
-        <div class="flow" style="margin-top:14px" data-flow="w4">
-          <button class="flow-step active" data-detail="The product plan — what the crossover needs to be, in every market it sells in.">Product plan<span class="arrow">→</span></button>
-          <button class="flow-step" data-detail="Decisions that hold up globally — one product, many markets.">Cross-market calls<span class="arrow">→</span></button>
-          <button class="flow-step" data-detail="Launch — the plan becomes a car on the road.">Launch<span class="arrow">→</span></button>
-          <button class="flow-step" data-detail="Next model year — the loop starts again, with what the market taught us.">Next model year</button>
+        <span class="label">Try it — a vehicle-program portfolio, demo data</span>
+        <div class="demo-controls" style="margin-top:14px">
+          <button class="active" data-prog-filter="all">All</button>
+          <button data-prog-filter="on-track">On track</button>
+          <button data-prog-filter="at-risk">At risk</button>
+          <button data-prog-filter="delayed">Delayed</button>
         </div>
-        <div class="flow-detail" data-flow-detail="w4"><b>Product plan.</b> The product plan — what the crossover needs to be, in every market it sells in.</div>
+        <table class="demo-table">
+          <thead><tr><th>Program</th><th>Segment</th><th>Status</th><th>Next milestone</th></tr></thead>
+          <tbody>
+            <tr data-status="on-track"><td>Atlas</td><td>Midsize SUV</td><td><span class="status on-track">On track</span></td><td>Design freeze</td></tr>
+            <tr data-status="on-track"><td>Beacon</td><td>Compact SUV</td><td><span class="status on-track">On track</span></td><td>Prototype build</td></tr>
+            <tr data-status="at-risk"><td>Canyon</td><td>Pickup</td><td><span class="status at-risk">At risk</span></td><td>Supplier review</td></tr>
+            <tr data-status="at-risk"><td>Delta</td><td>Sedan</td><td><span class="status at-risk">At risk</span></td><td>Cost review</td></tr>
+            <tr data-status="delayed"><td>Ember</td><td>Electric SUV</td><td><span class="status delayed">Delayed</span></td><td>Battery validation</td></tr>
+            <tr data-status="delayed"><td>Frontier</td><td>Full-size SUV</td><td><span class="status delayed">Delayed</span></td><td>Crash testing</td></tr>
+          </tbody>
+        </table>
+        <p class="demo-note">Demo data — invented for this page, not real GM data.</p>
       </div>
     </section>
 
@@ -549,7 +609,7 @@
       <span class="label reveal">Projects</span>
       <h2 class="reveal" style="font-size:clamp(30px,4.5vw,44px);font-weight:900;letter-spacing:-0.02em;margin:12px 0 8px">What I'm building now</h2>
       <div class="proj-grid">
-        <div class="proj reveal d1"><span class="tag">Ongoing</span><h3>Marcin Hub</h3><p>AI-built portfolio tools — small, useful software built with AI, shipped fast and iterated in the open.</p></div>
+        <div class="proj reveal d1"><span class="tag">Ongoing</span><h3>Marcin Hub</h3><p>A vehicle-program portfolio tool, rebuilt solo with AI — shipped fast and iterated in the open.</p></div>
         <div class="proj reveal d2"><span class="tag">Open source</span><h3>OpenAutoLink</h3><p>Open-source car connectivity project — connecting what cars already know to the tools around them.</p></div>
         <div class="proj reveal d3"><span class="tag">Hands-on</span><h3>3D Prints</h3><p>Printed parts and prototypes — from a sketch to a physical object on the desk.</p></div>
       </div>
@@ -558,21 +618,20 @@
     <section class="wins reveal" id="wins">
       <span class="label">Wins</span>
       <h2>The numbers that hold up</h2>
-      <p class="muted" style="color:#57534e">Only figures from the actual record. No estimates, no borrowed metrics.</p>
       <div class="acc">
-        <div class="acc-row"><button class="acc-head"><span class="fig">23</span><span class="ttl">Years in automotive</span><span class="pm">+</span></button><div class="acc-body"><div class="acc-body-inner">From engineering in 2003 to software strategy in 2025 — powertrain, interiors, product, connected services, and global strategy.</div></div></div>
-        <div class="acc-row"><button class="acc-head"><span class="fig">3</span><span class="ttl">Nameplates led</span><span class="pm">+</span></button><div class="acc-body"><div class="acc-body-inner">Chevrolet Equinox, Buick Encore GX, Chevrolet Trailblazer — product management and product marketing across all three.</div></div></div>
-        <div class="acc-row"><button class="acc-head"><span class="fig">2</span><span class="ttl">Markets worked in</span><span class="pm">+</span></button><div class="acc-body"><div class="acc-body-inner">United States and China — including three years based in Shanghai leading software strategy for SAIC-GM.</div></div></div>
-        <div class="acc-row"><button class="acc-head"><span class="fig">MBA</span><span class="ttl">Michigan Ross, 2014</span><span class="pm">+</span></button><div class="acc-body"><div class="acc-body-inner">Master of Business Administration, Stephen M. Ross School of Business, University of Michigan.</div></div></div>
-        <div class="acc-row"><button class="acc-head"><span class="fig">BSME</span><span class="ttl">Kettering, 2007 — cum laude</span><span class="pm">+</span></button><div class="acc-body"><div class="acc-body-inner">Bachelor of Science in Mechanical Engineering, Kettering University, graduated cum laude.</div></div></div>
-        <div class="acc-row"><button class="acc-head"><span class="fig">500+</span><span class="ttl">LinkedIn connections</span><span class="pm">+</span></button><div class="acc-body"><div class="acc-body-inner">A network built across GM, SAIC-GM, and the wider automotive and tech community.</div></div></div>
+        <div class="acc-row"><button class="acc-head"><span class="fig">$167M</span><span class="ttl">L2++ ADAS development approved</span><span class="pm">+</span></button><div class="acc-body"><div class="acc-body-inner">China market research and pitch deck supported GM's approval of $167M for L2++ ADAS development.</div></div></div>
+        <div class="acc-row"><button class="acc-head"><span class="fig">8</span><span class="ttl">Export regions with OnStar</span><span class="pm">+</span></button><div class="acc-body"><div class="acc-body-inner">OnStar connectivity delivered on China-sourced export vehicles across Mexico, AMEO, South America, GMAP, South Korea, Israel, ANZ and Central Asia.</div></div></div>
+        <div class="acc-row"><button class="acc-head"><span class="fig">3</span><span class="ttl">Nameplates launched</span><span class="pm">+</span></button><div class="acc-body"><div class="acc-body-inner">Chevrolet Equinox, Buick Encore GX, Chevrolet Trailblazer — product management and product marketing across all three.</div></div></div>
+        <div class="acc-row"><button class="acc-head"><span class="fig">3 years</span><span class="ttl">In Shanghai, leading SAIC-GM software strategy</span><span class="pm">+</span></button><div class="acc-body"><div class="acc-body-inner">Deputy Director, Software Strategy at SAIC-GM, 2022–2025 — software strategy in China, cross-border execution.</div></div></div>
+        <div class="acc-row"><button class="acc-head"><span class="fig">7 → 1</span><span class="ttl">Rebuilt solo with AI</span><span class="pm">+</span></button><div class="acc-body"><div class="acc-body-inner">Rebuilt solo with AI a vehicle-program portfolio tool that once took a 7-developer team and about $3M a year to run — about 240k Copilot credits over about 5 months.</div></div></div>
+        <div class="acc-row"><button class="acc-head"><span class="fig">2</span><span class="ttl">Markets — United States and China</span><span class="pm">+</span></button><div class="acc-body"><div class="acc-body-inner">United States and China — including three years based in Shanghai leading software strategy for SAIC-GM.</div></div></div>
       </div>
     </section>
 
 <section id="resume">
       <span class="label reveal">Resume</span>
       <h2 class="reveal" style="font-size:clamp(30px,4.5vw,44px);font-weight:900;letter-spacing:-0.02em;margin:12px 0 8px">The record, on paper</h2>
-      <p class="muted reveal" style="font-size:16px;line-height:1.6;max-width:680px">A two-page resume, rebuilt from the work record. Click a numbered marker to jump to the work behind it.</p>
+      <p class="muted reveal" style="font-size:16px;line-height:1.6;max-width:680px">A two-page resume. Click a numbered marker to jump to the work behind it.</p>
       <div class="res-viewer reveal">
         <div class="res-toolbar">
           <span class="mono" id="res-page-label">RESUME · PAGE 1 / 2</span>
@@ -581,6 +640,7 @@
             <button data-res-page="2">2</button>
           </span>
           <button class="res-print" id="res-print">Print / Save as PDF</button>
+          <a class="res-print" href="../assets/resume.pdf" download>Download PDF</a>
         </div>
         <article class="resume-doc res-page active" data-page="1">
           <h3>Marcin Fracz</h3>
@@ -595,20 +655,20 @@
           <div class="res-sec">Summary</div>
           <p class="res-sum">Strategist transforming global software and AI ecosystems with high-velocity, cross-border execution. Twenty-three years in automotive, from powertrain engineering to software strategy in Shanghai. Exploring new leadership opportunities.</p>
           <div class="res-sec">Professional Experience</div>
-          <div class="res-role"><span class="yrs">2025</span><div><h4>Manager, Global Planning &amp; Joint Ventures, OnStar Product Marketing (International) — General Motors</h4><p>Global planning and OnStar product marketing.</p></div></div>
-          <div class="res-role"><span class="yrs">2022–2025</span><div><h4>Deputy Director, Software Strategy — SAIC-GM, Shanghai</h4><p>Software strategy in China, cross-border execution.</p></div><button class="res-anno" data-target="#w1" title="Software Strategy — SAIC-GM">02</button></div>
-          <div class="res-role"><span class="yrs">2020–2022</span><div><h4>Business Strategy Manager, Connected &amp; OTA Services — General Motors</h4><p>Connected services and over-the-air updates.</p></div><button class="res-anno" data-target="#w2" title="Connected &amp; OTA Services">03</button></div>
-          <div class="res-role"><span class="yrs">2018–2020</span><div><h4>Product Manager, Buick Encore GX and Chevrolet Trailblazer — General Motors</h4><p>Small SUVs, from plan to launch.</p></div><button class="res-anno" data-target="#w3" title="Trailblazer &amp; Encore GX">04</button></div>
+          <div class="res-role"><span class="yrs">2025–2026</span><div><h4>Manager, Global Planning &amp; Joint Ventures, OnStar Product Marketing (International) — General Motors</h4><p>Global planning and OnStar product marketing.</p></div><button class="res-anno" data-target="#w0" title="OnStar International">02</button></div>
+          <div class="res-role"><span class="yrs">2022–2025</span><div><h4>Deputy Director, Software Strategy — SAIC-GM, Shanghai</h4><p>Software strategy in China, cross-border execution.</p></div><button class="res-anno" data-target="#w1" title="Software Strategy — SAIC-GM">03</button></div>
+          <div class="res-role"><span class="yrs">2020–2022</span><div><h4>Business Strategy Manager, Connected &amp; OTA Services — General Motors</h4><p>Connected services and over-the-air updates.</p></div><button class="res-anno" data-target="#w2" title="Connected &amp; OTA Services">04</button></div>
+          <div class="res-role"><span class="yrs">2018–2020</span><div><h4>Product Manager, Buick Encore GX and Chevrolet Trailblazer — General Motors</h4><p>Small SUVs, from plan to launch.</p></div><button class="res-anno" data-target="#w3" title="Trailblazer &amp; Encore GX">05</button></div>
         </article>
         <article class="resume-doc res-page" data-page="2">
           <div class="res-sec" style="margin-top:0">Professional Experience, continued</div>
-          <div class="res-role"><span class="yrs">2014–2018</span><div><h4>Global Product Manager, compact / mid crossovers — General Motors</h4><p>Chevrolet Equinox.</p></div><button class="res-anno" data-target="#w4" title="Equinox — Global Product Manager">05</button></div>
+          <div class="res-role"><span class="yrs">2014–2018</span><div><h4>Global Product Manager, compact / mid crossovers — General Motors</h4><p>Chevrolet Equinox.</p></div><button class="res-anno" data-target="#w4" title="Equinox — Global Product Manager">06</button></div>
           <div class="res-role"><span class="yrs">2003–2014</span><div><h4>Engineering — Federal-Mogul, Chrysler, Johnson Controls</h4><p>Powertrain and vehicle interiors.</p></div></div>
-          <div class="res-sec">Education <button class="res-anno inline" data-target="#timeline" title="Timeline">06</button></div>
+          <div class="res-sec">Education <button class="res-anno inline" data-target="#timeline" title="Timeline">07</button></div>
           <div class="res-role"><span class="yrs">2014</span><div><h4>MBA — Michigan Ross, University of Michigan</h4><p>Master of Business Administration.</p></div></div>
           <div class="res-role"><span class="yrs">2007</span><div><h4>BSME, cum laude — Kettering University</h4><p>Bachelor of Science in Mechanical Engineering.</p></div></div>
           <div class="res-sec">Projects</div>
-          <div class="res-role"><span class="yrs">Now</span><div><h4>Marcin Hub · OpenAutoLink · 3D Prints</h4><p>AI-built portfolio tools, open-source car connectivity, and printed parts and prototypes.</p></div></div>
+          <div class="res-role"><span class="yrs">Now</span><div><h4>Marcin Hub · OpenAutoLink · 3D Prints</h4><p>AI-built vehicle-program portfolio, open-source car connectivity, and printed parts and prototypes.</p></div></div>
           <div class="res-sec">Skills</div>
           <p class="res-sum">Software strategy · Connected services &amp; OTA · Product management · AI building · Cross-border execution</p>
         </article>
@@ -625,7 +685,7 @@
         <div class="tl-item reveal"><div class="years">2018–2020</div><h3>Product Manager, Buick Encore GX and Chevrolet Trailblazer</h3><p class="co">General Motors</p><p>Small SUVs, from plan to launch.</p></div>
         <div class="tl-item reveal"><div class="years">2020–2022</div><h3>Business Strategy Manager, Connected &amp; OTA Services</h3><p class="co">General Motors</p><p>Connected services and over-the-air updates.</p></div>
         <div class="tl-item reveal"><div class="years">2022–2025</div><h3>Deputy Director, Software Strategy</h3><p class="co">SAIC-GM, Shanghai</p><p>Software strategy in China, cross-border execution.</p></div>
-        <div class="tl-item reveal"><div class="years">2025</div><h3>Manager, Global Planning &amp; Joint Ventures, OnStar Product Marketing (International)</h3><p class="co">General Motors</p><p>Global planning and OnStar product marketing.</p></div>
+        <div class="tl-item reveal"><div class="years">2025–2026</div><h3>Manager, Global Planning &amp; Joint Ventures, OnStar Product Marketing (International)</h3><p class="co">General Motors</p><p>Global planning and OnStar product marketing.</p></div>
         <div class="tl-item reveal"><div class="years">NOW</div><h3>Exploring new leadership opportunities</h3><p class="co">Director-level roles</p><p>Automotive strategy, product and AI. Building with AI in the meantime.</p></div>
       </div>
     </section>
@@ -646,7 +706,7 @@
 
     <footer>
       <span>Marcin Fracz · 2026</span>
-      <span>Built with plain HTML, CSS and JavaScript.</span>
+      <span>Built with AI, in plain HTML, CSS and JavaScript — no libraries, no frameworks, no build step.</span>
     </footer>
   </div>
 </main>
@@ -670,31 +730,6 @@
     revealEls.forEach(function (el) { io.observe(el); });
   } else {
     revealEls.forEach(function (el) { el.classList.add('in'); });
-  }
-
-  /* animated stat counters */
-  function countUp(el) {
-    var target = parseInt(el.getAttribute('data-count'), 10);
-    var start = null, dur = 1100;
-    function step(ts) {
-      if (!start) start = ts;
-      var p = Math.min((ts - start) / dur, 1);
-      var eased = 1 - Math.pow(1 - p, 3);
-      el.textContent = Math.round(target * eased);
-      if (p < 1) requestAnimationFrame(step);
-    }
-    requestAnimationFrame(step);
-  }
-  var counters = document.querySelectorAll('.stat .num[data-count]');
-  if ('IntersectionObserver' in window) {
-    var cio = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) {
-        if (en.isIntersecting) { countUp(en.target); cio.unobserve(en.target); }
-      });
-    }, { threshold: 0.4 });
-    counters.forEach(function (el) { cio.observe(el); });
-  } else {
-    counters.forEach(countUp);
   }
 
   /* hero live clocks (Detroit / Shanghai) */
@@ -724,22 +759,6 @@
         row.classList.add('open');
         body.style.maxHeight = body.scrollHeight + 'px';
       }
-    });
-  });
-
-  /* flow steps: click a step to see its detail */
-  document.querySelectorAll('[data-flow]').forEach(function (flow) {
-    var key = flow.getAttribute('data-flow');
-    var detail = document.querySelector('[data-flow-detail="' + key + '"]');
-    flow.querySelectorAll('.flow-step').forEach(function (step) {
-      step.addEventListener('click', function () {
-        flow.querySelectorAll('.flow-step').forEach(function (s) { s.classList.remove('active'); });
-        step.classList.add('active');
-        if (detail) {
-          var label = step.textContent.replace('→', '').trim();
-          detail.innerHTML = '<b>' + label + '.</b> ' + step.getAttribute('data-detail');
-        }
-      });
     });
   });
 
@@ -788,6 +807,17 @@
     });
   });
 
+
+  /* program portfolio demo (fake data): filter the table rows */
+  document.querySelectorAll('[data-prog-filter]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var f = b.getAttribute('data-prog-filter');
+      document.querySelectorAll('[data-prog-filter]').forEach(function (x) { x.classList.toggle('active', x === b); });
+      document.querySelectorAll('.demo-table tbody tr').forEach(function (row) {
+        row.style.display = (f === 'all' || row.getAttribute('data-status') === f) ? '' : 'none';
+      });
+    });
+  });
 
   /* resume viewer: page switcher, annotation jumps, print */
   var resPages = document.querySelectorAll('.res-page');
