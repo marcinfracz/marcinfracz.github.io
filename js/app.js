@@ -171,6 +171,7 @@
     var win = findWindow(name);
     if (!win) return;
     win.classList.remove("hidden-window", "minimised");
+    if (name === "browser") win.classList.add("maximised"); /* the browser opens fullscreen, so the showcase fills the screen */
     win.style.display = "";
     var dockBtn = document.querySelector('[data-dock="' + name + '"]');
     if (dockBtn) dockBtn.classList.remove("has-min");
@@ -505,7 +506,7 @@
     var img = el("wallpaper-img");
     if (img) img.src = art.type === "image" ? art.src : "";
     var framedImg = el("framed-art-img");
-    if (framedImg && art.type === "image") framedImg.src = art.src;
+    if (framedImg && art.type === "image") { framedImg.src = art.src; framedImg.alt = art.caption || art.label; }
     var cap = el("framed-art-caption");
     if (cap) cap.textContent = art.caption;
     var credit = el("wp-credit");
