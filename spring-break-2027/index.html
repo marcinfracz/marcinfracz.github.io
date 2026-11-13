@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spring Break 2027 — Detroit · Barcelona · London | Fracz Family Trip</title>
+<meta name="description" content="The Fracz family spring break, March 24 – April 1, 2027. Detroit to Barcelona to London and home, with every flight, hotel and time in one place.">
+<meta property="og:title" content="Spring Break 2027 — Barcelona &amp; London">
+<meta property="og:description" content="Detroit → Istanbul → Barcelona → London → home. March 24 – April 1, 2027. Every flight, hotel and time, in one place.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FAF6EF; --paper:#FFFDF8; --ink:#14213D; --ink-soft:#3D4A63; --muted:#6B7280;
+  --line:#E5DDCF; --blue:#2563EB; --blue-soft:#DBEAFE; --green:#2E7D5B; --green-soft:#D9EDE2;
+  --amber:#B45309; --amber-soft:#FEF3C7; --terra:#C96F4A; --terra-soft:#FBE9E0; --navy:#14213D;
+  --radius:16px; --shadow:0 10px 30px rgba(20,33,61,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--cream);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3,.serif{font-family:'Fraunces',Georgia,serif}
+a{color:var(--blue)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+/* ---------- top bar ---------- */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(250,246,239,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.topbar .wrap{display:flex;align-items:center;gap:16px;height:56px}
+.logo{font-family:'Fraunces',Georgia,serif;font-weight:700;font-size:18px;letter-spacing:.2px;white-space:nowrap}
+.logo span{color:var(--terra)}
+.topbar nav{display:flex;gap:2px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+.topbar nav a{text-decoration:none;color:var(--ink-soft);font-size:13.5px;font-weight:600;padding:8px 10px;border-radius:8px;white-space:nowrap}
+.topbar nav a:hover{background:#EFE8DA;color:var(--ink)}
+.pill-btn{border:1px solid var(--ink);background:var(--ink);color:#fff;font:600 13px 'Inter',sans-serif;padding:8px 14px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.pill-btn.ghost{background:transparent;color:var(--ink)}
+/* ---------- hero ---------- */
+.hero{background:linear-gradient(180deg,#14213D 0%,#1D3259 62%,#24406E 100%);color:#fff;border-radius:0 0 28px 28px;overflow:hidden}
+.hero .wrap{padding:52px 20px 40px}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:#F2B705}
+.hero h1{font-size:clamp(38px,6vw,64px);line-height:1.04;margin:12px 0 10px;letter-spacing:-.01em}
+.hero h1 em{color:#F2B705;font-style:normal}
+.hero p.sub{font-size:clamp(16px,2.4vw,19px);color:#D7DEEB;max-width:640px}
+.route-line{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:26px 0 8px;font-weight:700;font-size:15px}
+.route-line .city{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);padding:8px 14px;border-radius:999px}
+.route-line .city small{display:block;font-size:11px;font-weight:600;color:#B9C4D8;letter-spacing:.08em}
+.route-line .arrow{color:#F2B705;font-size:18px}
+.countdown{display:flex;gap:10px;margin-top:26px;flex-wrap:wrap}
+.cd{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:12px 16px;min-width:92px}
+.cd b{display:block;font-size:28px;line-height:1;font-variant-numeric:tabular-nums}
+.cd span{font-size:11.5px;color:#B9C4D8;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.cd-note{font-size:13px;color:#B9C4D8;margin-top:10px}
+.clocks{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:22px}
+.clock{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:12px 14px}
+.clock small{display:block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#B9C4D8}
+.clock b{font-size:21px;font-variant-numeric:tabular-nums}
+.clock span{font-size:12px;color:#B9C4D8}
+/* ---------- sections ---------- */
+section{padding:44px 0 8px}
+.sec-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+.sec-head h2{font-size:clamp(26px,4vw,34px);letter-spacing:-.01em}
+.sec-head .kicker{font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--terra)}
+.sec-sub{color:var(--muted);max-width:720px;margin-bottom:20px;font-size:15px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:20px}
+.stat{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px 14px;text-align:center}
+.stat b{display:block;font-family:'Fraunces',Georgia,serif;font-size:30px;line-height:1}
+.stat span{font-size:12px;color:var(--muted);font-weight:600}
+/* time toggle */
+.toggle{display:inline-flex;background:#EFE8DA;border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px}
+.toggle button{border:0;background:transparent;font:700 13px 'Inter',sans-serif;color:var(--ink-soft);padding:7px 14px;border-radius:999px;cursor:pointer}
+.toggle button.active{background:var(--ink);color:#fff}
+/* ---------- map ---------- */
+.map-card{padding:22px 22px 10px;overflow:hidden}
+.map-card svg{width:100%;height:auto;display:block}
+.map-legend{display:flex;gap:18px;flex-wrap:wrap;padding:6px 4px 16px;font-size:13px;color:var(--ink-soft)}
+.map-legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.city-detail{border-top:1px solid var(--line);padding:16px 6px 8px;font-size:15px}
+.city-detail h3{font-size:20px;margin-bottom:4px}
+.city-detail p{color:var(--ink-soft)}
+.city-detail .meta{font-size:13px;color:var(--muted);margin-top:6px}
+/* ---------- gantt ---------- */
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.filters button{border:1px solid var(--line);background:var(--paper);font:600 13.5px 'Inter',sans-serif;padding:8px 14px;border-radius:999px;cursor:pointer;color:var(--ink-soft)}
+.filters button.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.filters .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:0}
+.gantt{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;overflow-x:auto}
+.gantt-grid{display:grid;grid-template-columns:150px repeat(9,1fr);min-width:760px;gap:0}
+.g-head{font-size:12px;font-weight:700;color:var(--muted);text-align:center;padding:6px 2px;border-bottom:2px solid var(--line)}
+.g-head.today{background:#FFF7D6;border-radius:8px 8px 0 0}
+.g-label{font-size:13px;font-weight:600;padding:12px 8px 12px 0;border-bottom:1px solid #F0EADD;display:flex;align-items:center;gap:7px}
+.g-label .dot{width:10px;height:10px;border-radius:3px;flex:none}
+.g-cell{border-bottom:1px solid #F0EADD;position:relative;padding:10px 3px}
+.g-bar{position:absolute;top:50%;transform:translateY(-50%);height:26px;border-radius:7px;color:#fff;font-size:11.5px;font-weight:700;display:flex;align-items:center;padding:0 9px;white-space:nowrap;overflow:hidden;cursor:pointer;border:0;text-align:left}
+.g-bar:hover{filter:brightness(1.08)}
+.g-bar.flight{background:var(--blue)}
+.g-bar.hotel{background:var(--green)}
+.g-bar.layover{background:#D97706}
+.gantt.dim-flights .g-bar.flight,.gantt.dim-hotels .g-bar.hotel,.gantt.dim-layovers .g-bar.layover{opacity:.18}
+.gantt-note{font-size:13px;color:var(--muted);margin-top:12px}
+/* ---------- flights ---------- */
+.flights{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.flight{padding:20px}
+.flight .f-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.flight .airline{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--blue)}
+.flight h3{font-size:19px;margin:4px 0 2px}
+.flight .f-route{font-size:14px;color:var(--ink-soft);font-weight:600}
+.tag{display:inline-block;font-size:11.5px;font-weight:700;padding:4px 9px;border-radius:999px;background:var(--blue-soft);color:#1D4ED8;white-space:nowrap}
+.tag.green{background:var(--green-soft);color:#166534}
+.tag.amber{background:var(--amber-soft);color:#92400E}
+.f-times{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin:16px 0 10px;text-align:center}
+.f-times b{font-size:20px;font-variant-numeric:tabular-nums}
+.f-times small{display:block;font-size:12px;color:var(--muted);font-weight:600}
+.f-mid{font-size:12px;color:var(--muted);font-weight:700}
+.f-mid .line{height:2px;background:var(--line);margin:4px 0;position:relative}
+.f-mid .line:after{content:"✈";position:absolute;right:-4px;top:-11px;font-size:13px}
+.f-meta{border-top:1px solid var(--line);padding-top:12px;font-size:13.5px;color:var(--ink-soft);display:grid;grid-template-columns:1fr 1fr;gap:6px 14px}
+.f-meta b{color:var(--ink)}
+/* ---------- hotels ---------- */
+.hotels{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.hotel{padding:22px}
+.hotel .h-top{display:flex;justify-content:space-between;gap:10px}
+.hotel h3{font-size:21px}
+.hotel .addr{color:var(--ink-soft);font-size:14px;margin:4px 0 12px}
+.hotel .nights{font-size:13px;font-weight:700;color:var(--green)}
+.h-meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
+.h-meta div b{display:block;font-size:16px}
+.h-meta div span{font-size:12px;color:var(--muted);font-weight:600}
+.hotel .map-link{display:inline-block;margin-top:14px;font-size:13.5px;font-weight:700}
+.callout{border:1px solid #F0C9A8;background:#FFF7ED;border-radius:14px;padding:16px 18px;margin-top:14px;font-size:14.5px}
+.callout b{color:#9A3412}
+.callout p{color:#7C2D12}
+/* ---------- days ---------- */
+.days{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.day{padding:20px;position:relative}
+.day.travel{border-top:4px solid var(--blue)}
+.day.stay{border-top:4px solid var(--green)}
+.day .d-date{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--terra)}
+.day h3{font-size:19px;margin:4px 0 10px}
+.day ul{list-style:none}
+.day li{font-size:14px;color:var(--ink-soft);padding:7px 0 7px 22px;position:relative;border-top:1px dashed #EFE8DA}
+.day li:first-child{border-top:0}
+.day li:before{content:"";position:absolute;left:2px;top:14px;width:8px;height:8px;border-radius:50%;background:var(--blue)}
+.day li.hotel-ev:before{background:var(--green)}
+.day li.lay-ev:before{background:#D97706}
+.day li b{color:var(--ink)}
+.day .free{font-size:13.5px;color:var(--muted);font-style:italic;margin-top:10px}
+/* ---------- ideas / checklist ---------- */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ideas{padding:22px}
+.ideas h3{font-size:19px;margin-bottom:4px}
+.ideas p{font-size:14px;color:var(--muted);margin-bottom:12px}
+.ideas ul{list-style:none}
+.ideas li{font-size:14.5px;padding:8px 0;border-top:1px dashed #EFE8DA}
+.ideas li b{color:var(--ink)}
+.check{padding:22px}
+.check label{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;padding:9px 0;border-top:1px dashed #EFE8DA;cursor:pointer}
+.check label:first-of-type{border-top:0}
+.check input{width:18px;height:18px;margin-top:2px;accent-color:var(--green);flex:none}
+.check label.done span{text-decoration:line-through;color:var(--muted)}
+.check .progress{font-size:13px;color:var(--muted);font-weight:600;margin-top:10px}
+/* ---------- footer ---------- */
+footer{margin:48px 0 40px;text-align:center;color:var(--muted);font-size:13.5px}
+footer .serif{font-size:20px;color:var(--ink);margin-bottom:6px}
+.fact-strip{background:var(--navy);color:#D7DEEB;border-radius:18px;padding:22px;margin-top:36px}
+.fact-strip h3{color:#fff;font-size:21px;margin-bottom:8px}
+.fact-strip p{font-size:14.5px;max-width:720px}
+.fact-strip p b{color:#F2B705}
+@media(max-width:860px){
+  .stats{grid-template-columns:repeat(3,1fr)}
+  .clocks{grid-template-columns:repeat(2,1fr)}
+  .flights,.hotels,.two-col{grid-template-columns:1fr}
+  .days{grid-template-columns:1fr 1fr}
+}
+@media(max-width:560px){
+  .days{grid-template-columns:1fr}
+  .topbar nav{display:none}
+  .hero .wrap{padding-top:36px}
+}
+@media print{
+  .topbar,.filters,.toggle,.pill-btn{display:none!important}
+  body{background:#fff}
+  .card{box-shadow:none;break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="logo">Spring Break <span>2027</span></div>
+    <nav>
+      <a href="#route">Route</a><a href="#gantt">Gantt</a><a href="#flights">Flights</a>
+      <a href="#hotels">Hotels</a><a href="#days">Day by Day</a><a href="#ready">Ready</a>
+    </nav>
+    <button class="pill-btn" onclick="window.print()">Print / Save PDF</button>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Fracz Family · Spring Break · March 24 – April 1, 2027</div>
+    <h1>Detroit to Barcelona<br>to London, <em>and home.</em></h1>
+    <p class="sub">Tatiana planned it. This is the whole trip in one place — every flight, every hotel, every time, in local time and Detroit time.</p>
+    <div class="route-line" aria-label="Route">
+      <div class="city">Detroit<small>DTW · HOME</small></div><span class="arrow">→</span>
+      <div class="city">Istanbul<small>IST · LAYOVER</small></div><span class="arrow">→</span>
+      <div class="city">Barcelona<small>BCN · 3 NIGHTS</small></div><span class="arrow">→</span>
+      <div class="city">London<small>LGW · 3 NIGHTS</small></div><span class="arrow">→</span>
+      <div class="city">Barcelona<small>BCN · 1 NIGHT*</small></div><span class="arrow">→</span>
+      <div class="city">Detroit<small>DTW · HOME</small></div>
+    </div>
+    <div class="countdown" id="countdown" aria-label="Countdown to departure">
+      <div class="cd"><b id="cd-d">–</b><span>Days</span></div>
+      <div class="cd"><b id="cd-h">–</b><span>Hours</span></div>
+      <div class="cd"><b id="cd-m">–</b><span>Minutes</span></div>
+      <div class="cd"><b id="cd-s">–</b><span>Seconds</span></div>
+    </div>
+    <p class="cd-note">Until wheels up: Turkish Airlines TK206, Wed, Mar 24, 2027 at 9:05 PM Detroit time.</p>
+    <div class="clocks">
+      <div class="clock"><small>Detroit · EDT</small><b data-clock="America/Detroit">--:--</b><span data-date="America/Detroit"></span></div>
+      <div class="clock"><small>Istanbul · TRT</small><b data-clock="Europe/Istanbul">--:--</b><span data-date="Europe/Istanbul"></span></div>
+      <div class="clock"><small>Barcelona · CET/CEST</small><b data-clock="Europe/Madrid">--:--</b><span data-date="Europe/Madrid"></span></div>
+      <div class="clock"><small>London · GMT/BST</small><b data-clock="Europe/London">--:--</b><span data-date="Europe/London"></span></div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+
+  <div class="stats">
+    <div class="stat"><b>9</b><span>days away</span></div>
+    <div class="stat"><b>6</b><span>flights</span></div>
+    <div class="stat"><b>2</b><span>hotels · 6 nights</span></div>
+    <div class="stat"><b>4</b><span>cities</span></div>
+    <div class="stat"><b>2</b><span>Istanbul layovers</span></div>
+    <div class="stat"><b>1</b><span>booking ref*</span></div>
+  </div>
+  <p style="font-size:12.5px;color:var(--muted);margin-top:8px">* Vueling confirmation <b>QKDDQM</b> covers both Barcelona ↔ London flights. Turkish Airlines bookings show no confirmation in the itinerary Tatiana shared.</p>
+
+  <!-- ROUTE MAP -->
+  <section id="route">
+    <div class="sec-head"><span class="kicker">The Route</span><h2>One loop, four cities</h2></div>
+    <p class="sec-sub">Tap a city to see what happens there. The long way home goes through Istanbul both ways — that is the Turkish Airlines routing, and it is also why the layovers matter.</p>
+    <div class="card map-card">
+      <svg viewBox="0 0 1000 420" role="img" aria-label="Route map: Detroit to Istanbul to Barcelona to London to Barcelona to Istanbul to Detroit">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#C96F4A"/></marker>
+        </defs>
+        <rect x="0" y="0" width="1000" height="420" rx="14" fill="#EDF1F7"/>
+        <g fill="#D5DDE8" stroke="#fff" stroke-width="1.5">
+          <path d="M60 90 L250 60 L330 110 L300 190 L210 230 L120 200 L55 150 Z"/>
+          <path d="M430 60 L700 40 L820 90 L780 180 L620 210 L480 170 L430 110 Z"/>
+          <path d="M470 230 L640 220 L700 300 L560 360 L460 320 Z"/>
+        </g>
+        <g stroke="#C96F4A" stroke-width="2.5" fill="none" stroke-dasharray="7 6">
+          <path id="arc1" d="M185 150 Q 380 20 600 120"/>
+          <path id="arc2" d="M600 120 Q 560 200 545 235"/>
+          <path id="arc3" d="M545 235 Q 520 140 500 130"/>
+          <path id="arc4" d="M500 130 Q 560 200 545 235"/>
+          <path id="arc5" d="M545 235 Q 580 180 600 120"/>
+          <path id="arc6" d="M600 120 Q 400 20 185 150"/>
+        </g>
+        <g font-family="Inter,sans-serif" font-size="13" font-weight="700" fill="#14213D">
+          <circle cx="185" cy="150" r="9" fill="#14213D" stroke="#fff" stroke-width="3"/><text x="185" y="185" text-anchor="middle">Detroit · DTW</text>
+          <circle cx="600" cy="120" r="9" fill="#C96F4A" stroke="#fff" stroke-width="3"/><text x="600" y="92" text-anchor="middle">Istanbul · IST</text>
+          <circle cx="545" cy="235" r="9" fill="#2563EB" stroke="#fff" stroke-width="3"/><text x="545" y="268" text-anchor="middle">Barcelona · BCN</text>
+          <circle cx="500" cy="130" r="9" fill="#2E7D5B" stroke="#fff" stroke-width="3"/><text x="500" y="158" text-anchor="middle">London · LGW</text>
+        </g>
+        <g font-family="Inter,sans-serif" font-size="11.5" fill="#6B7280" font-weight="600">
+          <text x="390" y="62" text-anchor="middle">TK206 · Mar 24</text>
+          <text x="640" y="175" text-anchor="middle">TK1855 · Mar 25</text>
+          <text x="470" y="205" text-anchor="middle">VY7602 · Mar 28</text>
+          <text x="585" y="290" text-anchor="middle">VY7617 · Mar 31</text>
+          <text x="330" y="105" text-anchor="middle">TK205 · Apr 1</text>
+        </g>
+      </svg>
+      <div class="map-legend">
+        <span><i style="background:#14213D"></i>Detroit — home</span>
+        <span><i style="background:#C96F4A"></i>Istanbul — layover both ways</span>
+        <span><i style="background:#2563EB"></i>Barcelona — Mar 25–28</span>
+        <span><i style="background:#2E7D5B"></i>London — Mar 28–31</span>
+      </div>
+      <div class="city-detail" id="city-detail">
+        <h3>Detroit (DTW) — where it starts, and ends</h3>
+        <p>Depart Wed, Mar 24 at 9:05 PM on Turkish Airlines TK206. Land back home Thu, Apr 1 at 6:50 PM on TK205, after the second Istanbul layover.</p>
+        <p class="meta">Outbound: TK206 (Boeing 787-9) · Return: TK205 (Airbus A350-900)</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- GANTT -->
+  <section id="gantt">
+    <div class="sec-head"><span class="kicker">At a Glance</span><h2>The Gantt, upgraded</h2>
+      <span style="margin-left:auto" class="toggle" role="group" aria-label="Time display">
+        <button id="btn-local" class="active" onclick="setTimeMode('local')">Local time</button>
+        <button id="btn-detroit" onclick="setTimeMode('detroit')">Detroit time</button>
+      </span>
+    </div>
+    <p class="sec-sub">Tatiana's chart, made clickable. Filter it, hover a bar for the detail, tap a bar to jump to that day. Times below switch with the toggle above — local time is what the airport screens will show.</p>
+    <div class="filters" id="filters">
+      <button class="active" data-filter="all">All</button>
+      <button data-filter="flight"><span class="dot" style="background:#2563EB"></span>Flights</button>
+      <button data-filter="hotel"><span class="dot" style="background:#2E7D5B"></span>Hotel stays</button>
+      <button data-filter="layover"><span class="dot" style="background:#D97706"></span>Layovers</button>
+    </div>
+    <div class="card gantt" id="gantt-card">
+      <div class="gantt-grid">
+        <div></div>
+        <div class="g-head">Mar 24<br>Wed</div><div class="g-head">Mar 25<br>Thu</div><div class="g-head">Mar 26<br>Fri</div>
+        <div class="g-head">Mar 27<br>Sat</div><div class="g-head">Mar 28<br>Sun</div><div class="g-head">Mar 29<br>Mon</div>
+        <div class="g-head">Mar 30<br>Tue</div><div class="g-head">Mar 31<br>Wed</div><div class="g-head">Apr 01<br>Thu</div>
+
+        <div class="g-label"><span class="dot" style="background:#2563EB"></span>DTW → BCN</div>
+        <div class="g-cell" style="grid-column:2/4"><button class="g-bar flight" style="left:58%;right:0" data-goto="day-0324" title="TK206 DTW→IST, departs 9:05 PM Detroit · TK1855 IST→BCN, arrives 5:05 PM">TK206 · TK1855</button></div>
+
+        <div class="g-label"><span class="dot" style="background:#2E7D5B"></span>Barcelona stay</div>
+        <div class="g-cell" style="grid-column:3/6"><button class="g-bar hotel" style="left:4%;right:0" data-goto="day-0325" title="Amister Apartments Pelai, Pelai 11 — check-in Mar 25, 4:00 PM; check-out Mar 28, 11:00 AM">Amister Apartments Pelai</button></div>
+
+        <div class="g-label"><span class="dot" style="background:#2563EB"></span>BCN → LGW</div>
+        <div class="g-cell" style="grid-column:6/7"><button class="g-bar flight" style="left:12%;right:12%" data-goto="day-0328" title="Vueling 7602, 8:45–10:15 AM · Conf QKDDQM">VY7602</button></div>
+
+        <div class="g-label"><span class="dot" style="background:#2E7D5B"></span>London stay</div>
+        <div class="g-cell" style="grid-column:6/9"><button class="g-bar hotel" style="left:30%;right:0" data-goto="day-0328" title="Park Plaza Westminster Bridge, 200 Westminster Bridge Rd — check-in Mar 28, 3:00 PM; check-out Mar 31, 11:00 AM">Park Plaza Westminster Bridge</button></div>
+
+        <div class="g-label"><span class="dot" style="background:#2563EB"></span>LGW → BCN</div>
+        <div class="g-cell" style="grid-column:9/10"><button class="g-bar flight" style="left:30%;right:5%" data-goto="day-0331" title="Vueling 7617, 7:40–10:55 PM · Conf QKDDQM">VY7617</button></div>
+
+        <div class="g-label"><span class="dot" style="background:#2563EB"></span>BCN → DTW</div>
+        <div class="g-cell" style="grid-column:9/11"><button class="g-bar flight" style="left:55%;right:0" data-goto="day-0331" title="TK1852 BCN→IST 7:30 AM · TK205 IST→DTW, lands 6:50 PM Detroit">TK1852 · TK205</button></div>
+      </div>
+      <p class="gantt-note">Bars are drawn to the day, not the hour — the flight times are in the day-by-day section below. Europe springs forward on Sun, Mar 28, so Barcelona and London both shift that morning; the times on this page already account for it.</p>
+    </div>
+  </section>
+
+  <!-- FLIGHTS -->
+  <section id="flights">
+    <div class="sec-head"><span class="kicker">Flight Board</span><h2>Six flights, two airlines</h2></div>
+    <p class="sec-sub">Turkish Airlines carries the long haul both ways via Istanbul. Vueling covers the Barcelona ↔ London hop. Times switch with the Local / Detroit toggle above.</p>
+    <div class="flights">
+
+      <article class="card flight">
+        <div class="f-top"><div><div class="airline">Turkish Airlines · Boeing 787-9</div><h3>TK206</h3><div class="f-route">Detroit (DTW) → Istanbul (IST)</div></div><span class="tag">Overnight</span></div>
+        <div class="f-times">
+          <div><b class="t" data-l="9:05 PM" data-d="9:05 PM">9:05 PM</b><small>Wed, Mar 24 · Detroit</small></div>
+          <div class="f-mid">✈<div class="line"></div>overnight</div>
+          <div><b>Mar 25</b><small>Istanbul · arrives before the 2:15 PM layover</small></div>
+        </div>
+        <div class="f-meta"><span>Departs <b>9:05 PM EDT</b></span><span>Arrives <b>Istanbul, Thu Mar 25</b></span><span>Next: <b>1h 15m layover</b></span><span>Aircraft <b>Boeing 787-9</b></span></div>
+      </article>
+
+      <article class="card flight">
+        <div class="f-top"><div><div class="airline">Turkish Airlines · Airbus A330-300</div><h3>TK1855</h3><div class="f-route">Istanbul (IST) → Barcelona (BCN)</div></div><span class="tag">3h 35m</span></div>
+        <div class="f-times">
+          <div><b class="t" data-l="3:30 PM" data-d="8:30 AM">3:30 PM</b><small>Thu, Mar 25 · Istanbul (TRT)</small></div>
+          <div class="f-mid">✈<div class="line"></div>3h 35m</div>
+          <div><b class="t" data-l="5:05 PM" data-d="12:05 PM">5:05 PM</b><small>Thu, Mar 25 · Barcelona (CET)</small></div>
+        </div>
+        <div class="f-meta"><span>Departs <b>15:30 TRT</b></span><span>Arrives <b>17:05 CET</b></span><span>Then: <b>check in, Barcelona</b></span><span>Aircraft <b>Airbus A330-300</b></span></div>
+      </article>
+
+      <article class="card flight">
+        <div class="f-top"><div><div class="airline">Vueling · Confirmation QKDDQM</div><h3>VY7602</h3><div class="f-route">Barcelona (BCN) → London (LGW)</div></div><span class="tag green">2h 30m</span></div>
+        <div class="f-times">
+          <div><b class="t" data-l="8:45 AM" data-d="2:45 AM">8:45 AM</b><small>Sun, Mar 28 · Barcelona (CEST)</small></div>
+          <div class="f-mid">✈<div class="line"></div>2h 30m</div>
+          <div><b class="t" data-l="10:15 AM" data-d="5:15 AM">10:15 AM</b><small>Sun, Mar 28 · London (BST)</small></div>
+        </div>
+        <div class="f-meta"><span>Departs <b>08:45 CEST</b></span><span>Arrives <b>10:15 BST</b></span><span>Conf <b>QKDDQM</b></span><span>Then: <b>check in, London</b></span></div>
+      </article>
+
+      <article class="card flight">
+        <div class="f-top"><div><div class="airline">Vueling · Confirmation QKDDQM</div><h3>VY7617</h3><div class="f-route">London (LGW) → Barcelona (BCN)</div></div><span class="tag green">2h 15m</span></div>
+        <div class="f-times">
+          <div><b class="t" data-l="7:40 PM" data-d="2:40 PM">7:40 PM</b><small>Wed, Mar 31 · London (BST)</small></div>
+          <div class="f-mid">✈<div class="line"></div>2h 15m</div>
+          <div><b class="t" data-l="10:55 PM" data-d="4:55 PM">10:55 PM</b><small>Wed, Mar 31 · Barcelona (CEST)</small></div>
+        </div>
+        <div class="f-meta"><span>Departs <b>19:40 BST</b></span><span>Arrives <b>22:55 CEST</b></span><span>Conf <b>QKDDQM</b></span><span>Then: <b>overnight in Barcelona*</b></span></div>
+      </article>
+
+      <article class="card flight">
+        <div class="f-top"><div><div class="airline">Turkish Airlines · Airbus A321-231</div><h3>TK1852</h3><div class="f-route">Barcelona (BCN) → Istanbul (IST)</div></div><span class="tag">3h 40m</span></div>
+        <div class="f-times">
+          <div><b class="t" data-l="7:30 AM" data-d="1:30 AM">7:30 AM</b><small>Thu, Apr 1 · Barcelona (CEST)</small></div>
+          <div class="f-mid">✈<div class="line"></div>3h 40m</div>
+          <div><b class="t" data-l="12:10 PM" data-d="5:10 AM">12:10 PM</b><small>Thu, Apr 1 · Istanbul (TRT)</small></div>
+        </div>
+        <div class="f-meta"><span>Departs <b>07:30 CEST</b></span><span>Arrives <b>12:10 TRT</b></span><span>Next: <b>2h 40m layover</b></span><span>Aircraft <b>Airbus A321-231</b></span></div>
+      </article>
+
+      <article class="card flight">
+        <div class="f-top"><div><div class="airline">Turkish Airlines · Airbus A350-900</div><h3>TK205</h3><div class="f-route">Istanbul (IST) → Detroit (DTW)</div></div><span class="tag">11h 00m · Home</span></div>
+        <div class="f-times">
+          <div><b class="t" data-l="2:50 PM" data-d="7:50 AM">2:50 PM</b><small>Thu, Apr 1 · Istanbul (TRT)</small></div>
+          <div class="f-mid">✈<div class="line"></div>11h 00m</div>
+          <div><b class="t" data-l="6:50 PM" data-d="6:50 PM">6:50 PM</b><small>Thu, Apr 1 · Detroit (EDT)</small></div>
+        </div>
+        <div class="f-meta"><span>Departs <b>14:50 TRT</b></span><span>Arrives <b>18:50 EDT</b></span><span>Aircraft <b>Airbus A350-900</b></span><span>Welcome home <b>🏠</b></span></div>
+      </article>
+
+    </div>
+    <div class="card" style="margin-top:14px;padding:16px 20px;display:flex;gap:14px;flex-wrap:wrap;align-items:center">
+      <span class="tag amber">Layover 1 · Thu, Mar 25</span>
+      <span style="font-size:14.5px">Istanbul Airport, <b class="t" data-l="2:15 – 3:30 PM (TRT)" data-d="7:15 – 8:30 AM (Detroit)">2:15 – 3:30 PM (TRT)</b> · 1h 15m — tight, stay near the gate.</span>
+      <span class="tag amber">Layover 2 · Thu, Apr 1</span>
+      <span style="font-size:14.5px">Istanbul Airport, <b class="t" data-l="12:10 – 2:50 PM (TRT)" data-d="5:10 – 7:50 AM (Detroit)">12:10 – 2:50 PM (TRT)</b> · 2h 40m — room to breathe.</span>
+    </div>
+  </section>
+
+  <!-- HOTELS -->
+  <section id="hotels">
+    <div class="sec-head"><span class="kicker">Where You Sleep</span><h2>Two home bases</h2></div>
+    <p class="sec-sub">Three nights in Barcelona, three in London. Check-in and check-out in local time, with Detroit time in the toggle above.</p>
+    <div class="hotels">
+      <article class="card hotel">
+        <div class="h-top"><div><h3>Amister Apartments Pelai</h3><div class="addr">Pelai 11, Barcelona</div></div><span class="tag green">3 nights</span></div>
+        <p style="font-size:14.5px;color:var(--ink-soft)">Right in the old city, a short walk from Plaça de Catalunya. Home for the Barcelona half of the trip.</p>
+        <div class="h-meta">
+          <div><span>Check-in · Thu, Mar 25</span><b class="t" data-l="4:00 PM" data-d="11:00 AM">4:00 PM</b></div>
+          <div><span>Check-out · Sun, Mar 28</span><b class="t" data-l="11:00 AM" data-d="5:00 AM">11:00 AM</b></div>
+        </div>
+        <a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Amister+Apartments+Pelai+11+Barcelona" target="_blank" rel="noopener">Open in Google Maps →</a>
+      </article>
+      <article class="card hotel">
+        <div class="h-top"><div><h3>Park Plaza Westminster Bridge</h3><div class="addr">200 Westminster Bridge Rd, London</div></div><span class="tag green">3 nights</span></div>
+        <p style="font-size:14.5px;color:var(--ink-soft)">On the Thames by Westminster Bridge — Big Ben and the London Eye are effectively outside the door.</p>
+        <div class="h-meta">
+          <div><span>Check-in · Sun, Mar 28</span><b class="t" data-l="3:00 PM" data-d="10:00 AM">3:00 PM</b></div>
+          <div><span>Check-out · Wed, Mar 31</span><b class="t" data-l="11:00 AM" data-d="6:00 AM">11:00 AM</b></div>
+        </div>
+        <a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Park+Plaza+Westminster+Bridge+200+Westminster+Bridge+Rd+London" target="_blank" rel="noopener">Open in Google Maps →</a>
+      </article>
+    </div>
+    <div class="callout">
+      <b>One gap Tatiana's PDF doesn't cover — worth sorting before you go.</b>
+      <p style="margin-top:4px">You land back in Barcelona at 10:55 PM on Wed, Mar 31 and fly out at 7:30 AM on Thu, Apr 1. No hotel is listed for that night. Either a one-night stay near BCN airport, or a very early start — either way, it is the one loose end in an otherwise tight plan.</p>
+    </div>
+  </section>
+
+  <!-- DAY BY DAY -->
+  <section id="days">
+    <div class="sec-head"><span class="kicker">Day by Day</span><h2>Nine days, no guessing</h2></div>
+    <p class="sec-sub">Every day, in order. Free days are exactly that — nothing booked, nothing invented. The ideas at the bottom are just that: ideas.</p>
+    <div class="days">
+      <article class="card day travel" id="day-0324"><div class="d-date">Wed · Mar 24</div><h3> Wheels up from Detroit</h3>
+        <ul><li><b>9:05 PM</b> — Turkish Airlines TK206 departs DTW → Istanbul (Boeing 787-9)</li></ul>
+        <p class="free">Overnight flight. Sleep if you can — Barcelona starts the moment you land.</p></article>
+      <article class="card day travel" id="day-0325"><div class="d-date">Thu · Mar 25</div><h3>Through Istanbul to Barcelona</h3>
+        <ul>
+          <li class="lay-ev"><b>2:15 – 3:30 PM TRT</b> — Istanbul transfer, 1h 15m <span style="color:var(--muted)">(7:15 – 8:30 AM Detroit)</span></li>
+          <li><b>3:30 – 5:05 PM</b> — TK1855, Istanbul → Barcelona (A330-300)</li>
+          <li class="hotel-ev"><b>4:00 PM</b> — Check in, Amister Apartments Pelai, Pelai 11</li>
+        </ul><p class="free">First evening in Barcelona. Unpack, walk to Plaça de Catalunya, find dinner.</p></article>
+      <article class="card day stay" id="day-0326"><div class="d-date">Fri · Mar 26</div><h3>Barcelona — free day</h3>
+        <ul><li class="hotel-ev"><b>All day</b> — Amister Apartments Pelai</li></ul>
+        <p class="free">Nothing booked. The whole city is the plan.</p></article>
+      <article class="card day stay" id="day-0327"><div class="d-date">Sat · Mar 27</div><h3>Barcelona — free day</h3>
+        <ul><li class="hotel-ev"><b>All day</b> — Amister Apartments Pelai</li></ul>
+        <p class="free">Last full day in Barcelona. Save something good for it.</p></article>
+      <article class="card day travel" id="day-0328"><div class="d-date">Sun · Mar 28</div><h3>Barcelona → London</h3>
+        <ul>
+          <li class="hotel-ev"><b>11:00 AM</b> — Check out, Amister Apartments Pelai</li>
+          <li><b>8:45 – 10:15 AM</b> — Vueling 7602, Barcelona → London Gatwick · Conf QKDDQM</li>
+          <li class="hotel-ev"><b>3:00 PM</b> — Check in, Park Plaza Westminster Bridge</li>
+        </ul><p class="free">Europe springs forward today — clocks go ahead 1 hour in Barcelona and London. Times above already include it.</p></article>
+      <article class="card day stay" id="day-0329"><div class="d-date">Mon · Mar 29</div><h3>London — free day</h3>
+        <ul><li class="hotel-ev"><b>All day</b> — Park Plaza Westminster Bridge</li></ul>
+        <p class="free">Nothing booked. Westminster is outside the door.</p></article>
+      <article class="card day stay" id="day-0330"><div class="d-date">Tue · Mar 30</div><h3>London — free day</h3>
+        <ul><li class="hotel-ev"><b>All day</b> — Park Plaza Westminster Bridge</li></ul>
+        <p class="free">Last full day in London.</p></article>
+      <article class="card day travel" id="day-0331"><div class="d-date">Wed · Mar 31</div><h3>London → Barcelona, late</h3>
+        <ul>
+          <li class="hotel-ev"><b>11:00 AM</b> — Check out, Park Plaza Westminster Bridge</li>
+          <li><b>7:40 – 10:55 PM</b> — Vueling 7617, London Gatwick → Barcelona · Conf QKDDQM</li>
+        </ul><p class="free">Arrive Barcelona 10:55 PM. Early flight tomorrow — see the note in Hotels.</p></article>
+      <article class="card day travel" id="day-0401"><div class="d-date">Thu · Apr 1</div><h3>Home via Istanbul</h3>
+        <ul>
+          <li><b>7:30 AM – 12:10 PM</b> — TK1852, Barcelona → Istanbul (A321-231)</li>
+          <li class="lay-ev"><b>12:10 – 2:50 PM TRT</b> — Istanbul transfer, 2h 40m <span style="color:var(--muted)">(5:10 – 7:50 AM Detroit)</span></li>
+          <li><b>2:50 – 6:50 PM</b> — TK205, Istanbul → Detroit (A350-900)</li>
+        </ul><p class="free">Land DTW 6:50 PM Detroit time. Home for dinner.</p></article>
+    </div>
+  </section>
+
+  <!-- IDEAS + CHECKLIST -->
+  <section id="ready">
+    <div class="sec-head"><span class="kicker">Before You Go</span><h2>Fill the free days, pack the bags</h2></div>
+    <p class="sec-sub">The free days have no bookings in Tatiana's itinerary, so these are ideas, not plans — and a checklist that saves itself on this device.</p>
+    <div class="two-col">
+      <div class="card ideas">
+        <h3>🇪🇸 Barcelona ideas</h3>
+        <p>Ideas for Mar 26–27 — nothing booked yet.</p>
+        <ul>
+          <li><b>Sagrada Família</b> — book timed tickets ahead, it sells out</li>
+          <li><b>Gothic Quarter</b> — wander from Plaça de Catalunya, ten minutes from the apartment</li>
+          <li><b>Park Güell</b> — Gaudí, views, and a good long walk</li>
+          <li><b>La Boqueria</b> — lunch at the market on La Rambla</li>
+          <li><b>Barceloneta beach</b> — late March is jacket weather, but the walk is worth it</li>
+        </ul>
+        <h3 style="margin-top:18px">🇬🇧 London ideas</h3>
+        <p>Ideas for Mar 29–30 — nothing booked yet.</p>
+        <ul>
+          <li><b>Westminster &amp; Big Ben</b> — literally across the bridge from the hotel</li>
+          <li><b>London Eye</b> — next door; book a timed slot</li>
+          <li><b>Tower of London</b> — half a day, worth every minute</li>
+          <li><b>Borough Market</b> — lunch, then walk the South Bank back</li>
+          <li><b>Hyde Park &amp; Kensington</b> — an easy slow morning</li>
+        </ul>
+      </div>
+      <div class="card check">
+        <h3 style="font-size:19px;margin-bottom:4px">Pack &amp; prep checklist</h3>
+        <p style="font-size:14px;color:var(--muted);margin-bottom:8px">Tap to check off — it remembers on this device.</p>
+        <div id="checklist">
+          <label><input type="checkbox"><span>Passports — check expiry dates</span></label>
+          <label><input type="checkbox"><span>Vueling confirmation <b>QKDDQM</b> saved to phones</span></label>
+          <label><input type="checkbox"><span>Turkish Airlines bookings — save confirmations when they arrive</span></label>
+          <label><input type="checkbox"><span>Sort the Mar 31 overnight in Barcelona</span></label>
+          <label><input type="checkbox"><span>Travel insurance &amp; health cards</span></label>
+          <label><input type="checkbox"><span>Phone chargers + EU/UK plug adapters (both!)</span></label>
+          <label><input type="checkbox"><span>Download offline maps for Barcelona &amp; London</span></label>
+          <label><input type="checkbox"><span>Layers — Barcelona ~60s°F, London ~50s°F in late March</span></label>
+          <label><input type="checkbox"><span>Notify bank / enable travel notifications</span></label>
+          <label><input type="checkbox"><span>House, mail &amp; rides to DTW sorted</span></label>
+        </div>
+        <p class="progress" id="check-progress">0 of 10 done</p>
+      </div>
+    </div>
+
+    <div class="fact-strip">
+      <h3 class="serif">Why this beats the PDF</h3>
+      <p>The PDF Tatiana's AI made was a good chart. This one <b>counts down</b>, shows <b>live clocks</b> in all four cities, lets you flip every time between <b>local and Detroit time</b>, links the hotels to maps, flags the <b>one unbooked night (Mar 31)</b>, and keeps a <b>checklist</b> that remembers what is done. Same trip, same times — just impossible to misread at 2:45 in the morning in an airport.</p>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="serif">Spring Break 2027 · Detroit → Barcelona → London → Detroit</div>
+  <p>Planned by Tatiana. Built for the Fracz family by Muse.<br>
+  All flights and hotels are from the itinerary Tatiana shared. Free days have no bookings — the city ideas are suggestions, not reservations.<br>
+  Vueling confirmation QKDDQM · Turkish Airlines confirmations not listed in the shared itinerary.</p>
+</footer>
+
+<script>
+/* Countdown to TK206 departure: Mar 24, 2027, 21:05 EDT (UTC-4) = Mar 25, 01:05 UTC */
+var DEP = Date.UTC(2027, 2, 25, 1, 5, 0);
+function tick(){
+  var now = Date.now(), diff = DEP - now;
+  if (diff <= 0){ document.getElementById('cd-d').textContent = '0'; return; }
+  var d = Math.floor(diff/864e5), h = Math.floor(diff/36e5)%24, m = Math.floor(diff/6e4)%60, s = Math.floor(diff/1e3)%60;
+  document.getElementById('cd-d').textContent = d;
+  document.getElementById('cd-h').textContent = String(h).padStart(2,'0');
+  document.getElementById('cd-m').textContent = String(m).padStart(2,'0');
+  document.getElementById('cd-s').textContent = String(s).padStart(2,'0');
+  document.querySelectorAll('[data-clock]').forEach(function(el){
+    try{
+      el.textContent = new Intl.DateTimeFormat('en-US',{hour:'numeric',minute:'2-digit',hour12:true,timeZone:el.getAttribute('data-clock')}).format(new Date());
+    }catch(e){}
+  });
+  document.querySelectorAll('[data-date]').forEach(function(el){
+    try{
+      el.textContent = ' · ' + new Intl.DateTimeFormat('en-US',{weekday:'short',month:'short',day:'numeric',timeZone:el.getAttribute('data-date')}).format(new Date());
+    }catch(e){}
+  });
+}
+tick(); setInterval(tick, 1000);
+
+/* Local / Detroit time toggle */
+function setTimeMode(mode){
+  document.getElementById('btn-local').classList.toggle('active', mode==='local');
+  document.getElementById('btn-detroit').classList.toggle('active', mode==='detroit');
+  document.querySelectorAll('.t').forEach(function(el){
+    el.textContent = mode==='local' ? el.getAttribute('data-l') : el.getAttribute('data-d');
+  });
+  try{ localStorage.setItem('sb27-time', mode); }catch(e){}
+}
+try{ var saved = localStorage.getItem('sb27-time'); if(saved==='detroit') setTimeMode('detroit'); }catch(e){}
+
+/* Gantt filters */
+document.querySelectorAll('#filters button').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('#filters button').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    var f = btn.getAttribute('data-filter');
+    var card = document.getElementById('gantt-card');
+    card.classList.remove('dim-flights','dim-hotels','dim-layovers');
+    if(f==='flight') card.classList.add('dim-hotels','dim-layovers');
+    if(f==='hotel') card.classList.add('dim-flights','dim-layovers');
+    if(f==='layover') card.classList.add('dim-flights','dim-hotels');
+  });
+});
+/* Gantt bars jump to the day */
+document.querySelectorAll('.g-bar').forEach(function(bar){
+  bar.addEventListener('click', function(){
+    var el = document.getElementById(bar.getAttribute('data-goto'));
+    if(el) el.scrollIntoView({behavior:'smooth', block:'center'});
+  });
+});
+/* Checklist with localStorage */
+var boxes = document.querySelectorAll('#checklist input');
+function updateCheck(){
+  var done = 0;
+  boxes.forEach(function(b, i){
+    b.closest('label').classList.toggle('done', b.checked);
+    if(b.checked) done++;
+    try{ localStorage.setItem('sb27-check-'+i, b.checked ? '1' : '0'); }catch(e){}
+  });
+  document.getElementById('check-progress').textContent = done + ' of ' + boxes.length + ' done';
+}
+boxes.forEach(function(b, i){
+  try{ if(localStorage.getItem('sb27-check-'+i)==='1') b.checked = true; }catch(e){}
+  b.addEventListener('change', updateCheck);
+});
+updateCheck();
+</script>
+</body>
+</html>
