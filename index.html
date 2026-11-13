@@ -4,11 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Marcin Fracz</title>
-<meta name="description" content="Marcin Fracz: strategist transforming global software and AI ecosystems with high-velocity, cross-border execution.">
+<meta name="description" content="Automotive product &amp; software strategy leader · GM · SAIC-GM Shanghai">
+<meta property="og:title" content="Marcin Fracz — Automotive product &amp; software strategy leader">
+<meta property="og:description" content="Automotive product &amp; software strategy leader · GM · SAIC-GM Shanghai">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://marcinfracz.github.io/">
+<meta property="og:image" content="https://marcinfracz.github.io/assets/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=16">
+<link rel="stylesheet" href="css/styles.css?v=17">
 </head>
 <body>
 <div class="wallpaper" aria-hidden="true"><img id="wallpaper-img" src="assets/skyline.jpg" alt=""></div>
@@ -112,6 +119,7 @@
     <div class="window-body intro-body">
       <img class="avatar" id="intro-photo" src="assets/profile.jpg" alt="Marcin Fracz">
       <h1 id="intro-name"></h1>
+      <p class="intro-title" id="intro-title"></p>
       <p class="headline" id="intro-headline"></p>
       <div class="intro-buttons" id="intro-buttons"></div>
       <button class="welcome-strip" data-open="browser">Work Showcase <span>↗</span></button>
@@ -124,11 +132,6 @@
     <div class="clock-grid" id="clocks"></div>
   </section>
 
-  <!-- AI Signals -->
-  <section class="widget glass news" id="widget-news" data-widget="news" data-draggable="1">
-    <div class="widget-bar" data-drag><span class="widget-title" id="news-title"></span><span class="widget-sub" id="news-sub"></span><span class="widget-actions"><button class="bar-btn" data-widget-size="news" title="Change size" aria-label="Change size">↻</button><button class="bar-btn" data-widget-hide="news" title="Hide widget" aria-label="Hide widget">×</button></span></div>
-    <ul id="news-list"></ul>
-  </section>
 
   <!-- Weather (off by default) -->
   <section class="widget glass weather" id="widget-weather" data-widget="weather" data-draggable="1">
@@ -179,12 +182,6 @@
   </div>
 </section>
 
-<section class="widget glass overlay-window hidden-window" id="widget-sizzle" data-window="sizzle" data-draggable="1">
-  <div class="window-bar" data-drag><span class="dot red" data-act="close"></span><span class="dot yellow" data-act="min"></span><span class="dot green" data-act="max"></span><span class="window-title" id="sizzle-title"></span></div>
-  <div class="window-body">
-    <p class="muted" id="sizzle-note"></p>
-  </div>
-</section>
 
 <section class="window glass overlay-window hidden-window" id="window-finder" data-window="finder" data-draggable="1">
   <div class="window-bar" data-drag><span class="dot red" data-act="close"></span><span class="dot yellow" data-act="min"></span><span class="dot green" data-act="max"></span><span class="window-title">Finder</span></div>
@@ -224,6 +221,7 @@
       <label>Email<input name="email" type="email" required></label>
       <label>Topic
         <select name="topic">
+          <option>Job opportunity</option>
           <option>Collaboration</option>
           <option>Advisory</option>
           <option>Speaking</option>
@@ -290,7 +288,7 @@
   <ul id="palette-list"></ul>
 </div>
 
-<script src="content/content.js?v=16"></script>
-<script src="js/app.js?v=16"></script>
+<script src="content/content.js?v=17"></script>
+<script src="js/app.js?v=17"></script>
 </body>
 </html>
