@@ -16,9 +16,41 @@
 <header class="menubar">
   <div class="mb-left">
     <span class="mb-name">Marcin Fracz</span>
-    <span class="mb-item">File</span>
-    <span class="mb-item">View</span>
-    <span class="mb-item">Window</span>
+    <div class="menu">
+      <button class="mb-item menu-btn" data-menu="file">File</button>
+      <div class="menu-dropdown" id="menu-file">
+        <button data-action="open-finder">Open Finder</button>
+        <button data-action="open-about">About Marcin</button>
+        <button data-action="open-work">Open Work</button>
+        <button data-action="open-projects">Open Projects</button>
+        <button data-action="open-notes">Open Notes</button>
+        <button data-action="contact">Contact Marcin</button>
+        <div class="menu-sep"></div>
+        <button data-action="search">Search… <span class="kbd">⌘K</span></button>
+      </div>
+    </div>
+    <div class="menu">
+      <button class="mb-item menu-btn" data-menu="view">View</button>
+      <div class="menu-dropdown" id="menu-view">
+        <button data-action="wallpaper-settings">Wallpaper Settings…</button>
+        <button data-action="widget-settings">Widget Settings…</button>
+        <div class="menu-sep"></div>
+        <button data-action="toggle-welcome"><span class="check" id="check-welcome">✓</span> Show Welcome</button>
+        <button data-action="reset-positions">Reset Welcome Position</button>
+        <button data-action="show-desktop">Show Desktop</button>
+        <div class="menu-sep"></div>
+        <button data-action="light"><span class="check" id="check-light">✓</span> Light Appearance</button>
+        <button data-action="dark"><span class="check" id="check-dark"></span> Dark Appearance</button>
+      </div>
+    </div>
+    <div class="menu">
+      <button class="mb-item menu-btn" data-menu="window">Window</button>
+      <div class="menu-dropdown" id="menu-window">
+        <div id="window-list"></div>
+        <div class="menu-sep"></div>
+        <button data-action="close-all">Close All Windows</button>
+      </div>
+    </div>
   </div>
   <div class="mb-right">
     <span class="mb-clock" id="topbar-clock"></span>
@@ -124,6 +156,41 @@
     <p class="muted" id="sizzle-note"></p>
   </div>
 </section>
+
+<section class="window glass overlay-window hidden-window" id="window-finder" data-window="finder">
+  <div class="window-bar" data-drag><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="window-title">Finder</span><button class="win-close" data-close="finder" aria-label="Close">×</button></div>
+  <div class="window-body">
+    <ul class="finder-list">
+      <li><button data-open="about">About Marcin</button></li>
+      <li><button data-open="work">Work</button></li>
+      <li><button data-open="projects">Projects</button></li>
+      <li><button data-open="sizzle">Sizzle Reel</button></li>
+      <li><button data-open="contact-note">Contact Marcin</button></li>
+      <li><span class="finder-dim">Resume — coming soon</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="window glass overlay-window hidden-window" id="window-wallpaper" data-window="wallpaper">
+  <div class="window-bar" data-drag><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="window-title">Wallpaper Settings</span><button class="win-close" data-close="wallpaper" aria-label="Close">×</button></div>
+  <div class="window-body">
+    <div class="wp-options" id="wp-options"></div>
+  </div>
+</section>
+
+<section class="window glass overlay-window hidden-window" id="window-widgets" data-window="widgets">
+  <div class="window-bar" data-drag><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="window-title">Widget Settings</span><button class="win-close" data-close="widgets" aria-label="Close">×</button></div>
+  <div class="window-body">
+    <label class="toggle-row"><input type="checkbox" id="toggle-clocks" checked> World Clock</label>
+    <label class="toggle-row"><input type="checkbox" id="toggle-news" checked> AI Signals</label>
+    <label class="toggle-row"><input type="checkbox" id="toggle-notes" checked> Sticky Notes</label>
+  </div>
+</section>
+
+<div class="palette hidden-window" id="palette">
+  <input id="palette-input" type="text" placeholder="Search…" autocomplete="off">
+  <ul id="palette-list"></ul>
+</div>
 
 <div class="art-caption">Shanghai · Lujiazui</div>
 
