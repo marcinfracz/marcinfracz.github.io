@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=8">
+<link rel="stylesheet" href="css/styles.css?v=9">
 </head>
 <body>
 <div class="wallpaper" aria-hidden="true"><img id="wallpaper-img" src="assets/skyline.jpg" alt=""></div>
@@ -25,6 +25,7 @@
         <button data-action="open-projects">Open Projects</button>
         <button data-action="open-notes-win">Open Notes</button>
         <button data-action="open-terminal">Open Terminal</button>
+        <button data-action="open-browser">Open Browser</button>
         <button data-action="contact">Contact Marcin</button>
         <div class="menu-sep"></div>
         <button data-action="search">Search… <span class="kbd">⌘K</span></button>
@@ -89,8 +90,8 @@
     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
   </button>
   <span class="rail-sep"></span>
-  <button data-href="work/" title="Work Showcase" aria-label="Work Showcase">
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+  <button data-open="browser" data-dock="browser" title="Browser" aria-label="Browser">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="currentColor" stroke="none"/></svg>
   </button>
   <button data-href="https://www.linkedin.com/in/marcinfracz/" data-newtab="1" title="LinkedIn" aria-label="LinkedIn">
     <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
@@ -113,7 +114,7 @@
       <h1 id="intro-name"></h1>
       <p class="headline" id="intro-headline"></p>
       <div class="intro-buttons" id="intro-buttons"></div>
-      <a class="welcome-strip" href="work/">Work Showcase <span>↗</span></a>
+      <button class="welcome-strip" data-open="browser">Work Showcase <span>↗</span></button>
     </div>
   </section>
 
@@ -174,7 +175,7 @@
     <div class="timeline-viewport">
       <div class="timeline" id="timeline"></div>
     </div>
-    <a class="showcase-link" href="work/">View the full work showcase ↗</a>
+    <button class="showcase-link" data-open="browser">View the full work showcase in the browser ↗</button>
   </div>
 </section>
 
@@ -236,6 +237,26 @@
   </div>
 </section>
 
+<!-- Browser: a Safari-style window with the showcase inside -->
+<section class="window glass overlay-window browser-window hidden-window" id="window-browser" data-window="browser" data-draggable="1">
+  <div class="window-bar" data-drag><span class="dot red" data-act="close"></span><span class="dot yellow" data-act="min"></span><span class="dot green" data-act="max"></span><span class="window-title">Browser</span></div>
+  <div class="browser-toolbar">
+    <button id="browser-back" title="Back" aria-label="Back">‹</button>
+    <button id="browser-forward" title="Forward" aria-label="Forward">›</button>
+    <button id="browser-reload" title="Reload" aria-label="Reload">↻</button>
+    <input id="browser-url" type="text" value="" spellcheck="false" autocomplete="off" aria-label="Address">
+    <button id="browser-open-tab" title="Open in a new tab" aria-label="Open in a new tab">↗</button>
+  </div>
+  <div class="browser-body">
+    <iframe id="browser-frame" title="Browser" src="about:blank"></iframe>
+    <div class="browser-blocked hidden-window" id="browser-blocked">
+      <p><b>This site doesn't allow embedding.</b></p>
+      <p class="muted">Some sites refuse to load inside another page. You can still open it in a real tab.</p>
+      <button class="pill-btn" id="browser-blocked-open">Open in new tab ↗</button>
+    </div>
+  </div>
+</section>
+
 <section class="window glass overlay-window hidden-window" id="window-wallpaper" data-window="wallpaper" data-draggable="1">
   <div class="window-bar" data-drag><span class="dot red" data-act="close"></span><span class="dot yellow" data-act="min"></span><span class="dot green" data-act="max"></span><span class="window-title">Wallpaper Settings</span></div>
   <div class="window-body">
@@ -263,7 +284,7 @@
   <ul id="palette-list"></ul>
 </div>
 
-<script src="content/content.js?v=8"></script>
-<script src="js/app.js?v=8"></script>
+<script src="content/content.js?v=9"></script>
+<script src="js/app.js?v=9"></script>
 </body>
 </html>
