@@ -14,6 +14,7 @@
 
   /* ================= content injection ================= */
   el("intro-name").textContent = C.intro.name;
+  el("intro-title").textContent = C.intro.title;
   el("intro-headline").textContent = C.intro.headline;
   el("intro-photo").src = C.intro.photo;
   el("intro-buttons").innerHTML = C.intro.buttons.map(function (b) {
@@ -45,19 +46,9 @@
 
   el("clocks-title").textContent = C.widgets.clocksTitle;
   el("clocks-sub").textContent = C.widgets.clocksSub || "";
-  el("news-title").textContent = C.widgets.newsTitle;
-  el("news-sub").textContent = C.widgets.newsSub || "";
-  el("news-list").innerHTML = C.widgets.news.map(function (n) {
-    return '<li><a href="' + esc(n.url) + '" target="_blank" rel="noopener">' +
-      '<span class="news-tag tag-' + esc(n.tag.toLowerCase()) + '">' + esc(n.tag) + '</span>' +
-      '<span class="news-src">' + esc(n.source) + " · " + esc(n.date) + "</span>" +
-      '<span class="news-title">' + esc(n.title) + "</span></a></li>";
-  }).join("");
-  el("sizzle-title").textContent = C.widgets.sizzleTitle;
-  el("sizzle-note").textContent = C.widgets.sizzleNote;
 
   el("note-motto-text").textContent = C.notes.motto;
-  el("note-resume-text").textContent = C.notes.resumeNote;
+  el("note-resume-text").innerHTML = '<a href="assets/resume.pdf">' + esc(C.notes.resumeNote) + "</a>";
   var email = el("note-email");
   email.textContent = C.notes.contact.email;
   email.href = "mailto:" + C.notes.contact.email;
@@ -423,7 +414,7 @@
   var PREF_KEY = "mf-site-prefs-v6";
   var prefs = {
     wallpaper: "skyline", mode: "framed", dark: false,
-    widgets: { clocks: { on: true, size: "M" }, news: { on: true, size: "M" }, weather: { on: false, size: "S" } },
+    widgets: { clocks: { on: true, size: "M" }, weather: { on: false, size: "S" } },
     welcome: true
   };
   try {
@@ -441,6 +432,9 @@
     }
     if (typeof saved.welcome === "boolean") prefs.welcome = saved.welcome;
   } catch (e) {}
+  /* a widget removed in v16 may still have a saved preference; drop it
+     here instead of breaking the widget panel */
+  delete prefs.widgets.news;
   function savePrefs() { try { localStorage.setItem(PREF_KEY, JSON.stringify(prefs)); } catch (e) {} }
 
   /* ================= wallpaper ================= */
@@ -558,7 +552,7 @@
   on("mb-theme-btn", "click", function () { prefs.dark = !prefs.dark; applyTheme(); });
 
   /* ================= widgets ================= */
-  var WIDGET_SIZES = { clocks: { S: 300, M: 480, L: 680 }, news: { S: 300, M: 380, L: 520 }, weather: { S: 300, M: 300, L: 300 } };
+  var WIDGET_SIZES = { clocks: { S: 300, M: 480, L: 680 }, weather: { S: 300, M: 300, L: 300 } };
   var SIZE_ORDER = ["S", "M", "L"];
   function applyWidgets() {
     Object.keys(prefs.widgets).forEach(function (key) {
@@ -575,7 +569,6 @@
   function renderWidgetPanel() {
     var labels = {
       clocks: { name: "World Clock", sub: "Detroit, Shanghai, Mexico City" },
-      news: { name: "AI Signals", sub: "What matters now" },
       weather: { name: "Weather", sub: "A window, not a dashboard" }
     };
     var onCount = Object.keys(prefs.widgets).filter(function (k) { return prefs.widgets[k].on; }).length;
@@ -605,6 +598,7 @@
     if (t) {
       markPanelClick();
       var key = t.getAttribute("data-widget-toggle");
+      if (!prefs.widgets[key]) return; /* removed widget with a stale saved preference */
       prefs.widgets[key].on = !prefs.widgets[key].on;
       applyWidgets();
       if (key === "weather" && prefs.widgets[key].on) loadWeather();
@@ -614,6 +608,7 @@
     if (ss) {
       markPanelClick();
       var parts = ss.getAttribute("data-widget-size-set").split(":");
+      if (!prefs.widgets[parts[0]]) return;
       prefs.widgets[parts[0]].size = parts[1];
       applyWidgets();
       return;
@@ -627,7 +622,7 @@
       return;
     }
     var hide = e.target.closest("[data-widget-hide]");
-    if (hide) {
+    if (hide && prefs.widgets[hide.getAttribute("data-widget-hide")]) {
       prefs.widgets[hide.getAttribute("data-widget-hide")].on = false;
       applyWidgets();
     }
@@ -762,7 +757,7 @@
     else if (a === "reset-wallpaper") { prefs.wallpaper = "skyline"; prefs.mode = "framed"; applyWallpaper(); }
     else if (a === "reset-widgets") {
       markPanelClick();
-      prefs.widgets = { clocks: { on: true, size: "M" }, news: { on: true, size: "M" }, weather: { on: false, size: "S" } };
+      prefs.widgets = { clocks: { on: true, size: "M" }, weather: { on: false, size: "S" } };
       applyWidgets();
     }
     else if (a === "close-widget-panel") closeWidgetPanel();
@@ -817,13 +812,13 @@
   function renderNotes() {
     var pinned = [
       { tag: "Motto", text: C.notes.motto },
-      { tag: "Resume", text: C.notes.resumeNote },
+      { tag: "Resume", text: C.notes.resumeNote, href: "assets/resume.pdf" },
       { tag: "Contact", text: C.notes.contact.email + " · LinkedIn" }
     ];
     el("notes-body").innerHTML =
       '<p class="notes-section">Pinned on desktop · ' + pinned.length + "</p><ul class=\"notes-list\">" +
       pinned.map(function (n) {
-        return "<li><span class=\"note-tag\">" + esc(n.tag) + "</span>" + esc(n.text) + "</li>";
+        return "<li><span class=\"note-tag\">" + esc(n.tag) + "</span>" + (n.href ? '<a href="' + n.href + '">' + esc(n.text) + "</a>" : esc(n.text)) + "</li>";
       }).join("") + "</ul>" +
       '<p class="notes-section">In rotation</p><ul class="notes-list"><li><span class="note-tag">Daily Quote</span><span id="daily-quote">' + esc(C.quotes[quoteIdx]) + '</span> <button class="quote-btn" id="quote-next">Show another quote</button></li></ul>';
     on("quote-next", "click", function () {
@@ -898,6 +893,13 @@
   function browserShowBlocked() { el("browser-blocked").classList.remove("hidden-window"); }
   function browserArmTimer() {
     clearTimeout(browserLoadTimer);
+    /* Same-origin pages (the showcase) always load inside the frame, so the
+       "doesn't allow embedding" notice must never fire for them. Only arm it
+       for other cross-origin pages, where a blocked embed can leave the frame empty. */
+    if (browserCurrent === BROWSER_HOME) return;
+    try {
+      if (new URL(browserCurrent, window.location.href).origin === window.location.origin) return;
+    } catch (e) {}
     browserLoadTimer = setTimeout(function () { browserShowBlocked(); }, 8000);
   }
   function browserGo(url, push) {
@@ -958,7 +960,6 @@
     { label: "Terminal", hint: "Window", run: function () { openWindow("terminal"); } },
     { label: "Contact Marcin", hint: "Window", run: function () { openWindow("contact-win"); } },
     { label: "World Clock", hint: "Widget", run: function () { var w = el("widget-clocks"); if (w) { w.style.display = ""; bringToFront(w); } } },
-    { label: "AI Signals", hint: "Widget", run: function () { var w = el("widget-news"); if (w) { w.style.display = ""; bringToFront(w); } } },
     { label: "Wallpaper Settings", hint: "Settings", run: function () { openWindow("wallpaper"); } },
     { label: "Widget Settings", hint: "Settings", run: openWidgetPanel },
     { label: "Dark Appearance", hint: "View", run: function () { prefs.dark = true; applyTheme(); } },
