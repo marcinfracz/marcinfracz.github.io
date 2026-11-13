@@ -272,20 +272,27 @@
   try { positions = JSON.parse(localStorage.getItem(POS_KEY) || "{}"); } catch (e) {}
   function savePositions() { try { localStorage.setItem(POS_KEY, JSON.stringify(positions)); } catch (e) {} }
   function restorePositions() {
+    var vw = window.innerWidth, vh = window.innerHeight;
     Object.keys(positions).forEach(function (id) {
       var node = document.getElementById(id);
       var pos = positions[id];
       if (!node || !pos || typeof pos.left !== "number") return;
-      node.style.left = pos.left + "px";
-      node.style.top = pos.top + "px";
+      /* clamp stale saved positions into the viewport so a bad save can never strand a window off-screen */
+      var left = Math.max(0, Math.min(pos.left, vw - 120));
+      var top = Math.max(40, Math.min(pos.top, vh - 80));
+      positions[id] = { left: left, top: top };
+      node.style.left = left + "px";
+      node.style.top = top + "px";
       /* only overlay windows need their centring transform cleared;
          notes keep their CSS tilt, desktop windows have none */
       if (node.classList.contains("overlay-window")) node.style.transform = "none";
     });
+    savePositions();
   }
   restorePositions();
 
   var drag = null;
+  var unmaxTime = 0; /* when a drag last dropped a window out of fullscreen, so a double-click that caused it does not put it straight back */
   function endDrag() {
     if (!drag) return;
     var node = drag.node;
@@ -294,7 +301,11 @@
     var top = Math.max(40, Math.min(parseFloat(node.style.top) + drag.dy, vh - 80));
     node.style.left = left + "px";
     node.style.top = top + "px";
-    node.style.transform = "";
+    /* overlay windows are centred in CSS with translate(-50%,-50%); clearing the
+       inline transform here would snap the window up-left by half its size on
+       every drop. Keep "none" for them; other elements (notes) get their CSS
+       tilt back by clearing it. */
+    node.style.transform = node.classList.contains("overlay-window") ? "none" : "";
     node.classList.remove("dragging");
     document.body.classList.remove("is-dragging");
     positions[drag.id] = { left: left, top: top };
@@ -302,9 +313,9 @@
     drag = null;
   }
 
-  /* ================= resize windows ================= */
+  /* ================= resize windows + widgets ================= */
   var resize = null;
-  document.querySelectorAll(".overlay-window").forEach(function (w) {
+  document.querySelectorAll(".overlay-window, .widget").forEach(function (w) {
     var h = document.createElement("span");
     h.className = "resize-handle";
     h.setAttribute("data-resize", "");
@@ -314,11 +325,11 @@
     if (window.innerWidth <= 1100) return;
     var h = e.target.closest("[data-resize]");
     if (!h) return;
-    var win = h.closest(".overlay-window");
+    var win = h.closest(".overlay-window, .widget");
     if (!win) return;
     if (win.classList.contains("maximised")) win.classList.remove("maximised");
     var rect = win.getBoundingClientRect();
-    resize = { node: win, startX: e.clientX, startY: e.clientY, startW: rect.width, startH: rect.height };
+    resize = { node: win, startX: e.clientX, startY: e.clientY, startW: rect.width, startH: rect.height, customW: 0 };
     document.body.classList.add("is-resizing");
     bringToFront(win);
     e.preventDefault();
@@ -326,14 +337,26 @@
   document.addEventListener("pointermove", function (e) {
     if (!resize) return;
     var vw = window.innerWidth, vh = window.innerHeight;
-    var w = Math.max(340, Math.min(resize.startW + (e.clientX - resize.startX), vw - 24));
-    var hgt = Math.max(260, Math.min(resize.startH + (e.clientY - resize.startY), vh - 48));
+    var isWidget = resize.node.classList.contains("widget");
+    var minW = isWidget ? 260 : 340;
+    var w = Math.max(minW, Math.min(resize.startW + (e.clientX - resize.startX), vw - 24));
     resize.node.style.width = w + "px";
+    if (isWidget) { resize.customW = w; return; }
+    var hgt = Math.max(260, Math.min(resize.startH + (e.clientY - resize.startY), vh - 48));
     resize.node.style.height = hgt + "px";
   });
   function endResize() {
     if (!resize) return;
     document.body.classList.remove("is-resizing");
+    if (resize.node.classList.contains("widget") && resize.customW) {
+      var key = resize.node.id.replace("widget-", "");
+      if (prefs.widgets[key]) {
+        prefs.widgets[key].size = "custom";
+        prefs.widgets[key].customWidth = resize.customW;
+        savePrefs();
+        renderWidgetPanel();
+      }
+    }
     resize = null;
   }
   document.addEventListener("pointerup", endResize);
@@ -352,6 +375,7 @@
     if (e.target.closest("button, a, input, select, textarea, .dot[data-act]")) return;
     var id = target.id;
     if (!id) return;
+    if (target.classList.contains("maximised")) { target.classList.remove("maximised"); unmaxTime = Date.now(); } /* dragging a fullscreen window drops it back to normal size first */
     var rect = target.getBoundingClientRect();
     var parentRect = { left: 0, top: 0 };
     if (!target.classList.contains("overlay-window")) {
@@ -382,6 +406,17 @@
   });
   document.addEventListener("pointerup", endDrag);
   document.addEventListener("pointercancel", endDrag);
+
+  /* double-click a window's title bar to go fullscreen (and back) */
+  document.addEventListener("dblclick", function (e) {
+    var handle = e.target.closest("[data-drag]");
+    if (!handle) return;
+    if (e.target.closest("button, a, input, select, textarea, .dot[data-act]")) return;
+    var win = handle.closest(".overlay-window");
+    if (!win) return;
+    if (Date.now() - unmaxTime < 600) return; /* this double-click already restored the window via the drag; do not put it back */
+    win.classList.toggle("maximised");
+  });
 
   /* ================= preferences ================= */
   var PREF_KEY = "mf-site-prefs-v6";
@@ -470,7 +505,8 @@
       var p = prefs.widgets[key];
       if (!w) return;
       w.style.display = p.on ? "" : "none";
-      if (WIDGET_SIZES[key] && WIDGET_SIZES[key][p.size]) w.style.width = WIDGET_SIZES[key][p.size] + "px";
+      if (p.size === "custom" && p.customWidth) w.style.width = p.customWidth + "px";
+      else if (WIDGET_SIZES[key] && WIDGET_SIZES[key][p.size]) w.style.width = WIDGET_SIZES[key][p.size] + "px";
     });
     renderWidgetPanel();
     savePrefs();
