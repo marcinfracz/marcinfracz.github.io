@@ -258,7 +258,7 @@ body.wp-cream .framed-art { display: none; }
   right: 24px;
   bottom: 24px;
   transform: none;
-  width: auto;
+  width: auto !important;
   max-height: none;
 }
 .overlay-window.maximised .window-body { max-height: calc(100vh - 48px - 24px - 41px); }
