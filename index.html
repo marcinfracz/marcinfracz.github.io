@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marcin Fracz</title>
+<meta name="description" content="Marcin Fracz: strategist transforming global software and AI ecosystems with high-velocity, cross-border execution.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="wallpaper" aria-hidden="true"></div>
+
+<header class="topbar">
+  <span class="topbar-name">Marcin Fracz</span>
+  <span class="topbar-clock" id="topbar-clock"></span>
+</header>
+
+<main class="desktop" id="desktop">
+
+  <!-- Intro card -->
+  <section class="window glass intro" id="window-intro" data-window="intro">
+    <div class="window-bar" data-drag><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="window-title">Welcome</span></div>
+    <div class="window-body intro-body">
+      <img class="avatar" id="intro-photo" src="assets/profile.jpg" alt="Marcin Fracz">
+      <h1 id="intro-name"></h1>
+      <p class="headline" id="intro-headline"></p>
+      <div class="intro-buttons" id="intro-buttons"></div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="window glass" id="window-about" data-window="about">
+    <div class="window-bar" data-drag><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="window-title">About</span><button class="win-close" data-close="about" aria-label="Close">×</button></div>
+    <div class="window-body" id="about-body"></div>
+  </section>
+
+  <!-- Work -->
+  <section class="window glass wide" id="window-work" data-window="work">
+    <div class="window-bar" data-drag><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="window-title">Work</span><button class="win-close" data-close="work" aria-label="Close">×</button></div>
+    <div class="window-body">
+      <p class="hint" id="work-note"></p>
+      <div class="timeline-controls">
+        <button id="zoom-out" aria-label="Zoom out">−</button>
+        <button id="zoom-in" aria-label="Zoom in">+</button>
+      </div>
+      <div class="timeline-viewport">
+        <div class="timeline" id="timeline"></div>
+      </div>
+      <h3>Education</h3>
+      <ul class="edu" id="edu-list"></ul>
+    </div>
+  </section>
+
+  <!-- Projects -->
+  <section class="window glass" id="window-projects" data-window="projects">
+    <div class="window-bar" data-drag><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span><span class="window-title">Projects</span><button class="win-close" data-close="projects" aria-label="Close">×</button></div>
+    <div class="window-body" id="projects-body"></div>
+  </section>
+
+  <!-- Widgets -->
+  <aside class="widgets">
+    <section class="widget glass">
+      <h2 id="clocks-title"></h2>
+      <div id="clocks"></div>
+    </section>
+    <section class="widget glass">
+      <h2 id="news-title"></h2>
+      <ul id="news-list"></ul>
+    </section>
+    <section class="widget glass">
+      <h2 id="sizzle-title"></h2>
+      <p class="muted" id="sizzle-note"></p>
+    </section>
+  </aside>
+
+  <!-- Sticky notes -->
+  <aside class="notes">
+    <div class="note yellow">
+      <p id="note-motto"></p>
+    </div>
+    <div class="note pink">
+      <p>Resume</p>
+      <p class="muted" id="note-resume"></p>
+    </div>
+    <div class="note blue">
+      <p>Contact</p>
+      <p><a id="note-email" href=""></a></p>
+      <p class="muted" id="note-linkedin"></p>
+    </div>
+  </aside>
+
+</main>
+
+<nav class="dock glass" id="dock"></nav>
+
+<script src="content/content.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
