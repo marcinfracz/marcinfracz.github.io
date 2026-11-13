@@ -25,7 +25,7 @@ body {
   inset: 0;
   z-index: 0;
   background:
-    linear-gradient(rgba(245, 240, 230, 0.42), rgba(245, 240, 230, 0.42)),
+    linear-gradient(rgba(245, 240, 230, 0.65), rgba(245, 240, 230, 0.65)),
     url('../assets/wallpaper.jpg') center / cover no-repeat;
 }
 
@@ -115,12 +115,14 @@ body {
   box-shadow: var(--shadow);
 }
 .window { grid-column: span 6; overflow: hidden; }
-.window.wide { grid-column: span 8; }
+.window.wide { grid-column: span 12; }
+#window-about { grid-column: span 8; }
 #window-projects { grid-column: span 4; }
 #widget-clocks { grid-column: span 6; }
 #widget-news { grid-column: span 6; }
 #widget-sizzle { grid-column: span 6; }
-.notes { grid-column: span 6; display: flex; flex-direction: column; gap: 16px; }
+.notes { grid-column: span 12; display: flex; flex-direction: row; gap: 16px; }
+.note { flex: 1; }
 
 .window-bar {
   display: flex;
@@ -211,7 +213,7 @@ body {
 .timeline {
   display: flex;
   gap: 0;
-  min-width: 720px;
+  min-width: 960px;
   padding-top: 28px;
   position: relative;
   transform-origin: left top;
@@ -224,7 +226,7 @@ body {
   background: var(--accent);
   border-radius: 2px;
 }
-.timeline-item { flex: 1 0 190px; padding: 0 14px 0 0; position: relative; }
+.timeline-item { flex: 1 0 160px; padding: 0 14px 0 0; position: relative; }
 .timeline-item::before {
   content: '';
   position: absolute;
@@ -277,7 +279,8 @@ body {
 /* Mobile */
 @media (max-width: 768px) {
   .desktop { grid-template-columns: 1fr; padding: 18px 14px 120px; }
-  .window, .window.wide, #window-projects, #widget-clocks, #widget-news, #widget-sizzle, .notes { grid-column: 1 / -1; }
+  .window, .window.wide, #window-about, #window-projects, #widget-clocks, #widget-news, #widget-sizzle, .notes { grid-column: 1 / -1; }
+  .notes { flex-direction: column; }
   .dock-rail {
     left: 50%; top: auto; bottom: 14px;
     transform: translateX(-50%);
