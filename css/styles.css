@@ -41,7 +41,6 @@ body {
   display: none;
 }
 body.wp-full .wallpaper img { display: block; }
-body.dark .wallpaper img { display: block; }
 .wallpaper::after {
   content: '';
   position: absolute;
@@ -50,7 +49,7 @@ body.dark .wallpaper img { display: block; }
   display: none;
 }
 body.wp-full .wallpaper::after { display: block; }
-body.dark .wallpaper::after { display: block; background: rgba(20, 18, 16, 0.5); }
+body.dark.wp-full .wallpaper::after { background: rgba(20, 18, 16, 0.5); }
 
 /* Framed artwork in the centre of the wall */
 .framed-art {
@@ -79,7 +78,7 @@ body.dark .wallpaper::after { display: block; background: rgba(20, 18, 16, 0.5);
   padding: 4px 12px;
   border-radius: 999px;
 }
-body.wp-full .framed-art, body.dark .framed-art { display: none; }
+body.wp-full .framed-art { display: none; }
 body.wp-cream .framed-art { display: none; }
 
 /* Menu bar — 36px, 13px type */
@@ -194,7 +193,7 @@ body.wp-cream .framed-art { display: none; }
 #widget-news { right: 1.5%; top: 8%; width: 380px; z-index: 10; }
 #widget-weather { left: 17%; top: 58%; width: 300px; z-index: 10; }
 .note { position: absolute; z-index: 10; }
-#note-motto { left: 17%; top: 84%; }
+#note-motto { left: 17%; top: 84%; width: 265px; }
 #note-resume { left: 42%; top: 87%; }
 #note-contact { right: 13%; top: 84%; }
 .dragging { box-shadow: 0 32px 90px rgba(15, 23, 42, 0.35); }
@@ -255,10 +254,10 @@ body.wp-cream .framed-art { display: none; }
 #window-terminal.overlay-window { width: min(840px, 94vw); }
 .hidden-window { display: none !important; }
 .overlay-window.maximised {
-  top: 48px;
-  left: 24px;
-  right: 24px;
-  bottom: 24px;
+  top: 48px !important;
+  left: 24px !important;
+  right: 24px !important;
+  bottom: 24px !important;
   transform: none;
   width: auto !important;
   max-height: none;
@@ -399,7 +398,7 @@ body.wp-cream .framed-art { display: none; }
 .project a { color: var(--accent); text-decoration: none; font-weight: 600; }
 
 /* News */
-#news-list { list-style: none; margin: 0; padding: 0; }
+#news-list { list-style: none; margin: 0; padding: 2px 20px 18px; }
 #news-list li { padding: 12px 0; border-top: 1px solid rgba(28, 25, 23, 0.08); }
 #news-list li:first-child { border-top: none; }
 #news-list a { color: var(--ink); text-decoration: none; }
@@ -429,7 +428,7 @@ body.wp-cream .framed-art { display: none; }
 .note.pink { background: #fbcfe8; transform: rotate(0.9deg); }
 .note.blue { background: #bfdbfe; transform: rotate(-0.5deg); }
 .note-tag { font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(28, 25, 23, 0.55); margin: 0 0 2px; }
-.note p { margin: 0; color: var(--ink); line-height: 1.45; }
+.note p { margin: 0; color: var(--ink); line-height: 1.45; text-wrap: balance; }
 .handwritten { font-family: 'Caveat', cursive; font-size: 22px; line-height: 1.2; }
 .note a { color: var(--ink); font-weight: 600; }
 
