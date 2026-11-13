@@ -59,7 +59,9 @@
   .btn:hover { border-color: var(--accent); transform: translateY(-1px); }
   .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
   .btn.primary:hover { background: var(--accent-deep); }
-  .stats { display: flex; gap: 48px; flex-wrap: wrap; margin-top: 48px; }
+  .stats { display: grid; grid-template-columns: repeat(6, 1fr); margin-top: 48px; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  .stat { padding: 18px 16px; border-left: 1px solid var(--line); }
+  .stat:first-child { border-left: none; }
   .stat .num { font-size: 40px; font-weight: 900; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
   .stat .cap { font-size: 13px; color: var(--muted); margin-top: 4px; max-width: 200px; line-height: 1.45; }
   /* hero entrance */
@@ -72,7 +74,7 @@
   .route { margin-top: 56px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); padding: 26px 26px 18px; overflow: hidden; }
   .route svg { display: block; width: 100%; height: auto; }
   .route .dot-grid { fill: #2e2e2e; }
-  .route .arc { fill: none; stroke: var(--accent); stroke-width: 2; stroke-dasharray: 6 8; animation: dashmove 1.6s linear infinite; }
+  .route .arc { fill: none; stroke: var(--accent); stroke-width: 3; stroke-dasharray: 6 8; animation: dashmove 1.6s linear infinite; }
   @keyframes dashmove { to { stroke-dashoffset: -28; } }
   .route .node { fill: var(--accent); }
   .route .node-ring { fill: none; stroke: var(--accent); stroke-width: 1.5; opacity: 0.5; }
@@ -181,9 +183,14 @@
   /* v14: statement hero */
   .hero h1.statement { font-size: clamp(40px, 6.4vw, 76px); }
   .hero h1 .accent { color: var(--accent); }
-  .route .land { fill: #262626; }
-  .stats .stat .num { font-size: 36px; }
-  .stats .stat .cap { max-width: 170px; }
+  .route .land { fill: #3f3f46; }
+  .map-table { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin-top: 16px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .map-cell { padding: 14px 16px; border-left: 1px solid var(--line); }
+  .map-cell:first-child { border-left: none; }
+  .map-cell .mc-city { font-size: 13px; font-weight: 800; letter-spacing: 0.02em; }
+  .map-cell .mc-sub { font-size: 13px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
+  .stats .stat .num { font-size: 34px; }
+  .stats .stat .cap { max-width: none; }
 
   /* v14: resume viewer */
   .res-viewer { margin-top: 28px; }
@@ -207,6 +214,16 @@
   .res-nums .res-anno { position: absolute; right: 0; top: -13px; margin: 0; }
   .flash { animation: flashhl 1.4s ease; }
   @keyframes flashhl { 0%, 100% { box-shadow: none; } 25%, 60% { box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.65); border-radius: 8px; } }
+
+  /* v15: vertical timeline (the 7-column wave wrapped role titles badly) */
+  .tl { position: relative; margin-top: 34px; padding-left: 24px; border-left: 2px solid var(--line); }
+  .tl-item { position: relative; padding: 0 0 28px 18px; }
+  .tl-item:last-child { padding-bottom: 0; }
+  .tl-item::before { content: ''; position: absolute; left: -31px; top: 5px; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); border: 3px solid var(--bg); }
+  .tl-item .years { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); font-weight: 700; }
+  .tl-item h3 { margin: 6px 0 3px; font-size: 19px; }
+  .tl-item .co { margin: 0 0 4px; color: var(--muted); font-size: 14px; font-weight: 600; }
+  .tl-item p { margin: 0; color: var(--muted); font-size: 14.5px; line-height: 1.55; }
 
   /* v14: wavy timeline */
   .tl-wave { margin-top: 30px; }
@@ -241,6 +258,12 @@
     .route { padding: 18px 14px 12px; }
     .tl-cols { grid-template-columns: 1fr; }
     .tl-wave { display: none; }
+    .stats { grid-template-columns: repeat(3, 1fr); }
+    .stat:nth-child(4) { border-left: none; }
+    .stat:nth-child(n+4) { border-top: 1px solid var(--line); }
+    .map-table { grid-template-columns: 1fr; }
+    .map-cell { border-left: none; border-top: 1px solid var(--line); }
+    .map-cell:first-child { border-top: none; }
   }
   @media (prefers-reduced-motion: reduce) {
     .reveal { opacity: 1; transform: none; transition: none; }
@@ -380,17 +403,26 @@
           <text class="clock" x="258" y="88" text-anchor="middle" id="hero-detroit-time">—</text>
           <text class="city" x="798" y="214" text-anchor="middle">SHANGHAI</text>
           <text class="clock" x="798" y="160" text-anchor="middle" id="hero-shanghai-time">—</text>
+
+          <circle class="node" cx="225" cy="232" r="4"/>
+          <text class="city" x="225" y="256" text-anchor="middle" font-size="12">MEXICO CITY</text>
           <text class="clock" x="475" y="36" text-anchor="middle">12 HOURS APART · ONE WORKING DAY</text>
         </svg>
+
+        <div class="map-table">
+          <div class="map-cell"><div class="mc-city">DETROIT · United States</div><div class="mc-sub">Home base — product, strategy, and the US market. 11 years at GM.</div></div>
+          <div class="map-cell"><div class="mc-city">SHANGHAI · China</div><div class="mc-sub">3 years leading software strategy for SAIC-GM, 2022–2025.</div></div>
+          <div class="map-cell"><div class="mc-city">MEXICO CITY · Mexico</div><div class="mc-sub">The third clock on the desktop — the region in between.</div></div>
+        </div>
         <p class="route-note">Detroit to Shanghai, every working day — strategy set in Shanghai, aligned with Detroit. The three nameplates: Equinox, Encore GX, Trailblazer.</p>
       </div>
-      <div class="stats anim a6">
-        <div class="stat"><div class="num" data-count="23">0</div><div class="cap">years in automotive, engineering to strategy</div></div>
-        <div class="stat"><div class="num" data-count="3">0</div><div class="cap">nameplates — Equinox, Encore GX, Trailblazer</div></div>
-        <div class="stat"><div class="num" data-count="2">0</div><div class="cap">markets — United States and China</div></div>
-        <div class="stat"><div class="num" data-count="11">0</div><div class="cap">years at General Motors, 2014–2025</div></div>
-        <div class="stat"><div class="num" data-count="3">0</div><div class="cap">years in Shanghai, leading SAIC-GM software strategy</div></div>
-        <div class="stat"><div class="num" data-count="6">0</div><div class="cap">roles, from the engineering floor to the strategy table</div></div>
+<div class="stats anim a6">
+        <div class="stat"><div class="num">23</div><div class="cap">years in automotive, engineering to strategy</div></div>
+        <div class="stat"><div class="num">3</div><div class="cap">nameplates — Equinox, Encore GX, Trailblazer</div></div>
+        <div class="stat"><div class="num">2</div><div class="cap">markets — United States and China</div></div>
+        <div class="stat"><div class="num">11</div><div class="cap">years at General Motors, 2014–2025</div></div>
+        <div class="stat"><div class="num">3</div><div class="cap">years in Shanghai, leading SAIC-GM software strategy</div></div>
+        <div class="stat"><div class="num">6</div><div class="cap">roles, from the engineering floor to the strategy table</div></div>
       </div>
     </section>
 
@@ -540,7 +572,7 @@
 <section id="resume">
       <span class="label reveal">Resume</span>
       <h2 class="reveal" style="font-size:clamp(30px,4.5vw,44px);font-weight:900;letter-spacing:-0.02em;margin:12px 0 8px">The record, on paper</h2>
-      <p class="muted reveal" style="font-size:16px;line-height:1.6;max-width:680px">Rebuilt from the work record — the original file is gone, so this is the resume as it stands. Click a numbered marker to jump to the work behind it.</p>
+      <p class="muted reveal" style="font-size:16px;line-height:1.6;max-width:680px">A two-page resume, rebuilt from the work record. Click a numbered marker to jump to the work behind it.</p>
       <div class="res-viewer reveal">
         <div class="res-toolbar">
           <span class="mono" id="res-page-label">RESUME · PAGE 1 / 2</span>
@@ -587,25 +619,14 @@
       <span class="label reveal">Timeline</span>
       <h2 class="reveal" style="font-size:clamp(30px,4.5vw,44px);font-weight:900;letter-spacing:-0.02em;margin:12px 0 8px">2003 — present</h2>
       <p class="muted reveal" style="font-size:16px;line-height:1.6;max-width:680px">From the engineering floor to the strategy table.</p>
-      <div class="tl-wave reveal">
-        <svg viewBox="0 0 1200 120" preserveAspectRatio="none" aria-hidden="true">
-          <path d="M 86 60 Q 171 22 257 60 Q 343 98 429 60 Q 514 22 600 60 Q 686 98 771 60 Q 857 22 943 60 Q 1029 98 1114 60" fill="none" stroke="#3b82f6" stroke-width="2.5"/>
-          <g fill="#0e0e0e" stroke="#3b82f6" stroke-width="2.5">
-            <circle cx="86" cy="60" r="7"/><circle cx="257" cy="60" r="7"/><circle cx="429" cy="60" r="7"/><circle cx="600" cy="60" r="7"/><circle cx="771" cy="60" r="7"/><circle cx="943" cy="60" r="7"/><circle cx="1114" cy="60" r="7"/>
-          </g>
-          <g fill="#3b82f6" font-family="JetBrains Mono, monospace" font-size="13" font-weight="700" text-anchor="middle">
-            <text x="86" y="34">2003</text><text x="257" y="34">2014</text><text x="429" y="34">2018</text><text x="600" y="34">2020</text><text x="771" y="34">2022</text><text x="943" y="34">2025</text><text x="1114" y="34">NOW</text>
-          </g>
-        </svg>
-      </div>
-      <div class="tl-cols reveal">
-        <div class="tl-col"><div class="years">2003–2014</div><h3>Engineering</h3><p class="co">Federal-Mogul, Chrysler, Johnson Controls</p><p>Powertrain and vehicle interiors.</p></div>
-        <div class="tl-col"><div class="years">2014–2018</div><h3>Global Product Manager, compact / mid crossovers</h3><p class="co">General Motors</p><p>Chevrolet Equinox.</p></div>
-        <div class="tl-col"><div class="years">2018–2020</div><h3>Product Manager, Encore GX &amp; Trailblazer</h3><p class="co">General Motors</p><p>Small SUVs, from plan to launch.</p></div>
-        <div class="tl-col"><div class="years">2020–2022</div><h3>Business Strategy Manager, Connected &amp; OTA</h3><p class="co">General Motors</p><p>Connected services and over-the-air updates.</p></div>
-        <div class="tl-col"><div class="years">2022–2025</div><h3>Deputy Director, Software Strategy</h3><p class="co">SAIC-GM, Shanghai</p><p>Software strategy in China, cross-border execution.</p></div>
-        <div class="tl-col"><div class="years">2025</div><h3>Manager, Global Planning &amp; Joint Ventures</h3><p class="co">General Motors</p><p>OnStar product marketing, international.</p></div>
-        <div class="tl-col"><div class="years">NOW</div><h3>Exploring new leadership opportunities</h3><p class="co">Director-level roles</p><p>Automotive strategy, product and AI. Building with AI in the meantime.</p></div>
+      <div class="tl">
+        <div class="tl-item reveal"><div class="years">2003–2014</div><h3>Engineering</h3><p class="co">Federal-Mogul, Chrysler, Johnson Controls</p><p>Powertrain and vehicle interiors.</p></div>
+        <div class="tl-item reveal"><div class="years">2014–2018</div><h3>Global Product Manager, compact / mid crossovers</h3><p class="co">General Motors</p><p>Chevrolet Equinox.</p></div>
+        <div class="tl-item reveal"><div class="years">2018–2020</div><h3>Product Manager, Buick Encore GX and Chevrolet Trailblazer</h3><p class="co">General Motors</p><p>Small SUVs, from plan to launch.</p></div>
+        <div class="tl-item reveal"><div class="years">2020–2022</div><h3>Business Strategy Manager, Connected &amp; OTA Services</h3><p class="co">General Motors</p><p>Connected services and over-the-air updates.</p></div>
+        <div class="tl-item reveal"><div class="years">2022–2025</div><h3>Deputy Director, Software Strategy</h3><p class="co">SAIC-GM, Shanghai</p><p>Software strategy in China, cross-border execution.</p></div>
+        <div class="tl-item reveal"><div class="years">2025</div><h3>Manager, Global Planning &amp; Joint Ventures, OnStar Product Marketing (International)</h3><p class="co">General Motors</p><p>Global planning and OnStar product marketing.</p></div>
+        <div class="tl-item reveal"><div class="years">NOW</div><h3>Exploring new leadership opportunities</h3><p class="co">Director-level roles</p><p>Automotive strategy, product and AI. Building with AI in the meantime.</p></div>
       </div>
     </section>
 
