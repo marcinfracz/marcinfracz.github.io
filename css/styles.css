@@ -12,6 +12,19 @@
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
+
+/* Slim, macOS-style scrollbars everywhere: thin, rounded, subtle. On Windows
+   Chrome the native bar is chunky grey; these rules make every scroller on
+   the site look Apple-like instead. */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(28, 25, 23, 0.28); border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background: rgba(28, 25, 23, 0.5); border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-corner { background: transparent; }
+* { scrollbar-width: thin; scrollbar-color: rgba(28, 25, 23, 0.35) transparent; }
+body.dark ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.28); border: 2px solid transparent; background-clip: padding-box; }
+body.dark ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.5); border: 2px solid transparent; background-clip: padding-box; }
+body.dark * { scrollbar-color: rgba(255, 255, 255, 0.35) transparent; }
 html, body { height: 100%; }
 body {
   margin: 0;
@@ -653,7 +666,11 @@ body.dark .finder-side { border-right-color: rgba(255, 255, 255, 0.1); }
   cursor: pointer;
 }
 .wp-mode.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
-.wp-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.wp-options { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
+/* the settings window never needs to be wider than this; without the cap the
+   option cards stretch into wide strips when the window is dragged wide */
+#window-wallpaper { max-width: 720px; }
+#window-wallpaper.maximised { max-width: none; }
 .wp-packs { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 4px; }
 .wp-pack-btn {
   border: 1px solid rgba(28, 25, 23, 0.15);
@@ -684,7 +701,7 @@ body.dark .finder-side { border-right-color: rgba(255, 255, 255, 0.1); }
 }
 .wp-option:hover { border-color: var(--accent); }
 .wp-option.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
-.wp-swatch { width: 100%; height: 64px; border-radius: 8px; background-size: cover; background-position: center; }
+.wp-swatch { width: 100%; aspect-ratio: 16 / 10; border-radius: 8px; background-size: cover; background-position: center; }
 .wp-option .check { color: var(--accent); font-weight: 700; }
 .wp-credit { margin: 14px 0; }
 
