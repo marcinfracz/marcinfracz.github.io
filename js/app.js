@@ -1,5 +1,7 @@
-/* Marcin Fracz personal site: content injection, window dragging,
-   analog world clocks, timeline zoom. Vanilla JS, no dependencies. */
+/* Marcin Fracz personal site: content injection, absolute desktop windows,
+   transform-free dragging (left/top), analog world clocks, timeline zoom,
+   working menus, Finder, search palette, wallpaper + widget settings.
+   Vanilla JS, no dependencies. */
 (function () {
   var C = window.SITE_CONTENT;
   if (!C) return;
@@ -65,9 +67,14 @@
   var email = el("note-email");
   email.textContent = C.notes.contact.email;
   email.href = "mailto:" + C.notes.contact.email;
-  el("note-linkedin").textContent = C.notes.contact.linkedin.indexOf("PLACEHOLDER") !== -1
-    ? "LinkedIn URL coming soon."
-    : C.notes.contact.linkedin;
+  var li = el("note-linkedin");
+  if (C.notes.contact.linkedin.indexOf("http") === 0) {
+    li.textContent = "LinkedIn";
+    li.href = C.notes.contact.linkedin;
+  } else {
+    li.textContent = C.notes.contact.linkedin;
+    li.removeAttribute("href");
+  }
 
   /* ---- Analog world clocks ---- */
   function dialSvg(i) {
@@ -146,7 +153,7 @@
     applyZoom();
   });
 
-  /* ---- Window open / close (dock rail is static HTML) ---- */
+  /* ---- Window open / close ---- */
   function findWindow(name) {
     return el("window-" + name) || el("widget-" + name);
   }
@@ -174,44 +181,61 @@
     if (closer) { closeWindow(closer.getAttribute("data-close")); }
   });
 
-  /* ---- Window dragging (desktop only; disabled under 768px by CSS) ---- */
-  var dragWin = null, startX = 0, startY = 0, origX = 0, origY = 0;
+  /* ---- Dragging: windows are absolutely positioned from the start,
+     so dragging only changes their own left/top — nothing else moves. ---- */
+  var POS_KEY = "mf-window-pos";
+  var positions = {};
+  try { positions = JSON.parse(localStorage.getItem(POS_KEY) || "{}"); } catch (e) {}
+  function savePositions() { try { localStorage.setItem(POS_KEY, JSON.stringify(positions)); } catch (e) {} }
+  ["intro", "work"].forEach(function (name) {
+    var win = findWindow(name);
+    var pos = positions[name];
+    if (win && pos && typeof pos.left === "number" && typeof pos.top === "number") {
+      win.style.left = pos.left + "px";
+      win.style.top = pos.top + "px";
+    }
+  });
+  var dragWin = null, dragName = "", startX = 0, startY = 0, origLeft = 0, origTop = 0;
   document.querySelectorAll("[data-drag]").forEach(function (bar) {
     bar.addEventListener("pointerdown", function (e) {
-      if (window.innerWidth <= 768) return;
+      if (window.innerWidth <= 1100) return;
       if (e.target.closest("button")) return;
       var win = bar.closest(".window, .widget");
       if (!win || win.classList.contains("overlay-window")) return;
+      var name = win.getAttribute("data-window");
+      if (name !== "intro" && name !== "work") return;
       dragWin = win;
+      dragName = name;
       var rect = win.getBoundingClientRect();
       var desk = el("desktop").getBoundingClientRect();
       startX = e.clientX;
       startY = e.clientY;
-      origX = rect.left - desk.left;
-      origY = rect.top - desk.top;
-      win.style.position = "absolute";
-      win.style.left = origX + "px";
-      win.style.top = origY + "px";
-      win.style.width = rect.width + "px";
-      win.style.margin = "0";
+      origLeft = rect.left - desk.left;
+      origTop = rect.top - desk.top;
+      win.style.left = origLeft + "px";
+      win.style.top = origTop + "px";
       win.classList.add("dragging");
       bar.setPointerCapture(e.pointerId);
     });
     bar.addEventListener("pointermove", function (e) {
-      if (dragWin !== bar.closest(".window")) return;
+      if (dragWin !== bar.closest(".window, .widget")) return;
       var win = dragWin;
-      win.style.left = (origX + e.clientX - startX) + "px";
-      win.style.top = (origY + e.clientY - startY) + "px";
+      win.style.left = Math.max(0, origLeft + e.clientX - startX) + "px";
+      win.style.top = Math.max(0, origTop + e.clientY - startY) + "px";
     });
     bar.addEventListener("pointerup", function () {
-      if (dragWin) dragWin.classList.remove("dragging");
+      if (!dragWin) return;
+      positions[dragName] = {
+        left: parseInt(dragWin.style.left, 10),
+        top: parseInt(dragWin.style.top, 10)
+      };
+      savePositions();
+      dragWin.classList.remove("dragging");
       dragWin = null;
     });
   });
 
-  /* ---- v4: functional desktop ---- */
-
-  /* Preferences (persisted) */
+  /* ---- Preferences (persisted) ---- */
   var PREF_KEY = "mf-site-prefs";
   var prefs = { wallpaper: "skyline", dark: false, widgets: { clocks: true, news: true, notes: true }, welcome: true };
   try {
@@ -227,11 +251,18 @@
   } catch (e) {}
   function savePrefs() { try { localStorage.setItem(PREF_KEY, JSON.stringify(prefs)); } catch (e) {} }
 
-  /* Wallpaper */
+  /* Wallpaper (swaps the <img>, or hides it for solid cream) */
   function applyWallpaper(id) {
     prefs.wallpaper = id;
     document.body.classList.remove("wp-skyline", "wp-cream", "wp-wave");
     document.body.classList.add("wp-" + id);
+    var img = el("wallpaper-img");
+    var wp = null;
+    C.wallpapers.forEach(function (w) { if (w.id === id) wp = w; });
+    if (img) {
+      if (wp && wp.type === "image") { img.src = wp.src; img.style.display = ""; }
+      else { img.style.display = "none"; }
+    }
     document.querySelectorAll("#wp-options .wp-option").forEach(function (b) {
       var active = b.getAttribute("data-wp") === id;
       b.classList.toggle("active", active);
@@ -344,9 +375,11 @@
     else if (a === "widget-settings") openWindow("widgets");
     else if (a === "toggle-welcome") { prefs.welcome = !prefs.welcome; applyWelcome(); }
     else if (a === "reset-positions") {
-      document.querySelectorAll(".window").forEach(function (w) {
-        w.style.position = ""; w.style.left = ""; w.style.top = ""; w.style.width = ""; w.style.margin = "";
-        w.classList.remove("dragging");
+      positions = {};
+      savePositions();
+      ["intro", "work"].forEach(function (name) {
+        var w = findWindow(name);
+        if (w) { w.style.left = ""; w.style.top = ""; w.classList.remove("dragging"); }
       });
     }
     else if (a === "show-desktop") closeAllWindows();
