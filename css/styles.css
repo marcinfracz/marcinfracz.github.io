@@ -309,6 +309,9 @@ body.wp-solid .framed-art { display: none; }
   cursor: pointer;
 }
 .intro-buttons button:hover, .pill-btn:hover { background: #f5f5f4; }
+.wp-footer { display: flex; justify-content: space-between; margin-top: 14px; }
+.pill-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.pill-btn.primary:hover { background: #1d4ed8; }
 .welcome-strip {
   display: block;
   width: 100%;
@@ -519,6 +522,9 @@ body.dark .wp-option { border-color: rgba(255, 255, 255, 0.15); }
 body.dark .wp-mode { background: #292524; border-color: #57534e; color: #f5f5f4; }
 body.dark .wp-mode.active { background: rgba(59, 130, 246, 0.18); }
 body.dark .pill-btn:hover, body.dark .intro-buttons button:hover { background: #44403c; }
+body.dark .pill-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+body.dark .pill-btn.primary:hover { background: #1d4ed8; }
+body.dark .art-chip { background: rgba(28, 25, 23, 0.7); color: rgba(255, 255, 255, 0.85); }
 body.dark #contact-form input, body.dark #contact-form select, body.dark #contact-form textarea { background: #292524; border-color: #57534e; color: #f5f5f4; }
 body.dark .note-tag { color: rgba(255, 255, 255, 0.6); }
 body.dark .wp-pack-btn { border-color: rgba(255, 255, 255, 0.2); }
@@ -656,7 +662,7 @@ body.dark .finder-side { border-right-color: rgba(255, 255, 255, 0.1); }
 .wp-options { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
 /* the settings window never needs to be wider than this; without the cap the
    option cards stretch into wide strips when the window is dragged wide */
-#window-wallpaper { max-width: 720px; }
+#window-wallpaper { width: min(720px, 94vw); max-width: 720px; }
 #window-wallpaper.maximised { max-width: none; }
 .wp-packs { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 4px; }
 .wp-pack-btn {
@@ -690,7 +696,6 @@ body.dark .finder-side { border-right-color: rgba(255, 255, 255, 0.1); }
 .wp-option.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
 .wp-swatch { width: 100%; aspect-ratio: 16 / 10; border-radius: 8px; background-size: cover; background-position: center; }
 .wp-option .check { color: var(--accent); font-weight: 700; }
-.wp-credit { margin: 14px 0; }
 
 /* Widget settings panel */
 .widget-panel {
