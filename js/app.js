@@ -149,6 +149,7 @@
     { id: "notes-win", label: "Notes" },
     { id: "terminal", label: "Terminal" },
     { id: "contact-win", label: "Contact" },
+    { id: "browser", label: "Browser" },
     { id: "wallpaper", label: "Wallpaper Settings" },
     { id: "widgets", label: "Widget Settings" }
   ];
@@ -172,6 +173,7 @@
     if (dockBtn) dockBtn.classList.remove("has-min");
     bringToFront(win);
     if (name === "terminal") setTimeout(function () { el("terminal-input").focus(); }, 50);
+    if (name === "browser") browserInit();
   }
   function closeWindow(name) {
     var win = findWindow(name);
@@ -548,6 +550,7 @@
     else if (a === "open-projects") openWindow("projects");
     else if (a === "open-notes-win") openWindow("notes-win");
     else if (a === "open-terminal") openWindow("terminal");
+    else if (a === "open-browser") openWindow("browser");
     else if (a === "contact") openWindow("contact-win");
     else if (a === "search") openPalette();
     else if (a === "wallpaper-settings") openWindow("wallpaper");
@@ -686,11 +689,80 @@
       "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
   });
 
+  /* ================= browser: a real browser window inside the desktop ================= */
+  var BROWSER_HOME = "https://marcinfracz.github.io/work/";
+  var browserHistory = [], browserIndex = -1, browserCurrent = "";
+  var frame = el("browser-frame"), urlBar = el("browser-url");
+  function browserNormalize(raw) {
+    raw = (raw || "").trim();
+    if (!raw) return BROWSER_HOME;
+    if (/^https?:\/\//i.test(raw)) return raw;
+    if (/^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(raw)) return "https://" + raw;
+    return "https://en.wikipedia.org/wiki/Special:Search?search=" + encodeURIComponent(raw);
+  }
+  function browserButtons() {
+    el("browser-back").disabled = browserIndex <= 0;
+    el("browser-forward").disabled = browserIndex >= browserHistory.length - 1;
+  }
+  function browserHideBlocked() { el("browser-blocked").classList.add("hidden-window"); }
+  function browserShowBlocked() { el("browser-blocked").classList.remove("hidden-window"); }
+  function browserCheckBlocked() {
+    setTimeout(function () {
+      try {
+        var doc = frame.contentDocument;
+        if (!doc || (doc.URL === "about:blank" && browserCurrent !== "about:blank")) browserShowBlocked();
+        else browserHideBlocked();
+      } catch (e) {
+        browserHideBlocked(); /* cross-origin page loaded fine, we just cannot inspect it */
+      }
+    }, 700);
+  }
+  function browserGo(url, push) {
+    browserCurrent = url;
+    urlBar.value = url;
+    frame.src = url;
+    if (push) {
+      browserHistory = browserHistory.slice(0, browserIndex + 1);
+      browserHistory.push(url);
+      browserIndex = browserHistory.length - 1;
+    }
+    browserButtons();
+    browserHideBlocked();
+    browserCheckBlocked();
+  }
+  function browserNavigate(raw) { browserGo(browserNormalize(raw), true); }
+  function browserInit() {
+    if (browserIndex < 0) browserGo(BROWSER_HOME, true);
+    else urlBar.value = browserCurrent;
+  }
+  on("browser-back", "click", function () {
+    if (browserIndex > 0) { browserIndex--; browserGo(browserHistory[browserIndex], false); }
+  });
+  on("browser-forward", "click", function () {
+    if (browserIndex < browserHistory.length - 1) { browserIndex++; browserGo(browserHistory[browserIndex], false); }
+  });
+  on("browser-reload", "click", function () {
+    if (browserCurrent) { frame.src = browserCurrent; browserHideBlocked(); browserCheckBlocked(); }
+  });
+  on("browser-open-tab", "click", function () {
+    if (browserCurrent) window.open(browserCurrent, "_blank", "noopener");
+  });
+  on("browser-blocked-open", "click", function () {
+    if (browserCurrent) window.open(browserCurrent, "_blank", "noopener");
+  });
+  urlBar.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") { e.preventDefault(); browserNavigate(urlBar.value); urlBar.blur(); }
+    else if (e.key === "Escape") { urlBar.value = browserCurrent; urlBar.blur(); }
+  });
+  urlBar.addEventListener("focus", function () { urlBar.select(); });
+  frame.addEventListener("load", browserCheckBlocked);
+
   /* ================= search palette ================= */
   var PALETTE_ITEMS = [
     { label: "About Marcin", hint: "Window", run: function () { openWindow("about"); } },
     { label: "Work", hint: "Window", run: function () { openWindow("work"); } },
-    { label: "Work Showcase", hint: "Page", run: function () { window.location.href = "work/"; } },
+    { label: "Browser", hint: "Window", run: function () { openWindow("browser"); } },
+    { label: "Work Showcase", hint: "Browser", run: function () { openWindow("browser"); } },
     { label: "Projects", hint: "Window", run: function () { openWindow("projects"); } },
     { label: "Marcin Hub", hint: "Project", run: function () { openWindow("projects"); } },
     { label: "OpenAutoLink", hint: "Project", run: function () { openWindow("projects"); } },
