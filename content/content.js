@@ -101,6 +101,11 @@ window.SITE_CONTENT = {
     sizzleTitle: "Sizzle Reel",
     sizzleNote: "Video coming soon."
   },
+  wallpapers: [
+    { id: "skyline", label: "Shanghai Skyline", type: "image", src: "assets/skyline.jpg" },
+    { id: "cream", label: "Solid Cream", type: "solid", src: "" },
+    { id: "wave", label: "The Great Wave", type: "image", src: "assets/wallpaper.jpg" }
+  ],
   notes: {
     motto: "Build it, ship it, learn from it.",
     resumeNote: "Resume PDF coming soon.",
