@@ -111,7 +111,7 @@ window.SITE_CONTENT = {
     resumeNote: "Resume PDF coming soon.",
     contact: {
       email: "marcin.fracz@gmail.com",
-      linkedin: "[PLACEHOLDER_LINKEDIN_URL]"
+      linkedin: "https://www.linkedin.com/in/marcinfracz/"
     }
   }
 };
