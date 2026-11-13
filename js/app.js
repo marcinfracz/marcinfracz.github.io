@@ -413,7 +413,7 @@
   /* ================= preferences ================= */
   var PREF_KEY = "mf-site-prefs-v6";
   var prefs = {
-    wallpaper: "skyline", mode: "framed", dark: false,
+    wallpaper: "shanghai-mist", mode: "framed", dark: false,
     widgets: { clocks: { on: true, size: "M" }, weather: { on: false, size: "S" } },
     welcome: true
   };
@@ -438,74 +438,44 @@
   function savePrefs() { try { localStorage.setItem(PREF_KEY, JSON.stringify(prefs)); } catch (e) {} }
 
   /* ================= wallpaper ================= */
-  /* All art is public domain or openly licensed (CC BY / CC BY-SA / CC0), via Wikimedia Commons.
-     The Great Wave (Hokusai) was removed entirely: it copied Zain's site too directly. */
-  var WP_ART = {
-    skyline: { label: "Shanghai Skyline", type: "image", src: "assets/skyline.jpg", thumb: "assets/skyline.jpg", caption: "Shanghai · Lujiazui", credit: "Shanghai skyline at dawn." },
-    satta: { label: "The Sea at Satta", type: "image", src: "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f1/Ando_Hiroshige_-_The_Sea_at_Satta%2C_Suruga_Province%2C_from_the_series_%22Thirty-six_Views_of_Mount_Fuji%22_-_Google_Art_Project.jpg/1920px-Ando_Hiroshige_-_The_Sea_at_Satta%2C_Suruga_Province%2C_from_the_series_%22Thirty-six_Views_of_Mount_Fuji%22_-_Google_Art_Project.jpg", caption: "The Sea at Satta, Suruga Province", credit: "Utagawa Hiroshige, 1858. Public domain, via Wikimedia Commons." },
-    shower: { label: "Sudden Shower", type: "image", src: "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/72/Hiroshige%2C_Sudden_shower_over_Shin-%C5%8Chashi_bridge_and_Atake%2C_1857.jpg/1920px-Hiroshige%2C_Sudden_shower_over_Shin-%C5%8Chashi_bridge_and_Atake%2C_1857.jpg", caption: "Sudden Shower over Shin-Ōhashi Bridge", credit: "Utagawa Hiroshige, 1857. Public domain, via Wikimedia Commons." },
-    "oi-river": { label: "The Ōi River", type: "image", src: "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c2/Hiroshige%2C_%C5%8Ci_River_between_Suruga_and_Totomi%2C_1858.jpg/1920px-Hiroshige%2C_%C5%8Ci_River_between_Suruga_and_Totomi%2C_1858.jpg", caption: "The Ōi River between Suruga and Totomi", credit: "Utagawa Hiroshige, 1858. Public domain, via Wikimedia Commons." },
-    "model-t": { label: "Model T Tourabout", type: "image", src: "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/de/Ford_Model_T_Tourabout-_P6280014.jpg/1920px-Ford_Model_T_Tourabout-_P6280014.jpg", caption: "Ford Model T Tourabout, 1910", credit: "Photo: Ermell, CC BY-SA 4.0, via Wikimedia Commons." },
-    "cadillac-1930": { label: "Cadillac 1930 Ad", type: "image", src: "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4a/Cadillac_Automobile_Company_of_Boston_1930.jpg/1920px-Cadillac_Automobile_Company_of_Boston_1930.jpg", caption: "Cadillac, 1930 advertisement", credit: "Cadillac Motor Car Co., 1930. Public domain, via Wikimedia Commons." },
-    "bel-air": { label: "1957 Bel Air", type: "image", src: "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/84/1957_Chevrolet_Bel_Air_4-Door_Sedan_1X7A2547.jpg/1920px-1957_Chevrolet_Bel_Air_4-Door_Sedan_1X7A2547.jpg", caption: "1957 Chevrolet Bel Air", credit: "Photo: Alexander-93, CC BY-SA 4.0, via Wikimedia Commons." },
-    "bugatti-35": { label: "Bugatti Type 35", type: "image", src: "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4c/Bugatti_Type_35.jpg/1920px-Bugatti_Type_35.jpg", caption: "Bugatti Type 35, 1924", credit: "Photo: Dontpanic, CC BY-SA 3.0, via Wikimedia Commons." },
-    ssk: { label: "1929 Mercedes SSK", type: "image", src: "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c2/1929_Mercedes-Benz_SSK_Louwman.jpg/1920px-1929_Mercedes-Benz_SSK_Louwman.jpg", caption: "1929 Mercedes-Benz SSK", credit: "Photo: Rutger van der Maar, CC BY 2.0, via Wikimedia Commons." },
-    xk120: { label: "1951 Jaguar XK120", type: "image", src: "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/67/1951_Jaguar_XK120_2.jpg/1920px-1951_Jaguar_XK120_2.jpg", caption: "1951 Jaguar XK120", credit: "Photo: Calreyn88, CC BY-SA 4.0, via Wikimedia Commons." },
-    "2000gt": { label: "1968 Toyota 2000GT", type: "image", src: "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d1/1968_Toyota_2000GT_Low.jpg/1920px-1968_Toyota_2000GT_Low.jpg", caption: "1968 Toyota 2000GT", credit: "Photo: MrWalkr, CC BY-SA 4.0, via Wikimedia Commons." },
-    "240z": { label: "1971 Datsun 240Z", type: "image", src: "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c7/1971_Datsun_240Z_East_African_Safari_Rally.jpg/1920px-1971_Datsun_240Z_East_African_Safari_Rally.jpg", caption: "1971 Datsun 240Z, East African Safari Rally", credit: "Photo: TTTNIS, CC0, via Wikimedia Commons." },
-    s600: { label: "Honda S600", type: "image", src: "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/66/Honda_S600.jpg/1920px-Honda_S600.jpg", caption: "Honda S600, 1965", credit: "Honda S600, 1965. Public domain, via Wikimedia Commons." },
-    eniac: { label: "ENIAC", type: "image", src: "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ee/Classic_shot_of_the_ENIAC_%28full_resolution%29.jpg/1920px-Classic_shot_of_the_ENIAC_%28full_resolution%29.jpg", caption: "ENIAC, 1946", credit: "U.S. Army photo, 1946. Public domain, via Wikimedia Commons." },
-    telephone: { label: "Bell Telephone", type: "image", src: "https://upload.wikimedia.org/wikipedia/commons/f/f6/Bell_Centennial_telephone_receiver_%26_transmitter_1876.png", caption: "Bell telephone, 1876", credit: "Elmer Ellsworth Burns, 1876. Public domain, via Wikimedia Commons." },
-    telegraph: { label: "Morse Telegraph Key", type: "image", src: "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4c/Morse-telegraph-key-150k-4096-diffuse_%28Smithsonian_Institution%29.png/1920px-Morse-telegraph-key-150k-4096-diffuse_%28Smithsonian_Institution%29.png", caption: "Morse telegraph key, 19th century", credit: "Smithsonian Institution. CC0, via Wikimedia Commons." },
-    "euc-rider": { label: "EUC Rider", type: "image", src: "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/77/Electric_Unicycle_%2837731880914%29.jpg/1920px-Electric_Unicycle_%2837731880914%29.jpg", caption: "Rider on an electric unicycle, 2017", credit: "Photo: Billie Grace Ward, CC BY 2.0, via Wikimedia Commons." },
-    solowheel: { label: "Solowheel", type: "image", src: "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/98/Solowheel_in_Rehbinderintie_C_IMG_5998.jpg/1920px-Solowheel_in_Rehbinderintie_C_IMG_5998.jpg", caption: "Solowheel in Helsinki, c. 2015", credit: "Photo: Anneli Salo, CC BY-SA 4.0, via Wikimedia Commons." },
-    v12s: { label: "INMOTION V12S", type: "image", src: "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f1/INMOTION_V12S_electric_unicycle.jpg/1920px-INMOTION_V12S_electric_unicycle.jpg", caption: "INMOTION V12S electric unicycle, 2024", credit: "Photo: Ervinv364, CC BY-SA 4.0, via Wikimedia Commons." },
-    cream: { label: "Solid Cream", type: "solid", src: "", color: "#e8e2d5", caption: "", credit: "A plain warm wall." },
-    stone: { label: "Warm Stone", type: "solid", src: "", color: "#d6d3d1", caption: "", credit: "A plain stone-grey wall." },
-    sage: { label: "Soft Sage", type: "solid", src: "", color: "#dde6dc", caption: "", credit: "A plain sage wall." },
-    slate: { label: "Deep Slate", type: "solid", src: "", color: "#292524", caption: "", credit: "A plain dark slate wall." }
-  };
-  var WP_PACKS = [
-    { id: "shanghai", label: "Shanghai", items: ["skyline"] },
-    { id: "woodblock", label: "Japanese Woodblock", items: ["satta", "shower", "oi-river"] },
-    { id: "american", label: "American Cars", items: ["model-t", "cadillac-1930", "bel-air"] },
-    { id: "european", label: "European Cars", items: ["bugatti-35", "ssk", "xk120"] },
-    { id: "asian", label: "Asian Cars", items: ["2000gt", "240z", "s600"] },
-    { id: "tech", label: "Technology", items: ["eniac", "telephone", "telegraph"] },
-    { id: "euc", label: "Electric Unicycles", items: ["euc-rider", "solowheel", "v12s"] },
-    { id: "solid", label: "Solid Colors", items: ["cream", "stone", "sage", "slate"] }
-  ];
-  function packOf(id) {
-    for (var i = 0; i < WP_PACKS.length; i++) {
-      if (WP_PACKS[i].items.indexOf(id) !== -1) return WP_PACKS[i].id;
+  /* ================= wallpaper ================= */
+  /* v17: 4 categories x 5 items, defined in content.js (wallpaperSettings).
+     All 15 images are AI-generated for this site (no people). Old packs
+     (Wikimedia prints, cars, EUC photos, Great Wave) removed. */
+  var WP_CATEGORIES = C.wallpaperSettings.categories;
+  function wpFind(id) {
+    for (var i = 0; i < WP_CATEGORIES.length; i++) {
+      var items = WP_CATEGORIES[i].items;
+      for (var j = 0; j < items.length; j++) if (items[j].id === id) return items[j];
     }
-    return "shanghai";
+    return null;
   }
-  var currentPack = packOf(prefs.wallpaper);
-  function wpThumb(w) {
-    if (w.thumb) return w.thumb;
-    /* Wikimedia only serves allowlisted thumbnail widths; 960px is verified to work, 320px is rejected */
-    if (w.src.indexOf("/1920px-") !== -1) return w.src.replace("/1920px-", "/960px-");
-    return w.src;
+  function categoryOf(id) {
+    for (var i = 0; i < WP_CATEGORIES.length; i++) {
+      var items = WP_CATEGORIES[i].items;
+      for (var j = 0; j < items.length; j++) if (items[j].id === id) return WP_CATEGORIES[i].id;
+    }
+    return "mobility-ai";
   }
+  var currentCategory = categoryOf(prefs.wallpaper);
   function applyWallpaper() {
-    if (!WP_ART[prefs.wallpaper]) prefs.wallpaper = "skyline"; /* e.g. the removed Wave */
-    var art = WP_ART[prefs.wallpaper];
-    Object.keys(WP_ART).forEach(function (id) { document.body.classList.remove("wp-" + id); });
+    var art = wpFind(prefs.wallpaper);
+    if (!art) { prefs.wallpaper = "shanghai-mist"; art = wpFind(prefs.wallpaper); } /* e.g. a removed pack id */
+    WP_CATEGORIES.forEach(function (c) { c.items.forEach(function (it) { document.body.classList.remove("wp-" + it.id); }); });
     document.body.classList.remove("wp-solid", "wp-framed", "wp-full");
     document.body.classList.add("wp-" + prefs.wallpaper, "wp-" + prefs.mode);
-    if (art.type === "solid") document.body.classList.add("wp-solid");
+    if (art.type === "color") document.body.classList.add("wp-solid");
     var wallEl = document.querySelector(".wallpaper");
-    if (wallEl) wallEl.style.background = art.type === "solid" ? art.color : "";
+    if (wallEl) wallEl.style.background = art.type === "color" ? art.value : "";
     var img = el("wallpaper-img");
     if (img) img.src = art.type === "image" ? art.src : "";
     var framedImg = el("framed-art-img");
-    if (framedImg && art.type === "image") { framedImg.src = art.src; framedImg.alt = art.caption || art.label; }
+    if (framedImg && art.type === "image") { framedImg.src = art.src; framedImg.alt = art.name; }
     var cap = el("framed-art-caption");
-    if (cap) cap.textContent = art.caption;
+    if (cap) cap.textContent = art.type === "image" ? art.name : "";
     var credit = el("wp-credit");
-    if (credit) credit.textContent = art.credit;
-    currentPack = packOf(prefs.wallpaper);
+    if (credit) credit.textContent = "";
+    currentCategory = categoryOf(prefs.wallpaper);
     renderWallpaperPanel();
     document.querySelectorAll(".wp-mode").forEach(function (b) {
       b.classList.toggle("active", b.getAttribute("data-wp-mode") === prefs.mode);
@@ -515,27 +485,26 @@
   function renderWallpaperPanel() {
     var packsEl = el("wp-packs");
     if (packsEl) {
-      packsEl.innerHTML = WP_PACKS.map(function (p) {
-        return '<button class="wp-pack-btn' + (p.id === currentPack ? " on" : "") + '" data-wp-pack="' + p.id + '">' + esc(p.label) + "</button>";
+      packsEl.innerHTML = WP_CATEGORIES.map(function (c) {
+        return '<button class="wp-pack-btn' + (c.id === currentCategory ? " on" : "") + '" data-wp-category="' + c.id + '">' + esc(c.name) + "</button>";
       }).join("");
     }
-    var pack = null;
-    WP_PACKS.forEach(function (p) { if (p.id === currentPack) pack = p; });
-    if (!pack) pack = WP_PACKS[0];
-    el("wp-options").innerHTML = pack.items.map(function (id) {
-      var w = WP_ART[id];
-      var sw = w.type === "solid"
-        ? "background:" + w.color + ";border:1px solid #d6d3d1"
-        : "background-image:url('" + esc(wpThumb(w)) + "')";
-      var active = id === prefs.wallpaper;
-      return '<button class="wp-option' + (active ? " active" : "") + '" data-wp="' + id + '">' +
-        '<span class="wp-swatch" style="' + sw + '"></span>' + esc(w.label) +
+    var cat = null;
+    WP_CATEGORIES.forEach(function (c) { if (c.id === currentCategory) cat = c; });
+    if (!cat) cat = WP_CATEGORIES[0];
+    el("wp-options").innerHTML = cat.items.map(function (w) {
+      var sw = w.type === "color"
+        ? "background:" + w.value + ";border:1px solid #d6d3d1"
+        : "background-image:url('" + esc(w.src) + "')";
+      var active = w.id === prefs.wallpaper;
+      return '<button class="wp-option' + (active ? " active" : "") + '" data-wp="' + w.id + '">' +
+        '<span class="wp-swatch" style="' + sw + '"></span>' + esc(w.name) +
         '<span class="check">' + (active ? "✓" : "") + "</span></button>";
     }).join("");
   }
   document.addEventListener("click", function (e) {
-    var pk = e.target.closest("[data-wp-pack]");
-    if (pk) { currentPack = pk.getAttribute("data-wp-pack"); renderWallpaperPanel(); return; }
+    var pk = e.target.closest("[data-wp-category]");
+    if (pk) { currentCategory = pk.getAttribute("data-wp-category"); renderWallpaperPanel(); return; }
     var wp = e.target.closest("[data-wp]");
     if (wp) { prefs.wallpaper = wp.getAttribute("data-wp"); applyWallpaper(); return; }
     var mode = e.target.closest("[data-wp-mode]");
@@ -754,7 +723,7 @@
       });
       savePositions();
     }
-    else if (a === "reset-wallpaper") { prefs.wallpaper = "skyline"; prefs.mode = "framed"; applyWallpaper(); }
+    else if (a === "reset-wallpaper") { prefs.wallpaper = "shanghai-mist"; prefs.mode = "framed"; applyWallpaper(); }
     else if (a === "reset-widgets") {
       markPanelClick();
       prefs.widgets = { clocks: { on: true, size: "M" }, weather: { on: false, size: "S" } };
