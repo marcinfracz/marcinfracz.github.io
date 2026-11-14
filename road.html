@@ -3,655 +3,494 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Marcin Fracz — The Road</title>
-<meta name="description" content="A scroll-driven journey through Marcin Fracz's career, from engineering to Shanghai to AI.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<title>Marcin Fracz — The Road (v3 greybox)</title>
+<meta name="description" content="Greybox draft of The Road v3: plain grey blocks, no art or 3D yet. Story, snap stops and layout only.">
+<meta name="robots" content="noindex, nofollow">
 <style>
+  /* ---- v3 theme tokens (from the brief) ---- */
   :root{
-    --ground:#F4F1EA; --ink:#1E2124; --muted:#8A8A8A; --accent:#E8A33D;
-    --line:#D8D2C4; --card:#FBF9F4; --body:#3d3a35;
-    --header-bg:rgba(244,241,234,.94);
+    --sky1:#E9EDF2; --sky2:#F4F1EA; --terrain:#C9D2DC; --road:#8C99A8;
+    --lane:#F4F1EA; --object:#DCE2E9; --object-shadow:#B8C2CD;
+    --card:#FAFAF7; --card-border:#D5DCE4;
+    --ink:#1E2124; --muted:#4A5562;
+    --accent:#E8A33D; --accent-text:#8A520C; --link:#2563EB;
+    --grey-box:#DCE2E9; --grey-box-border:#8C99A8; --grey-box-text:#4A5562;
+    --header-h:96px; --header-bg:#FAFAF7;
   }
   [data-theme="dark"]{
-    --ground:#191B1D; --ink:#F4F1EA; --muted:#9A978E; --accent:#E8A33D;
-    --line:#36393D; --card:#232629; --body:#D6D0C2;
-    --header-bg:rgba(25,27,29,.94);
+    --sky1:#0E1114; --sky2:#161A20; --terrain:#1A1F26; --road:#262D36;
+    --lane:#3A4350; --object:#222831; --object-shadow:#2E3640;
+    --card:#161A20; --card-border:#2A313B;
+    --ink:#ECEEF1; --muted:#A3ACB8;
+    --accent:#F2B456; --accent-text:#F2B456; --link:#6B9BFF;
+    --grey-box:#222831; --grey-box-border:#3A4350; --grey-box-text:#A3ACB8;
+    --header-bg:#161A20;
   }
   *{margin:0;padding:0;box-sizing:border-box}
-  html{scroll-behavior:auto}
-  body{background:var(--ground);color:var(--ink);font-family:Inter,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-  a{color:inherit;text-decoration:none}
-  .mono{font-family:"JetBrains Mono",monospace}
+  html,body{height:100%}
+  body{
+    background:linear-gradient(var(--sky1), var(--sky2));
+    color:var(--ink);
+    font-family:Inter,-apple-system,"Segoe UI",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit}
+  button{font-family:inherit;cursor:pointer}
 
-  /* ---------- top bar ---------- */
-  header{position:fixed;inset:0 0 auto 0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:18px 28px;pointer-events:none}
-  header .brand{font-weight:900;letter-spacing:.14em;font-size:13px;pointer-events:auto}
-  header .brand span{color:var(--accent)}
-  header nav{display:flex;gap:22px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;pointer-events:auto}
-  header nav a{opacity:.65}
-  header nav a:hover{opacity:1}
-  .head-right{display:flex;gap:14px;align-items:center;pointer-events:auto}
-  .head-resume{display:none}
-  #theme-toggle{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--ink);background:var(--card);color:var(--ink);font-size:16px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
-  #progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0%;z-index:60}
+  /* ---- fixed header band: nothing ever enters it ---- */
+  header{
+    position:fixed; inset:0 0 auto 0; z-index:100;
+    height:var(--header-h);
+    background:var(--header-bg);
+    border-bottom:1px solid var(--card-border);
+    display:flex; flex-direction:column; justify-content:center;
+    padding:0 20px; gap:6px;
+  }
+  .head-row{display:flex; align-items:center; justify-content:space-between; gap:16px}
+  .brand{font-weight:900; letter-spacing:.12em; font-size:14px; text-decoration:none; display:flex; align-items:center; gap:8px; white-space:nowrap}
+  .brand .home-ico{font-size:15px}
+  .brand span{color:var(--accent-text)}
+  .head-links{display:flex; align-items:center; gap:16px; font-size:12px; letter-spacing:.1em; text-transform:uppercase}
+  .head-links a{opacity:.75; text-decoration:none}
+  .head-links a:hover{opacity:1}
+  .head-status{font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--muted); letter-spacing:.06em; white-space:nowrap}
+  #theme-toggle{width:34px; height:34px; border-radius:50%; border:1.5px solid var(--ink); background:var(--card); color:var(--ink); font-size:15px; line-height:1; display:flex; align-items:center; justify-content:center; flex:none}
+  /* left-to-right progress arrow: 7 era segments + arrowhead */
+  .progress-arrow{display:flex; align-items:stretch; gap:0; overflow-x:auto; scrollbar-width:none; padding-bottom:1px}
+  .progress-arrow::-webkit-scrollbar{display:none}
+  .progress-arrow button{
+    flex:1 1 0; min-width:86px; border:1px solid var(--card-border);
+    background:var(--grey-box); color:var(--grey-box-text);
+    font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    padding:7px 10px 7px 16px; text-align:left; white-space:nowrap;
+    clip-path:polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%, 10px 50%);
+    margin-left:-6px;
+  }
+  .progress-arrow button:first-child{clip-path:polygon(0 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 0 100%); margin-left:0; padding-left:10px}
+  .progress-arrow button[aria-current="true"]{background:var(--accent); color:#1E2124}
+  .progress-arrow button:focus-visible{outline:2px solid var(--link); outline-offset:2px}
 
-  /* ---------- road ---------- */
-  #road-scroll{position:relative}
-  #road-sticky{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden}
-  #road-bg{position:absolute;inset:0;pointer-events:none;
-    background-image:radial-gradient(circle, var(--line) 1px, transparent 1px);
-    background-size:34px 34px;opacity:.45}
-  #road-track{display:flex;height:100%;width:max-content;will-change:transform}
-  .panel{flex:0 0 100vw;width:100vw;height:100%;position:relative;display:flex;flex-direction:column;justify-content:center;padding:96px 7vw 120px}
-  .panel .inner{max-width:1060px;width:100%;margin:0 auto;position:relative;z-index:2}
+  /* ---- prev / next: fixed at screen edges, in the gutter, never over content ---- */
+  .edge-btn{
+    position:fixed; top:50%; transform:translateY(-50%); z-index:90;
+    width:44px; height:44px; border-radius:50%;
+    border:1.5px solid var(--ink); background:var(--card); color:var(--ink);
+    font-size:20px; line-height:1; display:flex; align-items:center; justify-content:center;
+  }
+  .edge-btn:disabled{opacity:.3; cursor:default}
+  #prev-btn{left:12px}
+  #next-btn{right:12px}
 
-  /* intro */
-  .kicker{font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--muted);margin-bottom:18px}
-  h1{font-size:clamp(56px,10vw,148px);line-height:.92;font-weight:900;letter-spacing:-.03em}
-  h1 em{font-style:normal;color:var(--accent)}
-  .lede{margin-top:22px;font-size:clamp(16px,1.6vw,21px);line-height:1.55;color:var(--body);max-width:560px}
-  .scroll-hint{margin-top:44px;display:flex;align-items:center;gap:12px;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
-  .scroll-hint .mouse{width:22px;height:36px;border:2px solid var(--ink);border-radius:12px;position:relative}
-  .scroll-hint .mouse::after{content:"";position:absolute;left:50%;top:7px;width:4px;height:8px;margin-left:-2px;border-radius:2px;background:var(--accent);animation:wheel 1.8s ease-in-out infinite}
-  @keyframes wheel{0%{transform:translateY(0);opacity:1}70%{transform:translateY(10px);opacity:0}100%{transform:translateY(0);opacity:0}}
+  /* ---- track: horizontal ONLY on laptop/tablet ---- */
+  #track{
+    display:flex; height:100vh; height:100svh;
+    overflow-x:auto; overflow-y:hidden;
+    scroll-snap-type:x mandatory;
+    scrollbar-width:none; -ms-overflow-style:none;
+  }
+  #track::-webkit-scrollbar{display:none}
+  .panel{
+    flex:0 0 100vw; width:100vw; height:100%;
+    scroll-snap-align:start; scroll-snap-stop:always;
+    padding:calc(var(--header-h) + 18px) 72px 24px;
+    display:flex; flex-direction:column; justify-content:flex-start;
+  }
+  .panel-inner{max-width:1180px; width:100%; margin:0 auto; min-height:0; overflow-y:auto; scrollbar-width:none}
+  .panel-inner::-webkit-scrollbar{display:none}
+  /* Safety net only: on a normal laptop this never scrolls. On a very
+     short viewport it keeps long stops readable instead of overlapping
+     or clipping. The page itself never scrolls vertically. */
+  @media (max-width:1150px){
+    .panel{padding-left:64px; padding-right:64px}
+    .stop-grid{grid-template-columns:minmax(240px,300px) minmax(220px,1fr) minmax(180px,240px); gap:12px}
+    .hero-box{min-height:200px; padding:14px}
+    .stop-card{padding:16px}
+  }
+  .stop-kicker{font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--muted); margin-bottom:10px}
+  .stop-kicker b{color:var(--accent-text)}
+  /* safe zones: card | hero placeholder | callout placeholders. Nothing overlaps. */
+  .stop-grid{display:grid; grid-template-columns:minmax(280px,360px) minmax(260px,1fr) minmax(210px,280px); gap:20px; align-items:start}
+  .stop-card{background:var(--card); border:1px solid var(--card-border); padding:20px 22px}
+  .stop-card h2{font-size:clamp(24px,2.6vw,36px); line-height:1.05; font-weight:900; letter-spacing:-.01em; margin-bottom:6px}
+  .stop-card .role{font-size:14px; line-height:1.45; color:var(--ink); margin-bottom:10px}
+  .stop-card .meta{font-family:"JetBrains Mono",monospace; font-size:12px; color:var(--muted); line-height:1.6; margin-bottom:12px}
+  .stop-card .what{font-size:15px; line-height:1.55; margin-bottom:14px}
+  .wins{list-style:none; display:flex; flex-direction:column; gap:8px}
+  .wins li{border-left:3px solid var(--accent); padding:2px 0 2px 10px; font-size:13.5px; line-height:1.45}
+  .wins li b{font-size:15px}
+  .more-btn{margin-top:14px; border:1.5px solid var(--ink); background:transparent; color:var(--ink); border-radius:999px; padding:8px 14px; font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase}
+  .more-btn[aria-expanded="true"]{background:var(--ink); color:var(--card)}
+  .hero-box{
+    background:var(--grey-box); border:2px dashed var(--grey-box-border);
+    min-height:260px; padding:20px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:10px;
+  }
+  .hero-box .ph-label{font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--grey-box-text)}
+  .hero-box .ph-title{font-size:17px; font-weight:800; line-height:1.3}
+  .hero-box .ph-note{font-size:13px; line-height:1.5; color:var(--grey-box-text); max-width:340px}
+  .callouts{display:flex; flex-direction:column; gap:12px}
+  .callout-box{background:var(--grey-box); border:1.5px dashed var(--grey-box-border); padding:12px 14px}
+  .callout-box .ph-label{font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--grey-box-text); display:block; margin-bottom:5px}
+  .callout-box .ph-title{font-size:13.5px; font-weight:800; line-height:1.3}
+  .callout-box p{font-size:13px; line-height:1.5; color:var(--grey-box-text); margin-top:4px}
+  .callout-none{font-size:12px; color:var(--muted); font-family:"JetBrains Mono",monospace}
+  .note-box{grid-column:1 / -1; background:var(--grey-box); border:1px dashed var(--grey-box-border); padding:12px 16px; font-size:12.5px; line-height:1.55; color:var(--grey-box-text); margin-top:20px}
+  .note-box b{color:var(--ink)}
+  .more-box{grid-column:1 / -1; background:var(--card); border:1px solid var(--card-border); padding:16px 18px; margin-top:20px}
+  .more-box h3{font-size:13px; letter-spacing:.16em; text-transform:uppercase; margin-bottom:8px}
+  .more-box p{font-size:14px; line-height:1.6}
+  .more-box .open-flag{font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--accent-text); margin-top:8px}
+  [hidden]{display:none !important}
 
-  /* era */
-  .era-top{display:flex;align-items:baseline;gap:18px;flex-wrap:wrap}
-  .era-num{font-family:"JetBrains Mono",monospace;font-size:13px;letter-spacing:.2em;color:var(--muted)}
-  .era-dates{display:inline-block;border:1.5px solid var(--ink);border-radius:999px;padding:6px 14px;font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.08em;background:var(--card)}
-  .era h2{font-size:clamp(38px,5.2vw,76px);line-height:.98;font-weight:900;letter-spacing:-.02em;margin:18px 0 8px}
-  .era .role{font-size:clamp(14px,1.4vw,18px);color:var(--body);letter-spacing:.02em}
-  .era-grid{display:flex;gap:48px;align-items:flex-end;margin-top:30px;flex-wrap:wrap}
-  .era-proof .big{font-size:clamp(56px,7vw,110px);font-weight:900;line-height:.9;letter-spacing:-.03em}
-  .era-proof .big small{font-size:.42em;font-weight:800}
-  .era-proof .lbl{margin-top:8px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);max-width:220px;line-height:1.5}
-  .era p.story{max-width:520px;font-size:clamp(15px,1.35vw,18px);line-height:1.6;color:var(--body)}
-  .era p.story b{color:var(--ink)}
-  .era-scene{position:relative;margin-top:30px}
-  /* Ferdio-style scenes: looping video clips generated from the flat
-     line-drawn stills, same palette (off-white, navy ink, amber).
-     Motion is slow, small and restrained: one element moves inside a
-     still scene. Poster is the matching still, so the scene holds
-     its frame before the clip loads. */
-  .scene-svg,.scene-video{width:min(680px,72vw);height:auto;display:block}
-  .s-line{fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-  .s-thin{fill:none;stroke:var(--ink);stroke-width:1.25;opacity:.5;stroke-linecap:round}
-  .s-accent{fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round}
-  .s-dot{fill:var(--accent)}
-  .s-ink-dot{fill:var(--ink)}
-  .s-fill{fill:var(--ground);stroke:var(--ink);stroke-width:2;stroke-linejoin:round}
-  .s-card{fill:var(--card);stroke:var(--ink);stroke-width:2;stroke-linejoin:round}
-  .s-label{font-family:"JetBrains Mono",monospace;font-size:13px;letter-spacing:.18em;fill:var(--muted)}
-  .s-label-sm{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.14em;fill:var(--muted)}
-  .lbl{opacity:0;transition:opacity .9s ease}
-  .panel.era.active .lbl{opacity:1}
-  .lbl.d1{transition-delay:.25s}.lbl.d2{transition-delay:.55s}.lbl.d3{transition-delay:.85s}.lbl.d4{transition-delay:1.15s}
-  .blink{opacity:.2;transition:opacity .7s ease}
-  .blink.on{opacity:1}
-  .float-slow{animation:float-y 7s ease-in-out infinite}
-  .float-slower{animation:float-y 9s ease-in-out infinite}
-  @keyframes float-y{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-  .draw{stroke-dasharray:700;stroke-dashoffset:700}
-  .panel.era.active .draw{animation:draw-in 2.6s ease forwards}
-  @keyframes draw-in{to{stroke-dashoffset:0}}
-  .spin-dash{animation:spin-dash 3s linear infinite}
-  @keyframes spin-dash{to{stroke-dashoffset:-42}}
-  .dash-move{animation:dash-move 1.2s linear infinite}
-  @keyframes dash-move{to{stroke-dashoffset:-32}}
-  .ring-pulse{transform-box:fill-box;transform-origin:center;animation:ring-pulse 3s ease-out infinite}
-  .ring-pulse.r2{animation-delay:1s}.ring-pulse.r3{animation-delay:2s}
-  @keyframes ring-pulse{0%{opacity:.9;transform:scale(.55)}100%{opacity:0;transform:scale(1.5)}}
-  .sun-pulse{transform-box:fill-box;transform-origin:center;animation:sun-pulse 5s ease-in-out infinite}
-  @keyframes sun-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
-  /* small modules: chips + one-line answer, and the PMV demo bars */
-  .module{margin-top:24px;border-top:1px solid var(--line);padding-top:16px}
-  .mod-label{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
-  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-  .chip{border:1.5px solid var(--ink);border-radius:999px;padding:8px 14px;font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:600;letter-spacing:.06em;background:transparent;color:var(--ink);cursor:pointer;min-height:40px}
-  .chip.on{background:var(--ink);color:var(--ground)}
-  .mod-out{margin-top:12px;font-size:15px;line-height:1.55;color:var(--body)}
-  .mod-out b{color:var(--ink)}
-  .pmv-bars{display:flex;align-items:flex-end;gap:14px;height:110px;margin-top:14px}
-  .pmv-bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
-  .pmv-bar i{display:block;width:100%;background:var(--accent);min-height:4px;transition:height .5s ease}
-  .pmv-bar:first-child i{background:var(--ink)}
-  .pmv-bar span{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--muted);text-align:center}
-  .pmv-note{margin-top:10px;font-size:11px;color:var(--muted);letter-spacing:.04em}
-  .cutouts figure{transition:opacity .4s ease}
-  .cutouts figure.dim{opacity:.35}
-  .cutouts{display:flex;gap:24px;align-items:flex-end;margin-top:26px;flex-wrap:wrap}
-  .cutouts img{display:block;height:110px;width:auto}
-  .cutouts figure{margin:0}
-  .cutouts figcaption{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:8px;text-align:center}
-  .panel.active .era-dates{background:var(--ink);color:var(--ground);border-color:var(--ink)}
+  /* intro + finale panels */
+  .panel-intro .panel-inner, .panel-finale .panel-inner{max-width:820px; text-align:left}
+  .panel-intro h1{font-size:clamp(52px,9vw,120px); line-height:.92; font-weight:900; letter-spacing:-.03em}
+  .panel-intro h1 em{font-style:normal; color:var(--accent-text)}
+  .panel-intro .lede{margin-top:20px; font-size:clamp(16px,1.6vw,21px); line-height:1.55; max-width:560px}
+  .panel-intro .tagline{margin-top:22px; font-size:clamp(18px,2vw,26px); font-weight:800; line-height:1.3}
+  .panel-intro .hint{margin-top:28px; font-size:12px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted)}
+  .panel-finale h2{font-size:clamp(36px,5vw,64px); line-height:.95; font-weight:900; letter-spacing:-.02em}
+  .panel-finale p{margin-top:16px; font-size:16px; line-height:1.55; max-width:520px}
+  .panel-finale .home-btn{display:inline-block; margin-top:26px; background:var(--accent); color:#1E2124; border:1.5px solid #1E2124; border-radius:999px; padding:14px 24px; font-size:14px; font-weight:800; letter-spacing:.06em; text-decoration:none}
+  .panel-finale .fine-links{margin-top:22px; display:flex; gap:20px; font-size:12px; letter-spacing:.1em; text-transform:uppercase; flex-wrap:wrap}
+  .panel-finale .fine-links a{opacity:.75}
+  .error-box{padding:calc(var(--header-h) + 24px) 24px; max-width:720px; font-size:15px; line-height:1.6}
 
-  /* contact */
-  .contact h2{font-size:clamp(44px,7vw,96px);line-height:.95;font-weight:900;letter-spacing:-.02em}
-  .contact .email{display:inline-block;margin-top:26px;font-size:clamp(20px,2.6vw,34px);font-weight:800;border-bottom:3px solid var(--accent);padding-bottom:4px}
-  .contact .links{margin-top:26px;display:flex;gap:22px;font-size:13px;letter-spacing:.12em;text-transform:uppercase}
-  .contact .links a{opacity:.65}
-  .contact .links a:hover{opacity:1}
-  .contact .fine{margin-top:44px;font-size:12px;color:var(--muted);letter-spacing:.06em}
-
-  /* the line */
-  #road-svg{position:absolute;left:0;bottom:0;width:100%;height:34vh;z-index:1;pointer-events:none;overflow:visible}
-  /* Hunter's line: one smooth wave. Ahead of the car it is a thin dim
-     grey line (1px); behind the car it is amber, only slightly thicker. */
-  #road-svg path{fill:none;stroke:var(--muted);stroke-width:1}
-  #road-line-progress{fill:none;stroke:var(--accent);stroke-width:2.5;stroke-linecap:round}
-  /* nodes sit on the wave: hollow until the car passes, then solid amber */
-  #road-nodes circle{fill:var(--ground);stroke:var(--muted);stroke-width:1.5}
-  #road-nodes circle.done{fill:var(--accent);stroke:var(--accent)}
-  #road-nodes text{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.08em;fill:var(--muted)}
-  #road-nodes line{stroke:var(--line);stroke-width:1}
-  /* top-down car, like Hunter's: white body, ink outline, two dark windows */
-  #road-car .car-body{fill:#fff;stroke:var(--ink);stroke-width:1.5}
-  #road-car .car-window{fill:var(--ink)}
-
-  /* dark: the SVG scenes use theme variables, so they flip on their own.
-     Only the dark-blue cutouts need a lift. */
-  [data-theme="dark"] .cutouts img{filter:brightness(1.12)}
-  .era-label{position:absolute;left:7vw;bottom:calc(34vh + 14px);font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);z-index:2}
-
-  @media (max-width:700px){
-    /* PHONE (not tablet): vertical, app-like. No horizontal road.
-       Tablet at 768px+ keeps the horizontal scroll. */
-    header{position:sticky;padding:12px 16px;background:var(--header-bg);backdrop-filter:blur(12px)}
-    header .brand{font-size:12px}
-    header nav{display:none}
-    .head-resume{display:inline-block;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
-    /* nodes now live on the SVG line itself, so no CSS dots on the panels */
-    #road-nodes text{display:none}
-    #road-sticky{position:relative;height:auto;overflow:visible}
-    #road-track{flex-direction:column;width:auto;transform:none !important}
-    #road-bg{display:none}
-    /* phone: the SVG is the vertical road, a thin curvy line down the left */
-    #road-svg{display:block;position:absolute;left:0;top:0;width:48px;height:100%;z-index:1;pointer-events:none;overflow:visible}
-    #road-svg path{stroke-width:1}
-    #road-line-progress{stroke-width:2.5}
-    /* flex-basis fix: desktop .panel is flex:0 0 100vw, which in a column
-       flex container means a 390px-tall panel. Content taller than that
-       overflowed into the next panel, so each scene image sat under the
-       next era's heading. flex:0 0 auto lets each panel be its real height. */
-    .panel{flex:0 0 auto;width:auto;height:auto;min-height:0;padding:56px 20px 56px 36px;justify-content:flex-start;border-top:1px solid var(--line)}
-    .panel.intro{border-top:none;padding-top:64px}
-    h1{font-size:clamp(44px,15vw,64px)}
-    .lede{font-size:17px}
-    .era h2{font-size:clamp(30px,9vw,42px)}
-    .era-grid{gap:18px;flex-direction:column;align-items:flex-start}
-    .era-proof .big{font-size:clamp(48px,15vw,72px)}
-    .era-proof .lbl{max-width:none}
-    .scene-svg,.scene-video{width:100%;max-width:100%}
-    .cutouts img{height:64px}
-    .contact h2{font-size:clamp(36px,11vw,52px)}
-    .contact .email{font-size:20px;word-break:break-all}
-    .contact .links a{padding:10px 0;min-height:44px;display:inline-flex;align-items:center}
-    .era-scene{margin-top:26px}
-    .scroll-hint .mouse{display:none}
+  /* ---- phones (<768px): vertical ONLY ---- */
+  @media (max-width:767px){
+    :root{--header-h:104px}
+    html,body{overflow-x:hidden; overflow-y:auto}
+    #track{display:block; height:auto; overflow:visible; scroll-snap-type:none}
+    .panel{width:auto; height:auto; min-height:0; padding:calc(var(--header-h) + 16px) 20px 40px; scroll-snap-align:none; scroll-margin-top:calc(var(--header-h) + 8px)}
+    .panel-inner{overflow-y:visible}
+    .stop-grid{grid-template-columns:1fr}
+    .hero-box{min-height:180px}
+    .edge-btn{display:none}
+    header{padding:0 14px}
+    .head-status{display:none}
+    .brand{font-size:12px}
+    .progress-arrow button{min-width:78px; font-size:10px}
   }
   @media (prefers-reduced-motion:reduce){
-    #road-sticky{position:static;height:auto;overflow:visible}
-    #road-track{transform:none !important;overflow-x:auto}
-    .scroll-hint .mouse::after{animation:none}
-    .float-slow,.float-slower,.spin-dash,.dash-move,.ring-pulse,.sun-pulse{animation:none}
-    .panel.era.active .lbl{opacity:1}
+    #track{scroll-behavior:auto}
   }
 </style>
 </head>
 <body>
-<div id="progress"></div>
 <header>
-  <a class="brand" href="/">MARCIN FRACZ <span>— THE ROAD</span></a>
-  <div class="head-right">
-    <nav>
-      <a href="/work/">Work</a>
+  <div class="head-row">
+    <a class="brand" href="https://marcinfracz.github.io/" aria-label="Marcin Fracz - back to the desktop"><span class="home-ico" aria-hidden="true">&#8962;</span> MARCIN FRACZ <span>&mdash; THE ROAD</span></a>
+    <div class="head-links">
+      <span class="head-status" id="stop-status" aria-live="polite"></span>
       <a href="/assets/resume.pdf">Resume</a>
       <a href="mailto:marcin.fracz@gmail.com">Contact</a>
-    </nav>
-    <a class="head-resume" href="/assets/resume.pdf">Resume</a>
-    <button id="theme-toggle" type="button" aria-label="Switch to dark mode">&#9789;</button>
-  </div>
-</header>
-
-<main id="road-scroll">
-  <div id="road-sticky">
-    <div id="road-bg"></div>
-    <svg id="road-svg" aria-hidden="true">
-      <path id="road-line" d=""/>
-      <path id="road-line-progress" d=""/>
-      <g id="road-nodes"></g>
-      <g id="road-car">
-        <rect class="car-body" x="-15" y="-7" width="30" height="14" rx="7"/>
-        <rect class="car-window" x="-6" y="-5" width="7" height="10" rx="1.5"/>
-        <rect class="car-window" x="3" y="-5" width="7" height="10" rx="1.5"/>
-      </g>
-    </svg>
-    <div id="road-track">
-
-      <!-- intro -->
-      <section class="panel intro">
-        <div class="inner">
-          <div class="kicker">Marcin Fracz · Automotive product &amp; software strategy</div>
-          <h1>THE<br>ROAD<em>.</em></h1>
-          <p class="lede">One career, one road. Scroll and drive it — from an engineering floor in 2003, through Detroit and Shanghai, to building AI today.</p>
-          <div class="scroll-hint"><span class="mouse"></span> Scroll to drive</div>
-        </div>
-      </section>
-
-      <!-- 01 engineering -->
-      <section class="panel era" data-era="01">
-        <div class="inner">
-          <div class="era-top"><span class="era-num">01 / 07</span><span class="era-dates">2003 — 2014</span></div>
-          <h2>ENGINEERING</h2>
-          <div class="role">Federal-Mogul · Chrysler · Johnson Controls</div>
-          <div class="era-grid">
-            <div class="era-proof"><div class="big">11</div><div class="lbl">years learning how cars are engineered</div></div>
-            <p class="story">Eleven years on the engineering side — <b>powertrain, interiors, and vehicle systems</b> — before moving to product marketing. The foundation everything after it is built on.</p>
-          <div class="module"><div class="mod-label">On the floor</div><div class="chips"><button type="button" class="chip on" data-out="Eleven years on the engineering side — <b>powertrain</b> — before moving to product marketing.">Powertrain</button><button type="button" class="chip" data-out="Eleven years on the engineering side — <b>interiors</b> — before moving to product marketing.">Interiors</button><button type="button" class="chip" data-out="Eleven years on the engineering side — <b>vehicle systems</b> — before moving to product marketing.">Vehicle systems</button></div><p class="mod-out">Eleven years on the engineering side — <b>powertrain</b> — before moving to product marketing.</p></div>
-          </div>
-          <div class="era-scene"><video class="scene-video" src="assets/road/era-engineering.mp4" poster="assets/road/era-engineering.webp" autoplay muted loop playsinline preload="auto" aria-label="Engineering workshop: a car on a lift, blueprint line above"></video></div>
-        </div>
-      </section>
-
-      <!-- 02 equinox -->
-      <section class="panel era" data-era="02">
-        <div class="inner">
-          <div class="era-top"><span class="era-num">02 / 07</span><span class="era-dates">2014 — 2018</span></div>
-          <h2>EQUINOX</h2>
-          <div class="role">GM · Global Product Marketing, compact &amp; mid crossovers</div>
-          <div class="era-grid">
-            <div class="era-proof"><div class="big">5</div><div class="lbl">countries · Ecuador, Mexico, Canada, China, Korea</div></div>
-            <p class="story">Led the <b>Equinox</b> globally — vehicle product marketing, customer experience, and dealer business development in Mexico — with project and travel assignments across five countries.</p>
-          <div class="module"><div class="mod-label">Five countries</div><div class="chips"><button type="button" class="chip on" data-out="<b>Ecuador</b> — one of five countries in the global Equinox assignment.">Ecuador</button><button type="button" class="chip" data-out="<b>Mexico</b> — dealer business development, and Equinox launch work in Mexico.">Mexico</button><button type="button" class="chip" data-out="<b>Canada</b> — one of five countries in the global Equinox assignment.">Canada</button><button type="button" class="chip" data-out="<b>China</b> — one of five countries in the global Equinox assignment.">China</button><button type="button" class="chip" data-out="<b>Korea</b> — one of five countries in the global Equinox assignment.">Korea</button></div><p class="mod-out"><b>Ecuador</b> — one of five countries in the global Equinox assignment.</p></div>
-          </div>
-          <div class="era-scene"><video class="scene-video" src="assets/road/era-equinox.mp4" poster="assets/road/era-equinox.webp" autoplay muted loop playsinline preload="auto" aria-label="Clay model SUV on a turntable, five country dots above"></video></div>
-        </div>
-      </section>
-
-      <!-- 03 trailblazer / encore gx -->
-      <section class="panel era" data-era="03">
-        <div class="inner">
-          <div class="era-top"><span class="era-num">03 / 07</span><span class="era-dates">2018 — 2020</span></div>
-          <h2>TRAILBLAZER<br>&amp; ENCORE GX</h2>
-          <div class="role">GM · Product Marketing, small SUVs</div>
-          <div class="era-grid">
-            <div class="era-proof"><div class="big">2</div><div class="lbl">nameplates launched, both still selling</div></div>
-            <p class="story">Two nameplates, one segment. The <b>Chevrolet Trailblazer</b> and <b>Buick Encore GX</b> — launched together, and both still on the road today.</p>
-          <div class="module"><div class="mod-label">Pick a nameplate</div><div class="chips"><button type="button" class="chip on" data-target="trailblazer" data-out="<b>Chevrolet Trailblazer</b> — launched 2018, both nameplates still selling.">Trailblazer</button><button type="button" class="chip" data-target="encore" data-out="<b>Buick Encore GX</b> — launched 2018, both nameplates still selling.">Encore GX</button></div><p class="mod-out"><b>Chevrolet Trailblazer</b> — launched 2018, both nameplates still selling.</p></div>
-          </div>
-          <div class="cutouts">
-            <figure data-car="trailblazer"><img src="assets/road/trailblazer-cutout.png" alt="Chevrolet Trailblazer, side profile"><figcaption>Trailblazer</figcaption></figure>
-            <figure data-car="encore"><img src="assets/road/encore-gx-cutout.png" alt="Buick Encore GX, side profile"><figcaption>Encore GX</figcaption></figure>
-          </div>
-          <div class="era-scene"><video class="scene-video" src="assets/road/era-trailblazer-encore.mp4" poster="assets/road/era-trailblazer-encore.webp" autoplay muted loop playsinline preload="auto" aria-label="Open road with two small SUVs driving through low hills"></video></div>
-        </div>
-      </section>
-
-      <!-- 04 connected & ota -->
-      <section class="panel era" data-era="04">
-        <div class="inner">
-          <div class="era-top"><span class="era-num">04 / 07</span><span class="era-dates">2020 — 2022</span></div>
-          <h2>CONNECTED<br>&amp; OTA</h2>
-          <div class="role">GM · Business Strategy Manager, Connected &amp; OTA</div>
-          <div class="era-grid">
-            <div class="era-proof"><div class="big">4</div><div class="lbl">focus areas · Product, CX, Field / Sales / Ops, Software &amp; Digital</div></div>
-            <p class="story">The turn from vehicles to software. Strategy for <b>connected services and over-the-air updates</b> — the work that led to Shanghai.</p>
-          <div class="module"><div class="mod-label">Four focus areas</div><div class="chips"><button type="button" class="chip on" data-out="<b>Product</b> — strategy for connected services and over-the-air updates.">Product</button><button type="button" class="chip" data-out="<b>Customer experience</b> — strategy for connected services and over-the-air updates.">CX</button><button type="button" class="chip" data-out="<b>Field / Sales / Ops</b> — strategy for connected services and over-the-air updates.">Field / Sales / Ops</button><button type="button" class="chip" data-out="<b>Software &amp; Digital</b> — strategy for connected services and over-the-air updates.">Software &amp; Digital</button></div><p class="mod-out"><b>Product</b> — strategy for connected services and over-the-air updates.</p></div>
-          </div>
-          <div class="era-scene"><video class="scene-video" src="assets/road/era-connected-ota.mp4" poster="assets/road/era-connected-ota.webp" autoplay muted loop playsinline preload="auto" aria-label="Connected car with signal waves, cloud and phone"></video></div>
-        </div>
-      </section>
-
-      <!-- 05 shanghai -->
-      <section class="panel era" data-era="05">
-        <div class="inner">
-          <div class="era-top"><span class="era-num">05 / 07</span><span class="era-dates">2022 — 2025</span></div>
-          <h2>SHANGHAI</h2>
-          <div class="role">SAIC-GM · Deputy Director, Software Strategy</div>
-          <div class="era-grid">
-            <div class="era-proof"><div class="big"><small>$</small>167M</div><div class="lbl">L2++ ADAS approved — research &amp; pitch supported the approval</div></div>
-            <p class="story">Three years in Shanghai. Built the <b>software &amp; digital business</b> — about 2,650 people across five departments — and my China ADAS market research and pitch supported GM's approval of $167M for L2++ ADAS development.</p>
-          <div class="module"><div class="mod-label">The team — about 2,650 people</div><div class="chips"><button type="button" class="chip on" data-out="<b>Strategy</b> — 49 people. The department I led as Deputy Director.">Strategy · 49</button><button type="button" class="chip" data-out="<b>Product Development</b> — 455 people.">Product Development · 455</button><button type="button" class="chip" data-out="<b>Product Experience</b> — 57 people.">Product Experience · 57</button><button type="button" class="chip" data-out="<b>Information System</b> — 1,106 people.">Information System · 1,106</button><button type="button" class="chip" data-out="<b>SOS</b> — 986 people.">SOS · 986</button></div><p class="mod-out"><b>Strategy</b> — 49 people. The department I led as Deputy Director.</p></div>
-          </div>
-          <div class="era-scene"><video class="scene-video" src="assets/road/era-shanghai.mp4" poster="assets/road/era-shanghai.webp" autoplay muted loop playsinline preload="auto" aria-label="Shanghai Lujiazui skyline in thin line"></video></div>
-        </div>
-      </section>
-
-      <!-- 06 onstar -->
-      <section class="panel era" data-era="06">
-        <div class="inner">
-          <div class="era-top"><span class="era-num">06 / 07</span><span class="era-dates">2025 — 2026</span></div>
-          <h2>ONSTAR<br>INTERNATIONAL</h2>
-          <div class="role">GM · Manager, Global Planning &amp; Joint Ventures, OnStar Product Marketing</div>
-          <div class="era-grid">
-            <div class="era-proof"><div class="big">8</div><div class="lbl">export regions · Mexico, AMEO, South America, GMAP, South Korea, Israel, ANZ, Central Asia</div></div>
-            <p class="story">Aligned OnStar US, Middle East and Mexico, vehicle brands and three Chinese JVs to deliver <b>OnStar on China-sourced export vehicles</b> across eight regions.</p>
-          <div class="module"><div class="mod-label">Eight export regions</div><div class="chips"><button type="button" class="chip on" data-out="OnStar on China-sourced export vehicles in <b>Mexico</b>.">Mexico</button><button type="button" class="chip" data-out="OnStar on China-sourced export vehicles in <b>AMEO</b>.">AMEO</button><button type="button" class="chip" data-out="OnStar on China-sourced export vehicles in <b>South America</b>.">South America</button><button type="button" class="chip" data-out="OnStar on China-sourced export vehicles in <b>GMAP</b>.">GMAP</button><button type="button" class="chip" data-out="OnStar on China-sourced export vehicles in <b>South Korea</b>.">South Korea</button><button type="button" class="chip" data-out="OnStar on China-sourced export vehicles in <b>Israel</b>.">Israel</button><button type="button" class="chip" data-out="OnStar on China-sourced export vehicles in <b>ANZ</b>.">ANZ</button><button type="button" class="chip" data-out="OnStar on China-sourced export vehicles in <b>Central Asia</b>.">Central Asia</button></div><p class="mod-out">OnStar on China-sourced export vehicles in <b>Mexico</b>.</p></div>
-          </div>
-          <div class="era-scene"><video class="scene-video" src="assets/road/era-onstar.mp4" poster="assets/road/era-onstar.webp" autoplay muted loop playsinline preload="auto" aria-label="World map with eight dots connected by dotted routes"></video></div>
-        </div>
-      </section>
-
-      <!-- 07 now -->
-      <section class="panel era" data-era="07">
-        <div class="inner">
-          <div class="era-top"><span class="era-num">07 / 07</span><span class="era-dates">2026 — NOW</span></div>
-          <h2>AI BUILDER</h2>
-          <div class="role">Marcin Hub · Portfolio Made Visible</div>
-          <div class="era-grid">
-            <div class="era-proof"><div class="big">5<small>×</small></div><div class="lbl">more capable — the Marcin Hub rebuild, my estimate</div></div>
-            <p class="story">GM killed the original app in 2019 — it cost about $3M a year to run. I rebuilt it myself, <b>more capable</b> by my estimate, for about $10–15k in Copilot credits plus my time. Now I build AI tools, and I'm looking for the next director role.</p>
-          <div class="module"><div class="mod-label">Portfolio Made Visible — try it</div><div class="chips"><button type="button" class="chip" data-pmv="ford">Ford</button><button type="button" class="chip on" data-pmv="gm">GM</button><button type="button" class="chip" data-pmv="stellantis">Stellantis</button></div><div class="pmv-bars"><div class="pmv-bar"><i style="height:100%"></i><span>Equinox EV<br>55</span></div><div class="pmv-bar"><i style="height:55%"></i><span>Blazer EV<br>30</span></div><div class="pmv-bar"><i style="height:40%"></i><span>Lyriq<br>22</span></div></div><p class="mod-out"><b>GM</b> — Equinox EV leads this set. One automaker against another, same segment, same moment.</p><p class="pmv-note">Illustrative demo data — not real sales.</p></div>
-          </div>
-          <div class="era-scene"><video class="scene-video" src="assets/road/era-now-ai.mp4" poster="assets/road/era-now-ai.webp" autoplay muted loop playsinline preload="auto" aria-label="Neural network of dots and lines"></video></div>
-        </div>
-      </section>
-
-      <!-- contact -->
-      <section class="panel contact">
-        <div class="inner">
-          <div class="kicker">The road continues</div>
-          <h2>LET'S TALK<br>ABOUT<br>WHAT'S NEXT.</h2>
-          <a class="email" href="mailto:marcin.fracz@gmail.com">marcin.fracz@gmail.com</a>
-          <div class="links">
-            <a href="https://www.linkedin.com/in/marcinfracz/">LinkedIn</a>
-            <a href="/work/">Work showcase</a>
-            <a href="/assets/resume.pdf">Resume</a>
-          </div>
-          <p class="fine">Detroit · Shanghai · Everywhere the road goes. Built with AI, in the flat matte style of Ferdio.</p>
-        </div>
-      </section>
-
+      <button id="theme-toggle" type="button" aria-label="Switch to dark mode">&#9789;</button>
     </div>
   </div>
-</main>
+  <nav class="progress-arrow" id="progress-arrow" aria-label="Career eras, left to right"></nav>
+</header>
 
+<button class="edge-btn" id="prev-btn" type="button" aria-label="Previous stop">&#8592;</button>
+<button class="edge-btn" id="next-btn" type="button" aria-label="Next stop">&#8594;</button>
+
+<main id="track" aria-label="The Road, v3 greybox"></main>
+
+<script src="content/content.js"></script>
 <script>
 (function(){
-  /* Light / dark toggle. Saved choice wins, otherwise the system setting.
-     The landing page has its own toggle; this one is for The Road. */
-  var themeBtn = document.getElementById('theme-toggle');
-  function applyTheme(t){
-    document.documentElement.setAttribute('data-theme', t);
-    try{ localStorage.setItem('road-theme', t); }catch(e){}
-    if (themeBtn){
-      themeBtn.textContent = t === 'dark' ? '\u2600' : '\u263E';
-      themeBtn.setAttribute('aria-label', t === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-    }
+  "use strict";
+  /* matchMedia is universal in real browsers; this guard only keeps the
+     page from dying outright in test harnesses that lack it. */
+  if (!window.matchMedia) {
+    window.matchMedia = function(q){ return { matches:false, media:q, addEventListener:function(){}, addListener:function(){} }; };
   }
-  var savedTheme = null;
-  try{ savedTheme = localStorage.getItem('road-theme'); }catch(e){}
-  applyTheme(savedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
-  if (themeBtn) themeBtn.addEventListener('click', function(){
-    applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  var data = window.ROAD_V3;
+  var track = document.getElementById("track");
+  if (!data || !data.eras) {
+    track.innerHTML = '<div class="error-box"><b>ROAD_V3 text failed to load.</b><br>content/content.js did not provide window.ROAD_V3. Nothing else is rendered on purpose.</div>';
+    return;
+  }
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var isPhone = function(){ return window.matchMedia("(max-width: 767px)").matches; };
+  var esc = function(s){
+    return String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  };
+  var OPEN = "[OPEN]";
+
+  /* ---------- build the stop list: intro + 13 era/sub stops + finale ---------- */
+  var stops = []; /* {id, eraId, kind, era, stop} */
+  stops.push({ id:"intro", eraId:null, kind:"intro" });
+  data.eras.forEach(function(era){
+    era.stops.forEach(function(stop){
+      stops.push({ id: stop.id, eraId: era.id, kind:"era", era: era, stop: stop });
+    });
+  });
+  stops.push({ id:"finale", eraId:null, kind:"finale" });
+  var eraFirstStop = {};
+  data.eras.forEach(function(era){ eraFirstStop[era.id] = era.stops[0].id; });
+
+  /* ---------- render ---------- */
+  function stopCardHTML(era, stop){
+    var wins = stop.wins.map(function(w){
+      return "<li>" + esc(w) + "</li>";
+    }).join("");
+    var moreBtn = stop.more
+      ? '<button type="button" class="more-btn" aria-expanded="false">More: ' + esc(stop.more.title) + '</button>'
+      : '<button type="button" class="more-btn" aria-expanded="false" disabled style="opacity:.45; cursor:default">More: story to come ' + OPEN + '</button>';
+    return '<div class="stop-card">'
+      + '<div class="stop-kicker">' + esc(era.num) + ' / 7 &middot; ' + esc(stop.sub) + ' &middot; ' + esc(stop.years) + '</div>'
+      + '<h2>' + esc(stop.title) + '</h2>'
+      + '<p class="role">' + esc(stop.role) + '</p>'
+      + '<p class="meta">' + esc(stop.company) + ' &middot; ' + esc(stop.place) + ' &middot; ' + esc(stop.years) + '</p>'
+      + '<p class="what">' + esc(stop.what) + '</p>'
+      + '<ul class="wins">' + wins + '</ul>'
+      + moreBtn
+      + '</div>';
+  }
+  function heroHTML(stop){
+    return '<div class="hero-box" aria-label="Placeholder for the 3D hero object">'
+      + '<span class="ph-label">3D hero object &mdash; placeholder</span>'
+      + '<div class="ph-title">' + esc(stop.hero.label) + '</div>'
+      + '<div class="ph-note">' + esc(stop.hero.note) + '</div>'
+      + '</div>';
+  }
+  function calloutsHTML(stop){
+    if (!stop.callouts || !stop.callouts.length) {
+      return '<div class="callouts"><p class="callout-none">No callouts at this stop.</p></div>';
+    }
+    var items = stop.callouts.map(function(c, i){
+      return '<div class="callout-box"><span class="ph-label">Callout ' + (i + 1) + ' &mdash; placeholder</span>'
+        + '<div class="ph-title">' + esc(c.label) + '</div>'
+        + '<p>' + esc(c.text) + '</p></div>';
+    }).join("");
+    return '<div class="callouts">' + items + '</div>';
+  }
+  function panelHTML(s){
+    if (s.kind === "intro") {
+      return '<section class="panel panel-intro" data-stop="intro" aria-label="Introduction">'
+        + '<div class="panel-inner"><div class="stop-kicker">Marcin Fracz &middot; ' + esc(data.positioning) + '</div>'
+        + '<h1>THE<br>ROAD<em>.</em></h1>'
+        + '<p class="lede">' + esc(data.intro.lede) + '</p>'
+        + '<p class="tagline">' + esc(data.tagline) + '</p>'
+        + '<p class="hint">' + esc(data.intro.hint) + '</p></div></section>';
+    }
+    if (s.kind === "finale") {
+      return '<section class="panel panel-finale" data-stop="finale" aria-label="Finale">'
+        + '<div class="panel-inner"><div class="stop-kicker">The road continues</div>'
+        + '<h2>' + esc(data.finale.title) + '</h2>'
+        + '<p>' + esc(data.finale.text) + '</p>'
+        + '<div class="hero-box" style="margin-top:22px; min-height:150px"><span class="ph-label">Reel finale &mdash; placeholder</span><div class="ph-title">' + esc(data.finale.reelLabel) + '</div><div class="ph-note">' + esc(data.finale.reelNote) + '</div></div>'
+        + '<a class="home-btn" href="https://marcinfracz.github.io/">Back to the desktop</a>'
+        + '<div class="fine-links"><a href="mailto:marcin.fracz@gmail.com">marcin.fracz@gmail.com</a><a href="https://www.linkedin.com/in/marcinfracz/">LinkedIn</a><a href="/assets/resume.pdf">Resume</a></div>'
+        + '</div></section>';
+    }
+    var stop = s.stop, era = s.era;
+    var moreBox = stop.more
+      ? '<div class="more-box" hidden><h3>More: ' + esc(stop.more.title) + '</h3><p>' + esc(stop.more.text) + '</p></div>'
+      : '<div class="more-box" hidden><h3>More</h3><p>Story to come. ' + OPEN + ' No story is written for this stop in the brief yet.</p></div>';
+    var noteBox = stop.note
+      ? '<div class="note-box"><b>Note (review only):</b> ' + esc(stop.note) + '</div>'
+      : "";
+    return '<section class="panel panel-era" data-stop="' + esc(stop.id) + '" data-era="' + esc(era.id) + '" aria-label="' + esc(stop.title) + '">'
+      + '<div class="panel-inner"><div class="stop-grid">'
+      + stopCardHTML(era, stop)
+      + heroHTML(stop)
+      + calloutsHTML(stop)
+      + moreBox + noteBox
+      + '</div></div></section>';
+  }
+  track.innerHTML = stops.map(panelHTML).join("");
+
+  /* ---------- progress arrow (7 eras) ---------- */
+  var arrow = document.getElementById("progress-arrow");
+  var arrowLabels = { engineering:"Engineering", equinox:"Equinox", trailblazer:"Trailblazer", connected:"Connected", shanghai:"Shanghai", onstar:"OnStar", now:"Now" };
+  arrow.innerHTML = data.eras.map(function(era){
+    return '<button type="button" data-era="' + esc(era.id) + '">' + (era.num) + '. ' + esc(arrowLabels[era.id] || era.title) + '</button>';
+  }).join("");
+  arrow.addEventListener("click", function(e){
+    var b = e.target.closest("button[data-era]");
+    if (b) goTo(indexOfStop(eraFirstStop[b.getAttribute("data-era")]));
   });
 
-  /* Phone detection: phone only, not tablet. 700px covers iPhone / Android
-     portrait (360-430px). iPad at 768px+ keeps the desktop horizontal road. */
-  var isPhone = function(){ return window.matchMedia('(max-width: 700px)').matches; };
-  if (isPhone()) document.body.classList.add('is-phone');
-  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var sceneVids = Array.prototype.slice.call(document.querySelectorAll('.scene-video'));
-  if (reduce) sceneVids.forEach(function(v){ v.removeAttribute('autoplay'); v.pause(); });
-  var scrollEl = document.getElementById('road-scroll');
-  var track = document.getElementById('road-track');
-  var svg = document.getElementById('road-svg');
-  var line = document.getElementById('road-line');
-  var progressLine = document.getElementById('road-line-progress');
-  var nodesG = document.getElementById('road-nodes');
-  var car = document.getElementById('road-car');
-  var nodePts = [];
-  var ERA_YEARS = ['2003', '2014', '2018', '2020', '2022', '2025', '2026'];
-  var NS = 'http://www.w3.org/2000/svg';
+  /* ---------- navigation ---------- */
+  var panels = Array.prototype.slice.call(track.querySelectorAll(".panel"));
+  var statusEl = document.getElementById("stop-status");
+  var prevBtn = document.getElementById("prev-btn");
+  var nextBtn = document.getElementById("next-btn");
+  var current = 0, wheelLock = false;
 
-  function buildNodes(pts, H){
-    /* one node per era, on the wave, with its start year above it
-       (desktop only; on phone the date pill in each era already says it).
-       A faint hairline drops from each node, Hunter-style. */
-    nodesG.innerHTML = '';
-    nodePts = [];
-    eras.forEach(function(e, i){
-      var pt = pts[i + 1]; /* eras are panels 1..7, intro is panel 0 */
-      if (!pt) return;
-      var g = document.createElementNS(NS, 'g');
-      if (!isPhone()){
-        var tick = document.createElementNS(NS, 'line');
-        tick.setAttribute('x1', pt[0]); tick.setAttribute('y1', pt[1] + 8);
-        tick.setAttribute('x2', pt[0]); tick.setAttribute('y2', H);
-        g.appendChild(tick);
-        var lbl = document.createElementNS(NS, 'text');
-        lbl.setAttribute('x', pt[0] + 10); lbl.setAttribute('y', pt[1] - 10);
-        lbl.textContent = ERA_YEARS[i];
-        g.appendChild(lbl);
-      }
-      var c = document.createElementNS(NS, 'circle');
-      c.setAttribute('cx', pt[0]); c.setAttribute('cy', pt[1]); c.setAttribute('r', 5);
-      g.appendChild(c);
-      nodesG.appendChild(g);
-      nodePts.push({x: pt[0], y: pt[1], el: c});
-    });
+  function indexOfStop(id){
+    for (var i = 0; i < stops.length; i++) if (stops[i].id === id) return i;
+    return 0;
   }
-
-  function fillNodes(pt){
-    nodePts.forEach(function(n){
-      var done = isPhone() ? pt.y >= n.y - 1 : pt.x >= n.x - 1;
-      n.el.setAttribute('class', done ? 'done' : '');
-    });
+  /* Deep links from the brief: #shanghai, #pentastar etc. jump to that
+     era or sub-stop. A multi-stop era is addressed by its sub-stop id
+     (1a, 2c); a single-stop era by its era id (shanghai, onstar, now).
+     #pentastar is an alias for the gasket stop 1a. */
+  function hashForStop(s){
+    if (s.kind === "era") return s.era.stops.length > 1 ? s.id : s.eraId;
+    return s.id;
   }
-  var progress = document.getElementById('progress');
-  var bg = document.getElementById('road-bg');
-  var panels = Array.prototype.slice.call(document.querySelectorAll('.panel'));
-  var eras = Array.prototype.slice.call(document.querySelectorAll('.panel.era'));
-  var pathLen = 0, maxX = 0;
-
-  function smoothPath(pts){
-    // Catmull-Rom to Bezier
-    var d = 'M ' + pts[0][0] + ' ' + pts[0][1];
-    for (var i = 0; i < pts.length - 1; i++){
-      var p0 = pts[Math.max(0, i-1)], p1 = pts[i], p2 = pts[i+1], p3 = pts[Math.min(pts.length-1, i+2)];
-      var c1x = p1[0] + (p2[0]-p0[0])/6, c1y = p1[1] + (p2[1]-p0[1])/6;
-      var c2x = p2[0] - (p3[0]-p1[0])/6, c2y = p2[1] - (p3[1]-p1[1])/6;
-      d += ' C ' + c1x.toFixed(1) + ' ' + c1y.toFixed(1) + ', ' + c2x.toFixed(1) + ' ' + c2y.toFixed(1) + ', ' + p2[0].toFixed(1) + ' ' + p2[1].toFixed(1);
+  function indexOfHash(h){
+    h = (h || "").replace(/^#/, "");
+    if (!h) return 0;
+    if (h === "pentastar") return indexOfStop("1a");
+    for (var i = 0; i < stops.length; i++) {
+      if (stops[i].id === h) return i;
+      if (stops[i].eraId === h) return i;
     }
-    return d;
+    return 0;
   }
-
-  function placeCar(p){
-    /* p: 0..1 along the road. Car sits on the line, nose along the road. */
-    if (!pathLen || !car) return;
-    var d = Math.max(0, Math.min(1, p)) * pathLen;
-    var pt = line.getPointAtLength(d);
-    var pt2 = line.getPointAtLength(Math.min(pathLen, d + 1));
-    var angle = Math.atan2(pt2.y - pt.y, pt2.x - pt.x) * 180 / Math.PI;
-    car.setAttribute('transform', 'translate(' + pt.x.toFixed(1) + ' ' + pt.y.toFixed(1) + ') rotate(' + angle.toFixed(1) + ')');
-    fillNodes(pt);
-    if (progressLine){
-      progressLine.style.strokeDasharray = pathLen;
-      progressLine.style.strokeDashoffset = (pathLen * (1 - Math.max(0, Math.min(1, p)))).toFixed(1);
+  function panelLeft(i){ return panels[i].offsetLeft; }
+  function goTo(i, instant){
+    i = Math.max(0, Math.min(stops.length - 1, i));
+    current = i;
+    if (isPhone()) {
+      try {
+        if (panels[i].scrollIntoView) panels[i].scrollIntoView({ behavior: (instant || reduce) ? "auto" : "smooth", block: "start" });
+      } catch (e) {}
+    } else {
+      var behavior = (instant || reduce) ? "auto" : "smooth";
+      try {
+        if (track.scrollTo) track.scrollTo({ left: panelLeft(i), behavior: behavior });
+        else track.scrollLeft = panelLeft(i);
+      } catch (e) { track.scrollLeft = panelLeft(i); }
     }
+    update(i);
   }
+  function update(i){
+    if (typeof i === "number") current = i;
+    statusEl.textContent = "Stop " + (current + 1) + " of " + stops.length;
+    prevBtn.disabled = current <= 0;
+    nextBtn.disabled = current >= stops.length - 1;
+    var eraId = stops[current].eraId;
+    arrow.querySelectorAll("button").forEach(function(b){
+      if (b.getAttribute("data-era") === eraId) b.setAttribute("aria-current", "true");
+      else b.removeAttribute("aria-current");
+    });
+    var stopId = stops[current].id;
+    if (stopId) {
+      try { history.replaceState(null, "", "#" + hashForStop(stops[current])); } catch (e) {}
+    }
+    try {
+      if (eraId) localStorage.setItem("road-last-era", eraId);
+    } catch (e) {}
+  }
+  prevBtn.addEventListener("click", function(){ goTo(current - 1); });
+  nextBtn.addEventListener("click", function(){ goTo(current + 1); });
 
-  function layout(){
-    var vw = window.innerWidth, vh = window.innerHeight;
-    if (isPhone()){
-      /* phone: normal vertical page, curvy vertical road down the left */
-      document.body.classList.add('is-phone');
-      scrollEl.style.height = 'auto';
-      maxX = 0;
-      var hint = document.querySelector('.scroll-hint');
-      if (hint) hint.lastChild.textContent = ' Scroll down';
-      /* vertical road: one point per panel centre, x weaving slightly */
-      var H = track.offsetHeight;
-      var xs = [20, 16, 24, 16, 23, 17, 24, 16, 20];
-      svg.setAttribute('width', 48);
-      svg.setAttribute('height', H);
-      svg.setAttribute('viewBox', '0 0 48 ' + H);
-      var pts = panels.map(function(pn, i){
-        var cy = pn.offsetTop + pn.offsetHeight / 2;
-        return [xs[i] || 20, cy];
+  /* wheel + trackpad: deltaY and deltaX both drive left/right (desktop only) */
+  track.addEventListener("wheel", function(e){
+    if (isPhone()) return;
+    e.preventDefault();
+    if (wheelLock) return;
+    var d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+    if (Math.abs(d) < 8) return;
+    wheelLock = true;
+    setTimeout(function(){ wheelLock = false; }, 450);
+    goTo(current + (d > 0 ? 1 : -1));
+  }, { passive:false });
+
+  /* drag / swipe: pointer drag moves the track, release snaps to nearest stop */
+  var dragging = false, dragMoved = 0, dragStartX = 0, dragStartLeft = 0;
+  track.addEventListener("pointerdown", function(e){
+    if (isPhone() || e.target.closest("button, a")) return;
+    dragging = true; dragMoved = 0;
+    dragStartX = e.clientX; dragStartLeft = track.scrollLeft;
+    track.setPointerCapture(e.pointerId);
+    track.style.scrollSnapType = "none";
+  });
+  track.addEventListener("pointermove", function(e){
+    if (!dragging) return;
+    var dx = e.clientX - dragStartX;
+    dragMoved = Math.max(dragMoved, Math.abs(dx));
+    track.scrollLeft = dragStartLeft - dx;
+  });
+  function endDrag(){
+    if (!dragging) return;
+    dragging = false;
+    track.style.scrollSnapType = "";
+    var nearest = 0, best = Infinity;
+    panels.forEach(function(p, i){
+      var d = Math.abs(p.offsetLeft - track.scrollLeft);
+      if (d < best) { best = d; nearest = i; }
+    });
+    goTo(nearest);
+  }
+  track.addEventListener("pointerup", endDrag);
+  track.addEventListener("pointercancel", endDrag);
+  track.addEventListener("click", function(e){
+    if (dragMoved > 6) { e.preventDefault(); e.stopPropagation(); }
+  }, true);
+
+  /* scroll (incl. touch swipe): keep current/stauts in sync */
+  var scrollTick = false;
+  track.addEventListener("scroll", function(){
+    if (isPhone() || scrollTick) return;
+    scrollTick = true;
+    requestAnimationFrame(function(){
+      scrollTick = false;
+      var nearest = 0, best = Infinity;
+      panels.forEach(function(p, i){
+        var d = Math.abs(p.offsetLeft - track.scrollLeft);
+        if (d < best) { best = d; nearest = i; }
       });
-      var d = smoothPath(pts);
-      line.setAttribute('d', d);
-      progressLine.setAttribute('d', d);
-      pathLen = line.getTotalLength();
-      buildNodes(pts, H);
-      updatePhone();
+      if (nearest !== current) update(nearest);
+    });
+  }, { passive:true });
+
+  /* keyboard: arrows, PageUp/Down, Space; Esc / H go home */
+  document.addEventListener("keydown", function(e){
+    if (e.key === "Escape" || e.key === "h" || e.key === "H") {
+      window.location.href = "https://marcinfracz.github.io/";
       return;
     }
-    document.body.classList.remove('is-phone');
-    var tw = track.scrollWidth;
-    maxX = Math.max(0, tw - vw);
-    if (!reduce){
-      scrollEl.style.height = (maxX + vh) + 'px';
-    }
-    // SVG spans the whole track
-    var H = Math.round(vh * 0.34);
-    svg.setAttribute('width', tw);
-    svg.setAttribute('height', H);
-    svg.setAttribute('viewBox', '0 0 ' + tw + ' ' + H);
-    // one point per panel centre, y undulating like a mountain
-    var pts = panels.map(function(p, i){
-      var cx = p.offsetLeft + p.offsetWidth / 2;
-      /* Hunter's wave: gentle sine, about 40-50px total, peak / trough /
-         peak / trough, rising to Now, then a flat tail to the right. */
-      var wave = [0.50, 0.43, 0.57, 0.44, 0.56, 0.45, 0.57, 0.46, 0.50][i] || 0.5;
-      return [cx, H * wave];
-    });
-    var d = smoothPath(pts);
-    line.setAttribute('d', d);
-    progressLine.setAttribute('d', d);
-    pathLen = line.getTotalLength();
-    buildNodes(pts, H);
-    placeCar(0);
-    update();
-  }
-
-  function updatePhone(){
-    var vh = window.innerHeight;
-    var total = Math.max(1, document.documentElement.scrollHeight - vh);
-    var p = Math.max(0, Math.min(1, window.scrollY / total));
-    progress.style.width = (p * 100).toFixed(1) + '%';
-    placeCar(p);
-    var best = null, bestD = 1e9;
-    eras.forEach(function(e){
-      var r = e.getBoundingClientRect();
-      var d = Math.abs(r.top + r.height / 2 - vh / 2);
-      if (d < bestD){ bestD = d; best = e; }
-    });
-    eras.forEach(function(e){ e.classList.toggle('active', e === best); });
-    if (best) countUp(best);
-  }
-
-  function update(){
-    if (isPhone()){ updatePhone(); return; }
-    if (reduce) return;
-    var vh = window.innerHeight;
-    var top = scrollEl.offsetTop;
-    var total = scrollEl.offsetHeight - vh;
-    var p = total > 0 ? (window.scrollY - top) / total : 0;
-    p = Math.max(0, Math.min(1, p));
-    track.style.transform = 'translate3d(' + (-p * maxX).toFixed(1) + 'px,0,0)';
-    // car drives the road; the driven part thickens in amber
-    placeCar(p);
-    progress.style.width = (p * 100).toFixed(1) + '%';
-    // parallax: background drifts slower than the track
-    bg.style.transform = 'translate3d(' + (-p * maxX * 0.25).toFixed(1) + 'px,0,0)';
-    // active era = nearest panel centre to viewport centre
-    var centre = p * maxX + window.innerWidth / 2;
-    var best = null, bestD = 1e9;
-    eras.forEach(function(e){
-      var c = e.offsetLeft + e.offsetWidth / 2;
-      var d = Math.abs(c - centre);
-      if (d < bestD){ bestD = d; best = e; }
-    });
-    eras.forEach(function(e){ e.classList.toggle('active', e === best); });
-    if (best) countUp(best);
-  }
-
-  /* small modules: chips switch the one-line answer; the Trailblazer
-     chips also highlight one cutout; the PMV chips swap the demo bars. */
-  var PMV = {
-    ford: {bars: [['F-150 Lightning', 42], ['Mustang Mach-E', 38], ['Explorer EV', 25]], out: '<b>Ford</b> — three EVs, one portfolio. Pick a nameplate to compare it against GM and Stellantis.'},
-    gm: {bars: [['Equinox EV', 55], ['Blazer EV', 30], ['Lyriq', 22]], out: '<b>GM</b> — Equinox EV leads this set. One automaker against another, same segment, same moment.'},
-    stellantis: {bars: [['Wagoneer S', 18], ['Charger Daytona', 15], ['Ram 1500 REV', 12]], out: '<b>Stellantis</b> — smaller EV volumes in this set. Same view, different portfolio.'}
-  };
-  function updatePMV(key){
-    var mod = document.querySelector('[data-pmv="' + key + '"]');
-    if (!mod) return;
-    var box = mod.closest('.module');
-    var data = PMV[key];
-    var bars = box.querySelectorAll('.pmv-bar');
-    var max = Math.max.apply(null, data.bars.map(function(b){ return b[1]; }));
-    bars.forEach(function(bar, i){
-      var b = data.bars[i];
-      bar.querySelector('i').style.height = Math.max(4, Math.round(b[1] / max * 100)) + '%';
-      bar.querySelector('span').innerHTML = b[0] + '<br>' + b[1];
-    });
-    box.querySelector('.mod-out').innerHTML = data.out;
-  }
-  document.querySelectorAll('.module').forEach(function(mod){
-    var chips = mod.querySelectorAll('.chip');
-    var out = mod.querySelector('.mod-out');
-    chips.forEach(function(ch){
-      ch.addEventListener('click', function(){
-        chips.forEach(function(c){ c.classList.remove('on'); });
-        ch.classList.add('on');
-        if (out && ch.dataset.out) out.innerHTML = ch.dataset.out;
-        if (ch.dataset.target){
-          mod.parentElement.querySelectorAll('.cutouts figure').forEach(function(f){
-            f.classList.toggle('dim', f.dataset.car !== ch.dataset.target);
-          });
-        }
-        if (ch.dataset.pmv) updatePMV(ch.dataset.pmv);
-      });
-    });
+    if (e.key === "ArrowRight" || e.key === "PageDown" || (e.key === " " && !e.shiftKey)) {
+      e.preventDefault(); goTo(current + 1);
+    } else if (e.key === "ArrowLeft" || e.key === "PageUp" || (e.key === " " && e.shiftKey)) {
+      e.preventDefault(); goTo(current - 1);
+    } else if (e.key === "Home") { e.preventDefault(); goTo(0); }
+    else if (e.key === "End") { e.preventDefault(); goTo(stops.length - 1); }
   });
 
-  /* proof numbers count up once, when their era comes into view */
-  function countUp(era){
-    if (!era || era.dataset.counted || reduce) return;
-    var big = era.querySelector('.era-proof .big');
-    if (!big) return;
-    var m = big.textContent.match(/([^0-9]*)([0-9]+)(.*)/);
-    if (!m) return;
-    era.dataset.counted = '1';
-    var orig = big.innerHTML, target = parseInt(m[2], 10), t0 = null;
-    function step(ts){
-      if (!t0) t0 = ts;
-      var k = Math.min(1, (ts - t0) / 900);
-      var v = Math.round(target * (1 - Math.pow(1 - k, 3)));
-      big.textContent = m[1] + v + m[3];
-      if (k < 1) requestAnimationFrame(step);
-      else big.innerHTML = orig;
-    }
-    requestAnimationFrame(step);
-  }
+  /* More buttons reveal new info (the only click that changes content) */
+  track.addEventListener("click", function(e){
+    var b = e.target.closest(".more-btn");
+    if (!b || b.disabled) return;
+    var panel = b.closest(".panel");
+    var box = panel.querySelector(".more-box");
+    var open = box.hasAttribute("hidden");
+    if (open) box.removeAttribute("hidden"); else box.setAttribute("hidden", "");
+    b.setAttribute("aria-expanded", open ? "true" : "false");
+  });
 
-  /* Ferdio-style randomness, restrained: every few seconds one small
-     element in the era in view lights up, then goes quiet again. */
-  if (!reduce){
-    setInterval(function(){
-      var active = document.querySelector('.panel.era.active');
-      if (!active) return;
-      var blinks = active.querySelectorAll('.blink');
-      if (!blinks.length) return;
-      var el = blinks[Math.floor(Math.random() * blinks.length)];
-      el.classList.add('on');
-      setTimeout(function(){ el.classList.remove('on'); }, 1200);
-    }, 2600);
+  /* ---------- theme: light default, saved choice wins, else system ---------- */
+  var themeBtn = document.getElementById("theme-toggle");
+  function applyTheme(t){
+    document.documentElement.setAttribute("data-theme", t);
+    try { localStorage.setItem("road-theme", t); } catch (e) {}
+    themeBtn.textContent = t === "dark" ? "\u2600" : "\u263E";
+    themeBtn.setAttribute("aria-label", t === "dark" ? "Switch to light mode" : "Switch to dark mode");
   }
+  var savedTheme = null;
+  try { savedTheme = localStorage.getItem("road-theme"); } catch (e) {}
+  applyTheme(savedTheme || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
+  themeBtn.addEventListener("click", function(){
+    applyTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark");
+  });
 
-  var ticking = false;
-  function onScroll(){
-    if (!ticking){ ticking = true; requestAnimationFrame(function(){ update(); ticking = false; }); }
+  /* ---------- deep link / last-visited era ---------- */
+  var start = 0;
+  var hash = window.location.hash || "";
+  if (hash) start = indexOfHash(hash);
+  else {
+    try {
+      var last = localStorage.getItem("road-last-era");
+      if (last && eraFirstStop[last]) start = indexOfStop(eraFirstStop[last]);
+    } catch (e) {}
   }
-  window.addEventListener('scroll', onScroll, {passive:true});
-  window.addEventListener('resize', layout);
-  window.addEventListener('load', layout);
-  document.querySelectorAll('img').forEach(function(im){ im.addEventListener('load', layout); });
-  layout();
+  window.addEventListener("load", function(){ goTo(start, true); });
+  goTo(start, true);
 })();
 </script>
 </body>
