@@ -1,921 +1,346 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Marcin Fracz — Work</title>
-<meta name="description" content="Automotive product &amp; software strategy leader · GM · SAIC-GM Shanghai">
-<meta property="og:title" content="Marcin Fracz — Automotive product &amp; software strategy leader">
-<meta property="og:description" content="Automotive product &amp; software strategy leader · GM · SAIC-GM Shanghai">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://marcinfracz.github.io/work/">
-<meta property="og:image" content="https://marcinfracz.github.io/assets/og-image.jpg">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="icon" type="image/png" href="../assets/favicon.png">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Marcin Fracz — The Road</title>
+<meta name="description" content="A scroll-driven journey through Marcin Fracz's career, from engineering to Shanghai to AI.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  :root { --bg: #0e0e0e; --panel: #161616; --panel2: #1c1c1c; --line: #262626; --ink: #f5f5f4; --muted: #a8a29e; --accent: #3b82f6; --accent-deep: #1d4ed8; --cream: #efe9dc; --cream-ink: #1c1917; }
-  * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  /* Slim, macOS-style scrollbars (see the desktop stylesheet for the same rules). */
-  ::-webkit-scrollbar { width: 8px; height: 8px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.28); border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }
-  ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.5); border: 2px solid transparent; background-clip: padding-box; }
-  ::-webkit-scrollbar-corner { background: transparent; }
-  * { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.35) transparent; }
-  body { margin: 0; font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--ink); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
-  a { color: var(--accent); }
-  .mono { font-family: 'JetBrains Mono', monospace; }
-  .label { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
-  .muted { color: var(--muted); }
-  /* skip link: visually hidden until focused */
-  .skip-link { position: absolute; left: -9999px; top: 0; z-index: 100; background: var(--accent); color: #fff; font-weight: 700; font-size: 14px; padding: 10px 16px; border-radius: 0 0 10px 0; text-decoration: none; }
-  .skip-link:focus { left: 0; }
-
-  /* scroll reveal */
-  .reveal { opacity: 0; transform: translateY(26px); transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1); }
-  .reveal.in { opacity: 1; transform: translateY(0); }
-  .reveal.d1 { transition-delay: 0.08s; } .reveal.d2 { transition-delay: 0.16s; } .reveal.d3 { transition-delay: 0.24s; }
-  .reveal.d4 { transition-delay: 0.32s; } .reveal.d5 { transition-delay: 0.4s; }
-
-  /* top bar */
-  .topbar { position: sticky; top: 0; z-index: 50; display: flex; align-items: center; gap: 22px; height: 56px; padding: 0 24px; background: rgba(14, 14, 14, 0.92); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
-  .topbar .brand { font-weight: 900; letter-spacing: 0.02em; color: var(--ink); text-decoration: none; font-size: 15px; }
-  .topbar nav { display: flex; gap: 18px; margin-left: auto; }
-  .topbar nav a { color: var(--muted); text-decoration: none; font-size: 13.5px; font-weight: 600; transition: color 0.15s; }
-  .topbar nav a:hover { color: var(--ink); }
-  .topbar .back { color: var(--accent); font-weight: 700; font-size: 13.5px; text-decoration: none; }
-
-  /* section rail */
-  .rail { position: fixed; left: 18px; top: 50%; transform: translateY(-50%); z-index: 40; display: flex; flex-direction: column; gap: 8px; }
-  .rail a { color: var(--muted); text-decoration: none; font-size: 11.5px; font-weight: 600; padding: 3px 8px; border-left: 2px solid transparent; transition: color 0.15s, border-color 0.15s; }
-  .rail a.active { color: var(--ink); border-left-color: var(--accent); }
-
-  .wrap { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
-  section { padding: 72px 0; border-bottom: 1px solid var(--line); }
-  .sec-head { display: flex; align-items: baseline; gap: 14px; }
-  .sec-num { font-family: 'JetBrains Mono', monospace; color: var(--accent); font-weight: 700; font-size: 13px; }
-
-  /* hero */
-  .hero { padding: 88px 0 64px; border-bottom: 1px solid var(--line);  position: relative; overflow: hidden; }
-  .hero > :not(.hero-glow) { position: relative; z-index: 1; }
-  .hero-glow { position: absolute; inset: 0; z-index: 0; pointer-events: none; background: radial-gradient(640px 320px at 18% 0%, rgba(59, 130, 246, 0.16), transparent 62%), radial-gradient(520px 280px at 88% 24%, rgba(59, 130, 246, 0.11), transparent 62%); animation: heroGlow 22s ease-in-out infinite alternate; }
-  .hero-glow::before { content: ""; position: absolute; inset: -26px 0 0; background-image: radial-gradient(rgba(255, 255, 255, 0.09) 1px, transparent 1.4px); background-size: 26px 26px; animation: heroDots 46s linear infinite; }
-  @keyframes heroGlow { from { opacity: 0.65; } to { opacity: 1; } }
-  @keyframes heroDots { from { transform: translateY(0); } to { transform: translateY(-26px); } }
-  .hero h1 { font-size: clamp(48px, 8vw, 96px); font-weight: 900; letter-spacing: -0.03em; line-height: 0.95; margin: 18px 0 10px; }
-  .hero .sub { font-size: 20px; font-weight: 600; color: var(--muted); }
-  .hero .tagline { font-size: 17px; line-height: 1.6; color: var(--muted); max-width: 640px; margin: 22px 0 28px; }
-  .hero .title-line { font-size: 19px; font-weight: 700; color: var(--ink); margin: 16px 0 0; }
-  .proof-strip { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 24px; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: rgba(59, 130, 246, 0.06); }
-  .proof-cell { padding: 16px 18px; border-left: 1px solid var(--line); }
-  .proof-cell:first-child { border-left: none; }
-  .proof-cell .num { font-size: 40px; font-weight: 900; letter-spacing: -0.02em; color: var(--accent); font-variant-numeric: tabular-nums; }
-  .proof-cell .cap { font-size: 13px; color: var(--muted); margin-top: 4px; line-height: 1.45; }
-  /* three pillars: overview cards that jump to the full case studies */
-  .pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 28px; }
-  .pillar { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--ink); text-decoration: none; transition: border-color 0.15s, transform 0.15s; }
-  .pillar:hover { border-color: var(--accent); transform: translateY(-2px); }
-  .pillar h3 { margin: 0 0 8px; font-size: 18px; font-weight: 800; letter-spacing: -0.01em; }
-  .pillar p { margin: 0 0 12px; font-size: 14.5px; line-height: 1.6; color: var(--muted); }
-  .pillar .go { font-size: 13.5px; font-weight: 700; color: var(--accent); }
-  /* slide-out resume drawer */
-  .resume-drawer { position: fixed; top: 0; right: 0; height: 100%; width: min(600px, 94vw); background: var(--panel); border-left: 1px solid var(--line); box-shadow: -24px 0 64px rgba(0, 0, 0, 0.55); transform: translateX(102%); transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); z-index: 80; display: flex; flex-direction: column; }
-  .resume-drawer.open { transform: translateX(0); }
-  .drawer-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(3px); z-index: 70; display: none; }
-  .drawer-backdrop.open { display: block; }
-  .drawer-bar { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--line); font-weight: 700; font-size: 14px; flex-shrink: 0; }
-  .drawer-close { font: inherit; font-size: 20px; line-height: 1; width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line); background: transparent; color: var(--ink); cursor: pointer; }
-  .drawer-close:hover { border-color: var(--accent); color: var(--accent); }
-  .resume-drawer iframe { flex: 1; width: 100%; border: none; background: #fff; }
-  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
-  .chip { display: inline-block; font-size: 13.5px; font-weight: 700; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel2); }
-  .demo-table { width: 100%; border-collapse: collapse; font-size: 14.5px; margin-top: 16px; }
-  .demo-table th { text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); padding: 8px 10px; border-bottom: 1px solid var(--line); }
-  .demo-table td { padding: 10px; border-bottom: 1px solid var(--line); }
-  .demo-table tr:last-child td { border-bottom: none; }
-  .status { display: inline-block; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 999px; }
-  .status.on-track { background: rgba(34, 197, 94, 0.15); color: #4ade80; }
-  .status.at-risk { background: rgba(234, 179, 8, 0.15); color: #facc15; }
-  .status.delayed { background: rgba(239, 68, 68, 0.15); color: #f87171; }
-  /* phone section menu (max-width 900px only) */
-  .phone-menu { display: none; }
-  .hero .btns { display: flex; gap: 12px; flex-wrap: wrap; }
-  .btn { display: inline-block; padding: 12px 20px; border-radius: 999px; font-size: 14px; font-weight: 700; text-decoration: none; border: 1px solid #3f3f46; color: var(--ink); transition: border-color 0.15s, background 0.15s, transform 0.15s; }
-  .btn:hover { border-color: var(--accent); transform: translateY(-1px); }
-  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .btn.primary:hover { background: var(--accent-deep); }
-  .hero .btns button.btn { font: inherit; background: transparent; cursor: pointer; }
-  .stats { display: grid; grid-template-columns: repeat(6, 1fr); margin-top: 48px; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
-  .stat { padding: 18px 16px; border-left: 1px solid var(--line); }
-  .stat:first-child { border-left: none; }
-  .stat .num { font-size: 40px; font-weight: 900; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
-  .stat .cap { font-size: 13px; color: var(--muted); margin-top: 4px; max-width: 200px; line-height: 1.45; }
-  /* hero entrance */
-  @keyframes rise { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
-  .hero .anim { opacity: 0; animation: rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
-  .hero .a1 { animation-delay: 0.05s; } .hero .a2 { animation-delay: 0.15s; } .hero .a3 { animation-delay: 0.25s; }
-  .hero .a4 { animation-delay: 0.35s; } .hero .a5 { animation-delay: 0.45s; } .hero .a6 { animation-delay: 0.6s; }
-
-  /* route visual */
-  .route { margin-top: 56px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); padding: 26px 26px 18px; overflow: hidden; }
-  .route svg { display: block; width: 100%; height: auto; }
-  .route .dot-grid { fill: #2e2e2e; }
-  .route .arc { fill: none; stroke: var(--accent); stroke-width: 3; stroke-dasharray: 6 8; animation: dashmove 1.6s linear infinite; }
-  @keyframes dashmove { to { stroke-dashoffset: -28; } }
-  .route .node { fill: var(--accent); }
-  .route .node-ring { fill: none; stroke: var(--accent); stroke-width: 1.5; opacity: 0.5; }
-  .route .city { fill: var(--ink); font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 800; letter-spacing: 0.02em; }
-  .route .clock { fill: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 12.5px; font-weight: 700; }
-  .route .route-note { font-size: 12.5px; color: var(--muted); margin: 10px 0 0; }
-
-  .intro p { font-size: 19px; line-height: 1.65; color: var(--muted); max-width: 720px; }
-  .intro p b { color: var(--ink); }
-
-  /* index cards */
-  .index-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 28px; }
-  .index-card { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); text-decoration: none; color: var(--ink); transition: border-color 0.2s, transform 0.2s, background 0.2s; }
-  .index-card:hover { border-color: var(--accent); transform: translateY(-3px); background: var(--panel2); }
-  .index-card .num { font-family: 'JetBrains Mono', monospace; color: var(--accent); font-weight: 700; font-size: 13px; }
-  .index-card h3 { margin: 10px 0 6px; font-size: 19px; }
-  .index-card p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
-
-  /* work sections */
-  .work-sec h2 { font-size: clamp(30px, 4.5vw, 44px); font-weight: 900; letter-spacing: -0.02em; line-height: 1.05; margin: 12px 0 8px; }
-  .work-sec .one-line { font-size: 17px; color: var(--muted); line-height: 1.55; max-width: 680px; }
-  .blocks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 30px 0; }
-  .block { border: 1px solid var(--line); border-radius: 12px; padding: 18px; background: var(--panel); transition: border-color 0.2s, transform 0.2s; }
-  .block:hover { border-color: rgba(59, 130, 246, 0.55); transform: translateY(-2px); }
-  .block h4 { margin: 0 0 8px; }
-  .block p { margin: 0; font-size: 14.5px; line-height: 1.6; color: var(--muted); }
-  .block p b { color: var(--ink); }
-  .demo { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); padding: 22px; margin-top: 8px; }
-  .demo .demo-note { font-size: 12px; color: var(--muted); margin-top: 14px; }
-  .demo-controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
-  .demo-controls button { font: inherit; font-size: 13px; font-weight: 700; padding: 8px 14px; border-radius: 999px; border: 1px solid #3f3f46; background: transparent; color: var(--ink); cursor: pointer; transition: background 0.15s, border-color 0.15s; }
-  .demo-controls button:hover { border-color: var(--accent); }
-  .demo-controls button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .demo-panel { font-size: 15px; line-height: 1.65; }
-  .demo-panel .big { font-size: 26px; font-weight: 800; letter-spacing: -0.01em; }
-
-  /* projects */
-  .proj-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 28px; }
-  .proj { border: 1px solid var(--line); border-radius: 14px; padding: 22px; background: var(--panel); transition: border-color 0.2s, transform 0.2s; }
-  .proj:hover { border-color: rgba(59, 130, 246, 0.55); transform: translateY(-3px); }
-  .proj h3 { margin: 10px 0 8px; font-size: 18px; }
-  .proj p { margin: 0; color: var(--muted); font-size: 14.5px; line-height: 1.6; }
-  .proj .tag { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); border: 1px solid rgba(59, 130, 246, 0.4); border-radius: 999px; padding: 3px 9px; }
-
-  /* wins */
-  .wins { background: var(--cream); color: var(--cream-ink); }
-  .wins .label { color: var(--accent-deep); }
-  .wins h2 { font-size: clamp(30px, 4.5vw, 44px); font-weight: 900; letter-spacing: -0.02em; margin: 12px 0 8px; }
-  .acc { border-top: 1px solid #d6d3d1; margin-top: 28px; }
-  .acc-row { border-bottom: 1px solid #d6d3d1; }
-  .acc-head { width: 100%; display: flex; align-items: center; gap: 20px; background: transparent; border: none; font: inherit; text-align: left; padding: 18px 4px; cursor: pointer; color: var(--cream-ink); }
-  .acc-head .fig { font-size: 30px; font-weight: 900; min-width: 130px; color: var(--accent-deep); font-variant-numeric: tabular-nums; }
-  .acc-head .ttl { font-size: 16px; font-weight: 700; flex: 1; }
-  .acc-head .pm { font-size: 22px; color: #78716c; transition: transform 0.25s; }
-  .acc-row.open .acc-head .pm { transform: rotate(45deg); }
-  .acc-body { max-height: 0; overflow: hidden; transition: max-height 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
-  .acc-body-inner { padding: 0 4px 18px 154px; color: #57534e; font-size: 15px; line-height: 1.6; max-width: 720px; }
-
-  /* resume */
-  .resume-doc { background: var(--cream); color: var(--cream-ink); border-radius: 16px; padding: 36px 36px 28px; margin-top: 28px; }
-  .resume-doc h3 { margin: 0; font-size: 26px; font-weight: 900; letter-spacing: -0.01em; }
-  .resume-doc .res-sub { color: #57534e; font-size: 14.5px; margin: 6px 0 0; }
-  .resume-doc .res-sec { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent-deep); margin: 26px 0 10px; }
-  .resume-doc .res-role { display: flex; gap: 18px; padding: 12px 0; border-top: 1px solid #d6d3d1; }
-  .resume-doc .res-role .yrs { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: var(--accent-deep); min-width: 96px; padding-top: 2px; }
-  .resume-doc .res-role h4 { margin: 0 0 3px; font-size: 15.5px; }
-  .resume-doc .res-role p { margin: 0; color: #57534e; font-size: 14px; line-height: 1.5; }
-  .resume-doc .res-cta { margin-top: 26px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-  .resume-doc .res-cta .btn { border-color: #a8a29e; color: var(--cream-ink); }
-  .resume-doc .res-cta .btn.primary { background: var(--accent-deep); border-color: var(--accent-deep); color: #fff; }
-  .resume-doc .res-cta .btn.disabled { opacity: 0.55; cursor: default; transform: none; }
-  .resume-doc .res-cta .btn.disabled:hover { border-color: #a8a29e; }
-
-  /* timeline */
-  .tl { position: relative; margin-top: 34px; padding-left: 24px; border-left: 2px solid var(--line); }
-  .tl-item { position: relative; padding: 0 0 30px 18px; }
-  .tl-item::before { content: ''; position: absolute; left: -31px; top: 5px; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); border: 3px solid var(--bg); }
-  .tl-item .years { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); font-weight: 700; }
-  .tl-item h3 { margin: 6px 0 4px; font-size: 19px; }
-  .tl-item p { margin: 0; color: var(--muted); font-size: 14.5px; line-height: 1.55; }
-
-  /* contact — big accent block */
-  .contact-block { background: var(--accent); border-radius: 20px; padding: 64px 40px; margin-top: 8px; }
-  .contact-block .label { color: rgba(255, 255, 255, 0.75); }
-  .contact-block h2 { font-size: clamp(30px, 4.5vw, 44px); font-weight: 900; letter-spacing: -0.02em; line-height: 1.05; margin: 14px 0 8px; color: #fff; }
-  .contact-block p { color: rgba(255, 255, 255, 0.85); font-size: 16px; line-height: 1.6; max-width: 560px; margin: 0 0 26px; }
-  .contact-block .email { display: block; font-size: clamp(24px, 4.5vw, 48px); font-weight: 900; letter-spacing: -0.02em; color: #fff; text-decoration: none; margin: 0 0 26px; word-break: break-all; }
-  .contact-block .email:hover { text-decoration: underline; }
-  .contact-block .btns { display: flex; gap: 12px; flex-wrap: wrap; }
-  .contact-block .btn { border-color: rgba(255, 255, 255, 0.5); color: #fff; }
-  .contact-block .btn:hover { border-color: #fff; background: rgba(255, 255, 255, 0.12); }
-  .contact-block .btn.primary { background: #fff; border-color: #fff; color: var(--accent-deep); }
-  .contact-block .btn.primary:hover { background: rgba(255, 255, 255, 0.92); }
-  footer { border-top: 1px solid var(--line); padding: 22px 0 40px; color: var(--muted); font-size: 13px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-
-
-  /* v14: statement hero */
-  .hero h1.statement { font-size: clamp(40px, 6.4vw, 76px); }
-  .hero h1 .accent { color: var(--accent); }
-  .route .land { fill: #3f3f46; }
-  .map-table { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin-top: 16px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
-  .map-cell { padding: 14px 16px; border-left: 1px solid var(--line); }
-  .map-cell:first-child { border-left: none; }
-  .map-cell .mc-city { font-size: 13px; font-weight: 800; letter-spacing: 0.02em; }
-  .map-cell .mc-sub { font-size: 13px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
-  .stats .stat .num { font-size: 34px; }
-  .stats .stat .cap { max-width: none; }
-
-  /* v14: resume viewer */
-  .res-viewer { margin-top: 28px; }
-  .res-toolbar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; background: var(--panel); border: 1px solid var(--line); border-bottom: none; border-radius: 14px 14px 0 0; padding: 12px 16px; }
-  .res-toolbar .mono { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; color: var(--muted); }
-  .res-pages { display: flex; gap: 6px; }
-  .res-pages button { font: inherit; font-size: 13px; font-weight: 700; width: 30px; height: 30px; border-radius: 8px; border: 1px solid #3f3f46; background: transparent; color: var(--ink); cursor: pointer; }
-  .res-pages button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .res-print { margin-left: auto; font: inherit; font-size: 13px; font-weight: 700; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--accent); background: transparent; color: var(--accent); cursor: pointer; transition: background 0.15s, color 0.15s; text-decoration: none; }
-  .res-print + .res-print { margin-left: 0; }
-  .res-print:hover { background: var(--accent); color: #fff; }
-  .res-page { display: none; border-radius: 0 0 14px 14px; }
-  .res-page.active { display: block; }
-  .res-nums { display: flex; gap: 0; margin: 22px 0 4px; border-top: 1px solid #d6d3d1; border-bottom: 1px solid #d6d3d1; padding: 14px 0; position: relative; }
-  .res-nums div { flex: 1; }
-  .res-nums b { display: block; font-size: 26px; font-weight: 900; color: var(--accent-deep); font-variant-numeric: tabular-nums; }
-  .res-nums span { font-size: 12.5px; color: #57534e; }
-  .res-sum { color: #57534e; font-size: 14.5px; line-height: 1.6; margin: 0; }
-  .res-anno { flex: none; align-self: flex-start; margin-top: 12px; width: 26px; height: 26px; border-radius: 6px; border: none; background: var(--accent); color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; cursor: pointer; transition: background 0.15s, transform 0.15s; }
-  .res-anno:hover { background: var(--accent-deep); transform: translateY(-1px); }
-  .res-anno.inline { margin: 0 0 0 8px; vertical-align: middle; }
-  .res-nums .res-anno { position: absolute; right: 0; top: -13px; margin: 0; }
-  .flash { animation: flashhl 1.4s ease; }
-  @keyframes flashhl { 0%, 100% { box-shadow: none; } 25%, 60% { box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.65); border-radius: 8px; } }
-
-  /* v15: vertical timeline (the 7-column wave wrapped role titles badly) */
-  .tl { position: relative; margin-top: 34px; padding-left: 24px; border-left: 2px solid var(--line); }
-  .tl-item { position: relative; padding: 0 0 28px 18px; }
-  .tl-item:last-child { padding-bottom: 0; }
-  .tl-item::before { content: ''; position: absolute; left: -31px; top: 5px; width: 12px; height: 12px; border-radius: 50%; background: var(--accent); border: 3px solid var(--bg); }
-  .tl-item .years { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); font-weight: 700; }
-  .tl-item h3 { margin: 6px 0 3px; font-size: 19px; }
-  .tl-item .co { margin: 0 0 4px; color: var(--muted); font-size: 14px; font-weight: 600; }
-  .tl-item p { margin: 0; color: var(--muted); font-size: 14.5px; line-height: 1.55; }
-
-  /* v14: wavy timeline */
-  .tl-wave { margin-top: 30px; }
-  .tl-wave svg { display: block; width: 100%; height: auto; }
-  .tl-cols { display: grid; grid-template-columns: repeat(7, 1fr); gap: 14px; margin-top: 18px; }
-  .tl-col { border-top: 2px solid var(--line); padding-top: 12px; }
-  .tl-col .years { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent); font-weight: 700; }
-  .tl-col h3 { margin: 8px 0 4px; font-size: 15px; line-height: 1.35; }
-  .tl-col .co { margin: 0 0 6px; color: var(--muted); font-size: 13px; font-weight: 600; }
-  .tl-col p { margin: 0; color: var(--muted); font-size: 13.5px; line-height: 1.55; }
-  .tl-col p:last-child { color: var(--muted); }
-
-  @media print {
-    body { background: #fff; }
-    .topbar, .rail, .hero, .intro, #work, #projects, #wins, #timeline, #contact, footer, .res-toolbar, .res-anno { display: none !important; }
-    #resume { padding: 0; border: none; }
-    .res-viewer { margin-top: 0; }
-    .res-page { display: block !important; border-radius: 0; box-shadow: none; margin: 0; max-width: none; page-break-after: always; }
-    .res-page:last-child { page-break-after: auto; }
+  :root{
+    --ground:#F4F1EA; --ink:#1E2124; --muted:#8A8A8A; --accent:#E8A33D;
+    --line:#D8D2C4; --card:#FBF9F4;
   }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:auto}
+  body{background:var(--ground);color:var(--ink);font-family:Inter,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  .mono{font-family:"JetBrains Mono",monospace}
 
-  @media (max-width: 900px) {
-    .blocks, .proj-grid, .index-grid { grid-template-columns: 1fr; }
-    .rail { display: none; }
-    .topbar nav { display: none; }
-    .acc-head .fig { min-width: 90px; font-size: 24px; }
-    .acc-body-inner { padding-left: 4px; }
-    .stats { gap: 28px; }
-    .resume-doc { padding: 26px 20px; }
-    .resume-doc .res-role { flex-direction: column; gap: 2px; }
-    .contact-block { padding: 44px 24px; }
-    .route { padding: 18px 14px 12px; }
-    .tl-cols { grid-template-columns: 1fr; }
-    .tl-wave { display: none; }
-    .stats { grid-template-columns: repeat(3, 1fr); }
-    .stat:nth-child(4) { border-left: none; }
-    .stat:nth-child(n+4) { border-top: 1px solid var(--line); }
-    .phone-menu { display: flex; position: sticky; top: 56px; z-index: 45; gap: 6px; overflow-x: auto; padding: 10px 12px; background: rgba(14, 14, 14, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); scrollbar-width: none; }
-    .phone-menu::-webkit-scrollbar { display: none; }
-    .phone-menu a { flex: none; color: var(--muted); text-decoration: none; font-size: 13px; font-weight: 700; padding: 7px 12px; border-radius: 999px; border: 1px solid var(--line); }
-    .phone-menu a:hover { color: var(--ink); border-color: var(--accent); }
-    .route .city, .route .clock { display: none; }
-    .proof-strip { grid-template-columns: 1fr; }
-    .pillars { grid-template-columns: 1fr; }
-    .proof-cell { border-left: none; border-top: 1px solid var(--line); }
-    .proof-cell:first-child { border-top: none; }
-    .map-table { grid-template-columns: 1fr; }
-    .map-cell { border-left: none; border-top: 1px solid var(--line); }
-    .map-cell:first-child { border-top: none; }
+  /* ---------- top bar ---------- */
+  header{position:fixed;inset:0 0 auto 0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:18px 28px;pointer-events:none}
+  header .brand{font-weight:900;letter-spacing:.14em;font-size:13px;pointer-events:auto}
+  header .brand span{color:var(--accent)}
+  header nav{display:flex;gap:22px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;pointer-events:auto}
+  header nav a{opacity:.65}
+  header nav a:hover{opacity:1}
+  #progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0%;z-index:60}
+
+  /* ---------- road ---------- */
+  #road-scroll{position:relative}
+  #road-sticky{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden}
+  #road-bg{position:absolute;inset:0;pointer-events:none;
+    background-image:radial-gradient(circle, #D8D2C4 1px, transparent 1px);
+    background-size:34px 34px;opacity:.45}
+  #road-track{display:flex;height:100%;width:max-content;will-change:transform}
+  .panel{flex:0 0 100vw;width:100vw;height:100%;position:relative;display:flex;flex-direction:column;justify-content:center;padding:96px 7vw 120px}
+  .panel .inner{max-width:1060px;width:100%;margin:0 auto;position:relative;z-index:2}
+
+  /* intro */
+  .kicker{font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--muted);margin-bottom:18px}
+  h1{font-size:clamp(56px,10vw,148px);line-height:.92;font-weight:900;letter-spacing:-.03em}
+  h1 em{font-style:normal;color:var(--accent)}
+  .lede{margin-top:22px;font-size:clamp(16px,1.6vw,21px);line-height:1.55;color:#3d3a35;max-width:560px}
+  .scroll-hint{margin-top:44px;display:flex;align-items:center;gap:12px;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+  .scroll-hint .mouse{width:22px;height:36px;border:2px solid var(--ink);border-radius:12px;position:relative}
+  .scroll-hint .mouse::after{content:"";position:absolute;left:50%;top:7px;width:4px;height:8px;margin-left:-2px;border-radius:2px;background:var(--accent);animation:wheel 1.8s ease-in-out infinite}
+  @keyframes wheel{0%{transform:translateY(0);opacity:1}70%{transform:translateY(10px);opacity:0}100%{transform:translateY(0);opacity:0}}
+
+  /* era */
+  .era-top{display:flex;align-items:baseline;gap:18px;flex-wrap:wrap}
+  .era-num{font-family:"JetBrains Mono",monospace;font-size:13px;letter-spacing:.2em;color:var(--muted)}
+  .era-dates{display:inline-block;border:1.5px solid var(--ink);border-radius:999px;padding:6px 14px;font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.08em;background:var(--card)}
+  .era h2{font-size:clamp(38px,5.2vw,76px);line-height:.98;font-weight:900;letter-spacing:-.02em;margin:18px 0 8px}
+  .era .role{font-size:clamp(14px,1.4vw,18px);color:#3d3a35;letter-spacing:.02em}
+  .era-grid{display:flex;gap:48px;align-items:flex-end;margin-top:30px;flex-wrap:wrap}
+  .era-proof .big{font-size:clamp(56px,7vw,110px);font-weight:900;line-height:.9;letter-spacing:-.03em}
+  .era-proof .big small{font-size:.42em;font-weight:800}
+  .era-proof .lbl{margin-top:8px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);max-width:220px;line-height:1.5}
+  .era p.story{max-width:520px;font-size:clamp(15px,1.35vw,18px);line-height:1.6;color:#3d3a35}
+  .era p.story b{color:var(--ink)}
+  .era-scene{margin-top:30px}
+  .era-scene img{display:block;width:min(680px,72vw);height:auto;border:1px solid var(--line);background:var(--card)}
+  .cutouts{display:flex;gap:24px;align-items:flex-end;margin-top:26px;flex-wrap:wrap}
+  .cutouts img{display:block;height:110px;width:auto}
+  .cutouts figure{margin:0}
+  .cutouts figcaption{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:8px;text-align:center}
+  .panel.active .era-dates{background:var(--ink);color:var(--ground);border-color:var(--ink)}
+
+  /* contact */
+  .contact h2{font-size:clamp(44px,7vw,96px);line-height:.95;font-weight:900;letter-spacing:-.02em}
+  .contact .email{display:inline-block;margin-top:26px;font-size:clamp(20px,2.6vw,34px);font-weight:800;border-bottom:3px solid var(--accent);padding-bottom:4px}
+  .contact .links{margin-top:26px;display:flex;gap:22px;font-size:13px;letter-spacing:.12em;text-transform:uppercase}
+  .contact .links a{opacity:.65}
+  .contact .links a:hover{opacity:1}
+  .contact .fine{margin-top:44px;font-size:12px;color:var(--muted);letter-spacing:.06em}
+
+  /* the line */
+  #road-svg{position:absolute;left:0;bottom:0;width:100%;height:34vh;z-index:1;pointer-events:none;overflow:visible}
+  #road-svg path{fill:none;stroke:var(--ink);stroke-width:2}
+  #road-svg path.dots{stroke:var(--muted);stroke-width:1.5;stroke-dasharray:2 7}
+  #road-dot{fill:var(--accent);stroke:var(--ink);stroke-width:2}
+  #road-dot-ring{fill:none;stroke:var(--accent);stroke-width:1.5;opacity:.55}
+
+  .era-label{position:absolute;left:7vw;bottom:calc(34vh + 14px);font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);z-index:2}
+
+  @media (max-width:700px){
+    .panel{padding:84px 6vw 150px}
+    .era-grid{gap:22px}
+    .cutouts img{height:74px}
+    header nav{display:none}
   }
-  @media (prefers-reduced-motion: reduce) {
-    .reveal { opacity: 1; transform: none; transition: none; }
-    .anim { opacity: 1; animation: none; }
-    .route .arc { animation: none; }
-    .hero-glow, .hero-glow::before { animation: none; }
-    html { scroll-behavior: auto; }
+  @media (prefers-reduced-motion:reduce){
+    #road-sticky{position:static;height:auto;overflow:visible}
+    #road-track{transform:none !important;overflow-x:auto}
+    .scroll-hint .mouse::after{animation:none}
   }
 </style>
 </head>
 <body>
-<a class="skip-link" href="#main">Skip to content</a>
-<header class="topbar">
-  <a class="brand" href="../">MARCIN FRACZ</a>
+<div id="progress"></div>
+<header>
+  <a class="brand" href="/">MARCIN FRACZ <span>— THE ROAD</span></a>
   <nav>
-    <a href="#work">Work</a>
-    <a href="#projects">Projects</a>
-    <a href="#wins">Wins</a>
-    <a href="#resume">Resume</a>
-    <a href="#timeline">Timeline</a>
-    <a href="#contact">Contact</a>
+    <a href="/work/">Work</a>
+    <a href="/assets/resume.pdf">Resume</a>
+    <a href="mailto:marcin.fracz@gmail.com">Contact</a>
   </nav>
-  <a class="back" href="../">Back to desktop ↗</a>
 </header>
 
-<nav class="phone-menu" aria-label="Sections">
-  <a href="#top">Top</a>
-  <a href="#work">Work</a>
-  <a href="#projects">Projects</a>
-  <a href="#wins">Wins</a>
-  <a href="#resume">Resume</a>
-  <a href="#timeline">Timeline</a>
-  <a href="#contact">Contact</a>
-</nav>
+<main id="road-scroll">
+  <div id="road-sticky">
+    <div id="road-bg"></div>
+    <svg id="road-svg" aria-hidden="true">
+      <path id="road-line-dots" class="dots" d=""/>
+      <path id="road-line" d=""/>
+      <circle id="road-dot-ring" r="16" cx="0" cy="0"/>
+      <circle id="road-dot" r="8" cx="0" cy="0"/>
+    </svg>
+    <div id="road-track">
 
-<nav class="rail" id="rail">
-  <a href="#top" data-sec="top">Top</a>
-  <a href="#work" data-sec="work">Work</a>
-  <a href="#projects" data-sec="projects">Projects</a>
-  <a href="#wins" data-sec="wins">Wins</a>
-  <a href="#resume" data-sec="resume">Resume</a>
-  <a href="#timeline" data-sec="timeline">Timeline</a>
-  <a href="#contact" data-sec="contact">Contact</a>
-</nav>
-
-<main id="top">
-  <div class="wrap" id="main" tabindex="-1">
-<section class="hero">
-      <div class="hero-glow" aria-hidden="true"></div>
-      <span class="label anim a1">Work Showcase</span>
-      <p class="title-line anim a2">Automotive product &amp; software strategy leader · GM · SAIC-GM Shanghai</p>
-      <h1 class="statement anim a2">GLOBAL SCALE. AI VELOCITY.<br><span class="accent">ARCHITECTING THE SOFTWARE-DEFINED FUTURE.</span></h1>
-      <div class="proof-strip anim a2">
-        <div class="proof-cell"><div class="num">$167M</div><div class="cap">L2++ ADAS development approved</div></div>
-        <div class="proof-cell"><div class="num">8</div><div class="cap">export regions with OnStar</div></div>
-        <div class="proof-cell"><div class="num">3</div><div class="cap">nameplates launched</div></div>
-      </div>
-      <p class="tagline anim a3">Strategist transforming global software and AI ecosystems with high-velocity, cross-border execution. Twenty-three years in automotive, from powertrain engineering to software strategy in Shanghai.</p>
-      <div class="btns anim a4">
-        <a class="btn primary" href="#work">See the work</a>
-        <a class="btn" href="#resume">Read the resume</a>
-        <button class="btn" id="resume-drawer-open" type="button">View Executive Resume</button>
-      </div>
-      <div class="route anim a5">
-        <svg viewBox="0 0 950 620" role="img" aria-label="A world map with a route from Detroit to Shanghai">
-          <defs>
-            <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.6" class="dot-grid"/></pattern>
-          </defs>
-          <rect width="950" height="620" fill="url(#dots)"/>
-          <g>
-          <path d="M853,348l0,24l40l5-5l4,0l2,2l1,7l8,4l2-1v-3l-6-5l-3-7l2-1l-2-4l-40l-1-4l-10-7L853,348L853,348z" class="land"/>
-          <path d="M137,225l5,15l-2,1l0,3l4,3v6l5,5l-2-15l-3-10l1-7l2,0l1,2l-1,6l13,25v9l10,12l12,5l5-3l7,6l4-4l-2-5l6-2l2,1l2-2h3l5-9l-2-2l-10,2l-2,7l-6,1l-7-3l-3-10l2-12l-5-3l-2-12l-2-1l-3,3l-4-2l-2-8l-15-2l-8-6L137,225L137,225z" class="land"/>
-          <path d="M474,227l-4-1l-17,3l-4,3l2,12l-7,0l-4,7l-10,2l0,5l32,24l5,0l18-14l-2-2l-30l-2-3v-14l-1-1l0-4l-4-4l0-4l2-1l-1-4L474,227L474,227z" class="land"/>
-          <path d="M405,277l2,3l0,12l3-2l20l3,1l4,5l3-2l170l-4-28l40l-8-6l0,4l-10,0l0,8l-30l0,6L405,277L405,277z" class="land"/>
-          <path d="M461,302l30l2-3l4-1l4,3l9,0l7-3l3-2l0-3l5-5l1-11l-3-7l-8-2l-18,14l-30l-1,10l-9,1L461,302L461,302z" class="land"/>
-          <path d="M462,319l4,0l5,5l2,1l2-1l30l1-4l4-2l40l7-14l0-3l-3-3l-7,3l-90l-4-3l-3,1l-2,3l0,8l-3,4L462,319L462,319z" class="land"/>
-          <path d="M475,227l6-2l2,1l0,1l-1,1l0,2l1,0v4l-1,2l0,1l4,1l-3,5l-10l0,4l-1,0l-1-1l0-4l-4-4l0-3l2-1L475,227L475,227z" class="land"/>
-          <path d="M480,248l20l0-4h1l3-5l8,2l2,3l8,4l4-2l0-2l-2-2l0-1l3-2h6l2,3l5,1l1,37l-30l-20-11l-2,1l-8-2l-2-3l-30l-2-3L480,248L480,248z" class="land"/>
-          <path d="M522,243l3,0l5,1l2,0l3-3h1l3,1h3l10l2,6l1,2l1,3l-1,1l-2-1l-2-6l-20l0,2l1,4l9,12l0,5l-3,3L522,273L522,243L522,243z" class="land"/>
-          <path d="M493,296l0-3l5-5l1-11l-3-6l2-1l21,11l0,11l-4,3v6l2,5h-4l-7,7l0,2l-50l0,1l-30l-2-4l-2-1l0-1l2-2v-7l-30l-3-2L493,296L493,296L493,296z" class="land"/>
-          <path d="M478,324l3,3l0,5l180l1-2l-5-5l-1-2l3-6l-2-4l-2-1v-2l2-1l0-6l-20l0,3l-7,14l-5,0l-3,2L478,324L478,324z" class="land"/>
-          <path d="M549,312l7-16l7,0l6,6l0,5h5l1,3l8,5l5,0l-9,10l-13,4h-3l-6-5l-2-1l-4-6l-3,0l0-3L549,312L549,312z" class="land"/>
-          <path d="M496,324l5,5l2-2l3,0l1-2l3-2l6,4l3-3l13,1L519,311l2-1l0-2l-3-1h-4l-7,7l0,3l-50l0,1l-30l-3,6L496,324L496,324z" class="land"/>
-          <path d="M491,333l0,1l5,0l0,12l-40l-3-2l-2,1l0,1l1,0l0,3l-3,2l1,1l3-2h1l0,1l2,1l6-5l0-4l1-3l4-3l1-10l-3,0l-3,4L491,333L491,333z" class="land"/>
-          <path d="M489,356l100l2,3l0,2l1,1h5l1-3h2l1,1l30l1,10l5,0v1l13,6l1,1h3l0-4l-5-2l0-3l2-5l50l-4-14l0-6l7-11l0-1l-1-1l0-3l-10l-1-2l-20-1l-4,4l-6-4l-2,1l-2,13l-4,3l-1,3l0,4l-7,6l-2-1l0,1L489,356L489,356z" class="land"/>
-          <path d="M515,385l3,4l5,0l2,1l5,0l4-6l12-6l1-5l-1-7l-6-4l-4,0l-2,5l0,2l5,2l0,5l-4,0l-1-2l-12-5l0,4l-6,0L515,385L515,385z" class="land"/>
-          <path d="M489,357l3,13l0,4l-5,5l-1,9l19,0l6,2l5-1l-3-4l0-11l60v-4l-50l-1-10l-2,0l-1-1l-1,0l-2,3H502l-1-1l0-2l-2-2L489,357L489,357z" class="land"/>
-          <path d="M541,413l3,2l6-4l1-6v-9l10-8l2,0l6-6l-1-12L552,372l0,4l3,2l1,7l-6,5l-1-3l0-4l-3-3l-8,4l7,4l0,11l-5,7L541,413L541,413z" class="land"/>
-          <path d="M497,422l3,0l2,2l5,0l1-13v-9l3-1l1-9l80l3-2l-50l-6,1l-7-2h-19l0,5l6,9l-1,5l0,2L497,422L497,422z" class="land"/>
-          <path d="M534,404l-8,7l-2,5l-6-1l-5,5l-30l0-6l-10l-1,13l-60l-2-2l-30l2,7l4,4l-3,4l2,5l5,2l4-3l11,0l1-1l5-1l16-16l0-5l-2,2h-3l-3-3l2-4l3-1l0-8L534,404L534,404z M530,422l20l2,3l0,3l-3,1l0,1l-4,0l-1-3l1-2L530,422L530,422z" class="land"/>
-          <path d="M321,50l-1,2l2,2l-1,2l4,5l4-1l6-1l7,7l4,12l-4,7l5-1l3,2l0,4l-6,0l3,3l4,1l-9,12l-1,7l2,6l-1,4l2,8l5,5l10l3-1l0,4l2,3l40l3-10l8-10l12-5l8-10l4,2h7l6-6l7-3l1-5l-5-4l-4-1l-2-6l5-3l8,4l3-3l-4-2l9-13l-2-5l-40l2-5l5-2l11-10l-3-4l-13,1l-7,7l4-8l-4-1l-2,4l-4-3l-10,1l3-4l16-1l-4-5l-17-3l-7,1l0,4l-7-2l0-2l-5,1l-1,3l5,2l-6,4l-4-5l-6-2l-1,4h-6l-2-5l-9-1l-5,2l0,3l-6-1l-4,2l0,4v2l-7,1l-3-2l-2,4l3,4l7-1l1,2l-5,2L321,50L321,50z" class="land"/>
-          <path d="M389,623l4-5l15-8l3-6l6-1l6-8l60l1-6l5-4l4,1l12-4l3,3l6,0l5-3l310l11,3l14-3l5,0l1-4h5l6,7l12-8l13-4l5,3l0-6l7-1l7,3v3l18,8l50l2,3l-6,7v5l6,3l1-3l25-10l18-2l4,2l14,2l3,1l5-3l70l6,5l0,5l14-3l2,1l1,5l13,4l4-3l0,4l5,0l6,5l6-3l5,0h4l30l0,7l9,5L389,623L389,623z" class="land"/>
-          <path d="M260,623l14-4l1-4l14-3l9,2l19-8l0-8l-6-9l1-2l-2-6v-6h3l-2-4l15-13l0,6l-3,1l-3,5l3,1l-3,4l-3-1l-2,4l0,5l50l3,5l1,6l7,9l0,11l-3,1l2,6l-1,2L260,623L260,623z" class="land"/>
-          <path d="M761,428l0,25l-4,3l0,2l5,4l13-2h7l2-4l15-3l11,3l-1,4l1,4l8-1l0,2l-5,4l2,1l4-1l-1,12l7,6l4-1l2,2l12-2l12-19l4-1l9-16l2-14l-5-7l2-1l-4-13l-5-3l1-18l-4-3l-1-10h-2l-7,24l-4,0l-9-9l5-13l-9-2l-10,3l-3,8l-5,1l0-6l-19,11l0,4l-3,4h-7l-15,6L761,428L761,428z" class="land"/>
-          <path d="M790,349l2,3l-1,4v1h3l1-10l1,0l2,10l2,0l2-4l-2-6l-1-3l5-3l-1-1l-4,3h-1l-2-3l1-1l4-2l6,2l20l4-4l-2-2l-4,3h-2l-4-2l-3,0l-3,5l-2,8L790,349L790,349z" class="land"/>
-          <path d="M807,302l0,3l-3,3l-3,0l-3,3l0,1l3-1l2-1l2,4l3,2l10l1-1l-2-2l1-1l2,1l1-2l-1-2l0-5L807,302L807,302z" class="land"/>
-          <path d="M791,273l-3,2l0,6l4,8l1,1l2-1l3,0l1,3l2,0l1-1l-1-2l-2-2l-30l-2-3l2-3l0-3l-1-4L791,273L791,273z" class="land"/>
-          <path d="M808,207l-5,6l1,1l2,0l4-3l3-1l3,3l2-1l1-3l40l4-5l-2-8l-1-4l2-2l-5-7l-1,0l-3,3v2l1,1l0,6l-3,4l-2-1l-1,3l0,3l1,2l-1,1l-2-2h-2l-1,1L808,207L808,207z" class="land"/>
-          <path d="M816,163l-2,1l1,3l1,1l0,4l-2,1l-1,3l4,5l3-1l0-1l-3-2l2-2l2,0l1,2l0-3l4-3l2-1l-2-3l-1-1l-1,1l-1,2l-3-1l-3-2L816,163L816,163z" class="land"/>
-          <path d="M883,18l-4,8l8,5l9-8l6,9l-6,1l-2,6l13,17l8,1l11,2l1-4L930,57l1,17L924,86l3,1l9-19l3-14l-6-3l-1-19l4,1l0,11l5,4l3-10l-2-6l7,3l1-35L874,0l-4,3l1,7l13,2l10-2l-4,7L883,18L883,18z" class="land"/>
-          <path d="M1,55l14,2l2,5l11-7l19-3l1-10l9-3l6-6v8l6,8L83,42l-6-7L69,13L60,3l-7-1L53,8l-5,3l-2-3l3-7L1,0L1,55L1,55z" class="land"/>
-          <path d="M592,373l-2,5l-4,6l-6,0l-3,3l0,10l-4,5l0,8l3,4l40l4-3l-1-5l9-16l-2-2l2-4l2,1l1-2l-2-8l-1-3L592,373L592,373z" class="land"/>
-          <path d="M406,117l-2-1l-3,2l-2,2l0,1l3,0l0,2l-1,1l0,1l3,0v3l4,1l3,1l3,0l5-2l4-5l0-3l-2-2l-2-2l-1,1l-1,2l-10l-1-2l-2,0l-3,2l-2,2l-1-1l0-2l1-1L406,117L406,117z" class="land"/>
-          <path d="M832,339l-4,0l-3,2l1,2l5,1v1l-3,2l1,5l1,0l1-5h2l1,5l11,9l0,7l4,4l20l0-25l-6-4l-6,4l-2,1l-4-2l0-7L832,339L832,339z" class="land"/>
-          <path d="M93,45l-8,2l2,9l9,2l0,2L82,65l-8,13l3,13L82,94l3-3l1,2l-4,5l-16,7l-10,2l0,4l24-7l10-3l9-11l10-7l-5,9l6,1l10-4l2,7l7,1l7,7l0,5l-1,1l1,5h2l0-8h2l0,20l5-4l-3-20h-5l-6-7l28-47l-28-22l-31,6l-1,9l7,4l-2,6L93,45L93,45z" class="land"/>
-          <path d="M229,30l-7,3v2l9,3l-2,2l1,3l6-2h5l2,4l4-4l-1-4l-3,1l0-4l2-3h-2l-2,2l-1,1l1,3l-2,1l-30l-1-4L229,30L229,30z" class="land"/>
-          <path d="M223,48l-8,2l-5,4l0,5l9,3l-2,4l-6-4l-2,3l4,3l0,5l6,2l80l1-2l6,6l4-1l1-4l3,2l0-4l-4-2l0-14l-3-2L232,56L223,48L223,48z" class="land"/>
-          <path d="M283,62L278,61l-6,2l-3,4l1,12l10,0l9,4l6,7l50l-1,7l-4,7l-5,2l-4-1l-2-2l-3,4l1,4l4,0l5-2l4,10l10,6l7-9l-6-9l3-4l5,8l8-7l-2-3l-6,2l-4-11l4-6l-8-8l-4,3l-4-9l-8,1l-2-10l-7,5l-1,6h-4l0-5L283,62L283,62z" class="land"/>
-          <path d="M286,40v2l-5,1l1,2l6,2l6,1l4,3l4-2l-3-3h4l2-3l6-1v-1l-3-2l0-2l9,2l14-5l-5-2l1-2h11l2-2l-22-8l-5-2l-6,4l-6-5l-30l-1,4l-4-4l-5,2l1,2l7,2l0,4l4,2l10-2l0,3l-8,4l-5-4l-4,0l4,6l-2,1l-3-3l-2,2l2,4h4l-1,4l-30l-4-4L286,40L286,40z" class="land"/>
-          <path d="M158,49l2,3l1,4l5,1l3-4l3,2l8,1l6-3l1,8h3V58l3,0l9,10l6,4l-3,5l1,1L219,80l0,5l3,0l1-8l5-1l3,5l7,4l4,1l2-3l0-5l4-3l1,4l-4,7l0,4l2-4l4-4l0-5l-2-4l1-3l6-3l3,2l0,18l4-4l2,2l-3,6l4,1l6-10l5,6l-2,10l-5,3l-5-3l-9,2l1,3l-2,4l-8,2l-9,7l-8,10l-1,3l5,2l2,5l7,7l11,5l-2,12l0,3l3,2l4-5l0-10l60l3-6l0-9l8-16l10,4l5,7l-2,7l4,2l10-7l3,18l9,11l0,6l-10,3l-5,5l-10-2l-50l-9,7l5-1l6-1l1,2l-2,6l0,5l3,2l3-1l2-2h2l-3,6l-6,0l-3,4h-3l-1-3l5-5l-6,2l0-9l-2-1l-5,2l0,4h-12l-10,7l-14,5l-1-2l7-10l-4-4l-2-5l-5-4l-50l-10-7l-71-12l-1-5l-6-6v-5l1-5l0-3l-2-3l0-4l6-5l-4-22l-50l-5-7L158,49L158,49z" class="land"/>
-          <path d="M149,158l-1,4l-3-2h-2l-1,4l-12,27l3,24l4,2l1,7h8l8,6l16,2l2,8l2,2l3-4l3,1l2,12l4,3l3-7l11-8l7,3l6,0l0-4l12,0l2,3l0,6l-1,4l2,6h4l4-6l-1-3l-1-6l2-7l10-9l8-2l-1-7l11-12l11-2L273,199l10-6v-8l-10l-4,1l0,5l-12,0l-10,6l-15,5l-2-3l7-10l-3-3l-2-4l-5-4l-50l-10-7L149,158L149,158z" class="land"/>
-          <path d="M254,300l-20l-14,11l-1,4l-2,0l1,9l-5,12l5,4l7,0l5,7l7,0l0,5H256l3-9l-2-3l1-6l50l-1-14l-12-4l-3-7L254,300L254,300z" class="land"/>
-          <path d="M250,306l0,3l3,1l1-5l3-4l3,4l8,2l7-1l5,6l3,2l-4,6l1,4l-2,3l-2,2l-5-2l-1,1v3l4,2l-3,3l-3,3l-30l-3-4l-1-14l-12-4l-2-6L250,306L250,306z" class="land"/>
-          <path d="M225,350l-2,2l0,3l17,31l18,11l3-5l1-10l-1-6l-5-8l-3,1l-1,1l-6-7l1-8l7-4l-1-4l-70l-3-6l-2-1l0,4l-9,10l-6-2L225,350L225,350z" class="land"/>
-          <path d="M259,373l8-4l3,0l2,8l13,4l2,6l5,1l2,5l-2,5l-8,1l-3,8l-70l-20l-4,4l-20l-6-15l2-3l1-11l-2-6L259,373L259,373z" class="land"/>
-          <path d="M305,418l2,2l-7,11l-3,3l1,13l6,7l-5,8l-4,2h-4l1,7l-6,2l2,5l-4,12l5,4l-3,6l-4,7l2,5l-6,1l-5-6l-1-18l-7-30l2-11l-5-14l3-18l3-3l-1-3l4-3l8,1l5,5l5,0l5,3l-2,4l0,4l80L305,418L305,418z" class="land"/>
-          <path d="M284,513l-3,4l0,4l-6-4l-7-10l-2-3l3-4l0-4l-3-1l-2-2l1-2l3-1l1-14l-5-3l-3-75l1-1l6,15l2,0l1,2l-3,3l-3,18l4,14l-2,10l7,31l1,18l5,6L284,513L284,513z" class="land"/>
-          <path d="M314,439l6-12l0-10l12-8h7l5-9l1-17l-2-4l12-11l0-12l-17-8l-20-6l-10-1l3-5l-1-8l-2-1l-3,6l-2,2l-4-2l-14,5l-5-6l1-6l-4,4l-5-3l0,1l0,2l4,2l-6,7l-40l-4-4l-5,0l-1,5l3,3l-3,10l-4,0l-6,4l-1,7l5,5l1-1l3-1l3,5l9-4l3,0l2,8l12,4l2,6l5,1l2,6l-2,5l2,3l0,4l6-1l5,7l0,5l3,3l-8,12L314,439L314,439z" class="land"/>
-          <path d="M818,73l2,6l4,1l4-6l-2-4l1-3h5l-1,3l0,9l-8,19l1,4l0,7l14,21l3,1l0-17l3-3l-3-7l3-3l-6-7l-3,0l-1-12l8-2l0-4l4-1l2,2l3-11l5-8l4-2l3,0v-4l-5-1l-7-6l4-4l-3-7l3-3l3,4l8,3l8,1l1-4l-4-4l5-7l-11-4l-3,6l-4-5l-20-7l-19,3l-3,2v2l4,2l0,5l-7-3l-16,6l-3-6h-11l-5,5l-18-4l-16,3l-2,5l3,1l0,4l-16,2l1,5l-15-3l4-7l-15-1l1,7l-5,2l-4-4l-16,3l-6,6l0,4l-4,0l0-4l13-11v-8l-8-2l-11,4l-5-5h-2l-3,5l2,2l-14,8l-12,9l-8,10v4l8,3l-4,3l-9-3l-4,3l-5-6l-1,2l6,18l2,1l4-2l2,2v3l-4-2l-2,2l2,3l-1,9l-8,1l0-3l5-3l1-8l-5-7l-2-11l-8-1l-1,4l2,2l-3,3l1,8l5,2l1,6l-5-3l-12-2l-2,4l-10,4l-2-3l-13,7l0,5l-5,1l2-4v-4l-5-2l-3,1l3,5l2,4v3l-4-1l-1-1l-4,4l2,4l-90l3,4l-1,2h-5l-3-2l-1-6l-5-2v-3l11,2l6,1l3-4l-2-4l-16-6l-6,1l-2,2l1,4l2,0l-1,6l7,17l-5,8l0,2l3,2l-2,2l-2,0l0,7l2,3l0,3l3,0l4,2l5,6l0,2l-1,3l30l3,1l4,6l11,1l0,8l-4,3l1,1l-4,4l-1,4l2,3l7,3l3-2l19,7l1-2l-4-4v-5l-3-1l0-4l4-5l-7-5l0-8l8-5l9,1l2,3l9,1l7-4l-4-4l1-7l18-9l14,6l5-4l13,13l10-1l4,4l10,1l6-9l8,4l4,1l4-4l-4-3l3-5l9,3l2,4l4,0l3-2l70l1,2l8,1l5-6l11,1l3-1l1-6l-3-7l3-3h10l10,12l13,7h4l0-3l5-3l0,16l-4,0v4l2,3l0,4l2,1l1-3l2,1l1,1l5-1l5-13l0-16l-6-13l-7-9l-4,1v3l-9-3l3-7l3-19l12-4l6-4h6L806,96l2,3l5-6l3,0l0-3l-5-1l3-12L818,73L818,73z" class="land"/>
-          <path d="M670,170l-3,9l-50l-5,11l4,5l-9,12l-5-1l-3,4l1,2l4,0l2,4l4,1l11,14v7l5,3l6-1l7,4l9,3l4-1l5-1l10-7l3,1l1,3l3,1l4,6l-3,6l2,4l4,2l1,5l5,1l1-2l7-4l5,0l5,6l4-2l2,0l1,3l2,0l3-4l10-4l9-11l3-10l0-7l-4-1l2-3l0-4l-10-10v-5l3-4l3-1l0-3h-7l-1,4l-3-1l-4-4l3-7l4-4l3,0l0,6l2,2l4-4l20l0-3l4-5l3,0l2-6l2-1l0-3l-2-2l0-5l40l0-14l-3,2l-1,4l-50l-13-7l-9-11l-100l-2,2l3,7l-1,7l-4,2l-20l0,7l2,1l4-2l5,3v3l-4,0l-3,7l-3,0l-10,13l-10,5l-7,1l-5-3l-7,4l-7-2l-2-5l-12-1l-7-11h-3l-2-5L670,170z" class="land"/>
-          <path d="M674,170l6-8l7,3l5,1l6-5l-4-3l3-4l8,3l3,4l5,0l3-2l50l1,2l9,0l6-6l8,1l0,8l3,1l4-2l4,2l0,1l-3,0l-3,7l-3,0l-10,13l-10,4l-6,0l-5-3l-7,4l-7-2l-2-5l-12-1l-6-11l-30L674,170L674,170z" class="land"/>
-          <path d="M577,189l4-2l50l0,7h-3l-2,3l3,4l4,2l0,3l10l1-2l2,0l1,2h3v-3l-2-5l-1-4l5-2l7,1l4,4l10-1l5,8l6,0l2-3l20l0-3l30l2,2l2-4l15,2l3-3l-4-5l6-12l5,0l3-8l-6-1l-4-4l-10,1l-13-12l-5,4l-14-6l-17,8l0,6l4,5l-8,4l-100l-2-3l-80l-7,5l0,7L577,189L577,189z" class="land"/>
-          <path d="M594,208l-1,3h-4v4l4,3l-1,4v2l2,0l2-3l6-1l12,4l0,3l7,1l7-8l-1-2l-5-1l-14-9l-1-3h-5l-2,4h-2L594,208L594,208z" class="land"/>
-          <path d="M629,219l3,0v-5l-3-2l5-6h2l2,2l5-2l-7-2l0-2l-2,0l-2,3l-70l-5-8l-9,1l-4-4l-6-1l-4,2l3,9l0,3l2,0l2-4l6,0l1,3l13,9l5,1L629,219L629,219z" class="land"/>
-          <path d="M630,212l4-5h2l1,1l-2,1v1l1,1l6,0l2-1l1,0l1,2l4,0l2,4l-1,1l-1,0l-1-1l-20l-3,0l0,3l-30l0-3l-2-2l-3,2l0,2l-3,1h-2l0-6L630,212L630,212z" class="land"/>
-          <path d="M637,199l0,3l0,2l9,3l-8,3l-1-1l-2,1l0,1l1,0l5,0l3-1l3-4l4,1l5-7l-14-2l-2,5l-2-3L637,199L637,199z" class="land"/>
-          <path d="M614,227l2,12l4,1l0,2l-3,2l5,4l10-4l1-4l6-4l2-9l2-2l-2-3l6-4l-1-1l-3,0l0,3l-40l0-4l-1-1l-2,2l0,2l-3,1l-60l-8,8L614,227L614,227z" class="land"/>
-          <path d="M623,250l3,4l0,2l-3,1l0,3h4l1-1h8l7,6l1-3h5l0-4l-5-5l1-3l50l7-15l-4-3l-1-5l10-1l-6-8l-3-1l-1,2l-1,0l-6,4l2,3l-2,2l-3,10l-6,4l-1,4L623,250L623,250z" class="land"/>
-          <path d="M671,313l5-2l3-10l0-12l16-17v-4l3-1l0-5l-3-7l2-4l4,4l6,0v2l-2,2l0,1l3,0l1,3h1l2-4l1-10l4-3l0-4l-1-3l-20l-9,6l1,4l-60l-2-3l-1,0l0,4l-14-1l-9-4l0-5l-6-4l0-7l-4-5l-9,1l1,4l4,4l-8,16l-5,0l-1,2l5,5l0,5l-50l-1,2l40l0,2l-3,2l2,4l4,1l2-2l1-3l1-1l2,2l0,4l-1,2l0,3L671,313L671,313z" class="land"/>
-          <path d="M696,253l-1,2l3,6l0,5l1,1l4,0l2-2l2,1l0,3l1-1l0-4l-10l-1-3l-30l-1-2l2-2l0-1h-5L696,253L696,253z" class="land"/>
-          <path d="M729,304l-3-4l2-3l-2-3l-20l0-6l-3-5l-1,1l-2,3l-2,0l-1-1l-1-4l-2-3l-7-6l2-1l0-5l2-4l1-10l4-2l0-4l2,1l3,5l-3,5l2,4l4,2l1,5l6,1l-2,3l-7,3l-1,5l5,7l0,4l-1,1l0,1l4,6l0,6L729,304L729,304z" class="land"/>
-          <path d="M730,270l3,4v5l1,1l5-2l1,0l6,7l0,5l-20l-2-1l-1,0l-2,4l0,2l2,1l0,2l-1,1l-5-3v-3l-20l-1,1l0,13l3,5l5,5l0,1l-30l-3-4h-3l-3-3l-1-3l1-2l0-2l2-3l0-6l-4-6l0-1l1-1l0-4l-5-7l1-4L730,270L730,270z" class="land"/>
-          <path d="M735,263l-2,1l-2,6l3,4l-1,5l1,0l6-3l8,8l0,5l2,1l4-3l0-3l-12-11l0-2l1-1l-1-3l-5-1L735,263L735,263z" class="land"/>
-          <path d="M745,304l1,2l0,2l3,0l4-5l4-1l2-5l-1-8l-4-5l-4-3l-5-8l4-6l-5-6l-40l-4,2l1,5l5,1l1,4l-2,1l0,1l11,11l0,3l-1,10L745,304L745,304z" class="land"/>
-          <path d="M570,218l-1,1l0,2l2,2l5,6l-1,2h-1l0,2l3,4l3,0l6,8l3,0l2,2l0,4l10,6h4l2-2l30l2,4l11,1l0-4l3-1l0-1l-3-4l-6-5l3-3l0-1l-4-1l-2-14l0-3l-11-4l-5,1l-3,3l-20l-1,1l-50l-7-5l-3-3l-1,0l-2,2L570,218L570,218z" class="land"/>
-          <path d="M559,209l-2,2l-80l-5-3l-50l-6,4l-5,0l0,3h-6l-2,2v1l1,1v1l-1,2l1,1l2-1l2,2l0,1l-1,1l1,1l5,1l4-2v-2l2,0l4,2l5-1l2-2l1,0v2h2l2-3l13-1l6-1l-2-2l0-3l1-1l-4-3l0-3h-2L559,209L559,209z" class="land"/>
-          <path d="M584,253l7,10l2,2l1,4l11,1l1,1l-1,5l-7,4l-10,3l-6,5l-7-4l-4,3L566,279l-4-2l-1-2v-5l-14-17l-1-3h4l5-4l0-2l-1-1l3-2l6,0l10,8l60l0,1L584,253L584,253z" class="land"/>
-          <path d="M564,225l-2,8l-6,5l0,3l6,0l10,8l60l0-2l2-2l3,2l00l-6-7l-30l-4-5l1-3l10l0-1l-5-5L564,225L564,225z" class="land"/>
-          <path d="M515,102l2-1L517,99l-1-1l0-2h1v-1l-5-1l-7,1l-1,3L503,97l-1-2l-3,0L498,99l-2,1l-1-2l-7,6l1,2l-3,1l-6,12l-2,1l0,1l2,1l-1,2l-40l-1-1l-2,3l-1,1l0,3l-1,1l-3,1l-2,5l1,8l1,4l1,1l30l5-5l2-3l1,5l3-6l0-16l3-2l1-9l8-11l4-1l2-2l6,1l3,2l1-5l5-3L515,102L515,102z" class="land"/>
-          <path d="M446,149l-2,3l1,1h4v2l-1,1l1,4l2,5l2,4l3,1l1,2l0,2l-2,1l0,1l1,1l-1,1l-3,1l-5-1l-8,4l-3-1l7-4l-1-1l-40l2-4l0-3l30l-1-6l-40l-1-1l0-4l-2,0l2-7l4-3L446,149L446,149z" class="land"/>
-          <path d="M498,105l2,2h4l2,4l1,7l-5,4v4l-3,5l-2,0l-3,5l0,4l5,4l0,2l-2,3l-3,2l0,8l-4,1l-1,3h-2l-1-6l-5-7l4-6l0-16l3-1l1-9l7-11L498,105L498,105z" class="land"/>
-          <path d="M507,117l2,1l1,2l-1,2l-6,7l-1,4l1,5l5,4l7-3l5-1l5-8l-4-9l-3-8l1-5l-20l-1-4l-3-5l-3,2l-1,5l-3-2l-5-1l-1,1l2,2l30l3,4L507,117L507,117z" class="land"/>
-          <path d="M511,175l1,2l0,2l-1,2l-2,3l-1,1l-2-1l-1,0l-3,1l-3-1l-5-3l-5-2l-2-3l0-7l4-3l5-2l20l-1,1l0,1l8,0l20l3,4l-1,2l0,2L511,175L511,175z" class="land"/>
-          <path d="M448,205h-13l-3-1l-1,0l-2,3l1,3l5,0l1,2l-2,12l0,2l3,2l4,0l8-2l4-5l0-5l7-6l0-3l-60L448,205L448,205z" class="land"/>
-          <path d="M460,179l-2,1l-4,5l-1,0l-2-1l-1,0l-1,3l-6,0l0,1l4,3l5,4l0,5l-3,5l6,3l6,0l2-2l4,0l1,1l40l2-2l-2-3l0-2l1-2l-1-2l-2,1l0-2l5-5v-3l-3-2l-20L460,179L460,179z" class="land"/>
-          <path d="M471,168l4-1v-3l30l2,2l2,0l3-1l2,1l2,2l0,7l2,3l-3,0l-5,3l0,1l4,4l0,2l-4,2l-4,0l-1,2h-2l-1-2l-3-1l0-3l-3-2l0-2l-2-3l0-3l2-1L471,168L471,168z" class="land"/>
-          <path d="M472,197l-1,2l0,2l2,3l40l8,10l5,2l3,3l1,7l2-1l1-4l0-3l20l0-1l-7-3l-6-6l-3-4l-1-4l3-1l-1-2l-2-2l-20l-2,1l-2,3l-1,1l-2-1L472,197L472,197z" class="land"/>
-          <path d="M516,173l-3,2l1,3l-3,6l0,2l1,1l8,0l2-2l2,1l3,5l-3,5l3,1l4-5l2,0l2,1l-2,2l2,4h3l1-3l3-1l0-2l-5-1l0-2h5l5-4l2-2l0-7l-11-1l-4-6l-3-1l-4,0l-2,4l-8,0l-2-1L516,173L516,173z" class="land"/>
-          <path d="M507,218l0,1l5,2l2,1l-1,1l-3,0l0,1l1,2l3,2l1,0l0-3l2-2l-5-6l1-2l10l2,1l1-1l0-2l5,0l0-3l-2,2l-70l-4,2L507,218L507,218z" class="land"/>
-          </g>
-          <path class="arc" d="M 258 112 Q 530 10 798 186"/>
-          <circle class="node-ring" cx="258" cy="112" r="12"><animate attributeName="r" values="8;18" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.6;0" dur="2s" repeatCount="indefinite"/></circle>
-          <circle class="node" cx="258" cy="112" r="6"/>
-          <circle class="node-ring" cx="798" cy="186" r="12"><animate attributeName="r" values="8;18" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.6;0" dur="2s" repeatCount="indefinite"/></circle>
-          <circle class="node" cx="798" cy="186" r="6"/>
-          <text class="city" x="258" y="140" text-anchor="middle">DETROIT</text>
-          <text class="clock" x="258" y="88" text-anchor="middle" id="hero-detroit-time">—</text>
-          <text class="city" x="798" y="214" text-anchor="middle">SHANGHAI</text>
-          <text class="clock" x="798" y="160" text-anchor="middle" id="hero-shanghai-time">—</text>
-
-          <circle class="node" cx="225" cy="232" r="4"/>
-          <text class="city" x="225" y="256" text-anchor="middle" font-size="12">MEXICO CITY</text>
-          <text class="clock" x="475" y="36" text-anchor="middle">HALF A WORLD APART · ONE WORKING DAY</text>
-        </svg>
-
-        <div class="map-table">
-          <div class="map-cell"><div class="mc-city">DETROIT · United States</div><div class="mc-sub">Home base — product, strategy, and the US market. 11 years at GM.</div></div>
-          <div class="map-cell"><div class="mc-city">SHANGHAI · China</div><div class="mc-sub">3 years leading software strategy for SAIC-GM, 2022–2025.</div></div>
-          <div class="map-cell"><div class="mc-city">MEXICO CITY · Mexico</div><div class="mc-sub">The third clock on the desktop — the region in between.</div></div>
+      <!-- intro -->
+      <section class="panel intro">
+        <div class="inner">
+          <div class="kicker">Marcin Fracz · Automotive product &amp; software strategy</div>
+          <h1>THE<br>ROAD<em>.</em></h1>
+          <p class="lede">One career, left to right. Scroll down and drive it — from an engineering floor in 2003, through Detroit and Shanghai, to building AI today.</p>
+          <div class="scroll-hint"><span class="mouse"></span> Scroll to drive</div>
         </div>
-        <p class="route-note">Detroit to Shanghai, every working day — strategy set in Shanghai, aligned with Detroit.</p>
-      </div>
-<div class="stats anim a6">
-        <div class="stat"><div class="num">23</div><div class="cap">years in automotive, engineering to strategy</div></div>
-        <div class="stat"><div class="num">3</div><div class="cap">nameplates — Equinox, Encore GX, Trailblazer</div></div>
-        <div class="stat"><div class="num">2</div><div class="cap">markets — United States and China</div></div>
-        <div class="stat"><div class="num">11</div><div class="cap">years at General Motors, 2014–2026</div></div>
-        <div class="stat"><div class="num">3</div><div class="cap">years in Shanghai, leading SAIC-GM software strategy</div></div>
-        <div class="stat"><div class="num">6</div><div class="cap">roles, from the engineering floor to the strategy table</div></div>
-      </div>
-    </section>
+      </section>
 
-    <section id="pillars">
-      <span class="label reveal">Three pillars</span>
-      <div class="pillars">
-        <a class="pillar reveal d1" href="#w5"><h3>Agentic AI &amp; Execution</h3><p>Rebuilt solo with AI a tool that once took a 7-developer team and about $3M a year to run — for about $10,000–$15,000 in Copilot credits and my own time.</p><span class="go">See the Marcin Hub case study →</span></a>
-        <a class="pillar reveal d2" href="#w1"><h3>Global SDV Strategy</h3><p>Led software and ADAS strategy at SAIC-GM in Shanghai. Market research and a pitch deck supported GM's approval of $167M for L2++ ADAS development.</p><span class="go">See the SAIC-GM case study →</span></a>
-        <a class="pillar reveal d3" href="#w0"><h3>Enterprise Connectivity</h3><p>Aligned OnStar US, Middle East and Mexico, the vehicle brands and three Chinese JVs to deliver OnStar connectivity on China-sourced export vehicles across 8 regions.</p><span class="go">See the OnStar case study →</span></a>
-      </div>
-    </section>
-
-    <section class="intro reveal">
-      <span class="label">Position</span>
-      <p style="margin-top:14px">I work where <b>software, product and global markets</b> meet. My career runs from engineering floors to product launches to leading software strategy for a joint venture in Shanghai, and today I build with AI. The work below is the visible record: the products, the services, and the tools I built along the way.</p>
-    </section>
-
-    <section id="work">
-      <span class="label reveal">Work Index</span>
-      <div class="index-grid">
-        <a class="index-card reveal d1" href="#w0"><span class="num">01</span><h3>OnStar International</h3><p>OnStar connectivity on China-sourced export vehicles, across 8 regions.</p></a>
-        <a class="index-card reveal d2" href="#w1"><span class="num">02</span><h3>Software Strategy — SAIC-GM</h3><p>Leading software strategy for a joint venture in Shanghai.</p></a>
-        <a class="index-card reveal d3" href="#w2"><span class="num">03</span><h3>Connected &amp; OTA Services</h3><p>Connected services and over-the-air updates at GM.</p></a>
-        <a class="index-card reveal d4" href="#w3"><span class="num">04</span><h3>Small SUVs — Trailblazer &amp; Encore GX</h3><p>Two small SUVs, from plan to launch.</p></a>
-        <a class="index-card reveal d4" href="#w4"><span class="num">05</span><h3>Equinox — Global Product Manager</h3><p>Compact and mid crossovers, led from the product side.</p></a>
-      </div>
-    </section>
-
-    <section class="work-sec reveal" id="w0">
-      <span class="label">01 · General Motors · 2025–2026</span>
-      <h2>OnStar International</h2>
-      <p class="one-line">Manager, Global Planning &amp; Joint Ventures — aligning OnStar, the vehicle brands and three Chinese JVs to bring OnStar connectivity to China-sourced export vehicles.</p>
-      <div class="blocks">
-        <div class="block reveal d1"><h4 class="label">Problem</h4><p>China-sourced export vehicles needed <b>OnStar connectivity in markets around the world</b> — and the work had to align OnStar US, Middle East and Mexico, the vehicle brands, and three Chinese JVs.</p></div>
-        <div class="block reveal d2"><h4 class="label">Built</h4><p>Aligned OnStar US, Middle East and Mexico, the vehicle brands and three Chinese JVs to deliver <b>OnStar connectivity on China-sourced export vehicles</b>.</p></div>
-        <div class="block reveal d3"><h4 class="label">Outcome</h4><p>OnStar connectivity delivered on China-sourced export vehicles <b>across 8 regions</b>.</p></div>
-      </div>
-      <div class="demo reveal">
-        <span class="label">The 8 export regions</span>
-        <div class="chips" style="margin-top:14px">
-          <span class="chip">Mexico</span>
-          <span class="chip">AMEO</span>
-          <span class="chip">South America</span>
-          <span class="chip">GMAP</span>
-          <span class="chip">South Korea</span>
-          <span class="chip">Israel</span>
-          <span class="chip">ANZ</span>
-          <span class="chip">Central Asia</span>
-        </div>
-      </div>
-    </section>
-
-    <section class="work-sec reveal" id="w1">
-      <span class="label">02 · SAIC-GM, Shanghai · 2022–2025</span>
-      <h2>Software Strategy for a Joint Venture</h2>
-      <p class="one-line">Deputy Director, Software Strategy at SAIC-GM — leading software strategy in China, with cross-border execution between Shanghai and the US.</p>
-      <div class="blocks">
-        <div class="block reveal d1"><h4 class="label">Problem</h4><p>A joint venture spanning two markets needed <b>one coherent software strategy</b>, built in China and aligned with a global organization.</p></div>
-        <div class="block reveal d2"><h4 class="label">Built</h4><p>Led the software strategy function as Deputy Director, working across the JV and with GM globally — <b>strategy, alignment and execution</b>, not just slides.</p></div>
-        <div class="block reveal d3"><h4 class="label">Outcome</h4><p>My China ADAS market research and pitch deck supported GM's approval of <b>$167M for L2++ ADAS development</b>. The work covered current and next-generation Cadillacs, redefining luxury for young Chinese buyers who expect experiences, technology and autonomy.</p></div>
-      </div>
-      <div class="demo reveal">
-        <span class="label">Two markets, one day</span>
-        <div class="demo-controls" style="margin-top:14px">
-          <button class="active" data-city="detroit">Detroit</button>
-          <button data-city="shanghai">Shanghai</button>
-          <button data-city="mexico">Mexico City</button>
-        </div>
-        <div class="demo-panel" id="city-panel"></div>
-        <p class="demo-note">Live clock. The work spanned these time zones every day.</p>
-      </div>
-    </section>
-
-    <section class="work-sec reveal" id="w2">
-      <span class="label">03 · General Motors · 2020–2022</span>
-      <h2>Connected &amp; OTA Services</h2>
-      <p class="one-line">Business Strategy Manager for Connected &amp; OTA Services — the strategy behind the services that keep cars connected and updated after they leave the factory.</p>
-      <div class="blocks">
-        <div class="block reveal d1"><h4 class="label">Problem</h4><p>Cars were becoming <b>software products</b>, but the business around connectivity and updates was still being figured out.</p></div>
-        <div class="block reveal d2"><h4 class="label">Built</h4><p>Business strategy for connected services and over-the-air updates — <b>what to offer, how to price it, how it ships</b>.</p></div>
-        <div class="block reveal d3"><h4 class="label">Outcome</h4><p>A connected-services strategy that treated the car as a platform, not a one-time sale.</p></div>
-      </div>
-    </section>
-
-    <section class="work-sec reveal" id="w3">
-      <span class="label">04 · General Motors · 2018–2020</span>
-      <h2>Trailblazer &amp; Encore GX</h2>
-      <p class="one-line">Product Manager for the Buick Encore GX and Chevrolet Trailblazer — small SUVs, from plan to launch.</p>
-      <div class="blocks">
-        <div class="block reveal d1"><h4 class="label">Problem</h4><p>Two new small SUVs entering a crowded segment needed <b>clear positioning and a clean launch</b>.</p></div>
-        <div class="block reveal d2"><h4 class="label">Built</h4><p>Product marketing for both nameplates, from plan to launch — <b>positioning, pricing logic and go-to-market</b>.</p></div>
-        <div class="block reveal d3"><h4 class="label">Outcome</h4><p>Both SUVs launched and on the road — two nameplates that are still selling today.</p></div>
-      </div>
-      <div class="demo reveal">
-        <span class="label">The nameplates</span>
-        <div class="demo-controls" style="margin-top:14px">
-          <button class="active" data-model="trailblazer">Chevrolet Trailblazer</button>
-          <button data-model="encore">Buick Encore GX</button>
-        </div>
-        <div class="demo-panel" id="model-panel"></div>
-      </div>
-    </section>
-
-    <section class="work-sec reveal" id="w4">
-      <span class="label">05 · General Motors · 2014–2018</span>
-      <h2>Equinox — Global Product Manager</h2>
-      <p class="one-line">Global Product Manager for compact and mid crossovers — the Chevrolet Equinox, one of GM's highest-volume nameplates.</p>
-      <div class="blocks">
-        <div class="block reveal d1"><h4 class="label">Problem</h4><p>A high-volume crossover in a fiercely competitive segment needed <b>product decisions that held up globally</b>.</p></div>
-        <div class="block reveal d2"><h4 class="label">Built</h4><p>Global product management for the Equinox line — <b>product planning across markets</b>, from engineering roots into the product seat.</p></div>
-        <div class="block reveal d3"><h4 class="label">Outcome</h4><p>Four years leading product for a flagship crossover, and the step from engineering into product leadership.</p></div>
-      </div>
-    </section>
-
-    <section class="work-sec reveal" id="w5">
-      <span class="label">06 · AI Builder · Now</span>
-      <h2>Marcin Hub, rebuilt solo with AI</h2>
-      <p class="one-line">A vehicle-program portfolio tool, rebuilt solo with AI. The original took a 7-developer team and about $3M a year to run — and GM killed it in 2019.</p>
-      <div class="blocks">
-        <div class="block reveal d1"><h4 class="label">Problem</h4><p>After the original was killed in 2019, the work fell back to <b>GM's databases</b> — and the daily problems that came with them.</p></div>
-        <div class="block reveal d2"><h4 class="label">Built</h4><p>Taught myself to build it — vibe coding, GM's app-posting process, data contracts and agreements — and posted it in the system. <b>Solo with AI</b>, about 240,000 Copilot credits a month, about $10,000–$15,000 in credits plus my own time.</p></div>
-        <div class="block reveal d3"><h4 class="label">Outcome</h4><p>A working tool, <b>more capable than the original and simpler to use</b>. GM estimated the original saved about 15,000 analyst hours a year; this version was never measured, but it does more.</p></div>
-      </div>
-      <div class="demo reveal">
-        <span class="label">Try it — a vehicle-program portfolio, demo data</span>
-        <div class="demo-controls" style="margin-top:14px">
-          <button class="active" data-prog-filter="all">All</button>
-          <button data-prog-filter="on-track">On track</button>
-          <button data-prog-filter="at-risk">At risk</button>
-          <button data-prog-filter="delayed">Delayed</button>
-        </div>
-        <table class="demo-table">
-          <thead><tr><th>Program</th><th>Segment</th><th>Status</th><th>Next milestone</th></tr></thead>
-          <tbody>
-            <tr data-status="on-track"><td>Atlas</td><td>Midsize SUV</td><td><span class="status on-track">On track</span></td><td>Design freeze</td></tr>
-            <tr data-status="on-track"><td>Beacon</td><td>Compact SUV</td><td><span class="status on-track">On track</span></td><td>Prototype build</td></tr>
-            <tr data-status="at-risk"><td>Canyon</td><td>Pickup</td><td><span class="status at-risk">At risk</span></td><td>Supplier review</td></tr>
-            <tr data-status="at-risk"><td>Delta</td><td>Sedan</td><td><span class="status at-risk">At risk</span></td><td>Cost review</td></tr>
-            <tr data-status="delayed"><td>Ember</td><td>Electric SUV</td><td><span class="status delayed">Delayed</span></td><td>Battery validation</td></tr>
-            <tr data-status="delayed"><td>Frontier</td><td>Full-size SUV</td><td><span class="status delayed">Delayed</span></td><td>Crash testing</td></tr>
-          </tbody>
-        </table>
-        <p class="demo-note">Demo data — invented for this page, not real GM data.</p>
-      </div>
-    </section>
-
-    <section id="projects">
-      <span class="label reveal">Projects</span>
-      <h2 class="reveal" style="font-size:clamp(30px,4.5vw,44px);font-weight:900;letter-spacing:-0.02em;margin:12px 0 8px">What I'm building now</h2>
-      <div class="proj-grid">
-        <div class="proj reveal d1"><span class="tag">Ongoing</span><h3>Marcin Hub</h3><p>A vehicle-program portfolio tool, rebuilt solo with AI — shipped fast and iterated in the open.</p></div>
-        <div class="proj reveal d2"><span class="tag">Open source</span><h3>OpenAutoLink</h3><p>Open-source car connectivity project — connecting what cars already know to the tools around them.</p></div>
-        <div class="proj reveal d3"><span class="tag">Hands-on</span><h3>3D Prints</h3><p>Printed parts and prototypes — from a sketch to a physical object on the desk.</p></div>
-      </div>
-    </section>
-
-    <section class="wins reveal" id="wins">
-      <span class="label">Wins</span>
-      <h2>The numbers that hold up</h2>
-      <div class="acc">
-        <div class="acc-row"><button class="acc-head"><span class="fig">$167M</span><span class="ttl">L2++ ADAS development approved</span><span class="pm">+</span></button><div class="acc-body"><div class="acc-body-inner">China market research and pitch deck supported GM's approval of $167M for L2++ ADAS development.</div></div></div>
-        <div class="acc-row"><button class="acc-head"><span class="fig">8</span><span class="ttl">Export regions with OnStar</span><span class="pm">+</span></button><div class="acc-body"><div class="acc-body-inner">OnStar connectivity delivered on China-sourced export vehicles across Mexico, AMEO, South America, GMAP, South Korea, Israel, ANZ and Central Asia.</div></div></div>
-        <div class="acc-row"><button class="acc-head"><span class="fig">3</span><span class="ttl">Nameplates launched</span><span class="pm">+</span></button><div class="acc-body"><div class="acc-body-inner">Chevrolet Equinox, Buick Encore GX, Chevrolet Trailblazer — product management and product marketing across all three.</div></div></div>
-        <div class="acc-row"><button class="acc-head"><span class="fig">3 years</span><span class="ttl">In Shanghai, leading SAIC-GM software strategy</span><span class="pm">+</span></button><div class="acc-body"><div class="acc-body-inner">Deputy Director, Software Strategy at SAIC-GM, 2022–2025 — software strategy in China, cross-border execution.</div></div></div>
-        <div class="acc-row"><button class="acc-head"><span class="fig">7 → 1</span><span class="ttl">Rebuilt solo with AI</span><span class="pm">+</span></button><div class="acc-body"><div class="acc-body-inner">Rebuilt solo with AI a vehicle-program portfolio tool that once took a 7-developer team and about $3M a year to run — for about $10,000–$15,000 in Copilot credits and my own time.</div></div></div>
-        <div class="acc-row"><button class="acc-head"><span class="fig">2</span><span class="ttl">Markets — United States and China</span><span class="pm">+</span></button><div class="acc-body"><div class="acc-body-inner">United States and China — including three years based in Shanghai leading software strategy for SAIC-GM.</div></div></div>
-      </div>
-    </section>
-
-<section id="resume">
-      <span class="label reveal">Resume</span>
-      <h2 class="reveal" style="font-size:clamp(30px,4.5vw,44px);font-weight:900;letter-spacing:-0.02em;margin:12px 0 8px">The record, on paper</h2>
-      <p class="muted reveal" style="font-size:16px;line-height:1.6;max-width:680px">A two-page resume. Click a numbered marker to jump to the work behind it.</p>
-      <div class="res-viewer reveal">
-        <div class="res-toolbar">
-          <span class="mono" id="res-page-label">RESUME · PAGE 1 / 2</span>
-          <span class="res-pages">
-            <button class="active" data-res-page="1">1</button>
-            <button data-res-page="2">2</button>
-          </span>
-          <button class="res-print" id="res-print">Print / Save as PDF</button>
-          <a class="res-print" href="../assets/resume.pdf" download>Download PDF</a>
-        </div>
-        <article class="resume-doc res-page active" data-page="1">
-          <h3>Marcin Fracz</h3>
-          <p class="res-sub">Strategist · Global Software &amp; AI · marcin.fracz@gmail.com · linkedin.com/in/marcinfracz · Detroit Metropolitan Area</p>
-          <div class="res-nums">
-            <div><b>23</b><span>years in automotive</span></div>
-            <div><b>3</b><span>nameplates led</span></div>
-            <div><b>2</b><span>markets — US &amp; China</span></div>
-            <div><b>11</b><span>years at GM</span></div>
-            <button class="res-anno" data-target="#top" title="Headline numbers — jump to the stats">01</button>
+      <!-- 01 engineering -->
+      <section class="panel era" data-era="01">
+        <div class="inner">
+          <div class="era-top"><span class="era-num">01 / 07</span><span class="era-dates">2003 — 2014</span></div>
+          <h2>ENGINEERING</h2>
+          <div class="role">Federal-Mogul · Chrysler · Johnson Controls</div>
+          <div class="era-grid">
+            <div class="era-proof"><div class="big">11</div><div class="lbl">years learning how cars are engineered</div></div>
+            <p class="story">Eleven years on the engineering side — <b>powertrain, interiors, and vehicle systems</b> — before moving to product marketing. The foundation everything after it is built on.</p>
           </div>
-          <div class="res-sec">Summary</div>
-          <p class="res-sum">Strategist transforming global software and AI ecosystems with high-velocity, cross-border execution. Twenty-three years in automotive, from powertrain engineering to software strategy in Shanghai. Exploring new leadership opportunities.</p>
-          <div class="res-sec">Professional Experience</div>
-          <div class="res-role"><span class="yrs">2025–2026</span><div><h4>Manager, Global Planning &amp; Joint Ventures, OnStar Product Marketing (International) — General Motors</h4><p>Global planning and OnStar product marketing.</p></div><button class="res-anno" data-target="#w0" title="OnStar International">02</button></div>
-          <div class="res-role"><span class="yrs">2022–2025</span><div><h4>Deputy Director, Software Strategy — SAIC-GM, Shanghai</h4><p>Software strategy in China, cross-border execution.</p></div><button class="res-anno" data-target="#w1" title="Software Strategy — SAIC-GM">03</button></div>
-          <div class="res-role"><span class="yrs">2020–2022</span><div><h4>Business Strategy Manager, Connected &amp; OTA Services — General Motors</h4><p>Connected services and over-the-air updates.</p></div><button class="res-anno" data-target="#w2" title="Connected &amp; OTA Services">04</button></div>
-          <div class="res-role"><span class="yrs">2018–2020</span><div><h4>Product Manager, Buick Encore GX and Chevrolet Trailblazer — General Motors</h4><p>Small SUVs, from plan to launch.</p></div><button class="res-anno" data-target="#w3" title="Trailblazer &amp; Encore GX">05</button></div>
-        </article>
-        <article class="resume-doc res-page" data-page="2">
-          <div class="res-sec" style="margin-top:0">Professional Experience, continued</div>
-          <div class="res-role"><span class="yrs">2014–2018</span><div><h4>Global Product Manager, compact / mid crossovers — General Motors</h4><p>Chevrolet Equinox.</p></div><button class="res-anno" data-target="#w4" title="Equinox — Global Product Manager">06</button></div>
-          <div class="res-role"><span class="yrs">2003–2014</span><div><h4>Engineering — Federal-Mogul, Chrysler, Johnson Controls</h4><p>Powertrain and vehicle interiors.</p></div></div>
-          <div class="res-sec">Education <button class="res-anno inline" data-target="#timeline" title="Timeline">07</button></div>
-          <div class="res-role"><span class="yrs">2014</span><div><h4>MBA — Michigan Ross, University of Michigan</h4><p>Master of Business Administration.</p></div></div>
-          <div class="res-role"><span class="yrs">2007</span><div><h4>BSME, cum laude — Kettering University</h4><p>Bachelor of Science in Mechanical Engineering.</p></div></div>
-          <div class="res-sec">Projects</div>
-          <div class="res-role"><span class="yrs">Now</span><div><h4>Marcin Hub · OpenAutoLink · 3D Prints</h4><p>AI-built vehicle-program portfolio, open-source car connectivity, and printed parts and prototypes.</p></div></div>
-          <div class="res-sec">Skills</div>
-          <p class="res-sum">Software strategy · Connected services &amp; OTA · Product management · AI building · Cross-border execution</p>
-        </article>
-      </div>
-    </section>
-
-<section id="timeline">
-      <span class="label reveal">Timeline</span>
-      <h2 class="reveal" style="font-size:clamp(30px,4.5vw,44px);font-weight:900;letter-spacing:-0.02em;margin:12px 0 8px">2003 — present</h2>
-      <p class="muted reveal" style="font-size:16px;line-height:1.6;max-width:680px">From the engineering floor to the strategy table.</p>
-      <div class="tl">
-        <div class="tl-item reveal"><div class="years">2003–2014</div><h3>Engineering</h3><p class="co">Federal-Mogul, Chrysler, Johnson Controls</p><p>Powertrain and vehicle interiors.</p></div>
-        <div class="tl-item reveal"><div class="years">2014–2018</div><h3>Global Product Manager, compact / mid crossovers</h3><p class="co">General Motors</p><p>Chevrolet Equinox.</p></div>
-        <div class="tl-item reveal"><div class="years">2018–2020</div><h3>Product Manager, Buick Encore GX and Chevrolet Trailblazer</h3><p class="co">General Motors</p><p>Small SUVs, from plan to launch.</p></div>
-        <div class="tl-item reveal"><div class="years">2020–2022</div><h3>Business Strategy Manager, Connected &amp; OTA Services</h3><p class="co">General Motors</p><p>Connected services and over-the-air updates.</p></div>
-        <div class="tl-item reveal"><div class="years">2022–2025</div><h3>Deputy Director, Software Strategy</h3><p class="co">SAIC-GM, Shanghai</p><p>Software strategy in China, cross-border execution.</p></div>
-        <div class="tl-item reveal"><div class="years">2025–2026</div><h3>Manager, Global Planning &amp; Joint Ventures, OnStar Product Marketing (International)</h3><p class="co">General Motors</p><p>Global planning and OnStar product marketing.</p></div>
-        <div class="tl-item reveal"><div class="years">NOW</div><h3>Exploring new leadership opportunities</h3><p class="co">Director-level roles</p><p>Automotive strategy, product and AI. Building with AI in the meantime.</p></div>
-      </div>
-    </section>
-
-    <section id="contact" style="border-bottom:none">
-      <div class="contact-block reveal">
-        <span class="label">Contact</span>
-        <h2>Let's talk about what's next.</h2>
-        <p>Director-level roles in automotive strategy, product and AI — or just a conversation about software, cars, and where both are going.</p>
-        <a class="email" href="mailto:marcin.fracz@gmail.com">marcin.fracz@gmail.com</a>
-        <div class="btns">
-          <a class="btn primary" href="mailto:marcin.fracz@gmail.com">Email me</a>
-          <a class="btn" href="https://www.linkedin.com/in/marcinfracz/" target="_blank" rel="noopener">LinkedIn ↗</a>
-          <a class="btn" href="#top">Back to top ↑</a>
+          <div class="era-scene"><img src="/assets/road/era-engineering.webp" alt="Engineering workshop: chassis blueprint, powertrain and a car on a lift" loading="lazy"></div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <footer>
-      <span>Marcin Fracz · 2026</span>
-      <span>Built with AI, in plain HTML, CSS and JavaScript — no libraries, no frameworks, no build step.</span>
-    </footer>
+      <!-- 02 equinox -->
+      <section class="panel era" data-era="02">
+        <div class="inner">
+          <div class="era-top"><span class="era-num">02 / 07</span><span class="era-dates">2014 — 2018</span></div>
+          <h2>EQUINOX</h2>
+          <div class="role">GM · Global Product Marketing, compact &amp; mid crossovers</div>
+          <div class="era-grid">
+            <div class="era-proof"><div class="big">5</div><div class="lbl">countries · Ecuador, Mexico, Canada, China, Korea</div></div>
+            <p class="story">Led the <b>Equinox</b> globally — vehicle product marketing, customer experience, and dealer business development in Mexico — with project and travel assignments across five countries.</p>
+          </div>
+          <div class="era-scene"><img src="/assets/road/era-equinox.webp" alt="Car design studio: a clay model SUV on a turntable" loading="lazy"></div>
+        </div>
+      </section>
+
+      <!-- 03 trailblazer / encore gx -->
+      <section class="panel era" data-era="03">
+        <div class="inner">
+          <div class="era-top"><span class="era-num">03 / 07</span><span class="era-dates">2018 — 2020</span></div>
+          <h2>TRAILBLAZER<br>&amp; ENCORE GX</h2>
+          <div class="role">GM · Product Marketing, small SUVs</div>
+          <div class="era-grid">
+            <div class="era-proof"><div class="big">2</div><div class="lbl">nameplates launched, both still selling</div></div>
+            <p class="story">Two nameplates, one segment. The <b>Chevrolet Trailblazer</b> and <b>Buick Encore GX</b> — launched together, and both still on the road today.</p>
+          </div>
+          <div class="cutouts">
+            <figure><img src="/assets/road/trailblazer-cutout.png" alt="Chevrolet Trailblazer, side profile"><figcaption>Trailblazer</figcaption></figure>
+            <figure><img src="/assets/road/encore-gx-cutout.png" alt="Buick Encore GX, side profile"><figcaption>Encore GX</figcaption></figure>
+          </div>
+          <div class="era-scene"><img src="/assets/road/era-trailblazer-encore.webp" alt="Open road with two small SUVs driving through low hills" loading="lazy"></div>
+        </div>
+      </section>
+
+      <!-- 04 connected & ota -->
+      <section class="panel era" data-era="04">
+        <div class="inner">
+          <div class="era-top"><span class="era-num">04 / 07</span><span class="era-dates">2020 — 2022</span></div>
+          <h2>CONNECTED<br>&amp; OTA</h2>
+          <div class="role">GM · Business Strategy Manager, Connected &amp; OTA</div>
+          <div class="era-grid">
+            <div class="era-proof"><div class="big">4</div><div class="lbl">focus areas · Product, CX, Field / Sales / Ops, Software &amp; Digital</div></div>
+            <p class="story">The turn from vehicles to software. Strategy for <b>connected services and over-the-air updates</b> — the work that led to Shanghai.</p>
+          </div>
+          <div class="era-scene"><img src="/assets/road/era-connected-ota.webp" alt="Connected car with signal waves, cloud and phone" loading="lazy"></div>
+        </div>
+      </section>
+
+      <!-- 05 shanghai -->
+      <section class="panel era" data-era="05">
+        <div class="inner">
+          <div class="era-top"><span class="era-num">05 / 07</span><span class="era-dates">2022 — 2025</span></div>
+          <h2>SHANGHAI</h2>
+          <div class="role">SAIC-GM · Deputy Director, Software Strategy</div>
+          <div class="era-grid">
+            <div class="era-proof"><div class="big"><small>$</small>167M</div><div class="lbl">L2++ ADAS approved — research &amp; pitch supported the approval</div></div>
+            <p class="story">Three years in Shanghai. Built the <b>software &amp; digital business</b> — about 2,650 people across five departments — and my China ADAS market research and pitch supported GM's approval of $167M for L2++ ADAS development.</p>
+          </div>
+          <div class="era-scene"><img src="/assets/road/era-shanghai.webp" alt="Shanghai Lujiazui skyline in thin line" loading="lazy"></div>
+        </div>
+      </section>
+
+      <!-- 06 onstar -->
+      <section class="panel era" data-era="06">
+        <div class="inner">
+          <div class="era-top"><span class="era-num">06 / 07</span><span class="era-dates">2025 — 2026</span></div>
+          <h2>ONSTAR<br>INTERNATIONAL</h2>
+          <div class="role">GM · Manager, Global Planning &amp; Joint Ventures, OnStar Product Marketing</div>
+          <div class="era-grid">
+            <div class="era-proof"><div class="big">8</div><div class="lbl">export regions · Mexico, AMEO, South America, GMAP, South Korea, Israel, ANZ, Central Asia</div></div>
+            <p class="story">Aligned OnStar US, Middle East and Mexico, vehicle brands and three Chinese JVs to deliver <b>OnStar on China-sourced export vehicles</b> across eight regions.</p>
+          </div>
+          <div class="era-scene"><img src="/assets/road/era-onstar.webp" alt="World map with eight dots connected by dotted routes" loading="lazy"></div>
+        </div>
+      </section>
+
+      <!-- 07 now -->
+      <section class="panel era" data-era="07">
+        <div class="inner">
+          <div class="era-top"><span class="era-num">07 / 07</span><span class="era-dates">2026 — NOW</span></div>
+          <h2>AI BUILDER</h2>
+          <div class="role">Marcin Hub · Portfolio Made Visible</div>
+          <div class="era-grid">
+            <div class="era-proof"><div class="big">5<small>×</small></div><div class="lbl">more capable — the Marcin Hub rebuild, my estimate</div></div>
+            <p class="story">GM killed the original app in 2019 — it cost about $3M a year to run. I rebuilt it myself, <b>more capable</b> by my estimate, for about $10–15k in Copilot credits plus my time. Now I build AI tools, and I'm looking for the next director role.</p>
+          </div>
+          <div class="era-scene"><img src="/assets/road/era-now-ai.webp" alt="Neural network of dots and lines with a small robot" loading="lazy"></div>
+        </div>
+      </section>
+
+      <!-- contact -->
+      <section class="panel contact">
+        <div class="inner">
+          <div class="kicker">The road continues</div>
+          <h2>LET'S TALK<br>ABOUT<br>WHAT'S NEXT.</h2>
+          <a class="email" href="mailto:marcin.fracz@gmail.com">marcin.fracz@gmail.com</a>
+          <div class="links">
+            <a href="https://www.linkedin.com/in/marcinfracz/">LinkedIn</a>
+            <a href="/work/">Work showcase</a>
+            <a href="/assets/resume.pdf">Resume</a>
+          </div>
+          <p class="fine">Detroit · Shanghai · Everywhere the road goes. Built with AI, in the flat matte style of Ferdio.</p>
+        </div>
+      </section>
+
+    </div>
   </div>
 </main>
 
-<div class="drawer-backdrop" id="resume-backdrop"></div>
-<aside class="resume-drawer" id="resume-drawer" aria-label="Executive resume" aria-hidden="true">
-  <div class="drawer-bar"><span>Executive Resume</span><button class="drawer-close" id="resume-drawer-close" type="button" aria-label="Close resume">×</button></div>
-  <iframe src="../assets/resume.pdf" title="Marcin Fracz resume (PDF)"></iframe>
-</aside>
-
 <script>
-(function () {
-  /* when this page is shown inside the desktop's browser window,
-     "Back to desktop" breaks out of the frame to the real desktop */
-  if (window !== window.top) {
-    document.querySelectorAll('a[href="../"]').forEach(function (a) { a.target = '_top'; });
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var scrollEl = document.getElementById('road-scroll');
+  var track = document.getElementById('road-track');
+  var svg = document.getElementById('road-svg');
+  var line = document.getElementById('road-line');
+  var dots = document.getElementById('road-line-dots');
+  var dot = document.getElementById('road-dot');
+  var ring = document.getElementById('road-dot-ring');
+  var progress = document.getElementById('progress');
+  var bg = document.getElementById('road-bg');
+  var panels = Array.prototype.slice.call(document.querySelectorAll('.panel'));
+  var eras = Array.prototype.slice.call(document.querySelectorAll('.panel.era'));
+  var pathLen = 0, maxX = 0;
+
+  function smoothPath(pts){
+    // Catmull-Rom to Bezier
+    var d = 'M ' + pts[0][0] + ' ' + pts[0][1];
+    for (var i = 0; i < pts.length - 1; i++){
+      var p0 = pts[Math.max(0, i-1)], p1 = pts[i], p2 = pts[i+1], p3 = pts[Math.min(pts.length-1, i+2)];
+      var c1x = p1[0] + (p2[0]-p0[0])/6, c1y = p1[1] + (p2[1]-p0[1])/6;
+      var c2x = p2[0] - (p3[0]-p1[0])/6, c2y = p2[1] - (p3[1]-p1[1])/6;
+      d += ' C ' + c1x.toFixed(1) + ' ' + c1y.toFixed(1) + ', ' + c2x.toFixed(1) + ' ' + c2y.toFixed(1) + ', ' + p2[0].toFixed(1) + ' ' + p2[1].toFixed(1);
+    }
+    return d;
   }
 
-  /* scroll reveal */
-  var revealEls = document.querySelectorAll('.reveal');
-  if ('IntersectionObserver' in window) {
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) {
-        if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
-      });
-    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-    revealEls.forEach(function (el) { io.observe(el); });
-  } else {
-    revealEls.forEach(function (el) { el.classList.add('in'); });
-  }
-
-  /* hero live clocks (Detroit / Shanghai) */
-  var detFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Detroit', hour: 'numeric', minute: '2-digit' });
-  var shaFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Shanghai', hour: 'numeric', minute: '2-digit' });
-  function tickHero() {
-    var now = new Date();
-    var d = document.getElementById('hero-detroit-time');
-    var s = document.getElementById('hero-shanghai-time');
-    if (d) d.textContent = detFmt.format(now) + ' · DETROIT';
-    if (s) s.textContent = shaFmt.format(now) + ' · SHANGHAI';
-  }
-  tickHero();
-  setInterval(tickHero, 1000);
-
-  /* accordion (smooth) */
-  document.querySelectorAll('.acc-head').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var row = btn.closest('.acc-row');
-      var body = row.querySelector('.acc-body');
-      var open = row.classList.contains('open');
-      document.querySelectorAll('.acc-row.open').forEach(function (r) {
-        r.classList.remove('open');
-        r.querySelector('.acc-body').style.maxHeight = '0px';
-      });
-      if (!open) {
-        row.classList.add('open');
-        body.style.maxHeight = body.scrollHeight + 'px';
-      }
+  function layout(){
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var tw = track.scrollWidth;
+    maxX = Math.max(0, tw - vw);
+    if (!reduce){
+      scrollEl.style.height = (maxX + vh) + 'px';
+    }
+    // SVG spans the whole track
+    var H = Math.round(vh * 0.34);
+    svg.setAttribute('width', tw);
+    svg.setAttribute('height', H);
+    svg.setAttribute('viewBox', '0 0 ' + tw + ' ' + H);
+    // one point per panel centre, y undulating like a mountain
+    var pts = panels.map(function(p, i){
+      var cx = p.offsetLeft + p.offsetWidth / 2;
+      var wave = [0.62, 0.30, 0.58, 0.24, 0.55, 0.30, 0.58, 0.26, 0.50][i] || 0.5;
+      return [cx, H * wave];
     });
-  });
-
-  /* city demo */
-  var CITIES = {
-    detroit: { tz: 'America/Detroit', name: 'Detroit', note: 'Home base. Product, strategy and the US market.' },
-    shanghai: { tz: 'Asia/Shanghai', name: 'Shanghai', note: 'SAIC-GM. Software strategy for the joint venture.' },
-    mexico: { tz: 'America/Mexico_City', name: 'Mexico City', note: 'The third clock on the desktop — the region in between.' }
-  };
-  var cityPanel = document.getElementById('city-panel');
-  function renderCity(key) {
-    var c = CITIES[key];
-    var now = new Date();
-    var time = new Intl.DateTimeFormat('en-US', { timeZone: c.tz, hour: 'numeric', minute: '2-digit', second: '2-digit', weekday: 'long' }).format(now);
-    cityPanel.innerHTML = '<div class="big">' + c.name + ' · ' + time + '</div><p class="muted" style="margin:8px 0 0">' + c.note + '</p>';
+    var d = smoothPath(pts);
+    line.setAttribute('d', d);
+    dots.setAttribute('d', d);
+    pathLen = line.getTotalLength();
+    line.style.strokeDasharray = pathLen;
+    dots.style.strokeDasharray = '2 7';
+    update();
   }
-  renderCity('detroit');
-  setInterval(function () {
-    var active = document.querySelector('[data-city].active');
-    if (active) renderCity(active.getAttribute('data-city'));
-  }, 1000);
-  document.querySelectorAll('[data-city]').forEach(function (b) {
-    b.addEventListener('click', function () {
-      document.querySelectorAll('[data-city]').forEach(function (x) { x.classList.remove('active'); });
-      b.classList.add('active');
-      renderCity(b.getAttribute('data-city'));
-    });
-  });
 
-  /* model demo */
-  var MODELS = {
-    trailblazer: { name: 'Chevrolet Trailblazer', role: 'Product Manager, Small SUVs', years: '2018–2020', detail: 'From plan to launch — product marketing for a new small SUV entering a crowded segment.' },
-    encore: { name: 'Buick Encore GX', role: 'Product Manager, Small SUVs', years: '2018–2020', detail: 'From plan to launch — product marketing for the premium small SUV alongside the Trailblazer.' }
-  };
-  var modelPanel = document.getElementById('model-panel');
-  function renderModel(key) {
-    var m = MODELS[key];
-    modelPanel.innerHTML = '<div class="big">' + m.name + '</div><p class="muted" style="margin:8px 0 0">' + m.role + ' · ' + m.years + '<br>' + m.detail + '</p>';
+  function update(){
+    if (reduce) return;
+    var vh = window.innerHeight;
+    var top = scrollEl.offsetTop;
+    var total = scrollEl.offsetHeight - vh;
+    var p = total > 0 ? (window.scrollY - top) / total : 0;
+    p = Math.max(0, Math.min(1, p));
+    track.style.transform = 'translate3d(' + (-p * maxX).toFixed(1) + 'px,0,0)';
+    // line draws itself
+    line.style.strokeDashoffset = (pathLen * (1 - p)).toFixed(1);
+    var pt = line.getPointAtLength(p * pathLen);
+    dot.setAttribute('cx', pt.x); dot.setAttribute('cy', pt.y);
+    ring.setAttribute('cx', pt.x); ring.setAttribute('cy', pt.y);
+    progress.style.width = (p * 100).toFixed(1) + '%';
+    // parallax: background drifts slower than the track
+    bg.style.transform = 'translate3d(' + (-p * maxX * 0.25).toFixed(1) + 'px,0,0)';
+    // active era = nearest panel centre to viewport centre
+    var centre = p * maxX + window.innerWidth / 2;
+    var best = null, bestD = 1e9;
+    eras.forEach(function(e){
+      var c = e.offsetLeft + e.offsetWidth / 2;
+      var d = Math.abs(c - centre);
+      if (d < bestD){ bestD = d; best = e; }
+    });
+    eras.forEach(function(e){ e.classList.toggle('active', e === best); });
   }
-  renderModel('trailblazer');
-  document.querySelectorAll('[data-model]').forEach(function (b) {
-    b.addEventListener('click', function () {
-      document.querySelectorAll('[data-model]').forEach(function (x) { x.classList.remove('active'); });
-      b.classList.add('active');
-      renderModel(b.getAttribute('data-model'));
-    });
-  });
 
-
-  /* program portfolio demo (fake data): filter the table rows */
-  document.querySelectorAll('[data-prog-filter]').forEach(function (b) {
-    b.addEventListener('click', function () {
-      var f = b.getAttribute('data-prog-filter');
-      document.querySelectorAll('[data-prog-filter]').forEach(function (x) { x.classList.toggle('active', x === b); });
-      document.querySelectorAll('.demo-table tbody tr').forEach(function (row) {
-        row.style.display = (f === 'all' || row.getAttribute('data-status') === f) ? '' : 'none';
-      });
-    });
-  });
-
-  /* resume viewer: page switcher, annotation jumps, print */
-  var resPages = document.querySelectorAll('.res-page');
-  var resLabel = document.getElementById('res-page-label');
-  document.querySelectorAll('[data-res-page]').forEach(function (b) {
-    b.addEventListener('click', function () {
-      var n = b.getAttribute('data-res-page');
-      document.querySelectorAll('[data-res-page]').forEach(function (x) { x.classList.toggle('active', x === b); });
-      resPages.forEach(function (p) { p.classList.toggle('active', p.getAttribute('data-page') === n); });
-      if (resLabel) resLabel.textContent = 'RESUME · PAGE ' + n + ' / 2';
-    });
-  });
-  var printBtn = document.getElementById('res-print');
-  if (printBtn) printBtn.addEventListener('click', function () { window.print(); });
-  document.querySelectorAll('.res-anno').forEach(function (a) {
-    a.addEventListener('click', function () {
-      var t = document.querySelector(a.getAttribute('data-target'));
-      if (!t) return;
-      t.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      t.classList.remove('flash'); void t.offsetWidth; t.classList.add('flash');
-      setTimeout(function () { t.classList.remove('flash'); }, 1400);
-    });
-  });
-
-  /* section rail highlight */
-  var links = document.querySelectorAll('#rail a');
-  var secs = ['top', 'work', 'projects', 'wins', 'resume', 'timeline', 'contact'].map(function (id) { return document.getElementById(id); });
-  function onScroll() {
-    var y = window.scrollY + 120;
-    var current = 'top';
-    secs.forEach(function (s) { if (s && s.offsetTop <= y) current = s.id; });
-    links.forEach(function (a) { a.classList.toggle('active', a.getAttribute('data-sec') === current); });
+  var ticking = false;
+  function onScroll(){
+    if (!ticking){ ticking = true; requestAnimationFrame(function(){ update(); ticking = false; }); }
   }
-  window.addEventListener('scroll', onScroll, { passive: true });
-  /* slide-out resume drawer */
-  var drawer = document.getElementById('resume-drawer');
-  var backdrop = document.getElementById('resume-backdrop');
-  function openResumeDrawer() {
-    drawer.classList.add('open');
-    backdrop.classList.add('open');
-    drawer.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeResumeDrawer() {
-    drawer.classList.remove('open');
-    backdrop.classList.remove('open');
-    drawer.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-  }
-  var drawerOpenBtn = document.getElementById('resume-drawer-open');
-  if (drawerOpenBtn) drawerOpenBtn.addEventListener('click', openResumeDrawer);
-  var drawerCloseBtn = document.getElementById('resume-drawer-close');
-  if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', closeResumeDrawer);
-  if (backdrop) backdrop.addEventListener('click', closeResumeDrawer);
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeResumeDrawer(); });
-
-  onScroll();
+  window.addEventListener('scroll', onScroll, {passive:true});
+  window.addEventListener('resize', layout);
+  window.addEventListener('load', layout);
+  layout();
 })();
 </script>
 </body>
