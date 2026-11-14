@@ -783,6 +783,7 @@
     var pinned = [
       { tag: "Motto", text: C.notes.motto },
       { tag: "Resume", text: C.notes.resumeNote, href: "assets/resume.pdf" },
+      { tag: "Sizzle Reel", text: C.notes.reelNote, href: "reel.html" },
       { tag: "Contact", text: C.notes.contact.email + " · LinkedIn" }
     ];
     el("notes-body").innerHTML =
@@ -848,12 +849,14 @@
   var browserHistory = [], browserIndex = -1, browserCurrent = "";
   var frame = el("browser-frame"), urlBar = el("browser-url");
   var RESUME_URL = "https://marcinfracz.github.io/assets/resume.pdf";
+  var REEL_URL = "https://marcinfracz.github.io/reel.html";
   var browserTabs = []; /* {id, title, url, history, index} — one history stack per tab */
   var browserActiveId = null;
   var browserTabSeq = 0;
   function browserTitleFor(url) {
     if (url === BROWSER_HOME) return "Work Showcase";
     if (url === RESUME_URL) return "Resume";
+    if (url === REEL_URL) return "Sizzle Reel";
     try { return new URL(url).hostname.replace(/^www\./, ""); } catch (e) { return url; }
   }
   function browserActiveTab() {
@@ -1000,6 +1003,8 @@
   document.addEventListener("click", function (e) {
     var a = e.target.closest('a[href$="resume.pdf"]');
     if (a) { e.preventDefault(); browserOpenTab(RESUME_URL, "Resume"); return; }
+    var r = e.target.closest('a[href$="reel.html"]');
+    if (r) { e.preventDefault(); browserOpenTab(REEL_URL, "Sizzle Reel"); return; }
     var x = e.target.closest("[data-browser-tab-close]");
     if (x) { e.stopPropagation(); browserCloseTab(parseInt(x.getAttribute("data-browser-tab-close"), 10)); return; }
     var tb = e.target.closest("[data-browser-tab]");
