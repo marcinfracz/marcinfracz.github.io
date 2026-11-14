@@ -938,3 +938,53 @@ body.dark .browser-tab.active { background: var(--accent); border-color: var(--a
   .finder-body { flex-direction: column; }
   .finder-side { width: auto; flex-direction: row; border-right: none; border-bottom: 1px solid rgba(28, 25, 23, 0.1); flex-wrap: wrap; }
 }
+
+/* ================= PHONE ONLY (max-width 700px, not tablet) =================
+   Phone gets a stacked, app-like page: no desktop windows to drag, no
+   desktop-in-desktop browser, bottom dock as the tab bar. Tablet at 768px+
+   keeps the desktop layout. The 1100px stacking rules above still apply;
+   these rules fix what they miss on a 360-430px phone. */
+@media (max-width: 700px) {
+  html, body { -webkit-text-size-adjust: 100%; }
+  body { overflow-x: hidden; }
+  .menubar { height: 44px; padding: 0 8px 0 12px; }
+  .menubar .mb-left .menu { display: none; }
+  .mb-name { font-size: 14px; padding: 0 4px; }
+  #mb-widgets-btn { font-size: 13px; }
+  .desktop { padding: 12px 12px 132px; gap: 0; }
+  .framed-art { margin-bottom: 12px; }
+  .framed-art img { max-height: 38vh; border-width: 8px; }
+  .intro-body h1 { font-size: 26px; }
+  .avatar { width: 72px; height: 72px; }
+  .intro-buttons button, .pill-btn { min-height: 44px; font-size: 14px; }
+  .welcome-strip { min-height: 44px; font-size: 14px; }
+  /* clocks: the JS widget width (480px) would overflow a phone; force full width */
+  #widget-clocks, #widget-weather { width: auto !important; }
+  .clock-grid { gap: 4px; }
+  .clock-cell svg { width: 44px; height: 44px; }
+  .clock-time { font-size: 12px; }
+  .clock-city { font-size: 11px; }
+  .note { width: auto; transform: none; }
+  .handwritten { font-size: 20px; }
+  /* bottom dock = phone tab bar */
+  .dock-rail {
+    left: 8px; right: 8px; bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+    transform: none; width: auto; justify-content: space-around;
+    padding: 6px 4px; gap: 0;
+  }
+  .dock-rail button { width: 40px; height: 40px; flex: 0 0 auto; }
+  .rail-sep { width: 1px; height: 24px; margin: 0 2px; flex: 0 0 auto; }
+  /* overlay windows become full-screen sheets on a phone */
+  .overlay-window, #window-browser.overlay-window {
+    top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+    transform: none !important; width: 100vw !important; max-width: none !important;
+    height: 100dvh !important; max-height: none !important; border-radius: 0;
+  }
+  .overlay-window .window-body { max-height: calc(100dvh - 41px); }
+  .overlay-window.maximised .window-body { max-height: calc(100dvh - 41px); }
+  .finder-body { min-height: 0; }
+  .widget-panel { left: 8px; right: 8px; top: 52px; width: auto; }
+  .palette { width: calc(100vw - 16px); top: 52px; }
+  .browser-toolbar button { width: 34px; height: 34px; }
+  #browser-url { font-size: 14px; }
+}

@@ -86,10 +86,27 @@
   .era-label{position:absolute;left:7vw;bottom:calc(34vh + 14px);font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);z-index:2}
 
   @media (max-width:700px){
-    .panel{padding:84px 6vw 150px}
-    .era-grid{gap:22px}
-    .cutouts img{height:74px}
+    /* PHONE (not tablet): vertical, app-like. No horizontal road.
+       Tablet at 768px+ keeps the horizontal scroll. */
+    header{position:sticky;padding:12px 16px;background:rgba(244,241,234,.94);backdrop-filter:blur(12px)}
+    header .brand{font-size:12px}
     header nav{display:none}
+    #road-sticky{position:static;height:auto;overflow:visible}
+    #road-track{flex-direction:column;width:auto;transform:none !important}
+    #road-svg,#road-bg{display:none}
+    .panel{width:auto;height:auto;min-height:0;padding:56px 20px 44px;justify-content:flex-start;border-top:1px solid var(--line)}
+    .panel.intro{border-top:none;padding-top:64px}
+    h1{font-size:clamp(44px,15vw,64px)}
+    .lede{font-size:17px}
+    .era h2{font-size:clamp(30px,9vw,42px)}
+    .era-grid{gap:18px;flex-direction:column;align-items:flex-start}
+    .era-proof .big{font-size:clamp(48px,15vw,72px)}
+    .era-proof .lbl{max-width:none}
+    .era-scene img{width:100%;max-width:100%}
+    .cutouts img{height:64px}
+    .contact h2{font-size:clamp(36px,11vw,52px)}
+    .contact .email{font-size:20px;word-break:break-all}
+    .scroll-hint .mouse{display:none}
   }
   @media (prefers-reduced-motion:reduce){
     #road-sticky{position:static;height:auto;overflow:visible}
@@ -253,6 +270,10 @@
 
 <script>
 (function(){
+  /* Phone detection: phone only, not tablet. 700px covers iPhone / Android
+     portrait (360-430px). iPad at 768px+ keeps the desktop horizontal road. */
+  var isPhone = function(){ return window.matchMedia('(max-width: 700px)').matches; };
+  if (isPhone()) document.body.classList.add('is-phone');
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var scrollEl = document.getElementById('road-scroll');
   var track = document.getElementById('road-track');
@@ -281,6 +302,17 @@
 
   function layout(){
     var vw = window.innerWidth, vh = window.innerHeight;
+    if (isPhone()){
+      /* phone: normal vertical page, no sticky horizontal track */
+      document.body.classList.add('is-phone');
+      scrollEl.style.height = 'auto';
+      maxX = 0;
+      var hint = document.querySelector('.scroll-hint');
+      if (hint) hint.lastChild.textContent = ' Scroll down';
+      updatePhone();
+      return;
+    }
+    document.body.classList.remove('is-phone');
     var tw = track.scrollWidth;
     maxX = Math.max(0, tw - vw);
     if (!reduce){
@@ -306,7 +338,22 @@
     update();
   }
 
+  function updatePhone(){
+    var vh = window.innerHeight;
+    var total = Math.max(1, document.documentElement.scrollHeight - vh);
+    var p = Math.max(0, Math.min(1, window.scrollY / total));
+    progress.style.width = (p * 100).toFixed(1) + '%';
+    var best = null, bestD = 1e9;
+    eras.forEach(function(e){
+      var r = e.getBoundingClientRect();
+      var d = Math.abs(r.top + r.height / 2 - vh / 2);
+      if (d < bestD){ bestD = d; best = e; }
+    });
+    eras.forEach(function(e){ e.classList.toggle('active', e === best); });
+  }
+
   function update(){
+    if (isPhone()){ updatePhone(); return; }
     if (reduce) return;
     var vh = window.innerHeight;
     var top = scrollEl.offsetTop;

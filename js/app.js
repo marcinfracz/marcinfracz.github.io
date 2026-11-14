@@ -4,6 +4,14 @@
   var C = window.SITE_CONTENT;
   if (!C) return;
 
+  /* Phone detection: phone only, not tablet. 700px covers iPhone / Android
+     portrait (360-430px). iPad at 768px+ keeps the desktop. */
+  function isPhone() { return window.matchMedia('(max-width: 700px)').matches; }
+  if (isPhone()) document.body.classList.add('is-phone');
+  window.addEventListener('resize', function () {
+    document.body.classList.toggle('is-phone', isPhone());
+  });
+
   function el(id) { return document.getElementById(id); }
   function esc(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
@@ -162,6 +170,7 @@
     var win = findWindow(name);
     if (!win) return;
     win.classList.remove("hidden-window", "minimised");
+    if (name === "browser" && isPhone()) { window.location.href = BROWSER_HOME; return; }
     if (name === "browser") win.classList.add("maximised"); /* the browser opens fullscreen, so the showcase fills the screen */
     win.style.display = "";
     var dockBtn = document.querySelector('[data-dock="' + name + '"]');
@@ -264,6 +273,7 @@
   try { positions = JSON.parse(localStorage.getItem(POS_KEY) || "{}"); } catch (e) {}
   function savePositions() { try { localStorage.setItem(POS_KEY, JSON.stringify(positions)); } catch (e) {} }
   function restorePositions() {
+    if (isPhone()) return; /* phone is stacked, saved desktop positions would strand windows */
     var vw = window.innerWidth, vh = window.innerHeight;
     Object.keys(positions).forEach(function (id) {
       var node = document.getElementById(id);
@@ -529,6 +539,7 @@
       var p = prefs.widgets[key];
       if (!w) return;
       w.style.display = p.on ? "" : "none";
+      if (isPhone()) { w.style.width = ""; return; }
       if (p.size === "custom" && p.customWidth) w.style.width = p.customWidth + "px";
       else if (WIDGET_SIZES[key] && WIDGET_SIZES[key][p.size]) w.style.width = WIDGET_SIZES[key][p.size] + "px";
     });
@@ -889,6 +900,13 @@
     browserLoadTab(t);
   }
   function browserOpenTab(url, title) {
+    if (isPhone()) {
+      /* phone: no browser-in-a-browser. Work goes to the real page,
+         Resume / Reel open in a new tab so the site stays open. */
+      if (url === BROWSER_HOME) window.location.href = url;
+      else window.open(url, "_blank", "noopener");
+      return;
+    }
     var existing = null;
     browserTabs.forEach(function (t) { if (t.url === url) existing = t; });
     if (existing) browserSwitchTab(existing.id);
@@ -1002,9 +1020,9 @@
   });
   document.addEventListener("click", function (e) {
     var a = e.target.closest('a[href$="resume.pdf"]');
-    if (a) { e.preventDefault(); browserOpenTab(RESUME_URL, "Resume"); return; }
+    if (a && !isPhone()) { e.preventDefault(); browserOpenTab(RESUME_URL, "Resume"); return; }
     var r = e.target.closest('a[href$="reel.html"]');
-    if (r) { e.preventDefault(); browserOpenTab(REEL_URL, "Sizzle Reel"); return; }
+    if (r && !isPhone()) { e.preventDefault(); browserOpenTab(REEL_URL, "Sizzle Reel"); return; }
     var x = e.target.closest("[data-browser-tab-close]");
     if (x) { e.stopPropagation(); browserCloseTab(parseInt(x.getAttribute("data-browser-tab-close"), 10)); return; }
     var tb = e.target.closest("[data-browser-tab]");
