@@ -89,8 +89,12 @@
   #road-svg{position:absolute;left:0;bottom:0;width:100%;height:34vh;z-index:1;pointer-events:none;overflow:visible}
   #road-svg path{fill:none;stroke:var(--ink);stroke-width:2}
   #road-svg path.dots{stroke:var(--muted);stroke-width:1.5;stroke-dasharray:2 7}
-  #road-dot{fill:var(--accent);stroke:var(--ink);stroke-width:2}
-  #road-dot-ring{fill:none;stroke:var(--accent);stroke-width:1.5;opacity:.55}
+  /* driven part: slightly thicker, amber, drawn over the base line */
+  #road-line-progress{fill:none;stroke:var(--accent);stroke-width:4;stroke-linecap:round}
+  #road-car .car-body{fill:var(--ink)}
+  #road-car .car-window{fill:var(--accent)}
+  #road-car .car-wheel{fill:var(--ground);stroke:var(--ink);stroke-width:1.5}
+  #road-car .car-hub{fill:var(--ink)}
 
   [data-theme="dark"] .era-scene img,[data-theme="dark"] .cutouts img{filter:brightness(.88)}
   .era-label{position:absolute;left:7vw;bottom:calc(34vh + 14px);font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);z-index:2}
@@ -102,16 +106,18 @@
     header .brand{font-size:12px}
     header nav{display:none}
     .head-resume{display:inline-block;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
-    /* vertical road: thin spine down the left, one dot per stop.
+    /* era dots sit on the curvy road, one per stop.
        The dot fills amber on the era in view (JS .active class). */
-    #road-track{position:relative}
-    #road-track::before{content:"";position:absolute;left:11px;top:24px;bottom:24px;width:2px;background:var(--line);z-index:0}
     .panel.era::before,.panel.intro::before,.panel.contact::before{content:"";position:absolute;left:7px;top:68px;width:10px;height:10px;border-radius:50%;background:var(--ground);border:2px solid var(--ink);z-index:2}
     .panel.intro::before{top:76px}
     .panel.era.active::before,.panel.contact::before{background:var(--accent)}
-    #road-sticky{position:static;height:auto;overflow:visible}
+    #road-sticky{position:relative;height:auto;overflow:visible}
     #road-track{flex-direction:column;width:auto;transform:none !important}
-    #road-svg,#road-bg{display:none}
+    #road-bg{display:none}
+    /* phone: the SVG is the vertical road, a thin curvy line down the left */
+    #road-svg{display:block;position:absolute;left:0;top:0;width:48px;height:100%;z-index:1;pointer-events:none;overflow:visible}
+    #road-svg path{stroke-width:2}
+    #road-line-progress{stroke-width:3.5}
     /* flex-basis fix: desktop .panel is flex:0 0 100vw, which in a column
        flex container means a 390px-tall panel. Content taller than that
        overflowed into the next panel, so each scene image sat under the
@@ -160,8 +166,15 @@
     <svg id="road-svg" aria-hidden="true">
       <path id="road-line-dots" class="dots" d=""/>
       <path id="road-line" d=""/>
-      <circle id="road-dot-ring" r="16" cx="0" cy="0"/>
-      <circle id="road-dot" r="8" cx="0" cy="0"/>
+      <path id="road-line-progress" d=""/>
+      <g id="road-car">
+        <path class="car-body" d="M-22 3 L-21 -5 Q-20 -7 -18 -7 L-13 -7 L-9 -13 Q-8 -15 -5 -15 L3 -15 Q6 -15 8 -12 L13 -7 L20 -6 Q22 -5 22 -2 L22 3 Z"/>
+        <path class="car-window" d="M-7 -7 L-4 -13 L2 -13 L5 -7 Z"/>
+        <circle class="car-wheel" cx="-12" cy="4" r="4.5"/>
+        <circle class="car-wheel" cx="12" cy="4" r="4.5"/>
+        <circle class="car-hub" cx="-12" cy="4" r="1.6"/>
+        <circle class="car-hub" cx="12" cy="4" r="1.6"/>
+      </g>
     </svg>
     <div id="road-track">
 
@@ -326,8 +339,8 @@
   var svg = document.getElementById('road-svg');
   var line = document.getElementById('road-line');
   var dots = document.getElementById('road-line-dots');
-  var dot = document.getElementById('road-dot');
-  var ring = document.getElementById('road-dot-ring');
+  var progressLine = document.getElementById('road-line-progress');
+  var car = document.getElementById('road-car');
   var progress = document.getElementById('progress');
   var bg = document.getElementById('road-bg');
   var panels = Array.prototype.slice.call(document.querySelectorAll('.panel'));
@@ -346,15 +359,47 @@
     return d;
   }
 
+  function placeCar(p){
+    /* p: 0..1 along the road. Car sits on the line, nose along the road. */
+    if (!pathLen || !car) return;
+    var d = Math.max(0, Math.min(1, p)) * pathLen;
+    var pt = line.getPointAtLength(d);
+    var pt2 = line.getPointAtLength(Math.min(pathLen, d + 1));
+    var angle = Math.atan2(pt2.y - pt.y, pt2.x - pt.x) * 180 / Math.PI;
+    var s = isPhone() ? 0.65 : 1;
+    car.setAttribute('transform', 'translate(' + pt.x.toFixed(1) + ' ' + pt.y.toFixed(1) + ') rotate(' + angle.toFixed(1) + ') scale(' + s + ')');
+    if (progressLine){
+      progressLine.style.strokeDasharray = pathLen;
+      progressLine.style.strokeDashoffset = (pathLen * (1 - Math.max(0, Math.min(1, p)))).toFixed(1);
+    }
+  }
+
   function layout(){
     var vw = window.innerWidth, vh = window.innerHeight;
     if (isPhone()){
-      /* phone: normal vertical page, no sticky horizontal track */
+      /* phone: normal vertical page, curvy vertical road down the left */
       document.body.classList.add('is-phone');
       scrollEl.style.height = 'auto';
       maxX = 0;
       var hint = document.querySelector('.scroll-hint');
       if (hint) hint.lastChild.textContent = ' Scroll down';
+      /* vertical road: one point per panel centre, x weaving slightly */
+      var H = track.offsetHeight;
+      var xs = [20, 16, 22, 16, 21, 17, 22, 16, 20];
+      svg.setAttribute('width', 48);
+      svg.setAttribute('height', H);
+      svg.setAttribute('viewBox', '0 0 48 ' + H);
+      var pts = panels.map(function(pn, i){
+        var cy = pn.offsetTop + pn.offsetHeight / 2;
+        return [xs[i] || 20, cy];
+      });
+      var d = smoothPath(pts);
+      line.setAttribute('d', d);
+      dots.setAttribute('d', d);
+      progressLine.setAttribute('d', d);
+      pathLen = line.getTotalLength();
+      line.style.strokeDasharray = pathLen;
+      dots.style.strokeDasharray = '2 7';
       updatePhone();
       return;
     }
@@ -378,9 +423,11 @@
     var d = smoothPath(pts);
     line.setAttribute('d', d);
     dots.setAttribute('d', d);
+    progressLine.setAttribute('d', d);
     pathLen = line.getTotalLength();
     line.style.strokeDasharray = pathLen;
     dots.style.strokeDasharray = '2 7';
+    placeCar(0);
     update();
   }
 
@@ -389,6 +436,7 @@
     var total = Math.max(1, document.documentElement.scrollHeight - vh);
     var p = Math.max(0, Math.min(1, window.scrollY / total));
     progress.style.width = (p * 100).toFixed(1) + '%';
+    placeCar(p);
     var best = null, bestD = 1e9;
     eras.forEach(function(e){
       var r = e.getBoundingClientRect();
@@ -407,11 +455,8 @@
     var p = total > 0 ? (window.scrollY - top) / total : 0;
     p = Math.max(0, Math.min(1, p));
     track.style.transform = 'translate3d(' + (-p * maxX).toFixed(1) + 'px,0,0)';
-    // line draws itself
-    line.style.strokeDashoffset = (pathLen * (1 - p)).toFixed(1);
-    var pt = line.getPointAtLength(p * pathLen);
-    dot.setAttribute('cx', pt.x); dot.setAttribute('cy', pt.y);
-    ring.setAttribute('cx', pt.x); ring.setAttribute('cy', pt.y);
+    // car drives the road; the driven part thickens in amber
+    placeCar(p);
     progress.style.width = (p * 100).toFixed(1) + '%';
     // parallax: background drifts slower than the track
     bg.style.transform = 'translate3d(' + (-p * maxX * 0.25).toFixed(1) + 'px,0,0)';
@@ -433,6 +478,7 @@
   window.addEventListener('scroll', onScroll, {passive:true});
   window.addEventListener('resize', layout);
   window.addEventListener('load', layout);
+  document.querySelectorAll('img').forEach(function(im){ im.addEventListener('load', layout); });
   layout();
 })();
 </script>
