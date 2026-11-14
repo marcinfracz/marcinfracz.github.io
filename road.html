@@ -69,8 +69,43 @@
   .era-proof .lbl{margin-top:8px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);max-width:220px;line-height:1.5}
   .era p.story{max-width:520px;font-size:clamp(15px,1.35vw,18px);line-height:1.6;color:var(--body)}
   .era p.story b{color:var(--ink)}
-  .era-scene{margin-top:30px}
-  .era-scene img{display:block;width:min(680px,72vw);height:auto;border:1px solid var(--line);background:var(--card)}
+  .era-scene{position:relative;margin-top:30px}
+  /* no box: the scene is a transparent line drawing that floats on the
+     page ground, in light and in dark. */
+  .era-scene img{display:block;width:min(680px,72vw);height:auto;transition:transform 1.2s ease;
+    /* no box: the cream rectangle fades out at every edge, so the drawing
+       floats on the page ground instead of sitting in a frame. The deploy
+       tool only pushes text, so true transparent files cannot be uploaded
+       this way; this fade is the text-only way to get the same look. */
+    -webkit-mask-image:radial-gradient(ellipse 92% 92% at 50% 50%, #000 62%, transparent 98%);
+    mask-image:radial-gradient(ellipse 92% 92% at 50% 50%, #000 62%, transparent 98%)}
+  .panel.era.active .era-scene img{transform:scale(1.02)}
+  /* little elements moving, Hunter-style: a dashed line, a travelling dot,
+     two pulsing points. Pure CSS + SMIL, no JavaScript. */
+  .scene-motion{position:absolute;inset:0;pointer-events:none}
+  .scene-motion svg{width:100%;height:100%;overflow:visible}
+  .m-road{fill:none;stroke:var(--accent);stroke-width:.8;stroke-dasharray:3 3;opacity:.7;animation:m-dash 2.4s linear infinite}
+  @keyframes m-dash{to{stroke-dashoffset:-12}}
+  .m-dot{fill:var(--accent)}
+  .m-pulse{fill:var(--accent);animation:m-pulse 2.2s ease-in-out infinite}
+  .m-pulse2{animation-delay:1.1s}
+  @keyframes m-pulse{0%,100%{opacity:.25}50%{opacity:1}}
+  /* small modules: chips + one-line answer, and the PMV demo bars */
+  .module{margin-top:24px;border-top:1px solid var(--line);padding-top:16px}
+  .mod-label{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .chip{border:1.5px solid var(--ink);border-radius:999px;padding:8px 14px;font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:600;letter-spacing:.06em;background:transparent;color:var(--ink);cursor:pointer;min-height:40px}
+  .chip.on{background:var(--ink);color:var(--ground)}
+  .mod-out{margin-top:12px;font-size:15px;line-height:1.55;color:var(--body)}
+  .mod-out b{color:var(--ink)}
+  .pmv-bars{display:flex;align-items:flex-end;gap:14px;height:110px;margin-top:14px}
+  .pmv-bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+  .pmv-bar i{display:block;width:100%;background:var(--accent);min-height:4px;transition:height .5s ease}
+  .pmv-bar:first-child i{background:var(--ink)}
+  .pmv-bar span{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--muted);text-align:center}
+  .pmv-note{margin-top:10px;font-size:11px;color:var(--muted);letter-spacing:.04em}
+  .cutouts figure{transition:opacity .4s ease}
+  .cutouts figure.dim{opacity:.35}
   .cutouts{display:flex;gap:24px;align-items:flex-end;margin-top:26px;flex-wrap:wrap}
   .cutouts img{display:block;height:110px;width:auto}
   .cutouts figure{margin:0}
@@ -100,7 +135,10 @@
   #road-car .car-body{fill:#fff;stroke:var(--ink);stroke-width:1.5}
   #road-car .car-window{fill:var(--ink)}
 
-  [data-theme="dark"] .era-scene img,[data-theme="dark"] .cutouts img{filter:brightness(.88)}
+  /* dark: flip the transparent line art light (invert + hue restore keeps
+     the amber), and lift the dark-blue cutouts a little. */
+  [data-theme="dark"] .era-scene img{filter:invert(1) hue-rotate(180deg)}
+  [data-theme="dark"] .cutouts img{filter:brightness(1.12)}
   .era-label{position:absolute;left:7vw;bottom:calc(34vh + 14px);font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);z-index:2}
 
   @media (max-width:700px){
@@ -143,6 +181,8 @@
     #road-sticky{position:static;height:auto;overflow:visible}
     #road-track{transform:none !important;overflow-x:auto}
     .scroll-hint .mouse::after{animation:none}
+    .scene-motion{display:none}
+    .panel.era.active .era-scene img{transform:none}
   }
 </style>
 </head>
@@ -195,8 +235,9 @@
           <div class="era-grid">
             <div class="era-proof"><div class="big">11</div><div class="lbl">years learning how cars are engineered</div></div>
             <p class="story">Eleven years on the engineering side — <b>powertrain, interiors, and vehicle systems</b> — before moving to product marketing. The foundation everything after it is built on.</p>
+          <div class="module"><div class="mod-label">On the floor</div><div class="chips"><button type="button" class="chip on" data-out="Eleven years on the engineering side — <b>powertrain</b> — before moving to product marketing.">Powertrain</button><button type="button" class="chip" data-out="Eleven years on the engineering side — <b>interiors</b> — before moving to product marketing.">Interiors</button><button type="button" class="chip" data-out="Eleven years on the engineering side — <b>vehicle systems</b> — before moving to product marketing.">Vehicle systems</button></div><p class="mod-out">Eleven years on the engineering side — <b>powertrain</b> — before moving to product marketing.</p></div>
           </div>
-          <div class="era-scene"><img src="assets/road/era-engineering.webp" alt="Engineering workshop: chassis blueprint, powertrain and a car on a lift" loading="lazy"></div>
+          <div class="era-scene"><img src="assets/road/era-engineering.webp" alt="Engineering workshop: chassis blueprint, powertrain and a car on a lift" loading="lazy"><div class="scene-motion" aria-hidden="true"><svg viewBox="0 0 100 56" preserveAspectRatio="none"><path class="m-road" d="M2,50 C30,44 70,52 98,46"/><circle class="m-dot" r="3"><animateMotion dur="7s" repeatCount="indefinite" path="M2,50 C30,44 70,52 98,46"/></circle><circle class="m-pulse" cx="22" cy="18" r="2.5"/><circle class="m-pulse m-pulse2" cx="78" cy="14" r="2"/></svg></div></div>
         </div>
       </section>
 
@@ -209,8 +250,9 @@
           <div class="era-grid">
             <div class="era-proof"><div class="big">5</div><div class="lbl">countries · Ecuador, Mexico, Canada, China, Korea</div></div>
             <p class="story">Led the <b>Equinox</b> globally — vehicle product marketing, customer experience, and dealer business development in Mexico — with project and travel assignments across five countries.</p>
+          <div class="module"><div class="mod-label">Five countries</div><div class="chips"><button type="button" class="chip on" data-out="<b>Ecuador</b> — one of five countries in the global Equinox assignment.">Ecuador</button><button type="button" class="chip" data-out="<b>Mexico</b> — dealer business development, and Equinox launch work in Mexico.">Mexico</button><button type="button" class="chip" data-out="<b>Canada</b> — one of five countries in the global Equinox assignment.">Canada</button><button type="button" class="chip" data-out="<b>China</b> — one of five countries in the global Equinox assignment.">China</button><button type="button" class="chip" data-out="<b>Korea</b> — one of five countries in the global Equinox assignment.">Korea</button></div><p class="mod-out"><b>Ecuador</b> — one of five countries in the global Equinox assignment.</p></div>
           </div>
-          <div class="era-scene"><img src="assets/road/era-equinox.webp" alt="Car design studio: a clay model SUV on a turntable" loading="lazy"></div>
+          <div class="era-scene"><img src="assets/road/era-equinox.webp" alt="Car design studio: a clay model SUV on a turntable" loading="lazy"><div class="scene-motion" aria-hidden="true"><svg viewBox="0 0 100 56" preserveAspectRatio="none"><path class="m-road" d="M2,50 C30,44 70,52 98,46"/><circle class="m-dot" r="3"><animateMotion dur="9s" repeatCount="indefinite" path="M2,50 C30,44 70,52 98,46"/></circle><circle class="m-pulse" cx="22" cy="18" r="2.5"/><circle class="m-pulse m-pulse2" cx="78" cy="14" r="2"/></svg></div></div>
         </div>
       </section>
 
@@ -223,12 +265,13 @@
           <div class="era-grid">
             <div class="era-proof"><div class="big">2</div><div class="lbl">nameplates launched, both still selling</div></div>
             <p class="story">Two nameplates, one segment. The <b>Chevrolet Trailblazer</b> and <b>Buick Encore GX</b> — launched together, and both still on the road today.</p>
+          <div class="module"><div class="mod-label">Pick a nameplate</div><div class="chips"><button type="button" class="chip on" data-target="trailblazer" data-out="<b>Chevrolet Trailblazer</b> — launched 2018, both nameplates still selling.">Trailblazer</button><button type="button" class="chip" data-target="encore" data-out="<b>Buick Encore GX</b> — launched 2018, both nameplates still selling.">Encore GX</button></div><p class="mod-out"><b>Chevrolet Trailblazer</b> — launched 2018, both nameplates still selling.</p></div>
           </div>
           <div class="cutouts">
-            <figure><img src="assets/road/trailblazer-cutout.png" alt="Chevrolet Trailblazer, side profile"><figcaption>Trailblazer</figcaption></figure>
-            <figure><img src="assets/road/encore-gx-cutout.png" alt="Buick Encore GX, side profile"><figcaption>Encore GX</figcaption></figure>
+            <figure data-car="trailblazer"><img src="assets/road/trailblazer-cutout.png" alt="Chevrolet Trailblazer, side profile"><figcaption>Trailblazer</figcaption></figure>
+            <figure data-car="encore"><img src="assets/road/encore-gx-cutout.png" alt="Buick Encore GX, side profile"><figcaption>Encore GX</figcaption></figure>
           </div>
-          <div class="era-scene"><img src="assets/road/era-trailblazer-encore.webp" alt="Open road with two small SUVs driving through low hills" loading="lazy"></div>
+          <div class="era-scene"><img src="assets/road/era-trailblazer-encore.webp" alt="Open road with two small SUVs driving through low hills" loading="lazy"><div class="scene-motion" aria-hidden="true"><svg viewBox="0 0 100 56" preserveAspectRatio="none"><path class="m-road" d="M2,50 C30,44 70,52 98,46"/><circle class="m-dot" r="3"><animateMotion dur="8s" repeatCount="indefinite" path="M2,50 C30,44 70,52 98,46"/></circle><circle class="m-pulse" cx="22" cy="18" r="2.5"/><circle class="m-pulse m-pulse2" cx="78" cy="14" r="2"/></svg></div></div>
         </div>
       </section>
 
@@ -241,8 +284,9 @@
           <div class="era-grid">
             <div class="era-proof"><div class="big">4</div><div class="lbl">focus areas · Product, CX, Field / Sales / Ops, Software &amp; Digital</div></div>
             <p class="story">The turn from vehicles to software. Strategy for <b>connected services and over-the-air updates</b> — the work that led to Shanghai.</p>
+          <div class="module"><div class="mod-label">Four focus areas</div><div class="chips"><button type="button" class="chip on" data-out="<b>Product</b> — strategy for connected services and over-the-air updates.">Product</button><button type="button" class="chip" data-out="<b>Customer experience</b> — strategy for connected services and over-the-air updates.">CX</button><button type="button" class="chip" data-out="<b>Field / Sales / Ops</b> — strategy for connected services and over-the-air updates.">Field / Sales / Ops</button><button type="button" class="chip" data-out="<b>Software &amp; Digital</b> — strategy for connected services and over-the-air updates.">Software &amp; Digital</button></div><p class="mod-out"><b>Product</b> — strategy for connected services and over-the-air updates.</p></div>
           </div>
-          <div class="era-scene"><img src="assets/road/era-connected-ota.webp" alt="Connected car with signal waves, cloud and phone" loading="lazy"></div>
+          <div class="era-scene"><img src="assets/road/era-connected-ota.webp" alt="Connected car with signal waves, cloud and phone" loading="lazy"><div class="scene-motion" aria-hidden="true"><svg viewBox="0 0 100 56" preserveAspectRatio="none"><path class="m-road" d="M2,50 C30,44 70,52 98,46"/><circle class="m-dot" r="3"><animateMotion dur="11s" repeatCount="indefinite" path="M2,50 C30,44 70,52 98,46"/></circle><circle class="m-pulse" cx="22" cy="18" r="2.5"/><circle class="m-pulse m-pulse2" cx="78" cy="14" r="2"/></svg></div></div>
         </div>
       </section>
 
@@ -255,8 +299,9 @@
           <div class="era-grid">
             <div class="era-proof"><div class="big"><small>$</small>167M</div><div class="lbl">L2++ ADAS approved — research &amp; pitch supported the approval</div></div>
             <p class="story">Three years in Shanghai. Built the <b>software &amp; digital business</b> — about 2,650 people across five departments — and my China ADAS market research and pitch supported GM's approval of $167M for L2++ ADAS development.</p>
+          <div class="module"><div class="mod-label">The team — about 2,650 people</div><div class="chips"><button type="button" class="chip on" data-out="<b>Strategy</b> — 49 people. The department I led as Deputy Director.">Strategy · 49</button><button type="button" class="chip" data-out="<b>Product Development</b> — 455 people.">Product Development · 455</button><button type="button" class="chip" data-out="<b>Product Experience</b> — 57 people.">Product Experience · 57</button><button type="button" class="chip" data-out="<b>Information System</b> — 1,106 people.">Information System · 1,106</button><button type="button" class="chip" data-out="<b>SOS</b> — 986 people.">SOS · 986</button></div><p class="mod-out"><b>Strategy</b> — 49 people. The department I led as Deputy Director.</p></div>
           </div>
-          <div class="era-scene"><img src="assets/road/era-shanghai.webp" alt="Shanghai Lujiazui skyline in thin line" loading="lazy"></div>
+          <div class="era-scene"><img src="assets/road/era-shanghai.webp" alt="Shanghai Lujiazui skyline in thin line" loading="lazy"><div class="scene-motion" aria-hidden="true"><svg viewBox="0 0 100 56" preserveAspectRatio="none"><path class="m-road" d="M2,50 C30,44 70,52 98,46"/><circle class="m-dot" r="3"><animateMotion dur="10s" repeatCount="indefinite" path="M2,50 C30,44 70,52 98,46"/></circle><circle class="m-pulse" cx="22" cy="18" r="2.5"/><circle class="m-pulse m-pulse2" cx="78" cy="14" r="2"/></svg></div></div>
         </div>
       </section>
 
@@ -269,8 +314,9 @@
           <div class="era-grid">
             <div class="era-proof"><div class="big">8</div><div class="lbl">export regions · Mexico, AMEO, South America, GMAP, South Korea, Israel, ANZ, Central Asia</div></div>
             <p class="story">Aligned OnStar US, Middle East and Mexico, vehicle brands and three Chinese JVs to deliver <b>OnStar on China-sourced export vehicles</b> across eight regions.</p>
+          <div class="module"><div class="mod-label">Eight export regions</div><div class="chips"><button type="button" class="chip on" data-out="OnStar on China-sourced export vehicles in <b>Mexico</b>.">Mexico</button><button type="button" class="chip" data-out="OnStar on China-sourced export vehicles in <b>AMEO</b>.">AMEO</button><button type="button" class="chip" data-out="OnStar on China-sourced export vehicles in <b>South America</b>.">South America</button><button type="button" class="chip" data-out="OnStar on China-sourced export vehicles in <b>GMAP</b>.">GMAP</button><button type="button" class="chip" data-out="OnStar on China-sourced export vehicles in <b>South Korea</b>.">South Korea</button><button type="button" class="chip" data-out="OnStar on China-sourced export vehicles in <b>Israel</b>.">Israel</button><button type="button" class="chip" data-out="OnStar on China-sourced export vehicles in <b>ANZ</b>.">ANZ</button><button type="button" class="chip" data-out="OnStar on China-sourced export vehicles in <b>Central Asia</b>.">Central Asia</button></div><p class="mod-out">OnStar on China-sourced export vehicles in <b>Mexico</b>.</p></div>
           </div>
-          <div class="era-scene"><img src="assets/road/era-onstar.webp" alt="World map with eight dots connected by dotted routes" loading="lazy"></div>
+          <div class="era-scene"><img src="assets/road/era-onstar.webp" alt="World map with eight dots connected by dotted routes" loading="lazy"><div class="scene-motion" aria-hidden="true"><svg viewBox="0 0 100 56" preserveAspectRatio="none"><path class="m-road" d="M2,50 C30,44 70,52 98,46"/><circle class="m-dot" r="3"><animateMotion dur="9s" repeatCount="indefinite" path="M2,50 C30,44 70,52 98,46"/></circle><circle class="m-pulse" cx="22" cy="18" r="2.5"/><circle class="m-pulse m-pulse2" cx="78" cy="14" r="2"/></svg></div></div>
         </div>
       </section>
 
@@ -283,8 +329,9 @@
           <div class="era-grid">
             <div class="era-proof"><div class="big">5<small>×</small></div><div class="lbl">more capable — the Marcin Hub rebuild, my estimate</div></div>
             <p class="story">GM killed the original app in 2019 — it cost about $3M a year to run. I rebuilt it myself, <b>more capable</b> by my estimate, for about $10–15k in Copilot credits plus my time. Now I build AI tools, and I'm looking for the next director role.</p>
+          <div class="module"><div class="mod-label">Portfolio Made Visible — try it</div><div class="chips"><button type="button" class="chip" data-pmv="ford">Ford</button><button type="button" class="chip on" data-pmv="gm">GM</button><button type="button" class="chip" data-pmv="stellantis">Stellantis</button></div><div class="pmv-bars"><div class="pmv-bar"><i style="height:100%"></i><span>Equinox EV<br>55</span></div><div class="pmv-bar"><i style="height:55%"></i><span>Blazer EV<br>30</span></div><div class="pmv-bar"><i style="height:40%"></i><span>Lyriq<br>22</span></div></div><p class="mod-out"><b>GM</b> — Equinox EV leads this set. One automaker against another, same segment, same moment.</p><p class="pmv-note">Illustrative demo data — not real sales.</p></div>
           </div>
-          <div class="era-scene"><img src="assets/road/era-now-ai.webp" alt="Neural network of dots and lines with a small robot" loading="lazy"></div>
+          <div class="era-scene"><img src="assets/road/era-now-ai.webp" alt="Neural network of dots and lines with a small robot" loading="lazy"><div class="scene-motion" aria-hidden="true"><svg viewBox="0 0 100 56" preserveAspectRatio="none"><path class="m-road" d="M2,50 C30,44 70,52 98,46"/><circle class="m-dot" r="3"><animateMotion dur="12s" repeatCount="indefinite" path="M2,50 C30,44 70,52 98,46"/></circle><circle class="m-pulse" cx="22" cy="18" r="2.5"/><circle class="m-pulse m-pulse2" cx="78" cy="14" r="2"/></svg></div></div>
         </div>
       </section>
 
@@ -478,6 +525,7 @@
       if (d < bestD){ bestD = d; best = e; }
     });
     eras.forEach(function(e){ e.classList.toggle('active', e === best); });
+    if (best) countUp(best);
   }
 
   function update(){
@@ -503,6 +551,66 @@
       if (d < bestD){ bestD = d; best = e; }
     });
     eras.forEach(function(e){ e.classList.toggle('active', e === best); });
+    if (best) countUp(best);
+  }
+
+  /* small modules: chips switch the one-line answer; the Trailblazer
+     chips also highlight one cutout; the PMV chips swap the demo bars. */
+  var PMV = {
+    ford: {bars: [['F-150 Lightning', 42], ['Mustang Mach-E', 38], ['Explorer EV', 25]], out: '<b>Ford</b> — three EVs, one portfolio. Pick a nameplate to compare it against GM and Stellantis.'},
+    gm: {bars: [['Equinox EV', 55], ['Blazer EV', 30], ['Lyriq', 22]], out: '<b>GM</b> — Equinox EV leads this set. One automaker against another, same segment, same moment.'},
+    stellantis: {bars: [['Wagoneer S', 18], ['Charger Daytona', 15], ['Ram 1500 REV', 12]], out: '<b>Stellantis</b> — smaller EV volumes in this set. Same view, different portfolio.'}
+  };
+  function updatePMV(key){
+    var mod = document.querySelector('[data-pmv="' + key + '"]');
+    if (!mod) return;
+    var box = mod.closest('.module');
+    var data = PMV[key];
+    var bars = box.querySelectorAll('.pmv-bar');
+    var max = Math.max.apply(null, data.bars.map(function(b){ return b[1]; }));
+    bars.forEach(function(bar, i){
+      var b = data.bars[i];
+      bar.querySelector('i').style.height = Math.max(4, Math.round(b[1] / max * 100)) + '%';
+      bar.querySelector('span').innerHTML = b[0] + '<br>' + b[1];
+    });
+    box.querySelector('.mod-out').innerHTML = data.out;
+  }
+  document.querySelectorAll('.module').forEach(function(mod){
+    var chips = mod.querySelectorAll('.chip');
+    var out = mod.querySelector('.mod-out');
+    chips.forEach(function(ch){
+      ch.addEventListener('click', function(){
+        chips.forEach(function(c){ c.classList.remove('on'); });
+        ch.classList.add('on');
+        if (out && ch.dataset.out) out.innerHTML = ch.dataset.out;
+        if (ch.dataset.target){
+          mod.parentElement.querySelectorAll('.cutouts figure').forEach(function(f){
+            f.classList.toggle('dim', f.dataset.car !== ch.dataset.target);
+          });
+        }
+        if (ch.dataset.pmv) updatePMV(ch.dataset.pmv);
+      });
+    });
+  });
+
+  /* proof numbers count up once, when their era comes into view */
+  function countUp(era){
+    if (!era || era.dataset.counted || reduce) return;
+    var big = era.querySelector('.era-proof .big');
+    if (!big) return;
+    var m = big.textContent.match(/([^0-9]*)([0-9]+)(.*)/);
+    if (!m) return;
+    era.dataset.counted = '1';
+    var orig = big.innerHTML, target = parseInt(m[2], 10), t0 = null;
+    function step(ts){
+      if (!t0) t0 = ts;
+      var k = Math.min(1, (ts - t0) / 900);
+      var v = Math.round(target * (1 - Math.pow(1 - k, 3)));
+      big.textContent = m[1] + v + m[3];
+      if (k < 1) requestAnimationFrame(step);
+      else big.innerHTML = orig;
+    }
+    requestAnimationFrame(step);
   }
 
   var ticking = false;
