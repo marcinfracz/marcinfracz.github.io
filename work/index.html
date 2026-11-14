@@ -70,12 +70,12 @@
   .era p.story{max-width:520px;font-size:clamp(15px,1.35vw,18px);line-height:1.6;color:var(--body)}
   .era p.story b{color:var(--ink)}
   .era-scene{position:relative;margin-top:30px}
-  /* Ferdio-style scenes: bespoke flat line drawings, no box, no raster.
-     Thin ink lines, one amber accent, hairline dot grid, generous space.
+  /* Ferdio-style scenes: looping video clips generated from the flat
+     line-drawn stills, same palette (off-white, navy ink, amber).
      Motion is slow, small and restrained: one element moves inside a
-     still scene, a dot travels a path, a line draws itself, labels appear
-     one at a time when the era comes into view. */
-  .scene-svg{width:min(680px,72vw);height:auto;display:block}
+     still scene. Poster is the matching still, so the scene holds
+     its frame before the clip loads. */
+  .scene-svg,.scene-video{width:min(680px,72vw);height:auto;display:block}
   .s-line{fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
   .s-thin{fill:none;stroke:var(--ink);stroke-width:1.25;opacity:.5;stroke-linecap:round}
   .s-accent{fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round}
@@ -183,7 +183,7 @@
     .era-grid{gap:18px;flex-direction:column;align-items:flex-start}
     .era-proof .big{font-size:clamp(48px,15vw,72px)}
     .era-proof .lbl{max-width:none}
-    .scene-svg{width:100%;max-width:100%}
+    .scene-svg,.scene-video{width:100%;max-width:100%}
     .cutouts img{height:64px}
     .contact h2{font-size:clamp(36px,11vw,52px)}
     .contact .email{font-size:20px;word-break:break-all}
@@ -251,19 +251,7 @@
             <p class="story">Eleven years on the engineering side — <b>powertrain, interiors, and vehicle systems</b> — before moving to product marketing. The foundation everything after it is built on.</p>
           <div class="module"><div class="mod-label">On the floor</div><div class="chips"><button type="button" class="chip on" data-out="Eleven years on the engineering side — <b>powertrain</b> — before moving to product marketing.">Powertrain</button><button type="button" class="chip" data-out="Eleven years on the engineering side — <b>interiors</b> — before moving to product marketing.">Interiors</button><button type="button" class="chip" data-out="Eleven years on the engineering side — <b>vehicle systems</b> — before moving to product marketing.">Vehicle systems</button></div><p class="mod-out">Eleven years on the engineering side — <b>powertrain</b> — before moving to product marketing.</p></div>
           </div>
-          <div class="era-scene"><svg class="scene-svg" viewBox="0 0 680 380" role="img" aria-label="Engineering workshop: a car on a lift, blueprint line above">
-<defs><pattern id="gd1" width="34" height="34" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="1.2" fill="var(--line)"/></pattern></defs>
-<rect width="680" height="380" fill="url(#gd1)"/>
-<path class="s-thin draw" d="M60,80 C180,50 300,100 420,70 S580,50 630,85"/>
-<circle class="s-dot" r="4"><animateMotion dur="10s" repeatCount="indefinite" path="M60,80 C180,50 300,100 420,70 S580,50 630,85"/></circle>
-<text class="s-label lbl d1" x="60" y="46">POWERTRAIN</text>
-<text class="s-label lbl d2" x="300" y="36">INTERIORS</text>
-<text class="s-label lbl d3" x="520" y="46">SYSTEMS</text>
-<g class="float-slow"><path class="s-fill" d="M210,268 L218,224 L252,204 L348,204 L382,224 L432,230 L440,268 Z"/><circle class="s-fill" cx="262" cy="270" r="20"/><circle class="s-ink-dot" cx="262" cy="270" r="5"/><circle class="s-fill" cx="388" cy="270" r="20"/><circle class="s-ink-dot" cx="388" cy="270" r="5"/></g>
-<path class="s-line" d="M180,300 L180,150 M480,300 L480,150"/>
-<path class="s-line" d="M140,300 L540,300 M140,330 L540,330"/>
-<circle class="s-dot blink" cx="180" cy="150" r="4"/><circle class="s-dot blink" cx="480" cy="150" r="4"/>
-</svg></div>
+          <div class="era-scene"><video class="scene-video" src="/assets/road/era-engineering.mp4" poster="/assets/road/era-engineering.webp" autoplay muted loop playsinline preload="auto" aria-label="Engineering workshop: a car on a lift, blueprint line above"></video></div>
         </div>
       </section>
 
@@ -278,16 +266,7 @@
             <p class="story">Led the <b>Equinox</b> globally — vehicle product marketing, customer experience, and dealer business development in Mexico — with project and travel assignments across five countries.</p>
           <div class="module"><div class="mod-label">Five countries</div><div class="chips"><button type="button" class="chip on" data-out="<b>Ecuador</b> — one of five countries in the global Equinox assignment.">Ecuador</button><button type="button" class="chip" data-out="<b>Mexico</b> — dealer business development, and Equinox launch work in Mexico.">Mexico</button><button type="button" class="chip" data-out="<b>Canada</b> — one of five countries in the global Equinox assignment.">Canada</button><button type="button" class="chip" data-out="<b>China</b> — one of five countries in the global Equinox assignment.">China</button><button type="button" class="chip" data-out="<b>Korea</b> — one of five countries in the global Equinox assignment.">Korea</button></div><p class="mod-out"><b>Ecuador</b> — one of five countries in the global Equinox assignment.</p></div>
           </div>
-          <div class="era-scene"><svg class="scene-svg" viewBox="0 0 680 380" role="img" aria-label="Clay model SUV on a turntable, five country dots above">
-<defs><pattern id="gd2" width="34" height="34" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="1.2" fill="var(--line)"/></pattern></defs>
-<rect width="680" height="380" fill="url(#gd2)"/>
-<path class="s-thin" d="M120,120 Q340,20 560,120"/>
-<circle class="s-dot" r="4"><animateMotion dur="12s" repeatCount="indefinite" path="M120,120 Q340,20 560,120"/></circle>
-<circle class="s-dot lbl d1" cx="120" cy="120" r="5"/><circle class="s-dot lbl d2" cx="230" cy="72" r="5"/><circle class="s-dot lbl d3" cx="340" cy="58" r="5"/><circle class="s-dot lbl d4" cx="450" cy="72" r="5"/><circle class="s-dot lbl d4" cx="560" cy="120" r="5"/>
-<text class="s-label-sm lbl d1" x="104" y="146">ECUADOR</text><text class="s-label-sm lbl d2" x="214" y="98">MEXICO</text><text class="s-label-sm lbl d3" x="322" y="84">CANADA</text><text class="s-label-sm lbl d4" x="434" y="98">CHINA</text><text class="s-label-sm lbl d4" x="544" y="146">KOREA</text>
-<g class="float-slower"><path class="s-card" d="M230,240 L240,200 L280,182 L380,182 L420,200 L440,240 Z"/><circle class="s-fill" cx="282" cy="242" r="18"/><circle class="s-fill" cx="398" cy="242" r="18"/></g>
-<ellipse class="s-thin spin-dash" cx="340" cy="268" rx="190" ry="26" stroke-dasharray="6 8"/>
-</svg></div>
+          <div class="era-scene"><video class="scene-video" src="/assets/road/era-equinox.mp4" poster="/assets/road/era-equinox.webp" autoplay muted loop playsinline preload="auto" aria-label="Clay model SUV on a turntable, five country dots above"></video></div>
         </div>
       </section>
 
@@ -306,18 +285,7 @@
             <figure data-car="trailblazer"><img src="/assets/road/trailblazer-cutout.png" alt="Chevrolet Trailblazer, side profile"><figcaption>Trailblazer</figcaption></figure>
             <figure data-car="encore"><img src="/assets/road/encore-gx-cutout.png" alt="Buick Encore GX, side profile"><figcaption>Encore GX</figcaption></figure>
           </div>
-          <div class="era-scene"><svg class="scene-svg" viewBox="0 0 680 380" role="img" aria-label="Open road with two small SUVs driving through low hills">
-<defs><pattern id="gd3" width="34" height="34" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="1.2" fill="var(--line)"/></pattern></defs>
-<rect width="680" height="380" fill="url(#gd3)"/>
-<circle class="sun-pulse" cx="590" cy="70" r="22" fill="none" stroke="var(--accent)" stroke-width="2"/>
-<path class="s-thin" d="M0,180 C120,140 220,190 340,160 S560,130 680,170"/>
-<path class="s-line" d="M0,300 L680,260 M0,340 L680,310"/>
-<path class="s-accent dash-move" d="M0,320 L680,285" stroke-dasharray="14 18"/>
-<g><rect x="-16" y="-8" width="32" height="14" rx="7" class="s-fill"/><circle cx="-9" cy="7" r="4" class="s-fill"/><circle cx="9" cy="7" r="4" class="s-fill"/><animateMotion dur="7s" repeatCount="indefinite" path="M0,318 L680,283"/></g>
-<g><rect x="-16" y="-8" width="32" height="14" rx="7" class="s-fill"/><circle cx="-9" cy="7" r="4" class="s-fill"/><circle cx="9" cy="7" r="4" class="s-fill"/><animateMotion dur="11s" begin="-4s" repeatCount="indefinite" path="M0,318 L680,283"/></g>
-<text class="s-label lbl d1" x="60" y="60">TRAILBLAZER</text>
-<text class="s-label lbl d2" x="460" y="60">ENCORE GX</text>
-</svg></div>
+          <div class="era-scene"><video class="scene-video" src="/assets/road/era-trailblazer-encore.mp4" poster="/assets/road/era-trailblazer-encore.webp" autoplay muted loop playsinline preload="auto" aria-label="Open road with two small SUVs driving through low hills"></video></div>
         </div>
       </section>
 
@@ -332,20 +300,7 @@
             <p class="story">The turn from vehicles to software. Strategy for <b>connected services and over-the-air updates</b> — the work that led to Shanghai.</p>
           <div class="module"><div class="mod-label">Four focus areas</div><div class="chips"><button type="button" class="chip on" data-out="<b>Product</b> — strategy for connected services and over-the-air updates.">Product</button><button type="button" class="chip" data-out="<b>Customer experience</b> — strategy for connected services and over-the-air updates.">CX</button><button type="button" class="chip" data-out="<b>Field / Sales / Ops</b> — strategy for connected services and over-the-air updates.">Field / Sales / Ops</button><button type="button" class="chip" data-out="<b>Software &amp; Digital</b> — strategy for connected services and over-the-air updates.">Software &amp; Digital</button></div><p class="mod-out"><b>Product</b> — strategy for connected services and over-the-air updates.</p></div>
           </div>
-          <div class="era-scene"><svg class="scene-svg" viewBox="0 0 680 380" role="img" aria-label="Connected car with signal waves, cloud and phone">
-<defs><pattern id="gd4" width="34" height="34" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="1.2" fill="var(--line)"/></pattern></defs>
-<rect width="680" height="380" fill="url(#gd4)"/>
-<path class="s-accent ring-pulse" d="M300,210 A40,40 0 0 1 380,210"/>
-<path class="s-accent ring-pulse r2" d="M280,210 A60,60 0 0 1 400,210"/>
-<path class="s-accent ring-pulse r3" d="M260,210 A80,80 0 0 1 420,210"/>
-<g class="float-slow"><path class="s-fill" d="M250,268 L258,232 L286,216 L394,216 L422,232 L430,268 Z"/><circle class="s-fill" cx="292" cy="270" r="18"/><circle class="s-fill" cx="388" cy="270" r="18"/></g>
-<path class="s-line" d="M180,300 L500,300"/>
-<g class="s-line"><circle cx="545" cy="82" r="26"/><circle cx="585" cy="70" r="32"/><circle cx="620" cy="86" r="22"/><path d="M520,98 L642,98"/></g>
-<path class="s-thin" stroke-dasharray="3 6" d="M400,200 C470,160 510,140 545,112"/>
-<circle class="s-dot" r="4"><animateMotion dur="6s" repeatCount="indefinite" path="M400,200 C470,160 510,140 545,112"/></circle>
-<text class="s-label lbl d1" x="60" y="60">OTA UPDATE</text>
-<text class="s-label lbl d2" x="520" y="150">CLOUD</text>
-</svg></div>
+          <div class="era-scene"><video class="scene-video" src="/assets/road/era-connected-ota.mp4" poster="/assets/road/era-connected-ota.webp" autoplay muted loop playsinline preload="auto" aria-label="Connected car with signal waves, cloud and phone"></video></div>
         </div>
       </section>
 
@@ -360,19 +315,7 @@
             <p class="story">Three years in Shanghai. Built the <b>software &amp; digital business</b> — about 2,650 people across five departments — and my China ADAS market research and pitch supported GM's approval of $167M for L2++ ADAS development.</p>
           <div class="module"><div class="mod-label">The team — about 2,650 people</div><div class="chips"><button type="button" class="chip on" data-out="<b>Strategy</b> — 49 people. The department I led as Deputy Director.">Strategy · 49</button><button type="button" class="chip" data-out="<b>Product Development</b> — 455 people.">Product Development · 455</button><button type="button" class="chip" data-out="<b>Product Experience</b> — 57 people.">Product Experience · 57</button><button type="button" class="chip" data-out="<b>Information System</b> — 1,106 people.">Information System · 1,106</button><button type="button" class="chip" data-out="<b>SOS</b> — 986 people.">SOS · 986</button></div><p class="mod-out"><b>Strategy</b> — 49 people. The department I led as Deputy Director.</p></div>
           </div>
-          <div class="era-scene"><svg class="scene-svg" viewBox="0 0 680 380" role="img" aria-label="Shanghai Lujiazui skyline in thin line">
-<defs><pattern id="gd5" width="34" height="34" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="1.2" fill="var(--line)"/></pattern></defs>
-<rect width="680" height="380" fill="url(#gd5)"/>
-<circle class="sun-pulse" cx="90" cy="70" r="20" fill="none" stroke="var(--accent)" stroke-width="2"/>
-<path class="s-thin draw" d="M60,320 C200,180 420,120 620,90"/>
-<circle class="s-dot" r="4"><animateMotion dur="9s" repeatCount="indefinite" path="M60,320 C200,180 420,120 620,90"/></circle>
-<path class="s-line" d="M80,320 L80,180 L110,150 L140,180 L140,320 M170,320 L170,120 L200,90 L230,120 L230,320 M260,320 L260,200 L290,170 L320,200 L320,320 M350,320 L350,100 L380,70 L410,100 L410,320 M440,320 L440,160 L470,130 L500,160 L500,320 M530,320 L530,210 L560,180 L590,210 L590,320"/>
-<circle cx="380" cy="140" r="18" fill="none" stroke="var(--ink)" stroke-width="2"/>
-<circle class="s-dot blink" cx="100" cy="210" r="2.5"/><circle class="s-dot blink" cx="125" cy="250" r="2.5"/><circle class="s-dot blink" cx="190" cy="160" r="2.5"/><circle class="s-dot blink" cx="210" cy="220" r="2.5"/><circle class="s-dot blink" cx="280" cy="240" r="2.5"/><circle class="s-dot blink" cx="305" cy="280" r="2.5"/><circle class="s-dot blink" cx="370" cy="180" r="2.5"/><circle class="s-dot blink" cx="395" cy="240" r="2.5"/><circle class="s-dot blink" cx="460" cy="200" r="2.5"/><circle class="s-dot blink" cx="485" cy="260" r="2.5"/><circle class="s-dot blink" cx="550" cy="240" r="2.5"/><circle class="s-dot blink" cx="575" cy="280" r="2.5"/>
-<path class="s-line" d="M60,320 L620,320"/>
-<text class="s-label lbl d1" x="60" y="350">DETROIT</text>
-<text class="s-label lbl d2" x="540" y="60">SHANGHAI</text>
-</svg></div>
+          <div class="era-scene"><video class="scene-video" src="/assets/road/era-shanghai.mp4" poster="/assets/road/era-shanghai.webp" autoplay muted loop playsinline preload="auto" aria-label="Shanghai Lujiazui skyline in thin line"></video></div>
         </div>
       </section>
 
@@ -387,17 +330,7 @@
             <p class="story">Aligned OnStar US, Middle East and Mexico, vehicle brands and three Chinese JVs to deliver <b>OnStar on China-sourced export vehicles</b> across eight regions.</p>
           <div class="module"><div class="mod-label">Eight export regions</div><div class="chips"><button type="button" class="chip on" data-out="OnStar on China-sourced export vehicles in <b>Mexico</b>.">Mexico</button><button type="button" class="chip" data-out="OnStar on China-sourced export vehicles in <b>AMEO</b>.">AMEO</button><button type="button" class="chip" data-out="OnStar on China-sourced export vehicles in <b>South America</b>.">South America</button><button type="button" class="chip" data-out="OnStar on China-sourced export vehicles in <b>GMAP</b>.">GMAP</button><button type="button" class="chip" data-out="OnStar on China-sourced export vehicles in <b>South Korea</b>.">South Korea</button><button type="button" class="chip" data-out="OnStar on China-sourced export vehicles in <b>Israel</b>.">Israel</button><button type="button" class="chip" data-out="OnStar on China-sourced export vehicles in <b>ANZ</b>.">ANZ</button><button type="button" class="chip" data-out="OnStar on China-sourced export vehicles in <b>Central Asia</b>.">Central Asia</button></div><p class="mod-out">OnStar on China-sourced export vehicles in <b>Mexico</b>.</p></div>
           </div>
-          <div class="era-scene"><svg class="scene-svg" viewBox="0 0 680 380" role="img" aria-label="World map with eight dots connected by dotted routes">
-<defs><pattern id="gd6" width="34" height="34" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="1.2" fill="var(--line)"/></pattern></defs>
-<rect width="680" height="380" fill="url(#gd6)"/>
-<path class="s-thin" d="M40,190 L640,190"/>
-<path class="s-thin draw" d="M60,190 Q140,110 220,190"/>
-<path class="s-thin draw" d="M60,190 Q220,90 380,190"/>
-<path class="s-thin draw" d="M60,190 Q340,110 540,190"/>
-<circle class="s-dot" r="4"><animateMotion dur="14s" repeatCount="indefinite" path="M40,190 L640,190"/></circle>
-<circle class="s-dot lbl d1" cx="60" cy="190" r="5"/><circle class="s-dot lbl d1" cx="140" cy="190" r="5"/><circle class="s-dot lbl d2" cx="220" cy="190" r="5"/><circle class="s-dot lbl d2" cx="300" cy="190" r="5"/><circle class="s-dot lbl d3" cx="380" cy="190" r="7"/><circle class="s-dot lbl d3" cx="460" cy="190" r="5"/><circle class="s-dot lbl d4" cx="540" cy="190" r="5"/><circle class="s-dot lbl d4" cx="620" cy="190" r="5"/>
-<text class="s-label-sm lbl d1" x="44" y="222">MEX</text><text class="s-label-sm lbl d1" x="124" y="222">AMEO</text><text class="s-label-sm lbl d2" x="204" y="222">S AMER</text><text class="s-label-sm lbl d2" x="282" y="222">GMAP</text><text class="s-label-sm lbl d3" x="362" y="222">KOREA</text><text class="s-label-sm lbl d3" x="444" y="222">ISRAEL</text><text class="s-label-sm lbl d4" x="528" y="222">ANZ</text><text class="s-label-sm lbl d4" x="600" y="222">C ASIA</text>
-</svg></div>
+          <div class="era-scene"><video class="scene-video" src="/assets/road/era-onstar.mp4" poster="/assets/road/era-onstar.webp" autoplay muted loop playsinline preload="auto" aria-label="World map with eight dots connected by dotted routes"></video></div>
         </div>
       </section>
 
@@ -412,18 +345,7 @@
             <p class="story">GM killed the original app in 2019 — it cost about $3M a year to run. I rebuilt it myself, <b>more capable</b> by my estimate, for about $10–15k in Copilot credits plus my time. Now I build AI tools, and I'm looking for the next director role.</p>
           <div class="module"><div class="mod-label">Portfolio Made Visible — try it</div><div class="chips"><button type="button" class="chip" data-pmv="ford">Ford</button><button type="button" class="chip on" data-pmv="gm">GM</button><button type="button" class="chip" data-pmv="stellantis">Stellantis</button></div><div class="pmv-bars"><div class="pmv-bar"><i style="height:100%"></i><span>Equinox EV<br>55</span></div><div class="pmv-bar"><i style="height:55%"></i><span>Blazer EV<br>30</span></div><div class="pmv-bar"><i style="height:40%"></i><span>Lyriq<br>22</span></div></div><p class="mod-out"><b>GM</b> — Equinox EV leads this set. One automaker against another, same segment, same moment.</p><p class="pmv-note">Illustrative demo data — not real sales.</p></div>
           </div>
-          <div class="era-scene"><svg class="scene-svg" viewBox="0 0 680 380" role="img" aria-label="Neural network of dots and lines">
-<defs><pattern id="gd7" width="34" height="34" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="1.2" fill="var(--line)"/></pattern></defs>
-<rect width="680" height="380" fill="url(#gd7)"/>
-<g class="s-thin"><path d="M140,90 L340,60 M140,90 L340,140 M140,190 L340,140 M140,190 L340,220 M140,190 L340,300 M140,290 L340,220 M140,290 L340,300 M340,60 L540,90 M340,140 L540,90 M340,140 L540,190 M340,220 L540,190 M340,220 L540,290 M340,300 L540,290"/></g>
-<circle class="s-dot" r="4"><animateMotion dur="8s" repeatCount="indefinite" path="M140,190 L340,140 L540,190"/></circle>
-<circle class="s-fill blink" cx="140" cy="90" r="7"/><circle class="s-fill" cx="140" cy="190" r="7"/><circle class="s-fill blink" cx="140" cy="290" r="7"/>
-<circle class="s-fill" cx="340" cy="60" r="7"/><circle class="s-fill blink" cx="340" cy="140" r="7"/><circle class="s-fill" cx="340" cy="220" r="7"/><circle class="s-fill blink" cx="340" cy="300" r="7"/>
-<circle class="s-fill blink" cx="540" cy="90" r="7"/><circle class="s-fill" cx="540" cy="190" r="7"/><circle class="s-fill blink" cx="540" cy="290" r="7"/>
-<text class="s-label lbl d1" x="110" y="40">INPUT</text>
-<text class="s-label lbl d2" x="310" y="40">MODEL</text>
-<text class="s-label lbl d3" x="510" y="40">OUTPUT</text>
-</svg></div>
+          <div class="era-scene"><video class="scene-video" src="/assets/road/era-now-ai.mp4" poster="/assets/road/era-now-ai.webp" autoplay muted loop playsinline preload="auto" aria-label="Neural network of dots and lines"></video></div>
         </div>
       </section>
 
@@ -471,6 +393,8 @@
   var isPhone = function(){ return window.matchMedia('(max-width: 700px)').matches; };
   if (isPhone()) document.body.classList.add('is-phone');
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var sceneVids = Array.prototype.slice.call(document.querySelectorAll('.scene-video'));
+  if (reduce) sceneVids.forEach(function(v){ v.removeAttribute('autoplay'); v.pause(); });
   var scrollEl = document.getElementById('road-scroll');
   var track = document.getElementById('road-track');
   var svg = document.getElementById('road-svg');
