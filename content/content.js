@@ -143,6 +143,7 @@ window.SITE_CONTENT = {
   notes: {
     motto: "Build it, ship it,\nlearn from it.",
     resumeNote: "Resume (PDF)",
+    reelNote: "Sizzle Reel (1:41)",
     contact: {
       email: "marcin.fracz@gmail.com",
       linkedin: "https://www.linkedin.com/in/marcinfracz/"
