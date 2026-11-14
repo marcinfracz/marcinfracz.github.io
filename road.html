@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Marcin Fracz — The Road</title>
+<meta name="description" content="A scroll-driven journey through Marcin Fracz's career, from engineering to Shanghai to AI.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ground:#F4F1EA; --ink:#1E2124; --muted:#8A8A8A; --accent:#E8A33D;
+    --line:#D8D2C4; --card:#FBF9F4;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:auto}
+  body{background:var(--ground);color:var(--ink);font-family:Inter,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  .mono{font-family:"JetBrains Mono",monospace}
+
+  /* ---------- top bar ---------- */
+  header{position:fixed;inset:0 0 auto 0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:18px 28px;pointer-events:none}
+  header .brand{font-weight:900;letter-spacing:.14em;font-size:13px;pointer-events:auto}
+  header .brand span{color:var(--accent)}
+  header nav{display:flex;gap:22px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;pointer-events:auto}
+  header nav a{opacity:.65}
+  header nav a:hover{opacity:1}
+  #progress{position:fixed;top:0;left:0;height:3px;background:var(--accent);width:0%;z-index:60}
+
+  /* ---------- road ---------- */
+  #road-scroll{position:relative}
+  #road-sticky{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden}
+  #road-bg{position:absolute;inset:0;pointer-events:none;
+    background-image:radial-gradient(circle, #D8D2C4 1px, transparent 1px);
+    background-size:34px 34px;opacity:.45}
+  #road-track{display:flex;height:100%;width:max-content;will-change:transform}
+  .panel{flex:0 0 100vw;width:100vw;height:100%;position:relative;display:flex;flex-direction:column;justify-content:center;padding:96px 7vw 120px}
+  .panel .inner{max-width:1060px;width:100%;margin:0 auto;position:relative;z-index:2}
+
+  /* intro */
+  .kicker{font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--muted);margin-bottom:18px}
+  h1{font-size:clamp(56px,10vw,148px);line-height:.92;font-weight:900;letter-spacing:-.03em}
+  h1 em{font-style:normal;color:var(--accent)}
+  .lede{margin-top:22px;font-size:clamp(16px,1.6vw,21px);line-height:1.55;color:#3d3a35;max-width:560px}
+  .scroll-hint{margin-top:44px;display:flex;align-items:center;gap:12px;font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+  .scroll-hint .mouse{width:22px;height:36px;border:2px solid var(--ink);border-radius:12px;position:relative}
+  .scroll-hint .mouse::after{content:"";position:absolute;left:50%;top:7px;width:4px;height:8px;margin-left:-2px;border-radius:2px;background:var(--accent);animation:wheel 1.8s ease-in-out infinite}
+  @keyframes wheel{0%{transform:translateY(0);opacity:1}70%{transform:translateY(10px);opacity:0}100%{transform:translateY(0);opacity:0}}
+
+  /* era */
+  .era-top{display:flex;align-items:baseline;gap:18px;flex-wrap:wrap}
+  .era-num{font-family:"JetBrains Mono",monospace;font-size:13px;letter-spacing:.2em;color:var(--muted)}
+  .era-dates{display:inline-block;border:1.5px solid var(--ink);border-radius:999px;padding:6px 14px;font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.08em;background:var(--card)}
+  .era h2{font-size:clamp(38px,5.2vw,76px);line-height:.98;font-weight:900;letter-spacing:-.02em;margin:18px 0 8px}
+  .era .role{font-size:clamp(14px,1.4vw,18px);color:#3d3a35;letter-spacing:.02em}
+  .era-grid{display:flex;gap:48px;align-items:flex-end;margin-top:30px;flex-wrap:wrap}
+  .era-proof .big{font-size:clamp(56px,7vw,110px);font-weight:900;line-height:.9;letter-spacing:-.03em}
+  .era-proof .big small{font-size:.42em;font-weight:800}
+  .era-proof .lbl{margin-top:8px;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);max-width:220px;line-height:1.5}
+  .era p.story{max-width:520px;font-size:clamp(15px,1.35vw,18px);line-height:1.6;color:#3d3a35}
+  .era p.story b{color:var(--ink)}
+  .era-scene{margin-top:30px}
+  .era-scene img{display:block;width:min(680px,72vw);height:auto;border:1px solid var(--line);background:var(--card)}
+  .cutouts{display:flex;gap:24px;align-items:flex-end;margin-top:26px;flex-wrap:wrap}
+  .cutouts img{display:block;height:110px;width:auto}
+  .cutouts figure{margin:0}
+  .cutouts figcaption{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:8px;text-align:center}
+  .panel.active .era-dates{background:var(--ink);color:var(--ground);border-color:var(--ink)}
+
+  /* contact */
+  .contact h2{font-size:clamp(44px,7vw,96px);line-height:.95;font-weight:900;letter-spacing:-.02em}
+  .contact .email{display:inline-block;margin-top:26px;font-size:clamp(20px,2.6vw,34px);font-weight:800;border-bottom:3px solid var(--accent);padding-bottom:4px}
+  .contact .links{margin-top:26px;display:flex;gap:22px;font-size:13px;letter-spacing:.12em;text-transform:uppercase}
+  .contact .links a{opacity:.65}
+  .contact .links a:hover{opacity:1}
+  .contact .fine{margin-top:44px;font-size:12px;color:var(--muted);letter-spacing:.06em}
+
+  /* the line */
+  #road-svg{position:absolute;left:0;bottom:0;width:100%;height:34vh;z-index:1;pointer-events:none;overflow:visible}
+  #road-svg path{fill:none;stroke:var(--ink);stroke-width:2}
+  #road-svg path.dots{stroke:var(--muted);stroke-width:1.5;stroke-dasharray:2 7}
+  #road-dot{fill:var(--accent);stroke:var(--ink);stroke-width:2}
+  #road-dot-ring{fill:none;stroke:var(--accent);stroke-width:1.5;opacity:.55}
+
+  .era-label{position:absolute;left:7vw;bottom:calc(34vh + 14px);font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);z-index:2}
+
+  @media (max-width:700px){
+    .panel{padding:84px 6vw 150px}
+    .era-grid{gap:22px}
+    .cutouts img{height:74px}
+    header nav{display:none}
+  }
+  @media (prefers-reduced-motion:reduce){
+    #road-sticky{position:static;height:auto;overflow:visible}
+    #road-track{transform:none !important;overflow-x:auto}
+    .scroll-hint .mouse::after{animation:none}
+  }
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header>
+  <a class="brand" href="/">MARCIN FRACZ <span>— THE ROAD</span></a>
+  <nav>
+    <a href="/work/">Work</a>
+    <a href="/assets/resume.pdf">Resume</a>
+    <a href="mailto:marcin.fracz@gmail.com">Contact</a>
+  </nav>
+</header>
+
+<main id="road-scroll">
+  <div id="road-sticky">
+    <div id="road-bg"></div>
+    <svg id="road-svg" aria-hidden="true">
+      <path id="road-line-dots" class="dots" d=""/>
+      <path id="road-line" d=""/>
+      <circle id="road-dot-ring" r="16" cx="0" cy="0"/>
+      <circle id="road-dot" r="8" cx="0" cy="0"/>
+    </svg>
+    <div id="road-track">
+
+      <!-- intro -->
+      <section class="panel intro">
+        <div class="inner">
+          <div class="kicker">Marcin Fracz · Automotive product &amp; software strategy</div>
+          <h1>THE<br>ROAD<em>.</em></h1>
+          <p class="lede">One career, left to right. Scroll down and drive it — from an engineering floor in 2003, through Detroit and Shanghai, to building AI today.</p>
+          <div class="scroll-hint"><span class="mouse"></span> Scroll to drive</div>
+        </div>
+      </section>
+
+      <!-- 01 engineering -->
+      <section class="panel era" data-era="01">
+        <div class="inner">
+          <div class="era-top"><span class="era-num">01 / 07</span><span class="era-dates">2003 — 2014</span></div>
+          <h2>ENGINEERING</h2>
+          <div class="role">Federal-Mogul · Chrysler · Johnson Controls</div>
+          <div class="era-grid">
+            <div class="era-proof"><div class="big">11</div><div class="lbl">years learning how cars are engineered</div></div>
+            <p class="story">Eleven years on the engineering side — <b>powertrain, interiors, and vehicle systems</b> — before moving to product marketing. The foundation everything after it is built on.</p>
+          </div>
+          <div class="era-scene"><img src="assets/road/era-engineering.webp" alt="Engineering workshop: chassis blueprint, powertrain and a car on a lift" loading="lazy"></div>
+        </div>
+      </section>
+
+      <!-- 02 equinox -->
+      <section class="panel era" data-era="02">
+        <div class="inner">
+          <div class="era-top"><span class="era-num">02 / 07</span><span class="era-dates">2014 — 2018</span></div>
+          <h2>EQUINOX</h2>
+          <div class="role">GM · Global Product Marketing, compact &amp; mid crossovers</div>
+          <div class="era-grid">
+            <div class="era-proof"><div class="big">5</div><div class="lbl">countries · Ecuador, Mexico, Canada, China, Korea</div></div>
+            <p class="story">Led the <b>Equinox</b> globally — vehicle product marketing, customer experience, and dealer business development in Mexico — with project and travel assignments across five countries.</p>
+          </div>
+          <div class="era-scene"><img src="assets/road/era-equinox.webp" alt="Car design studio: a clay model SUV on a turntable" loading="lazy"></div>
+        </div>
+      </section>
+
+      <!-- 03 trailblazer / encore gx -->
+      <section class="panel era" data-era="03">
+        <div class="inner">
+          <div class="era-top"><span class="era-num">03 / 07</span><span class="era-dates">2018 — 2020</span></div>
+          <h2>TRAILBLAZER<br>&amp; ENCORE GX</h2>
+          <div class="role">GM · Product Marketing, small SUVs</div>
+          <div class="era-grid">
+            <div class="era-proof"><div class="big">2</div><div class="lbl">nameplates launched, both still selling</div></div>
+            <p class="story">Two nameplates, one segment. The <b>Chevrolet Trailblazer</b> and <b>Buick Encore GX</b> — launched together, and both still on the road today.</p>
+          </div>
+          <div class="cutouts">
+            <figure><img src="assets/road/trailblazer-cutout.png" alt="Chevrolet Trailblazer, side profile"><figcaption>Trailblazer</figcaption></figure>
+            <figure><img src="assets/road/encore-gx-cutout.png" alt="Buick Encore GX, side profile"><figcaption>Encore GX</figcaption></figure>
+          </div>
+          <div class="era-scene"><img src="assets/road/era-trailblazer-encore.webp" alt="Open road with two small SUVs driving through low hills" loading="lazy"></div>
+        </div>
+      </section>
+
+      <!-- 04 connected & ota -->
+      <section class="panel era" data-era="04">
+        <div class="inner">
+          <div class="era-top"><span class="era-num">04 / 07</span><span class="era-dates">2020 — 2022</span></div>
+          <h2>CONNECTED<br>&amp; OTA</h2>
+          <div class="role">GM · Business Strategy Manager, Connected &amp; OTA</div>
+          <div class="era-grid">
+            <div class="era-proof"><div class="big">4</div><div class="lbl">focus areas · Product, CX, Field / Sales / Ops, Software &amp; Digital</div></div>
+            <p class="story">The turn from vehicles to software. Strategy for <b>connected services and over-the-air updates</b> — the work that led to Shanghai.</p>
+          </div>
+          <div class="era-scene"><img src="assets/road/era-connected-ota.webp" alt="Connected car with signal waves, cloud and phone" loading="lazy"></div>
+        </div>
+      </section>
+
+      <!-- 05 shanghai -->
+      <section class="panel era" data-era="05">
+        <div class="inner">
+          <div class="era-top"><span class="era-num">05 / 07</span><span class="era-dates">2022 — 2025</span></div>
+          <h2>SHANGHAI</h2>
+          <div class="role">SAIC-GM · Deputy Director, Software Strategy</div>
+          <div class="era-grid">
+            <div class="era-proof"><div class="big"><small>$</small>167M</div><div class="lbl">L2++ ADAS approved — research &amp; pitch supported the approval</div></div>
+            <p class="story">Three years in Shanghai. Built the <b>software &amp; digital business</b> — about 2,650 people across five departments — and my China ADAS market research and pitch supported GM's approval of $167M for L2++ ADAS development.</p>
+          </div>
+          <div class="era-scene"><img src="assets/road/era-shanghai.webp" alt="Shanghai Lujiazui skyline in thin line" loading="lazy"></div>
+        </div>
+      </section>
+
+      <!-- 06 onstar -->
+      <section class="panel era" data-era="06">
+        <div class="inner">
+          <div class="era-top"><span class="era-num">06 / 07</span><span class="era-dates">2025 — 2026</span></div>
+          <h2>ONSTAR<br>INTERNATIONAL</h2>
+          <div class="role">GM · Manager, Global Planning &amp; Joint Ventures, OnStar Product Marketing</div>
+          <div class="era-grid">
+            <div class="era-proof"><div class="big">8</div><div class="lbl">export regions · Mexico, AMEO, South America, GMAP, South Korea, Israel, ANZ, Central Asia</div></div>
+            <p class="story">Aligned OnStar US, Middle East and Mexico, vehicle brands and three Chinese JVs to deliver <b>OnStar on China-sourced export vehicles</b> across eight regions.</p>
+          </div>
+          <div class="era-scene"><img src="assets/road/era-onstar.webp" alt="World map with eight dots connected by dotted routes" loading="lazy"></div>
+        </div>
+      </section>
+
+      <!-- 07 now -->
+      <section class="panel era" data-era="07">
+        <div class="inner">
+          <div class="era-top"><span class="era-num">07 / 07</span><span class="era-dates">2026 — NOW</span></div>
+          <h2>AI BUILDER</h2>
+          <div class="role">Marcin Hub · Portfolio Made Visible</div>
+          <div class="era-grid">
+            <div class="era-proof"><div class="big">5<small>×</small></div><div class="lbl">more capable — the Marcin Hub rebuild, my estimate</div></div>
+            <p class="story">GM killed the original app in 2019 — it cost about $3M a year to run. I rebuilt it myself, <b>more capable</b> by my estimate, for about $10–15k in Copilot credits plus my time. Now I build AI tools, and I'm looking for the next director role.</p>
+          </div>
+          <div class="era-scene"><img src="assets/road/era-now-ai.webp" alt="Neural network of dots and lines with a small robot" loading="lazy"></div>
+        </div>
+      </section>
+
+      <!-- contact -->
+      <section class="panel contact">
+        <div class="inner">
+          <div class="kicker">The road continues</div>
+          <h2>LET'S TALK<br>ABOUT<br>WHAT'S NEXT.</h2>
+          <a class="email" href="mailto:marcin.fracz@gmail.com">marcin.fracz@gmail.com</a>
+          <div class="links">
+            <a href="https://www.linkedin.com/in/marcinfracz/">LinkedIn</a>
+            <a href="/work/">Work showcase</a>
+            <a href="/assets/resume.pdf">Resume</a>
+          </div>
+          <p class="fine">Detroit · Shanghai · Everywhere the road goes. Built with AI, in the flat matte style of Ferdio.</p>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</main>
+
+<script>
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var scrollEl = document.getElementById('road-scroll');
+  var track = document.getElementById('road-track');
+  var svg = document.getElementById('road-svg');
+  var line = document.getElementById('road-line');
+  var dots = document.getElementById('road-line-dots');
+  var dot = document.getElementById('road-dot');
+  var ring = document.getElementById('road-dot-ring');
+  var progress = document.getElementById('progress');
+  var bg = document.getElementById('road-bg');
+  var panels = Array.prototype.slice.call(document.querySelectorAll('.panel'));
+  var eras = Array.prototype.slice.call(document.querySelectorAll('.panel.era'));
+  var pathLen = 0, maxX = 0;
+
+  function smoothPath(pts){
+    // Catmull-Rom to Bezier
+    var d = 'M ' + pts[0][0] + ' ' + pts[0][1];
+    for (var i = 0; i < pts.length - 1; i++){
+      var p0 = pts[Math.max(0, i-1)], p1 = pts[i], p2 = pts[i+1], p3 = pts[Math.min(pts.length-1, i+2)];
+      var c1x = p1[0] + (p2[0]-p0[0])/6, c1y = p1[1] + (p2[1]-p0[1])/6;
+      var c2x = p2[0] - (p3[0]-p1[0])/6, c2y = p2[1] - (p3[1]-p1[1])/6;
+      d += ' C ' + c1x.toFixed(1) + ' ' + c1y.toFixed(1) + ', ' + c2x.toFixed(1) + ' ' + c2y.toFixed(1) + ', ' + p2[0].toFixed(1) + ' ' + p2[1].toFixed(1);
+    }
+    return d;
+  }
+
+  function layout(){
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var tw = track.scrollWidth;
+    maxX = Math.max(0, tw - vw);
+    if (!reduce){
+      scrollEl.style.height = (maxX + vh) + 'px';
+    }
+    // SVG spans the whole track
+    var H = Math.round(vh * 0.34);
+    svg.setAttribute('width', tw);
+    svg.setAttribute('height', H);
+    svg.setAttribute('viewBox', '0 0 ' + tw + ' ' + H);
+    // one point per panel centre, y undulating like a mountain
+    var pts = panels.map(function(p, i){
+      var cx = p.offsetLeft + p.offsetWidth / 2;
+      var wave = [0.62, 0.30, 0.58, 0.24, 0.55, 0.30, 0.58, 0.26, 0.50][i] || 0.5;
+      return [cx, H * wave];
+    });
+    var d = smoothPath(pts);
+    line.setAttribute('d', d);
+    dots.setAttribute('d', d);
+    pathLen = line.getTotalLength();
+    line.style.strokeDasharray = pathLen;
+    dots.style.strokeDasharray = '2 7';
+    update();
+  }
+
+  function update(){
+    if (reduce) return;
+    var vh = window.innerHeight;
+    var top = scrollEl.offsetTop;
+    var total = scrollEl.offsetHeight - vh;
+    var p = total > 0 ? (window.scrollY - top) / total : 0;
+    p = Math.max(0, Math.min(1, p));
+    track.style.transform = 'translate3d(' + (-p * maxX).toFixed(1) + 'px,0,0)';
+    // line draws itself
+    line.style.strokeDashoffset = (pathLen * (1 - p)).toFixed(1);
+    var pt = line.getPointAtLength(p * pathLen);
+    dot.setAttribute('cx', pt.x); dot.setAttribute('cy', pt.y);
+    ring.setAttribute('cx', pt.x); ring.setAttribute('cy', pt.y);
+    progress.style.width = (p * 100).toFixed(1) + '%';
+    // parallax: background drifts slower than the track
+    bg.style.transform = 'translate3d(' + (-p * maxX * 0.25).toFixed(1) + 'px,0,0)';
+    // active era = nearest panel centre to viewport centre
+    var centre = p * maxX + window.innerWidth / 2;
+    var best = null, bestD = 1e9;
+    eras.forEach(function(e){
+      var c = e.offsetLeft + e.offsetWidth / 2;
+      var d = Math.abs(c - centre);
+      if (d < bestD){ bestD = d; best = e; }
+    });
+    eras.forEach(function(e){ e.classList.toggle('active', e === best); });
+  }
+
+  var ticking = false;
+  function onScroll(){
+    if (!ticking){ ticking = true; requestAnimationFrame(function(){ update(); ticking = false; }); }
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  window.addEventListener('resize', layout);
+  window.addEventListener('load', layout);
+  layout();
+})();
+</script>
+</body>
+</html>
