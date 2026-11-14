@@ -87,14 +87,18 @@
 
   /* the line */
   #road-svg{position:absolute;left:0;bottom:0;width:100%;height:34vh;z-index:1;pointer-events:none;overflow:visible}
-  #road-svg path{fill:none;stroke:var(--ink);stroke-width:2}
-  #road-svg path.dots{stroke:var(--muted);stroke-width:1.5;stroke-dasharray:2 7}
-  /* driven part: slightly thicker, amber, drawn over the base line */
-  #road-line-progress{fill:none;stroke:var(--accent);stroke-width:4;stroke-linecap:round}
-  #road-car .car-body{fill:var(--ink)}
-  #road-car .car-window{fill:var(--accent)}
-  #road-car .car-wheel{fill:var(--ground);stroke:var(--ink);stroke-width:1.5}
-  #road-car .car-hub{fill:var(--ink)}
+  /* Hunter's line: one smooth wave. Ahead of the car it is a thin dim
+     grey line (1px); behind the car it is amber, only slightly thicker. */
+  #road-svg path{fill:none;stroke:var(--muted);stroke-width:1}
+  #road-line-progress{fill:none;stroke:var(--accent);stroke-width:2.5;stroke-linecap:round}
+  /* nodes sit on the wave: hollow until the car passes, then solid amber */
+  #road-nodes circle{fill:var(--ground);stroke:var(--muted);stroke-width:1.5}
+  #road-nodes circle.done{fill:var(--accent);stroke:var(--accent)}
+  #road-nodes text{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.08em;fill:var(--muted)}
+  #road-nodes line{stroke:var(--line);stroke-width:1}
+  /* top-down car, like Hunter's: white body, ink outline, two dark windows */
+  #road-car .car-body{fill:#fff;stroke:var(--ink);stroke-width:1.5}
+  #road-car .car-window{fill:var(--ink)}
 
   [data-theme="dark"] .era-scene img,[data-theme="dark"] .cutouts img{filter:brightness(.88)}
   .era-label{position:absolute;left:7vw;bottom:calc(34vh + 14px);font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);z-index:2}
@@ -106,18 +110,15 @@
     header .brand{font-size:12px}
     header nav{display:none}
     .head-resume{display:inline-block;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
-    /* era dots sit on the curvy road, one per stop.
-       The dot fills amber on the era in view (JS .active class). */
-    .panel.era::before,.panel.intro::before,.panel.contact::before{content:"";position:absolute;left:7px;top:68px;width:10px;height:10px;border-radius:50%;background:var(--ground);border:2px solid var(--ink);z-index:2}
-    .panel.intro::before{top:76px}
-    .panel.era.active::before,.panel.contact::before{background:var(--accent)}
+    /* nodes now live on the SVG line itself, so no CSS dots on the panels */
+    #road-nodes text{display:none}
     #road-sticky{position:relative;height:auto;overflow:visible}
     #road-track{flex-direction:column;width:auto;transform:none !important}
     #road-bg{display:none}
     /* phone: the SVG is the vertical road, a thin curvy line down the left */
     #road-svg{display:block;position:absolute;left:0;top:0;width:48px;height:100%;z-index:1;pointer-events:none;overflow:visible}
-    #road-svg path{stroke-width:2}
-    #road-line-progress{stroke-width:3.5}
+    #road-svg path{stroke-width:1}
+    #road-line-progress{stroke-width:2.5}
     /* flex-basis fix: desktop .panel is flex:0 0 100vw, which in a column
        flex container means a 390px-tall panel. Content taller than that
        overflowed into the next panel, so each scene image sat under the
@@ -164,16 +165,13 @@
   <div id="road-sticky">
     <div id="road-bg"></div>
     <svg id="road-svg" aria-hidden="true">
-      <path id="road-line-dots" class="dots" d=""/>
       <path id="road-line" d=""/>
       <path id="road-line-progress" d=""/>
+      <g id="road-nodes"></g>
       <g id="road-car">
-        <path class="car-body" d="M-22 3 L-21 -5 Q-20 -7 -18 -7 L-13 -7 L-9 -13 Q-8 -15 -5 -15 L3 -15 Q6 -15 8 -12 L13 -7 L20 -6 Q22 -5 22 -2 L22 3 Z"/>
-        <path class="car-window" d="M-7 -7 L-4 -13 L2 -13 L5 -7 Z"/>
-        <circle class="car-wheel" cx="-12" cy="4" r="4.5"/>
-        <circle class="car-wheel" cx="12" cy="4" r="4.5"/>
-        <circle class="car-hub" cx="-12" cy="4" r="1.6"/>
-        <circle class="car-hub" cx="12" cy="4" r="1.6"/>
+        <rect class="car-body" x="-15" y="-7" width="30" height="14" rx="7"/>
+        <rect class="car-window" x="-6" y="-5" width="7" height="10" rx="1.5"/>
+        <rect class="car-window" x="3" y="-5" width="7" height="10" rx="1.5"/>
       </g>
     </svg>
     <div id="road-track">
@@ -338,9 +336,47 @@
   var track = document.getElementById('road-track');
   var svg = document.getElementById('road-svg');
   var line = document.getElementById('road-line');
-  var dots = document.getElementById('road-line-dots');
   var progressLine = document.getElementById('road-line-progress');
+  var nodesG = document.getElementById('road-nodes');
   var car = document.getElementById('road-car');
+  var nodePts = [];
+  var ERA_YEARS = ['2003', '2014', '2018', '2020', '2022', '2025', '2026'];
+  var NS = 'http://www.w3.org/2000/svg';
+
+  function buildNodes(pts, H){
+    /* one node per era, on the wave, with its start year above it
+       (desktop only; on phone the date pill in each era already says it).
+       A faint hairline drops from each node, Hunter-style. */
+    nodesG.innerHTML = '';
+    nodePts = [];
+    eras.forEach(function(e, i){
+      var pt = pts[i + 1]; /* eras are panels 1..7, intro is panel 0 */
+      if (!pt) return;
+      var g = document.createElementNS(NS, 'g');
+      if (!isPhone()){
+        var tick = document.createElementNS(NS, 'line');
+        tick.setAttribute('x1', pt[0]); tick.setAttribute('y1', pt[1] + 8);
+        tick.setAttribute('x2', pt[0]); tick.setAttribute('y2', H);
+        g.appendChild(tick);
+        var lbl = document.createElementNS(NS, 'text');
+        lbl.setAttribute('x', pt[0] + 10); lbl.setAttribute('y', pt[1] - 10);
+        lbl.textContent = ERA_YEARS[i];
+        g.appendChild(lbl);
+      }
+      var c = document.createElementNS(NS, 'circle');
+      c.setAttribute('cx', pt[0]); c.setAttribute('cy', pt[1]); c.setAttribute('r', 5);
+      g.appendChild(c);
+      nodesG.appendChild(g);
+      nodePts.push({x: pt[0], y: pt[1], el: c});
+    });
+  }
+
+  function fillNodes(pt){
+    nodePts.forEach(function(n){
+      var done = isPhone() ? pt.y >= n.y - 1 : pt.x >= n.x - 1;
+      n.el.setAttribute('class', done ? 'done' : '');
+    });
+  }
   var progress = document.getElementById('progress');
   var bg = document.getElementById('road-bg');
   var panels = Array.prototype.slice.call(document.querySelectorAll('.panel'));
@@ -366,8 +402,8 @@
     var pt = line.getPointAtLength(d);
     var pt2 = line.getPointAtLength(Math.min(pathLen, d + 1));
     var angle = Math.atan2(pt2.y - pt.y, pt2.x - pt.x) * 180 / Math.PI;
-    var s = isPhone() ? 0.65 : 1;
-    car.setAttribute('transform', 'translate(' + pt.x.toFixed(1) + ' ' + pt.y.toFixed(1) + ') rotate(' + angle.toFixed(1) + ') scale(' + s + ')');
+    car.setAttribute('transform', 'translate(' + pt.x.toFixed(1) + ' ' + pt.y.toFixed(1) + ') rotate(' + angle.toFixed(1) + ')');
+    fillNodes(pt);
     if (progressLine){
       progressLine.style.strokeDasharray = pathLen;
       progressLine.style.strokeDashoffset = (pathLen * (1 - Math.max(0, Math.min(1, p)))).toFixed(1);
@@ -385,7 +421,7 @@
       if (hint) hint.lastChild.textContent = ' Scroll down';
       /* vertical road: one point per panel centre, x weaving slightly */
       var H = track.offsetHeight;
-      var xs = [20, 16, 22, 16, 21, 17, 22, 16, 20];
+      var xs = [20, 16, 24, 16, 23, 17, 24, 16, 20];
       svg.setAttribute('width', 48);
       svg.setAttribute('height', H);
       svg.setAttribute('viewBox', '0 0 48 ' + H);
@@ -395,11 +431,9 @@
       });
       var d = smoothPath(pts);
       line.setAttribute('d', d);
-      dots.setAttribute('d', d);
       progressLine.setAttribute('d', d);
       pathLen = line.getTotalLength();
-      line.style.strokeDasharray = pathLen;
-      dots.style.strokeDasharray = '2 7';
+      buildNodes(pts, H);
       updatePhone();
       return;
     }
@@ -417,16 +451,16 @@
     // one point per panel centre, y undulating like a mountain
     var pts = panels.map(function(p, i){
       var cx = p.offsetLeft + p.offsetWidth / 2;
-      var wave = [0.62, 0.30, 0.58, 0.24, 0.55, 0.30, 0.58, 0.26, 0.50][i] || 0.5;
+      /* Hunter's wave: gentle sine, about 40-50px total, peak / trough /
+         peak / trough, rising to Now, then a flat tail to the right. */
+      var wave = [0.50, 0.43, 0.57, 0.44, 0.56, 0.45, 0.57, 0.46, 0.50][i] || 0.5;
       return [cx, H * wave];
     });
     var d = smoothPath(pts);
     line.setAttribute('d', d);
-    dots.setAttribute('d', d);
     progressLine.setAttribute('d', d);
     pathLen = line.getTotalLength();
-    line.style.strokeDasharray = pathLen;
-    dots.style.strokeDasharray = '2 7';
+    buildNodes(pts, H);
     placeCar(0);
     update();
   }
