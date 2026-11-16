@@ -183,9 +183,9 @@ html[data-theme="dark"] .bx{box-shadow:0 0 0 1px rgba(255,255,255,.12),0 10px 24
 .lk{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--ink2);margin-left:4px}
 .lk i{width:14px;height:14px;border-radius:50%;display:inline-block;box-shadow:0 0 0 1.5px var(--ring)}
 .zoom{pointer-events:auto;display:flex;align-items:center;gap:2px;padding:4px;border-radius:999px;background:var(--glass);border:1px solid var(--glass-line);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);flex:none}
-.zoom button{width:34px;height:34px;border-radius:50%;border:0;background:none;cursor:pointer;display:grid;place-items:center}
-.zoom button:hover{background:var(--surface2)}
-.zoom button:disabled{opacity:.35;cursor:default;background:none}
+.zoom>button{width:34px;height:34px;border-radius:50%;border:0;background:none;cursor:pointer;display:grid;place-items:center}
+.zoom>button:hover{background:var(--surface2)}
+.zoom>button:disabled{opacity:.35;cursor:default;background:none}
 .zoom output{min-width:96px;text-align:center;font-size:12px;font-weight:700;color:var(--ink2)}
 
 /* the role box that takes over the page: one template for every role */
@@ -433,6 +433,80 @@ html[data-theme="dark"] ::-webkit-scrollbar-thumb:hover{background:rgba(255,255,
   .links .cur{display:none}
   .pill.brand{font-size:0;gap:0;padding-right:4px}
 }
+/* v39: capability lenses, domain tags, outcomes, company boxes over their roles, zoom notches, calmer detail pages */
+.lenses{pointer-events:auto;display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:12px 0 0}
+.lens{display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 13px 0 11px;border-radius:999px;border:1px solid var(--glass-line);background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);font:700 12.5px var(--font);color:var(--ink2);cursor:pointer;white-space:nowrap;transition:background .15s,color .15s,box-shadow .15s}
+.lens:hover{color:var(--ink);box-shadow:0 0 0 1px var(--ink2) inset}
+.lens.on{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.lens .sw{display:inline-flex;gap:2px}.lens .sw i{width:10px;height:10px;border-radius:3px;box-shadow:0 0 0 1px rgba(255,255,255,.5)}
+.lens svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
+.lens-lt{font-size:9.5px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-right:4px}
+#hint b{color:var(--ink)}
+.bx.lens-off{opacity:.16;filter:grayscale(.7)}
+.bx.lens-on{box-shadow:0 0 0 2px var(--ink),0 14px 28px -10px rgba(10,16,28,.55)}
+html[data-theme="dark"] .bx.lens-on{box-shadow:0 0 0 2px #fff,0 14px 28px -10px rgba(0,0,0,.7)}
+.bx-d{display:none;font-size:10.5px;font-weight:600;line-height:1.22;opacity:.9;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+.bx-d::before{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.75;margin:0 5px 1px 0;vertical-align:middle}
+.z-m .bx-d,.z-s.roomy .bx-d{display:-webkit-box}
+.z-s .bx-d{font-size:10px}
+.bx-tags{display:none;flex-wrap:wrap;gap:4px;margin:1px 0 0;padding:0;list-style:none}
+.bx-tags li{font-size:11px;font-weight:700;line-height:1;padding:4px 8px;border-radius:999px;background:rgba(255,255,255,.17);box-shadow:inset 0 0 0 1px rgba(255,255,255,.22);white-space:nowrap}
+.z-l .bx-tags,.z-xl .bx-tags{display:flex}
+.bx-o{display:none;font-size:13px;font-weight:700;line-height:1.3;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+.bx-o::before{content:"→ ";opacity:.8}
+.z-l .bx-o,.z-xl .bx-o{display:-webkit-box}
+.z-l .bx-sum{display:none!important}
+.lg-chip{justify-content:center}
+.br-l{display:flex;align-items:center;gap:6px}
+.br-fl{flex:none;width:16px;height:16px;line-height:0}
+.br-fl .rf{box-shadow:0 0 0 1.5px var(--ring),0 2px 5px rgba(0,0,0,.2)}
+.lk i.lk-img{overflow:hidden;line-height:0}.lk i.lk-img img{width:100%;height:100%;object-fit:cover}
+.zseg{display:flex;align-items:center;gap:2px}
+.zseg button{height:30px;padding:0 11px;border:0;border-radius:999px;background:none;cursor:pointer;font:700 12px var(--font);color:var(--ink2);white-space:nowrap;display:flex;align-items:center;gap:6px}
+.zseg button:hover{background:var(--surface2);color:var(--ink)}
+.zseg button.on{background:var(--ink);color:var(--surface)}
+.zseg button::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.5}
+.zseg button.on::before{opacity:1}
+#zlabel{display:none}
+@media (max-width:1279px){
+  .zseg{gap:0;padding:0 4px}
+  .zseg button{width:22px;padding:0;justify-content:center;background:none!important}
+  .zseg button span{display:none}
+  .zseg button::before{width:8px;height:8px;opacity:.35;background:var(--ink)}
+  .zseg button.on::before{width:12px;height:12px;opacity:1}
+  #zlabel{display:block;min-width:84px}
+}
+/* detail pages: whitespace and thin rules instead of boxes */
+.kpis{gap:0 28px}
+.kpi{background:none;border:0;border-top:1px solid var(--line);border-radius:0;padding:14px 0 6px}
+.viz{gap:28px 32px}
+.card{border:0;border-radius:0;padding:0;background:none}
+.stories{gap:0 28px}
+.story{border:0;border-top:1px solid var(--line);border-radius:0;background:none;padding:16px 0 8px}
+.m-more{border:0;border-top:1px solid var(--line);border-radius:0;padding:14px 0 0}
+.m-h{margin-top:30px}
+/* the header stays in view: a compact copy pins to the top while the page scrolls */
+.m-stick{position:sticky;top:0;height:0;z-index:5}
+.m-sbar{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;gap:14px;padding:12px 76px 12px 30px;background:linear-gradient(180deg,var(--acc-soft),var(--surface));border-bottom:1px solid var(--line);box-shadow:0 10px 24px -18px rgba(0,0,0,.45);opacity:0;visibility:hidden;transform:translateY(-10px);transition:opacity .18s ease,transform .18s ease,visibility 0s linear .18s}
+.m-sbar::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:var(--acc)}
+.sheet.stuck .m-sbar{opacity:1;visibility:visible;transform:none;transition:opacity .18s ease,transform .18s ease,visibility 0s}
+.m-sbar .tile{height:44px;min-width:44px;max-width:110px;padding:5px 9px;border-radius:11px}
+.m-sbar .tile img{max-height:32px;max-width:90px}
+.m-sbar .tile.flag{width:40px;height:40px;padding:0}.m-sbar .tile.flag img{width:40px;height:40px}
+.m-sbar .tile.mono{font-size:14px}
+.m-sbar div{min-width:0}
+.m-sbar .eyebrow{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m-sbar b{display:block;font-size:17px;font-weight:800;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m-sbar .m-x{top:50%;right:16px;transform:translateY(-50%);width:34px;height:34px;font-size:18px}
+@media (max-width:767px){
+  .lenses{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:8px -14px 0;padding:0 14px 2px}
+  .lenses::-webkit-scrollbar{display:none}
+  .lens{height:30px;font-size:12px;padding:0 11px 0 9px}
+  .lens-lt{display:none}
+  .m-sbar{padding:10px 60px 10px 18px;gap:10px}.m-sbar b{font-size:15px}.m-sbar .tile{height:36px;min-width:36px;max-width:80px}.m-sbar .tile img{max-height:26px;max-width:66px}
+  .m-sbar .m-x{right:12px}
+}
+@media (max-width:600px){.legend{display:none}.dock{justify-content:flex-end}}
 </style>
 </head>
 <body>
@@ -455,20 +529,20 @@ html[data-theme="dark"] ::-webkit-scrollbar-thumb:hover{background:rgba(255,255,
   </nav>
 </header>
 
-<div class="intro" id="intro"><h1>Career, 2003 to now</h1><p id="hint">Drag or scroll to move. Pinch or use + and − to zoom. Click any role.</p></div>
+<div class="intro" id="intro"><h1>Career, 2003 to now</h1><p id="hint">Drag or scroll to move. Pinch or use + and − to zoom. Click any role.</p>
+  <div class="lenses" id="lenses" role="group" aria-label="Highlight roles by capability"></div></div>
 
 <main class="stage" id="stage" tabindex="0" aria-label="Career timeline. Use the arrow keys to move and plus or minus to zoom.">
   <div id="layer"></div>
 </main>
 
 <footer class="dock" id="dock">
-  <div class="legend" aria-label="Focus areas">
-    <span class="lt">Focus areas</span>
-    <span class="li f-product">Product</span><span class="li f-cx">CX</span><span class="li f-field">Field / Sales / Ops</span><span class="li f-digital">Software &amp; Digital</span><span class="li f-eng">Engineering</span>
-    <span class="lk"><i style="background:var(--cap-bg)"></i>Degree</span><span class="lk"><i style="background:linear-gradient(#c8384a 50%,#2b4c8c 50%)"></i>Country project (below the line)</span><span class="lk"><i class="lk-box"></i>Based abroad (flag on a role)</span>
+  <div class="legend" aria-label="Key">
+    <span class="lk"><i style="background:var(--cap-bg)"></i>Degree</span><span class="lk"><i class="lk-img"><img src="../assets/flags/ec.svg" alt=""></i>Country project (below the line)</span><span class="lk"><i class="lk-img"><img src="../assets/flags/mx.svg" alt=""></i>International assignment (flag on its bracket)</span>
   </div>
   <div class="zoom" role="group" aria-label="Zoom">
     <button type="button" id="zout" aria-label="Zoom out"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+    <div class="zseg" id="zseg"></div>
     <output id="zlabel" aria-live="polite">Whole career</output>
     <button type="button" id="zin" aria-label="Zoom in"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg></button>
   </div>
@@ -485,7 +559,9 @@ html[data-theme="dark"] ::-webkit-scrollbar-thumb:hover{background:rgba(255,255,
 
 <script src="../content/road-content.js?v=37"></script>
 <script type="module">
-import { flagURL, COUNTRY } from '../road/marks.js';
+import { COUNTRY } from '../road/marks.js';
+/* v39: sharp SVG flags (flag-icons, MIT) instead of small canvas drawings */
+const flagURL = c => '../assets/flags/' + String(c).toLowerCase() + '.svg';
 
 const R = window.ROAD_CONTENT;
 const STOP = Object.assign(Object.fromEntries(R.stops.map(s => [s.id, s])), R.roles || {});
@@ -560,10 +636,10 @@ const CHAPTERS = [
   { id: 'ch-program', tier: 2, a: 'traverse', b: 'mexico', t: 'Leadership development program', short: 'Leadership program', years: '2014–2017', acc: 'var(--f-cx)', cls: 'gmp',
     text: "GM's leadership development program: three rotations, from Chevrolet product marketing and global customer experience in Detroit to an international assignment in Mexico.",
     ids: ['traverse', 'customer-experience', 'mexico'] },
-  { id: 'ch-mexico', tier: 3, a: 'mexico', b: 'mexico', t: 'International assignment #1 · Mexico', short: 'Intl #1 · Mexico', years: '2016', acc: 'var(--f-digital)', cls: 'intl',
+  { id: 'ch-mexico', tier: 3, a: 'mexico', b: 'mexico', t: 'International assignment #1 · Mexico', short: 'Intl #1 · Mexico · 6 months', years: '2016 · 6 months', flag: 'MX', acc: 'var(--f-digital)', cls: 'intl',
     text: "An international assignment to GM de Mexico in Mexico City as Supervisor of the Business Development Center rollout, the last rotation of the leadership program.",
     ids: ['mexico'] },
-  { id: 'ch-abroad', tier: 3, a: 'shanghai', b: 'shanghai', t: 'International assignment #2 · Shanghai', short: 'Intl #2 · Shanghai', years: '2022–2025', acc: 'var(--f-digital)', cls: 'intl',
+  { id: 'ch-abroad', tier: 3, a: 'shanghai', b: 'shanghai', t: 'International assignment #2 · Shanghai', short: 'Intl #2 · Shanghai · 3 years', years: '2022–2025 · 3 years', flag: 'CN', acc: 'var(--f-digital)', cls: 'intl',
     text: "An international assignment to SAIC-GM, GM's joint venture in Shanghai, as Deputy Director of Software Strategy.",
     ids: ['shanghai'] }
 ];
@@ -580,6 +656,49 @@ const FLAG_NAME = c => c === 'GLOBE' ? 'International' : (COUNTRY[c] || c);
 const rflag = c => c === 'GLOBE' ? GLOBE_SVG : `<img alt="" src="${flagURL(c)}">`;
 const chick = c => c ? `<span class="rf" role="img" aria-label="${FLAG_NAME(c)}" title="${FLAG_NAME(c)}">${rflag(c)}</span>` : '';
 
+/* v39: what each role was about, in a recruiter's words, and one outcome per role, all from the role text above */
+const TAGS = {
+  'fm-coop': ['Product engineering', 'DFMEA and validation'],
+  'federal-mogul': ['Product engineering', 'Value engineering'],
+  chrysler: ['Design release', 'Global supply strategy'],
+  'johnson-controls': ['Program leadership', 'Customer launches'],
+  traverse: ['Vehicle product marketing', 'Pricing and content'],
+  'customer-experience': ['Customer experience', 'Global brand strategy'],
+  mexico: ['Dealer sales operations', 'National rollout'],
+  equinox: ['Global product management', 'Pricing and content'],
+  'trailblazer-encore': ['Vehicle product management', 'New vehicle launch'],
+  connected: ['Connected services', 'Software monetization'],
+  shanghai: ['Software strategy', 'Driver assist and cockpit'],
+  onstar: ['Software product marketing', 'Global launch']
+};
+const OUT = {
+  'fm-coop': 'Helped finish the 5.7L HEMI gaskets',
+  'federal-mogul': '$3M a year in value engineering savings',
+  chrysler: '$700k a year saved with a global supply strategy',
+  'johnson-controls': 'Launched ahead of schedule, 2.2% saved per seat',
+  traverse: 'Consideration up 6% at launch',
+  'customer-experience': 'Global dealer culture program with the Disney Institute',
+  mexico: '70% of GM Mexico dealers trained in six months',
+  equinox: 'Supported $200 per-vehicle profit improvements',
+  'trailblazer-encore': 'Two launches kept moving through the COVID supply crisis',
+  connected: 'Super Cruise monetization across every GM brand',
+  shanghai: 'Research and pitch supported a nine-figure driver-assist investment',
+  onstar: 'OnStar planned for 8 export regions'
+};
+const LI = { globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/>',
+  users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.3c2.1.7 3.5 2.6 3.5 5.7"/>',
+  spark: '<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/>' };
+const LENSES = [
+  { id: 'product-marketing', n: 'Product marketing', sw: ['product', 'digital'], d: 'vehicle and software', ids: ['traverse', 'equinox', 'trailblazer-encore', 'connected', 'onstar'] },
+  { id: 'software', n: 'Software & connected', sw: ['digital'], ids: ['connected', 'shanghai', 'onstar'] },
+  { id: 'customer', n: 'Customer & dealer', sw: ['cx', 'field'], ids: ['customer-experience', 'mexico'] },
+  { id: 'global', n: 'Global & JV', icon: 'globe', ids: ['customer-experience', 'mexico', 'equinox', 'trailblazer-encore', 'shanghai', 'onstar'] },
+  { id: 'leadership', n: 'Leadership & influence', icon: 'users', ids: ['chrysler', 'johnson-controls', 'mexico', 'equinox', 'connected', 'shanghai', 'onstar'] },
+  { id: 'innovation', n: 'AI & innovation', icon: 'spark', roles: 1, ids: ['federal-mogul', 'customer-experience', 'trailblazer-encore', 'shanghai', 'onstar'] },
+  { id: 'engineering', n: 'Engineering', sw: ['eng'], d: 'co-op included', ids: ['fm-coop', 'federal-mogul', 'chrysler', 'johnson-controls'] }
+];
+const LENS = Object.fromEntries(LENSES.map(l => [l.id, l]));
+
 /* ---------- build the elements once ---------- */
 const layer = $('#layer'), stage = $('#stage');
 const mk = (tag, cls, html, attrs) => { const n = document.createElement(tag); if (cls) n.className = cls; if (html != null) n.innerHTML = html; if (attrs) for (const k in attrs) n.setAttribute(k, attrs[k]); layer.appendChild(n); return n; };
@@ -592,19 +711,21 @@ const zoneUp = mk('span', 'zone', 'Domestic experience'), zoneDn = mk('span', 'z
 /* v33: soft hyphens let long words in narrow boxes break at a syllable instead of being clipped */
 const SHY = { Engineering: 'Engi&shy;neering', Engineer: 'Engi&shy;neer', Manager: 'Man&shy;ager', Supervisor: 'Super&shy;visor', Strategy: 'Strat&shy;egy', Marketing: 'Market&shy;ing', Director: 'Direc&shy;tor', Product: 'Prod&shy;uct', Release: 'Re&shy;lease', Business: 'Busi&shy;ness', Global: 'Glo&shy;bal', Rollout: 'Roll&shy;out' };
 const shy = t => t.replace(/[A-Za-z]+/g, w => SHY[w] || w);
-const brEls = CHAPTERS.map(c => mk('a', 'br t' + c.tier + (c.cls ? ' ' + c.cls : ''), `<span class="br-l"><span class="f">${esc(c.t)} <i>· ${esc(c.years)}</i></span><span class="s">${esc(c.short)}</span></span>`, { href: '#' + c.id, 'data-open': c.id, 'aria-label': `${c.t}, ${c.years}` }));
-const lgEls = EMP.map(e => mk('span', 'lg-chip' + (e.span ? ' span' : ''),
+const brEls = CHAPTERS.map(c => mk('a', 'br t' + c.tier + (c.cls ? ' ' + c.cls : ''), `<span class="br-l">${c.flag ? `<span class="br-fl">${chick(c.flag)}</span>` : ''}<span class="f">${esc(c.t)} <i>· ${esc(c.years)}</i></span><span class="s">${esc(c.short)}</span></span>`, { href: '#' + c.id, 'data-open': c.id, 'aria-label': `${c.t}, ${c.years}` }));
+const lgEls = EMP.map(e => mk('span', 'lg-chip span',
   `<img src="../assets/road/logos/${e.n}.png" alt="" width="${Math.round(20 * e.r)}" height="20"><b>${esc(e.t)}</b>`,
   { title: e.t }));
 const bxEls = ROLES.map(s => {
   const p = PROF[s.id] || {};
   const hl = (p.hl || []).slice(0, 3).map(x => `<li>${md(x)}</li>`).join('');
-  return mk('a', `bx ${s.lane} f-${s.focus}${s.flag ? ' has-flag' : ''}`,
-    (s.flag ? `<span class="bx-flag">${chick(s.flag)}</span>` : '') +
+  const tg = TAGS[s.id] || [];
+  return mk('a', `bx ${s.lane} f-${s.focus}`,
     `<span class="bx-k">${esc(s.kicker)}</span><span class="bx-t">${esc(s.label)}</span><span class="bx-s">${shy(esc(s.short))}</span><span class="bx-g">${shy(esc(s.tag))}</span>` +
+    (tg.length ? `<span class="bx-d">${esc(tg[0])}</span><ul class="bx-tags">${tg.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : '') +
+    (OUT[s.id] ? `<span class="bx-o">${esc(OUT[s.id])}</span>` : '') +
     `<span class="bx-sum">${esc(p.summary || '')}</span><ul class="bx-hl">${hl}</ul>` +
     `<span class="bx-y"><span class="yl">${esc(s.years)}</span><span class="yc">${esc(s.years.replace(/^(\d{4})–\d{2}(\d{2})$/, '$1–$2'))}</span><span class="bx-go">Details ›</span></span>`,
-    { href: '#' + s.id, 'data-open': s.id, 'aria-label': `${s.label}, ${s.co}, ${s.kicker}, ${s.years}` });
+    { href: '#' + s.id, 'data-open': s.id, 'aria-label': `${s.label}, ${s.co}, ${s.kicker}, ${s.years}${tg.length ? '. ' + tg.join(', ') : ''}` });
 });
 const CAP = '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 4 1 9l11 5 9-4.1V16h2V9z" fill="currentColor"/><path d="M6 12.6V16c0 1.7 2.7 3 6 3s6-1.3 6-3v-3.4l-6 2.7z" fill="currentColor"/></svg>';
 const STAR = '<svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path fill="currentColor" d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 21l1.6-7L2 9.2l7.1-.6z"/></svg>';
@@ -619,7 +740,7 @@ let lgKey = '';
 function measureLabels() {
   pinEls.forEach((el, i) => { el.classList.remove('nolabel'); pinW[i] = PINS[i].kind === 'deg' ? el.offsetWidth : el.querySelector('.pin-t').offsetWidth + 7; });
   lgKey = '';
-  brEls.forEach((el, i) => { el.classList.remove('short', 'none'); const f = el.querySelector('.f').offsetWidth; el.classList.add('short'); const s = el.querySelector('.s').offsetWidth; el.classList.remove('short'); brW[i] = { f, s }; });
+  brEls.forEach((el, i) => { el.classList.remove('short', 'none'); const f = el.firstChild.offsetWidth; el.classList.add('short'); const s = el.firstChild.offsetWidth; el.classList.remove('short'); brW[i] = { f, s }; });
 }
 
 /* ---------- view state: px per unit (U) and the unit at the left margin (u0) ---------- */
@@ -640,10 +761,10 @@ const sx = u => M + (u - u0) * U;
 const MODES = ['xs', 's', 'm', 'l', 'xl'];
 function modeFor(u, hMax) {
   const bw = 2 * u - 6, a = bw < 72 ? 0 : bw < 124 ? 1 : bw < 200 ? 2 : bw < 400 ? 3 : 4;
-  const b = hMax >= 236 ? 4 : hMax >= 150 ? 3 : hMax >= 92 ? 2 : hMax >= 70 ? 1 : 0;
+  const b = hMax >= 236 ? 4 : hMax >= 176 ? 3 : hMax >= 104 ? 2 : hMax >= 70 ? 1 : 0;
   return MODES[Math.min(a, b)];
 }
-const BOX_H = { xs: 72, s: 84, m: 96, l: 156, xl: 236 };
+const BOX_H = { xs: 72, s: 108, m: 110, l: 176, xl: 236 };
 const T = (el, x, y) => { el.style.transform = `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0)`; };
 
 function render() {
@@ -655,6 +776,7 @@ function render() {
   stage.classList.toggle('narrow', 2 * U - 6 < 104);
   hBox = Math.min(mode === 'xs' && 2 * U - 6 < 50 ? 44 : BOX_H[mode], hMax);
   stage.classList.toggle('xs-low', hBox < 64);
+  stage.classList.toggle('roomy', hBox >= 100);
   const up = 28 + hBox + 164, dn = 56 + 94;
   const y0 = bandTop + Math.max(0, (avail - up - dn) / 2) + up;
   const boxTop = y0 - 28 - hBox, dnTop = y0 + 56;
@@ -704,10 +826,8 @@ function render() {
     const cw = Math.min([lgW[i] || 90, lgC[i] || 80, lgI[i] || 34][v], Math.max(0, vis));
     el.style.maxWidth = Math.max(0, vis).toFixed(1) + 'px';
     el.classList.toggle('off', vis < (lgI[i] || 34) || b - a < 20);
-    /* v38: the General Motors chip spans all of its roles */
-    if (e.span) { el.style.width = Math.max(0, vis).toFixed(1) + 'px'; T(el, lo, boxTop - 36); return; }
-    const cx = Math.max(lo + cw / 2, Math.min(hi - cw / 2, (a + b) / 2));
-    T(el, cx - cw / 2, boxTop - 36);
+    /* v39: every company box spans its own roles, edge to edge, like General Motors */
+    el.style.width = Math.max(0, vis).toFixed(1) + 'px'; T(el, lo, boxTop - 36);
   });
   const gx = Math.max(M, sx(GM_START) + 3);
   T(zoneUp, gx, boxTop - 88); T(zoneDn, gx, dnTop + hBox + 12);
@@ -762,9 +882,13 @@ function markDim(on) {
   const span = spanU();
   ROLES.forEach((s, i) => bxEls[i].classList.toggle('dim', !!on && (s.s < u0 - 0.02 || s.e > u0 + span + 0.02)));
 }
+function buildZoomSeg() {
+  $('#zseg').innerHTML = levels.map((l, i) => `<button type="button" data-z="${i}" aria-label="Zoom: ${esc(l.n)}" title="${esc(l.n)}"><span>${esc(l.n)}</span></button>`).join('');
+}
 function syncZoomUI() {
   const k = levelIndex();
   $('#zlabel').textContent = levels[k].n;
+  document.querySelectorAll('#zseg button').forEach((b, i) => { b.classList.toggle('on', i === k); b.setAttribute('aria-pressed', i === k); });
   $('#zout').disabled = k === 0; $('#zin').disabled = k === levels.length - 1;
 }
 /* in the most detailed view, drop trailing highlights that would be cut mid-line */
@@ -804,6 +928,10 @@ function zoomStep(dir) {
   stopAnim(); markDim(false);
   const k = tgtK = Math.max(0, Math.min(levels.length - 1, base + dir));
   animateTo(levels[k].U, plan(levels[k].U, W / 2), 420, settled);
+}
+function zoomTo(k) {
+  stopAnim(); markDim(false); tgtK = k;
+  animateTo(levels[k].U, plan(levels[k].U, W / 2), 460, settled);
 }
 function goTo(id) {
   stopAnim(); markDim(false);
@@ -881,6 +1009,7 @@ stage.addEventListener('gesturechange', e => { if (!gs) return; e.preventDefault
 stage.addEventListener('gestureend', e => { if (!gs) return; e.preventDefault(); const x = gs.x; gs = null; settle(x); });
 $('#zin').addEventListener('click', () => zoomStep(1));
 $('#zout').addEventListener('click', () => zoomStep(-1));
+$('#zseg').addEventListener('click', e => { const b = e.target.closest('[data-z]'); if (b) zoomTo(+b.dataset.z); });
 addEventListener('keydown', e => {
   if (!$('#modal').hidden) {
     if (e.key === 'Escape') { e.preventDefault(); closeModal(); }
@@ -1067,11 +1196,12 @@ function chartHTML(id) {
     <p class="note">${esc(c.n)}. Grey is before, colour is after.</p></div>`;
 }
 
+const stickHTML = (tile, eyebrow, title) => `<div class="m-stick"><div class="m-sbar">${tile}<div><p class="eyebrow">${eyebrow}</p><b>${esc(title)}</b></div><button class="m-x" type="button" data-close aria-label="Close" tabindex="-1">×</button></div></div>`;
 function roleHTML(id) {
   const s = STOP[id] || {}, p = PROF[id] || {}, e = ERA[s.era];
   const flags = (s.flags || []).map(([c, when, what, cities]) => `<li class="chip" title="${esc(what || '')}"><img src="${flagURL(c)}" alt="">${esc(COUNTRY[c] || c)} · ${esc(when)}</li>`).join('');
   const chips = [s.place && `<li class="chip">${ico('pin')}${esc(s.place)}</li>`, s.span && `<li class="chip">${ico('cal')}${esc(s.span)}</li>`,
-    `<li class="chip"><i></i>${esc(focusName(id))}</li>`, e && `<li class="chip">${ico('target')}Chapter ${e.n} · ${esc(e.short || e.label)}</li>`].filter(Boolean).join('') + flags;
+    ...(TAGS[id] || [`<i></i>${esc(focusName(id))}`]).map(t => TAGS[id] ? `<li class="chip">${ico('tag')}${esc(t)}</li>` : `<li class="chip">${t}</li>`), e && `<li class="chip">${ico('target')}Chapter ${e.n} · ${esc(e.short || e.label)}</li>`].filter(Boolean).join('') + flags;
   const stories = (s.callouts || []).map((c, k) => { const [t, lede] = splitCallout(c.text); const body = (p.stories && p.stories[k]) || lede;
     return `<li class="story"><span class="badge">${ico(pick(t) !== 'check' ? pick(t) : pick(body))}</span><div><b><small>${LET(k)}</small>${esc(t)}</b><p>${esc(body)}</p>${marksHTML(p, k)}</div></li>`; }).join('');
   const work = (WORK[id] || []).map(x => `<a class="btn" href="${esc(x.href.replace(/^work\//, ''))}" title="${esc(x.text)} (synthetic data)">${ico('ext')}${esc(x.pill === 'Kit' ? 'Everyday kit' : 'Live demo: ' + x.title)}</a>`).join('');
@@ -1079,7 +1209,7 @@ function roleHTML(id) {
   const i = ORDER.indexOf(id), pv = ORDER[i - 1], nx = ORDER[i + 1];
   const chart = chartHTML(id), map = PLACES[id] ? mapHTML(PLACES[id], id === 'onstar' ? '8 export regions' : '', !chart) : '';
   const arc = arcHTML([id], innerWidth < 600 ? 'Tap a bar to open it' : '', innerWidth < 600 ? 480 : AW);
-  return `${X_BTN}<header class="m-top"><div class="m-hgrid">${tileHTML(id)}<div>
+  return `${stickHTML(tileHTML(id), `${esc(p.company || s.title)}${p.group ? ' · ' + esc(p.group) : ''}`, s.role || s.title)}${X_BTN}<header class="m-top"><div class="m-hgrid">${tileHTML(id)}<div>
       <p class="eyebrow">${esc(p.company || s.title)}${p.group ? ' · ' + esc(p.group) : ''}</p>
       <h2 class="m-role" id="m-title">${esc(s.role || s.title)}</h2>
       <ul class="chips">${chips}</ul></div></div>
@@ -1099,7 +1229,7 @@ function roleRow(id) {
 const FLAG_PLACES = { 'flag-CA-2012': [DET, ['Victoria, BC', 48.43, -123.37]], EC: [DET, ['Quito', -0.18, -78.47], ['Guayaquil', -2.17, -79.92]], CA: [DET, ['Canada', 45.42, -75.7]], CN: [DET, ['China', 31.23, 121.47]], KR: [DET, ['Korea', 37.0, 127.5]] };
 function flagHTML(pn) {
   const r = STOP[pn.role] || {};
-  return `${X_BTN}<header class="m-top"><div class="m-hgrid"><div class="tile flag"><img src="${flagURL(pn.c)}" alt=""></div><div>
+  return `${stickHTML(`<div class="tile flag"><img src="${flagURL(pn.c)}" alt=""></div>`, 'Country project · ' + esc(pn.sub), pn.t)}${X_BTN}<header class="m-top"><div class="m-hgrid"><div class="tile flag"><img src="${flagURL(pn.c)}" alt=""></div><div>
       <p class="eyebrow">Country project · ${esc(pn.sub)}</p><h2 class="m-role" id="m-title">${esc(pn.t)}</h2></div></div></header>
     <div class="m-body"><p class="m-sum">${esc(pn.text)}</p>
       <div class="viz" style="grid-template-columns:1fr;margin-top:16px">${mapHTML(FLAG_PLACES[pn.id] || FLAG_PLACES[pn.c] || [DET])}</div>
@@ -1107,7 +1237,7 @@ function flagHTML(pn) {
       <div class="m-acts" style="margin-bottom:22px"><a class="btn" href="../road.html#${esc(pn.role)}" target="_top">${ico('car')}See it on the Road</a></div></div>`;
 }
 function chapterHTML(c) {
-  return `${X_BTN}<header class="m-top"><p class="eyebrow">Chapter · ${esc(c.years)}</p><h2 class="m-role" id="m-title">${esc(c.t)}</h2></header>
+  return `${stickHTML('', 'Chapter · ' + esc(c.years), c.t)}${X_BTN}<header class="m-top"><p class="eyebrow">Chapter · ${esc(c.years)}</p><h2 class="m-role" id="m-title">${esc(c.t)}</h2></header>
     <div class="m-body"><p class="m-sum">${esc(c.text)}</p>
       <div class="viz" style="grid-template-columns:1fr;margin-top:16px">${arcHTML(c.ids, 'This chapter, lit', 520)}</div>
       <p class="m-h">Roles</p><ul class="ch-list">${c.ids.map(roleRow).join('')}</ul><div style="height:22px"></div></div>`;
@@ -1118,7 +1248,8 @@ function showTip(el, x, y) { const t = el.dataset.tt, s = el.dataset.ts; tip.inn
   const r = tip.getBoundingClientRect(); tip.style.left = Math.min(innerWidth - r.width - 8, Math.max(8, x - r.width / 2)) + 'px'; tip.style.top = Math.max(8, y - r.height - 14) + 'px'; }
 $('#sheet').addEventListener('pointermove', e => { const el = e.target.closest('[data-tt]'); if (el && e.pointerType !== 'touch') showTip(el, e.clientX, e.clientY); else tip.classList.remove('on'); });
 $('#sheet').addEventListener('pointerleave', () => tip.classList.remove('on'));
-$('#sheet').addEventListener('scroll', () => tip.classList.remove('on'), { passive: true });
+$('#sheet').addEventListener('scroll', () => { tip.classList.remove('on'); syncStick(); }, { passive: true });
+function syncStick() { const sh = $('#sheet'), top = sh.querySelector('.m-top'); if (!top) return; const on = sh.scrollTop > top.offsetHeight - 30; if (on !== sh.classList.contains('stuck')) { sh.classList.toggle('stuck', on); const x = sh.querySelector('.m-sbar .m-x'); if (x) x.tabIndex = on ? 0 : -1; } }
 $('#sheet').addEventListener('pointerover', e => { const el = e.target.closest('[data-pt]'); const card = e.target.closest('.card'); if (!card) return;
   card.querySelectorAll('.hot').forEach(n => n.classList.remove('hot')); if (el) card.querySelectorAll(`[data-pt="${el.dataset.pt}"]`).forEach(n => n.classList.add('hot')); });
 function animateCharts() { requestAnimationFrame(() => requestAnimationFrame(() => document.querySelectorAll('#sheet .gauge-arc').forEach(a => a.style.strokeDashoffset = a.dataset.to))); }
@@ -1132,7 +1263,7 @@ function openModal(id, how) {
   else return;
   if (modal.hidden) lastFocus = document.activeElement;
   curId = id;
-  sheet.className = 'sheet' + (small ? ' sm' : '');
+  sheet.className = 'sheet' + (small ? ' sm' : '');  /* v39: also clears the pinned header */
   sheet.style.setProperty('--acc', accent);
   sheet.innerHTML = html; sheet.scrollTop = 0; tip.classList.remove('on'); animateCharts();
   sheet.style.animation = 'none'; void sheet.offsetWidth; sheet.style.animation = '';
@@ -1189,12 +1320,31 @@ $('#theme').addEventListener('click', () => {
   try { const p = JSON.parse(localStorage.getItem('mf-site-prefs-v6') || '{}'); p.dark = dark; localStorage.setItem('mf-site-prefs-v6', JSON.stringify(p)); } catch (e) {}
 });
 
+/* ---------- v39: capability lenses ---------- */
+const HINT0 = $('#hint').textContent;
+const lensYears = l => { const y = l.ids.reduce((a, id) => a + (SLOT[id] ? SLOT[id].to - SLOT[id].from : 0), 0); return Math.round(y * 2) / 2; };
+$('#lenses').innerHTML = '<span class="lens-lt">Highlight</span><button type="button" class="lens on" data-lens="" aria-pressed="true">All roles</button>' + LENSES.map(l =>
+  `<button type="button" class="lens" data-lens="${l.id}" aria-pressed="false">${l.sw ? `<span class="sw" aria-hidden="true">${l.sw.map(f => `<i style="background:var(--f-${f})"></i>`).join('')}</span>` : `<svg viewBox="0 0 24 24" aria-hidden="true">${LI[l.icon]}</svg>`}${esc(l.n)}</button>`).join('');
+let lens = '';
+function setLens(id, push) {
+  const l = LENS[id] || null; lens = l ? id : '';
+  document.querySelectorAll('#lenses .lens').forEach(b => { const on = b.dataset.lens === lens; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
+  ROLES.forEach((s, i) => { const inL = !!l && l.ids.includes(s.id); bxEls[i].classList.toggle('lens-off', !!l && !inL); bxEls[i].classList.toggle('lens-on', inL); });
+  const h = $('#hint');
+  if (!l) h.textContent = touchy ? 'Flick to move. Pinch to zoom. Tap any role.' : HINT0;
+  else { const y = lensYears(l), n = l.ids.length;
+    h.innerHTML = `<b>${esc(l.n)}</b> · ${l.roles ? `${n} roles` : `about ${String(y).replace('.5', '½')} years across ${n} roles`}${l.d ? ', ' + esc(l.d) : ''}. ${touchy ? 'Tap' : 'Click'} any role.`; }
+  if (push !== false) { const u = new URL(location.href); if (lens) u.searchParams.set('lens', lens); else u.searchParams.delete('lens'); history.replaceState(history.state, '', u.pathname + u.search + u.hash); }
+}
+$('#lenses').addEventListener('click', e => { const b = e.target.closest('[data-lens]'); if (b) setLens(b.dataset.lens === lens ? '' : b.dataset.lens); });
+{ const q = new URLSearchParams(location.search).get('lens'); if (q && LENS[q]) setLens(q, false); }
+
 /* ---------- start ---------- */
-if (touchy) $('#hint').textContent = 'Flick to move. Pinch to zoom. Tap any role.';
-measure(); measureLabels(); U = levels[0].U; u0 = candidates()[0]; render(); settled();
+if (touchy && !lens) $('#hint').textContent = 'Flick to move. Pinch to zoom. Tap any role.';
+measure(); buildZoomSeg(); measureLabels(); U = levels[0].U; u0 = candidates()[0]; render(); settled();
 let rt = 0;
 addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => {
-  const k = levelIndex(), mid = u0 + spanU() / 2; measure(); U = levels[Math.min(k, levels.length - 1)].U; u0 = nearest(mid - spanU() / 2); render(); settled(); }, 120); });
+  const k = levelIndex(), mid = u0 + spanU() / 2; measure(); buildZoomSeg(); U = levels[Math.min(k, levels.length - 1)].U; u0 = nearest(mid - spanU() / 2); render(); settled(); }, 120); });
 if (document.fonts) document.fonts.ready.then(() => { measureLabels(); render(); });
 const h0 = location.hash.slice(1);
 if (known(h0)) openModal(h0);
