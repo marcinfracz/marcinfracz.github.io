@@ -23,7 +23,10 @@
   /* v38: fill the screen in fullscreen, Firefox included */
   video:fullscreen { width: 100vw !important; height: 100vh !important; max-width: none !important; max-height: none !important; aspect-ratio: auto !important; object-fit: contain !important; border-radius: 0 !important; background: #000 !important; }
   video:-moz-full-screen { width: 100vw !important; height: 100vh !important; max-width: none !important; max-height: none !important; aspect-ratio: auto !important; object-fit: contain !important; border-radius: 0 !important; background: #000 !important; }
-  </style>
+  
+/* v45 phone: 44px tap targets; inline links grow their tap area without moving the text */
+@media (max-width:767px){a{display:inline-block;padding:11px 0;margin:-11px 0}a.back{display:inline-flex;align-items:center;min-height:44px;margin:0}}
+</style>
 </head>
 <body>
 <main class="wrap">

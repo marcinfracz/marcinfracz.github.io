@@ -91,6 +91,9 @@ h1{margin:0;white-space:nowrap;font-size:clamp(30px,min(3.2vw,6vh),58px);line-he
 @media (max-width:760px){.dest{grid-template-columns:1fr;gap:22px}.dst{grid-template-columns:minmax(0,42%) minmax(0,1fr)}.dst .shot{aspect-ratio:16/10}}
 @media (max-width:560px){.wrap{padding-left:max(18px,env(safe-area-inset-left,0px));padding-right:max(18px,env(safe-area-inset-right,0px))}.play .btn{width:52px;height:52px}.play .btn svg{width:20px;height:20px}.play{padding:14px 16px}.play .lbl{font-size:14.5px;height:52px}.links{font-size:14px}.links li:not(:last-child)::after{margin:0 10px}}
 @media (prefers-reduced-motion:reduce){.shot,.play .btn,.dst h2 svg{transition:none}.dst:hover .shot{transform:none}}
+
+/* v45 phone: 44px tap targets; inline links grow their tap area without moving the text */
+@media (max-width:767px){.links a{display:inline-flex;align-items:center;min-height:44px}figcaption a,.foot a{display:inline-block;padding:14px 0;margin:-14px 0}}
 </style>
 </head>
 <body>
