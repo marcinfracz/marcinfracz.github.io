@@ -20,7 +20,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=22">
+<link rel="stylesheet" href="css/styles.css?v=35">
 </head>
 <body>
 <div class="wallpaper" aria-hidden="true"><img id="wallpaper-img" src="assets/wallpapers/shanghai-mist.jpg" alt=""></div>
@@ -34,6 +34,7 @@
         <button data-action="open-finder">Open Finder</button>
         <button data-action="open-about">About Marcin</button>
         <button data-action="open-work">Open Work</button>
+        <button data-action="open-brag">Open Work &amp; Tools</button>
         <button data-action="open-projects">Open Projects</button>
         <button data-action="open-notes-win">Open Notes</button>
         <button data-action="open-terminal">Open Terminal</button>
@@ -80,11 +81,17 @@
 </header>
 
 <nav class="dock-rail" id="dock-rail" aria-label="Apps">
+  <button data-href="road.html" data-dock="road" title="The Road" aria-label="The Road: career story">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20 9 4M20 20 15 4M12 6v2M12 11v2M12 16v2"/></svg>
+  </button>
   <button data-open="finder" data-dock="finder" title="Finder" aria-label="Finder">
     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg>
   </button>
   <button data-open="work" data-dock="work" title="Work" aria-label="Work">
     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+  </button>
+  <button data-brag="1" data-dock="brag" title="Work &amp; Tools" aria-label="Work and tools: four live demos">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
   </button>
   <button data-open="projects" data-dock="projects" title="Projects" aria-label="Projects">
     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
@@ -114,20 +121,27 @@
 
   <!-- Framed artwork: the centrepiece, like a print on the wall -->
   <figure class="framed-art" id="framed-art">
-    <img id="framed-art-img" src="assets/wallpapers/shanghai-mist.jpg" alt="Shanghai Lujiazui skyline in mist at dawn">
-    <figcaption class="art-chip" id="framed-art-caption">Shanghai · Lujiazui</figcaption>
+    <div class="art-frame">
+      <img id="framed-art-img" src="assets/wallpapers/shanghai-mist.jpg" alt="Shanghai Lujiazui skyline in mist at dawn">
+      <figcaption class="art-chip" id="framed-art-caption">Shanghai · Lujiazui</figcaption>
+    </div>
   </figure>
 
   <!-- Intro card -->
   <section class="window glass intro" id="window-intro" data-window="intro" data-draggable="1">
     <div class="window-bar" data-drag><span class="dot red" data-act="close"></span><span class="window-title">Welcome</span><button class="bar-btn" data-action="reset-welcome" title="Reset position" aria-label="Reset position">↻</button></div>
     <div class="window-body intro-body">
-      <img class="avatar" id="intro-photo" src="assets/profile.jpg" alt="Marcin Fracz">
+      <div class="avatar-wrap"><img class="avatar" id="intro-photo" src="assets/headshots/pro-blue-gray-avatar.jpg" alt="Marcin Fracz"><button class="photo-pick-btn" id="photo-pick-btn" type="button" hidden>Choose photo</button></div>
       <h1 id="intro-name"></h1>
       <p class="intro-title" id="intro-title"></p>
       <p class="headline" id="intro-headline"></p>
-      <div class="intro-buttons" id="intro-buttons"></div>
-      <button class="welcome-strip" data-action="open-work-showcase">Work Showcase <span>↗</span></button>
+      <div class="intro-actions">
+        <a class="ia ia-primary" href="road.html">The Road <span aria-hidden="true">→</span></a>
+        <a class="ia" href="assets/resume.pdf" target="_blank" rel="noopener">Resume</a>
+        <button class="ia" type="button" data-open="contact-win">Contact</button>
+      </div>
+      <p class="intro-road-cap">My career as one drive, from engine gaskets to AI.</p>
+      <div class="intro-links" id="intro-buttons"></div>
     </div>
   </section>
 
@@ -144,14 +158,37 @@
     <div class="weather-body" id="weather-body">Loading…</div>
   </section>
 
+
+  <!-- Career odometer -->
+  <section class="widget glass career" id="widget-career" data-widget="career" data-draggable="1">
+    <div class="widget-bar" data-drag><span class="widget-title">Career odometer</span><span class="widget-sub">20+ years</span><span class="widget-actions"><button class="bar-btn" data-widget-hide="career" title="Hide widget" aria-label="Hide widget">×</button></span></div>
+    <div class="career-body">
+      <div class="odo" aria-label="20 plus years"><span>2</span><span>0</span><span class="plus">+</span><em>years</em></div>
+      <p class="career-cos">Federal-Mogul · Chrysler Group · Johnson Controls · GM · SAIC-GM</p>
+      <p class="career-where">Worked in the US, Mexico and China</p>
+      <p class="career-adas"><i class="fan" aria-hidden="true"></i>From Super Cruise monetization across GM's North American brands to L2++ strategy in China.</p>
+      <div class="career-part" id="career-part"><b>Pentastar 3.6L head gaskets</b><span>Left and right bank, designed and tested. The engine passed 10 million built by 2019.</span></div>
+      <a class="career-road" href="road.html">Drive the road →</a>
+    </div>
+  </section>
+
+  <!-- Now building -->
+  <section class="widget glass building" id="widget-building" data-widget="building" data-draggable="1">
+    <div class="widget-bar" data-drag><span class="widget-title">Now building</span><span class="widget-sub">Marcin Hub</span><span class="widget-actions"><button class="bar-btn" data-widget-hide="building" title="Hide widget" aria-label="Hide widget">×</button></span></div>
+    <div class="building-body">
+      <div class="build-stats"><div><b>1,780</b><span>rows</span></div><div><b>217</b><span>programs</span></div><div><b>55</b><span>markets</span></div><div><b>1,800+</b><span>commits</span></div></div>
+      <ol class="build-loop" id="build-loop"><li>Brief</li><li>Plan</li><li>Approve</li><li>Build</li><li>Score</li><li>Fix</li><li>Checkpoint</li></ol>
+    </div>
+  </section>
+
   <!-- Sticky notes: each one drags on its own -->
   <div class="note yellow" id="note-motto" data-note="motto" data-draggable="1">
-    <p class="note-tag">Motto</p>
-    <p class="handwritten" id="note-motto-text"></p>
+    <p class="note-tag">Field notes</p>
+    <p class="handwritten" id="note-motto-text">Find the gap. Build the mechanism. Bring the decision.</p>
   </div>
   <div class="note pink" id="note-resume" data-note="resume" data-draggable="1">
     <p class="note-tag">Resume</p>
-    <p class="handwritten" id="note-resume-text"></p>
+    <p class="handwritten" id="note-resume-text"><a href="assets/resume.pdf">Resume (PDF)</a></p>
   </div>
   <div class="note blue" id="note-contact" data-note="contact" data-draggable="1">
     <p class="note-tag">Contact</p>
@@ -160,6 +197,18 @@
   </div>
 
 </main>
+
+<!-- Photo picker: preview only, hidden on the public site unless the address has ?pick -->
+<section class="window glass overlay-window hidden-window photo-picker" id="window-photos" data-window="photos" data-draggable="1">
+  <div class="window-bar" data-drag><span class="dot red" data-act="close"></span><span class="window-title">Choose the site photo</span></div>
+  <div class="window-body">
+    <div class="pp-layout">
+      <div class="pp-grid" id="pp-grid"></div>
+      <figure class="pp-preview"><img id="pp-big" alt=""><figcaption id="pp-cap"></figcaption></figure>
+    </div>
+    <p class="hint" id="pp-note">Your pick shows in this browser only. Tell Claude which one to make permanent.</p>
+  </div>
+</section>
 
 <!-- Overlay windows: open on demand -->
 <section class="window glass overlay-window hidden-window" id="window-about" data-window="about" data-draggable="1">
@@ -183,7 +232,7 @@
     <div class="timeline-viewport">
       <div class="timeline" id="timeline"></div>
     </div>
-    <button class="showcase-link" data-open="browser">View the full work showcase in the browser ↗</button>
+    <div class="showcase-row"><a class="showcase-link" href="work/timeline.html">Open the full timeline explorer ↗</a><a class="showcase-link" href="work/brag-book.html">See the work and tools: four live demos ↗</a><a class="showcase-link" href="road.html">Drive the Road ↗</a></div>
   </div>
 </section>
 
@@ -194,9 +243,10 @@
     <aside class="finder-side">
       <p class="finder-side-title">Favorites</p>
       <button data-finder-nav="start">Start Here</button>
-      <button data-finder-nav="projects">Projects</button>
+      <button data-finder-nav="tools">Live Demos</button>
+      <button data-finder-nav="kit">Everyday Kit</button>
       <button data-finder-nav="work">Work</button>
-      <button data-finder-nav="uses">Uses</button>
+      <button data-finder-nav="projects">Personal Builds</button>
     </aside>
     <div class="finder-main">
       <div class="finder-grid" id="finder-grid"></div>
@@ -236,19 +286,19 @@
       <label>Message<textarea name="message" rows="4" required></textarea></label>
       <button class="pill-btn" type="submit">Send</button>
     </form>
-    <p class="muted contact-alt">Prefer email? <a id="contact-email-link" href="">marcin.fracz@gmail.com</a> · <a href="https://www.linkedin.com/in/marcinfracz/" target="_blank" rel="noopener">LinkedIn</a></p>
+    <p class="muted contact-alt">Prefer email? <a id="contact-email-link" href="">Email me</a> · <a href="https://www.linkedin.com/in/marcinfracz/" target="_blank" rel="noopener">LinkedIn</a></p>
   </div>
 </section>
 
 <!-- Browser: a Safari-style window with the showcase inside -->
 <section class="window glass overlay-window browser-window hidden-window" id="window-browser" data-window="browser" data-draggable="1">
-  <div class="window-bar" data-drag><span class="dot red" data-act="close"></span><span class="dot yellow" data-act="min"></span><span class="dot green" data-act="max"></span><span class="window-title">Browser</span></div>
-  <div class="browser-tabs" id="browser-tabs"></div>
-  <div class="browser-toolbar">
+  <!-- one slim row: window dots, back/forward, tabs, open-in-tab. No address bar, so the page gets the room. -->
+  <div class="window-bar browser-bar" data-drag><span class="dot red" data-act="close"></span><span class="dot yellow" data-act="min"></span><span class="dot green" data-act="max"></span>
     <button id="browser-back" title="Back" aria-label="Back">‹</button>
     <button id="browser-forward" title="Forward" aria-label="Forward">›</button>
     <button id="browser-reload" title="Reload" aria-label="Reload">↻</button>
-    <input id="browser-url" type="text" value="" spellcheck="false" autocomplete="off" aria-label="Address">
+    <div class="browser-tabs" id="browser-tabs"></div>
+    <input id="browser-url" type="text" value="" spellcheck="false" autocomplete="off" aria-label="Address" hidden>
     <button id="browser-open-tab" title="Open in a new tab" aria-label="Open in a new tab">↗</button>
   </div>
   <div class="browser-body">
@@ -296,7 +346,7 @@
   <ul id="palette-list"></ul>
 </div>
 
-<script src="content/content.js?v=22"></script>
-<script src="js/app.js?v=22"></script>
+<script src="content/content.js?v=36"></script>
+<script src="js/app.js?v=36"></script>
 </body>
 </html>
