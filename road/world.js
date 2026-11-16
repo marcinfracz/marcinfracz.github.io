@@ -1,6 +1,7 @@
 /* The Road: terrain, road network, region-aware traffic, NPCs and the
    perception layer (radar, LiDAR, vision boxes, V2X). */
-import { cityFlat, cityRiver, cityKeepOut, cityWater } from './landmarks.js?v=41';
+import { cityFlat, cityRiver, cityKeepOut, cityWater } from './landmarks.js?v=43';
+import { buildLife } from './life.js?v=43';
 import { THREE, mat, ownMat, glowMat, reg, mesh, at, box, cyl, sph, grp, merge, bx, cy, label,
   smooth, clamp, lerp, rand, roadZ, roadDZ, tok } from './core.js';
 
@@ -114,7 +115,9 @@ export function buildWorld(scene, opts) {
   tg.computeVertexNormals();
   const tcBase = Float32Array.from(tc), tcHi = Float32Array.from(tcStrong);
   let tintZ = 0, tintTheme = '';
+  let life = null;
   function setZoomTint(z, th) {
+    if (life) life.setZoom(z);
     const gv = z < 0.05; if (gates.length && gates[0].visible !== gv) gates.forEach(g => { g.visible = gv; });
     const k = smooth(0.15, 0.85, z);
     if (th === tintTheme && Math.abs(k - tintZ) < 0.01 && !(k === 0 && tintZ !== 0) && !(k === 1 && tintZ !== 1)) return;
@@ -220,6 +223,57 @@ export function buildWorld(scene, opts) {
     }
   });
   topes.forEach(x => scene.add(at(mesh(new THREE.BoxGeometry(0.9, 0.18, HALF * 2), mat('accent'), false), x, 0.09, roadZ(x))));
+
+  /* ---------- v43: China's road markings through the Shanghai chapter ---------- */
+  const decalMats = [];
+  if (ax) {
+    const [A0, A1] = RNG.asia;
+    const cjk = (() => { try { const c = document.createElement('canvas'); c.width = c.height = 40; const q = c.getContext('2d'); const img = ch => { q.clearRect(0, 0, 40, 40); q.font = '32px sans-serif'; q.fillStyle = '#000'; q.fillText(ch, 2, 32); return q.getImageData(0, 0, 40, 40).data.join(','); }; return img('\u6162') !== img('\u516c') && img('\u6162') !== img('\uFFFF'); } catch (e) { return false; } })();
+    const decalTex = (w, h, draw) => { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t; };
+    const dMat = tex => { const m = layer(new THREE.MeshLambertMaterial({ map: tex, transparent: true, depthWrite: false }), 3); decalMats.push(m); return m; };
+    // a decal lying in a lane: along = length on the road, across = width; dir +1 reads for traffic going +x
+    const decal = (m, along, across, x, off, dir) => { const g = new THREE.PlaneGeometry(across, along); g.rotateX(-Math.PI / 2); g.rotateY(dir > 0 ? -Math.PI / 2 : Math.PI / 2); const me = new THREE.Mesh(g, m); me.position.set(x, 0.075, roadZ(x) + off); me.rotation.y = -Math.atan(roadDZ(x)); me.receiveShadow = true; me.renderOrder = 2; scene.add(me); return me; };
+    const W = '#F4F1EA', Y = '#E8B83A';
+    const txt = (str, col, fs) => dMat(decalTex(128, 384, (q, w, h) => { q.fillStyle = col; q.textAlign = 'center'; q.textBaseline = 'middle'; const n = str.length; q.font = `900 ${fs}px "Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif`; [...str].forEach((ch, i) => { q.save(); q.translate(w / 2, h * (n - i - 0.5) / n); q.scale(1, 2.6 / Math.max(1, n * 0.9)); q.fillText(ch, 0, 4); q.restore(); }); }));
+    const slowM = cjk ? txt('\u6162', W, 104) : null;           // man: slow
+    const busM = cjk ? txt('\u516c\u4ea4\u4e13\u7528', Y, 92) : null; // gongjiao zhuanyong: buses only
+    const sixtyM = dMat(decalTex(128, 384, (q, w, h) => { q.fillStyle = W; q.textAlign = 'center'; q.textBaseline = 'middle'; q.font = '900 110px Inter, Arial, sans-serif'; q.save(); q.translate(w / 2, h / 2); q.scale(1, 2.4); q.fillText('60', 0, 4); q.restore(); }));
+    const diamondM = dMat(decalTex(128, 384, (q, w, h) => { q.strokeStyle = W; q.lineWidth = 12; q.beginPath(); q.moveTo(w / 2, 14); q.lineTo(w - 16, h / 2); q.lineTo(w / 2, h - 14); q.lineTo(16, h / 2); q.closePath(); q.stroke(); }));
+    const arrowM = dMat(decalTex(128, 384, (q, w, h) => { q.fillStyle = W; // straight-and-left arrow, pointing up the texture
+      q.fillRect(w / 2 - 9, 120, 18, h - 130); q.beginPath(); q.moveTo(w / 2, 12); q.lineTo(w / 2 + 34, 120); q.lineTo(w / 2 - 34, 120); q.fill();
+      q.lineWidth = 16; q.strokeStyle = W; q.beginPath(); q.moveTo(w / 2, 300); q.quadraticCurveTo(w / 2, 220, 30, 220); q.stroke(); q.beginPath(); q.moveTo(8, 220); q.lineTo(40, 190); q.lineTo(40, 250); q.fill(); }));
+    const fishM = dMat(decalTex(128, 512, (q, w, h) => { q.strokeStyle = W; q.lineWidth = 9; for (let y = 30; y < h - 10; y += 46) { [[8, 1], [w - 8, -1]].forEach(([x0, sd]) => { q.beginPath(); q.moveTo(x0, y + 26); q.lineTo(x0 + sd * 34, y); q.stroke(); }); } q.lineWidth = 7; q.beginPath(); q.moveTo(6, 0); q.lineTo(6, h); q.moveTo(w - 6, 0); q.lineTo(w - 6, h); q.stroke(); }));
+    // approaching each crosswalk: fishbone lines, the diamond, "slow" and the lane arrows
+    signals.filter(sg => sg.cw && sg.x > A0 && sg.x < A1).forEach(sg => {
+      const X = sg.x - 2.5;
+      [[LANES.A, 1], [LANES.B, 1], [LANES.C, -1], [LANES.D, -1]].forEach(([off, dir]) => {
+        const at2 = d => X - dir * d;
+        decal(fishM, 16, 3.5, at2(32), off, dir);
+        decal(diamondM, 4.4, 2.2, at2(18), off, dir);
+        if (slowM) decal(slowM, 4.6, 2.4, at2(11.5), off, dir);
+        decal(arrowM, 5, 2.4, at2(5.5), off, dir);
+      });
+    });
+    // painted speed limits as the district begins, both ways
+    decal(sixtyM, 4.8, 2.4, A0 + 14, LANES.A, 1); decal(sixtyM, 4.8, 2.4, A0 + 14, LANES.B, 1);
+    decal(sixtyM, 4.8, 2.4, A1 - 14, LANES.C, -1); decal(sixtyM, 4.8, 2.4, A1 - 14, LANES.D, -1);
+    // the Bund side: a bus-only lane, and a yellow box junction where the side street meets the road
+    const sh = stops.find(sq => sq.id === 'shanghai' || sq.scene === 'shanghai');
+    const yM = layer(new THREE.MeshLambertMaterial({ color: Y }), 3); decalMats.push(yM); yM.userData.yellow = true;
+    const yCenter = layer(new THREE.MeshLambertMaterial({ color: Y }), 3); decalMats.push(yCenter); yCenter.userData.yellow = true;
+    [-0.22, 0.22].forEach(o => scene.add(ribbon(A0 + 4, A1 - 4, o - 0.1, o + 0.1, 0.07, yCenter)));
+    if (sh) {
+      const B0 = sh.x - 58, B1 = sh.x + 50;
+      const dg = new THREE.BoxGeometry(2.7, 0.04, 0.22), xs = []; for (let x = xMin - 40; x < xMax + 40; x += 6.5) if (x > B0 && x < B1) xs.push(x);
+      const ym = new THREE.InstancedMesh(dg, yM, xs.length * 2), o = new THREE.Object3D(); let k = 0;
+      xs.forEach(x => [-3.8, -7.4].forEach(off => { o.position.set(x, 0.075, roadZ(x) + off); o.rotation.y = -Math.atan(roadDZ(x)); o.updateMatrix(); ym.setMatrixAt(k++, o.matrix); }));
+      scene.add(ym);
+      if (busM) for (let x = B0 + 10; x < B1 - 6; x += 32) { if (Math.abs(x - (sh.x + 34)) < 9) continue; decal(busM, 7.5, 2.6, x, LANES.D, -1); }
+      const gx = sh.x + 34;
+      const boxM = dMat(decalTex(256, 512, (q, w, h) => { q.strokeStyle = Y; q.lineWidth = 10; q.strokeRect(8, 8, w - 16, h - 16); q.lineWidth = 6; q.save(); q.beginPath(); q.rect(8, 8, w - 16, h - 16); q.clip(); for (let d = -h; d < w + h; d += 46) { q.beginPath(); q.moveTo(d, 0); q.lineTo(d + h, h); q.moveTo(d + h, 0); q.lineTo(d, h); q.stroke(); } q.restore(); }));
+      decal(boxM, 9, 15, gx, 0, 1);
+    }
+  }
 
   /* ---------- scattered props (instanced) ---------- */
   const props = {
@@ -504,7 +558,7 @@ export function buildWorld(scene, opts) {
     ends.instanceMatrix.needsUpdate = mids.instanceMatrix.needsUpdate = true;
   }
 
-  /* ---------- v41: an air-ambulance helicopter circling ahead of the drive ---------- */
+  /* ---------- v43: an air-ambulance helicopter on its own random routes, never following the drive ---------- */
   const heli = (() => {
     const g = new THREE.Group();
     const body = mesh(new THREE.SphereGeometry(1.25, 14, 10), mat('obj')); body.scale.set(1.9, 1, 1); body.position.y = 0; g.add(body);
@@ -516,20 +570,46 @@ export function buildWorld(scene, opts) {
     g.add(cyl(0.15, 0.15, 0.6, 'objDark', 0, 1.1, 0, 8));
     const rotor = grp(box(10, 0.06, 0.38, 'objDark', 0, 0, 0), box(0.38, 0.06, 10, 'objDark', 0, 0, 0)); rotor.position.y = 1.72; g.add(rotor);
     const tail = grp(box(0.06, 1.8, 0.24, 'objDark', 0, -0.9, 0), box(0.06, 0.24, 1.8, 'objDark', 0, -0.12, 0)); tail.position.set(-6.4, 0.9, 0.2); g.add(tail);
+    const beacon = new THREE.Mesh(new THREE.SphereGeometry(0.22, 8, 6), new THREE.MeshBasicMaterial({ color: '#E5484D' })); beacon.position.set(-6.4, 1.15, 0); g.add(beacon);
     g.traverse(m => { if (m.isMesh) m.castShadow = true; });
-    g.scale.setScalar(1.05);
+    g.scale.setScalar(1.05); g.visible = false;
     scene.add(g);
-    return { g, rotor, tail, px: null, pz: null };
+    return { g, rotor, tail, beacon, f: null, wait: 2 + Math.random() * 6, yaw: 0 };
   })();
-  function updateHeli(t, heroX) {
-    const a = t * 0.11;
-    const x = heroX + 34 + Math.sin(a) * 30, z = roadZ(heroX + 34) - 38 + Math.cos(a * 1.3) * 14, y = 27 + Math.sin(t * 0.5) * 1.2;
-    const { g, rotor, tail } = heli;
-    if (heli.px !== null) { const dx = x - heli.px, dz = z - heli.pz; if (dx * dx + dz * dz > 1e-6) { const want = Math.atan2(-dz, dx); let d = want - g.rotation.y; d = Math.atan2(Math.sin(d), Math.cos(d)); g.rotation.y += d * 0.06; } }
-    heli.px = x; heli.pz = z;
-    g.position.set(x, y, z); g.rotation.z = -0.08;
-    rotor.rotation.y = t * 21; tail.rotation.z = t * 30;
+  function heliPlan(t, heroX) {
+    const rnd = Math.random, cu = u => clamp(u, -40, 150);
+    const mx = heroX + (rnd() - 0.4) * 100, mu = 5 + rnd() * 55;
+    const th = (rnd() < 0.5 ? 0 : Math.PI) + (rnd() - 0.5) * 1.8; // any slant, mostly across the view
+    const dx = Math.cos(th), du = Math.sin(th), Lh = 120 + rnd() * 70, bend = (rnd() - 0.5) * 80;
+    const P = [[mx - dx * Lh, cu(mu - du * Lh)], [mx - du * bend, cu(mu + dx * bend)], [mx + dx * Lh, cu(mu + du * Lh)]];
+    const v = 11 + rnd() * 6;
+    return { t0: t, P, y0: 14 + rnd() * 8, y1: 14 + rnd() * 8, dur: 2 * Lh / v, hover: rnd() < 0.3 ? 3 + rnd() * 4 : 0, yaw0: th };
   }
+  function updateHeli(t, heroX, still) {
+    const H = heli, { g, rotor, tail } = H;
+    if (still) { g.visible = false; return; }
+    if (!H.f) {
+      if (H.last === undefined) H.last = t;
+      if (t - H.last < H.wait) { g.visible = false; return; }
+      H.f = heliPlan(t, heroX); H.yaw = null;
+    }
+    const f = H.f, e = t - f.t0, half = f.dur / 2;
+    if (e > f.dur + f.hover) { H.f = null; H.last = t; H.wait = 10 + Math.random() * 30; g.visible = false; return; }
+    const s = e < half ? e / f.dur : e < half + f.hover ? 0.5 : (e - f.hover) / f.dur;
+    const B = (k, q) => (1 - q) * (1 - q) * f.P[0][k] + 2 * (1 - q) * q * f.P[1][k] + q * q * f.P[2][k];
+    const x = B(0, s), u = B(1, s), z = roadZ(x) - u;
+    const x2 = B(0, Math.min(1, s + 0.01)), u2 = B(1, Math.min(1, s + 0.01)), z2 = roadZ(x2) - u2;
+    const want = Math.atan2(-(z2 - z), x2 - x);
+    if (H.yaw === null) H.yaw = want;
+    let d = want - H.yaw; d = Math.atan2(Math.sin(d), Math.cos(d)); H.yaw += d * 0.08;
+    const y = lerp(f.y0, f.y1, s) + Math.sin(t * 0.5) * 0.8;
+    g.visible = true; g.position.set(x, y, z);
+    g.rotation.set(0, H.yaw, 0); g.rotateX(-clamp(d * 3, -0.25, 0.25)); g.rotateZ(e > half && e < half + f.hover ? -0.02 : -0.1);
+    rotor.rotation.y = t * 21; tail.rotation.z = t * 30;
+    H.beacon.visible = (t % 1.2) < 0.15;
+  }
+
+  life = buildLife(scene, { stops, height, regionAt, lite, xMin, xMax, cities, keepOut: (x, z) => cities.length ? cityKeepOut(cities, x, z) : false });
 
   /* ---------- perception layer ---------- */
   const sens = new THREE.Group(); scene.add(sens);
@@ -609,6 +689,7 @@ export function buildWorld(scene, opts) {
   function laneDir(l) { return l === 'A' || l === 'B' ? 1 : -1; }
   function wrap(x) { return x < xMin ? x + L : x > xMax ? x - L : x; }
 
+  let decalDusk = null;
   function update(dt, t, heroX, heroV, still) {
     const asiaW = w(RNG.asia, heroX, 20);
     /* traffic sim */
@@ -648,6 +729,7 @@ export function buildWorld(scene, opts) {
     const counts = {}; TYPES.forEach(tp => counts[tp] = 0);
     let hc = 0, bc = 0;
     const dusk = tok('glow') !== '#000000';
+    if (dusk !== decalDusk) { decalDusk = dusk; decalMats.forEach(m => m.color.set(m.userData.yellow ? (dusk ? '#9C7F3A' : '#E8B83A') : (dusk ? '#7F8894' : '#FFFFFF'))); }
     cars.forEach(c => {
       if (!c.show) return;
       const nb = nearBoundary(c.x); const sc = clamp(nb / 4, 0, 1); if (sc <= 0.02) return;
@@ -725,7 +807,8 @@ export function buildWorld(scene, opts) {
     }
     signals.forEach(s => { const ph = sigPhase(s, t); if (ph !== s.ph) { s.ph = ph; s.lamps.forEach((l, i) => { l.material = i === ph ? lampOn[i] : lampOff; }); } });
 
-    updateTrain(t); updateHeli(t, heroX);
+    updateTrain(t); updateHeli(t, heroX, still);
+    if (life) life.update(dt, t, heroX, still, dusk);
 
     /* v41 riders */
     const rc = {}; RIDE.forEach(k => rc[k] = 0);

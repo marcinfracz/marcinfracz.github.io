@@ -2,9 +2,9 @@
    { group, anchors: {name: Object3D}, update(t, k, dt) } where k is 1 when the
    camera has landed on that stop and 0 when it is far away. */
 import { THREE, reg, mat, ownMat, glowMat, mesh, at, box, cyl, sph, grp, label, canvasTex, tok, smooth, clamp, lerp, roadZ } from './core.js';
-import { vehicleGeo } from './world.js?v=41';
+import { vehicleGeo } from './world.js?v=43';
 import { drawFlag, drawMark, onLogo } from './marks.js?v=28';
-import { ketteringAB, bulldog, bulldogPoster, rossBuilding, burOak, blockMSign, wavingFlag, wave, signPanel, MAIZE, BLUE } from './landmarks.js?v=41';
+import { ketteringAB, bulldog, bulldogPoster, rossBuilding, burOak, blockMSign, wavingFlag, wave, signPanel, MAIZE, BLUE } from './landmarks.js?v=43';
 
 const pin = (parent, x, y, z) => { const o = new THREE.Object3D(); o.position.set(x, y, z); parent.add(o); return o; };
 const vmesh = (type, s = 1, key = 'obj') => { const m = mesh(vehicleGeo(type), mat(key, { vertexColors: true })); m.scale.setScalar(s); return m; };
@@ -522,17 +522,70 @@ B.cx = () => {
 };
 
 B.mexico = () => {
+  // round 43: a real GM dealer strip, the kind the BDC rollout visited 350+ times:
+  // Buick GMC and Chevrolet showrooms with inventory lots and banderines,
+  // brand pylons, a Servicio Express oil-change bay and a body and paint shop.
   const g = new THREE.Group();
-  const lots = [-14, 0, 14];
+  const lots = [-13, 2, 16];
   const flags = [];
-  lots.forEach((x, i) => {
-    const d = grp(box(8, 3.4, 5, 'obj', 0, 0, 0), box(8.6, 0.3, 6.6, 'accent', 0, 3.4, 0.6), box(6, 2.4, 0.1, 'glass', 0, 0.4, 2.52));
-    at(d, x, 0, -11); g.add(d);
-    for (let j = 0; j < 3; j++) { const c = vmesh(j % 2 ? 'compact' : 'suv', 0.8); at(c, x - 2.6 + j * 2.6, 0, -6.2, Math.PI / 2); g.add(c); }
-    [-1, 1].forEach(s => { const f = at(flag(6.5, 'accent', s < 0 ? 'MX' : null), x + s * 4.6, 0, -7.6); g.add(f); flags.push(f); });
+  const LAND = ownMat('land', { vertexColors: true });
+  const cars = {};
+  const car = (t, c, x, y, z, ry = Math.PI / 2, sc = 0.8) => (cars[t] = cars[t] || []).push({ c, x, y, z, ry, sc });
+  const sign = (text, w, h, bg, fg, x, y, z) => { const m = signPanel(text, w, h, bg, fg); m.position.set(x, y, z); m.rotation.x = -0.6; g.add(m); return m; };
+  // paving, stall lines and the drive the training van uses
+  g.add(box(46, 0.06, 2.6, 'road', 4, 0, -2.4));
+  g.add(box(30, 0.04, 8.6, 'objShade', -5.5, 0, -7.6));
+  for (let x = -19.4; x <= 8.6; x += 2.4) g.add(box(0.08, 0.05, 2.6, 'obj', x, 0, -9.2), box(0.08, 0.05, 2.6, 'obj', x, 0, -6));
+  // Buick GMC showroom
+  g.add(box(9.4, 3.6, 6, 'obj', -13, 0, -15), box(8.4, 2.4, 0.1, 'glass', -13, 0.2, -11.96), box(9.8, 0.9, 0.3, 'objDark', -13, 2.75, -11.9));
+  sign('BUICK · GMC', 7.6, 1.1, '#1E2630', '#FFFFFF', -13, 3.2, -11.72);
+  // Chevrolet showroom with a tall entry portal and the gold bowtie
+  g.add(box(13, 4.2, 6.4, 'obj', 2, 0, -15.2), box(11.6, 2.8, 0.1, 'glass', 2, 0.2, -11.96), box(3.4, 6, 0.6, 'objDark', 2, 0, -11.9));
+  sign('CHEVROLET', 7.4, 1.25, '#F5F5F2', '#1E2630', 7.6, 3.9, -11.6);
+  const bow = grp(box(2.1, 0.55, 0.12, 'accent', 0, 0, 0), box(0.7, 1.15, 0.12, 'accent', 0, -0.3, 0));
+  bow.rotation.z = -0.06; at(bow, 2, 4.4, -11.55); g.add(bow);
+  sign('AGENCIA', 2.6, 0.5, '#1E2630', '#FFFFFF', 2, 3.55, -11.55);
+  // Servicio Express: three bays, one car up on a lift
+  g.add(box(9.6, 3.8, 6, 'obj', 16, 0, -15));
+  [-3, 0, 3].forEach(dx => g.add(box(2.4, 2.8, 0.2, 'objDark', 16 + dx, 0, -11.95)));
+  sign('SERVICIO EXPRESS', 8.6, 1.1, '#2F6B4F', '#FFFFFF', 16, 3.25, -11.88);
+  g.add(cyl(0.12, 0.12, 2.6, 'accent', 14.6, 0, -11.2), cyl(0.12, 0.12, 2.6, 'accent', 17.4, 0, -11.2), box(2.6, 0.12, 0.5, 'objDark', 16, 1.42, -11.2));
+  const lifted = vmesh('compact', 0.72, 'objShade'); at(lifted, 16, 1.55, -11.2, 0); g.add(lifted);
+  car('suv', '#C9CED4', 13, 0, -9.6); car('pickup', '#1E1E1E', 19, 0, -9.6);
+  const oilPost = grp(cyl(0.07, 0.07, 2.4, 'objDark', 0, 0, 0)); { const sp = signPanel('CAMBIO DE ACEITE', 3, 0.7, '#E8A33D', '#1E2630'); sp.rotation.x = -0.45; oilPost.add(at(sp, 0, 2.7, 0.05)); } at(oilPost, 21.2, 0, -8.4); g.add(oilPost);
+  [[-0.5, 0], [0.5, 0], [0, 0.8]].forEach(([dx, dz]) => g.add(cyl(0.38, 0.38, 1, 'objDark', 11.4 + dx, 0, -11.2 + dz, 12)));
+  // Hojalatería y Pintura: body shop with a paint booth and a car in primer
+  g.add(box(8, 4, 6, 'obj', 26.4, 0, -15), box(4.2, 3.2, 4.4, 'objShade', 26.4, 0, -10.6), box(2.6, 2.4, 0.1, 'objDark', 26.4, 0.1, -8.36));
+  g.add(cyl(0.3, 0.3, 1.8, 'objDark', 25.2, 4, -14), cyl(0.3, 0.3, 1.8, 'objDark', 27.6, 4, -14));
+  sign('HOJALATERÍA Y PINTURA', 7.8, 1.1, '#8A3B2E', '#FFFFFF', 26.4, 3.35, -11.88);
+  const fumes = [0, 1].map(i => { const f = mesh(new THREE.SphereGeometry(0.5, 8, 6), glowMat('obj', 0.4), false); g.add(f); return f; });
+  car('suv', '#1F4E8C', 22.4, 0, -6.8, 0.35); const primer = box(1.3, 0.75, 1.9, 'objShade', 22.6, 0.34, -6.4); primer.rotation.y = 0.35; g.add(primer);
+  // inventory on the lots, nose out to the street
+  const CH = ['#C8102E', '#F2F2F0', '#1E1E1E', '#9AA3AD', '#1F4E8C', '#F2F2F0', '#5C6670'], BG = ['#F2F2F0', '#1E1E1E', '#7A1F2B', '#9AA3AD'];
+  let k = 0;
+  for (let x = -4.2; x <= 8; x += 2.4) [-9.2, -6].forEach(z => { car(k % 3 === 2 ? 'pickup' : k % 3 ? 'suv' : 'compact', CH[(k * 5) % CH.length], x, 0, z); k++; });
+  for (let x = -18.2; x <= -7; x += 2.4) [-9.2, -6].forEach(z => { car(k % 2 ? 'suv' : 'pickup', BG[(k * 3) % BG.length], x, 0, z); k++; });
+  Object.entries(cars).forEach(([t, list]) => {
+    const im = new THREE.InstancedMesh(vehicleGeo(t), LAND, list.length), o = new THREE.Object3D(), c = new THREE.Color();
+    list.forEach((v, i) => { o.position.set(v.x, v.y, v.z); o.rotation.set(0, v.ry, 0); o.scale.setScalar(v.sc); o.updateMatrix(); im.setMatrixAt(i, o.matrix); im.setColorAt(i, c.set(v.c)); });
+    im.castShadow = true; g.add(im);
   });
-  g.add(box(36, 0.06, 2.6, 'road', 0, 0, -2.4));
-  const mMark = mark({ name: 'GM de México', sub: 'Dealer business development', mono: 'GM', logo: 'generalmotors' }, 5.6, 1.55); at(mMark, -0.2, 4.95, -8.3); g.add(mMark);
+  // banderines strung over the lots
+  const TRI = ['#C8102E', '#F2F2F0', '#1F8A4C', '#F2B456', '#2563EB'];
+  const flagG = new THREE.CircleGeometry(0.3, 3); flagG.rotateZ(-Math.PI / 2);
+  const bn = []; const runs = [[-19.6, 9, -4.4], [-19.6, 9, -11]];
+  runs.forEach(([x0, x1]) => { const n = Math.round((x1 - x0) / 0.85); for (let i = 0; i <= n; i++) bn.push({ x: x0 + (x1 - x0) * i / n, f: i / n, run: bn.length }); });
+  const bMat = ownMat('land', { side: THREE.DoubleSide }); const bIm = new THREE.InstancedMesh(flagG, bMat, bn.length); g.add(bIm);
+  bn.forEach((b, i) => { b.z = i < bn.length / 2 ? runs[0][2] : runs[1][2]; bIm.setColorAt(i, new THREE.Color(TRI[i % TRI.length])); });
+  runs.forEach(([x0, x1, z]) => [x0, x1].forEach(x => g.add(cyl(0.08, 0.08, 4.6, 'objDark', x, 0, z))));
+  // brand pylons at the street
+  const pylon = (text, bg, fg, x) => { const p = grp(box(0.5, 5.4, 0.5, 'objDark', 0, 0, 0)); { const sp = signPanel(text, 3.8, 1.2, bg, fg); sp.rotation.x = -0.35; p.add(at(sp, 0, 5.9, 0.28)); } at(p, x, 0, -3.9); g.add(p); return p; };
+  pylon('CHEVROLET', '#D9A43A', '#1E2630', 9.6);
+  pylon('BUICK · GMC', '#1E2630', '#FFFFFF', -19.2);
+  [-4.9, 8.9].forEach(x => { const f = at(flag(6.8, 'accent', 'MX'), x, 0, -11.4); g.add(f); flags.push(f); });
+  // shoppers with a salesperson on the Chevrolet lot
+  [[-2.9, -7.6, 'cobalt'], [-2.1, -7.4, 'obj'], [-1.2, -7.8, 'accent']].forEach(([x, z, key]) => g.add(at(person(key, 0.75), x, 0, z)));
+  const mMark = mark({ name: 'GM de México', sub: 'Dealer business development', mono: 'GM', logo: 'generalmotors' }, 5.6, 1.55); at(mMark, -13, 5.7, -14.6); g.add(mMark);
   const van = vmesh('van', 0.9); g.add(van);
   const counter = label('VISITS 0', { size: 20, key: 'ink', bg: 'card', scale: 0.55 }); g.add(counter);
   // the BDC desk: phones ring, every lead gets a call back
@@ -553,7 +606,7 @@ B.mexico = () => {
   const wing = mesh(new THREE.ConeGeometry(0.5, 1.8, 4), mat('accent')); wing.rotation.z = 1.1; wing.position.set(0.7, 16.6, 0); angel.add(wing);
   const wing2 = wing.clone(); wing2.rotation.z = -1.1; wing2.position.x = -0.7; angel.add(wing2);
   at(angel, -24, 0, -16); g.add(angel);
-  const lMx = label('MÉXICO · CDMX · Guadalajara · Monterrey', { size: 20, key: 'ink', bg: 'card', scale: 0.56, weight: 800 }); lMx.position.set(0, 9.4, -11); g.add(lMx);
+  const lMx = label('MÉXICO · CDMX · Guadalajara · Monterrey', { size: 20, key: 'ink', bg: 'card', scale: 0.56, weight: 800 }); lMx.position.set(2, 9.6, -14); g.add(lMx);
   const jet = plane(0.42, 'objDark'); g.add(jet);
   let visits = 0, last = 0;
   return {
@@ -561,6 +614,8 @@ B.mexico = () => {
     update(t, k, dt) {
       { const q = (t * 0.05) % 1, x = lerp(-34, 34, q); jet.position.set(x, 15 + Math.sin(q * Math.PI) * 3, -20 + Math.sin(q * Math.PI * 2) * 2); jet.rotation.set(0, 0, Math.cos(q * Math.PI) * -0.12); jet.visible = q > 0.02 && q < 0.98; }
       flags.forEach(f => waveFlag(f, t));
+      { const o = new THREE.Object3D(); bn.forEach((b, i) => { const sag = Math.sin(b.f * Math.PI) * 0.9; o.position.set(b.x, 4.45 - sag, b.z); o.rotation.set(Math.sin(t * 2.2 + i * 0.7) * 0.35, 0, 0); o.updateMatrix(); bIm.setMatrixAt(i, o.matrix); }); bIm.instanceMatrix.needsUpdate = true; }
+      fumes.forEach((f, i) => { const q = ((t * 0.25 + i * 0.5) % 1); f.position.set(i ? 27.6 : 25.2, 5.9 + q * 2.2, -14); f.scale.setScalar(0.6 + q * 1.4); f.material.opacity = 0.35 * (1 - q); });
       // the training van drives dealer to dealer and stops at each lot
       const seg = (t * 0.12) % 3, i = Math.floor(seg), f = seg - i;
       const xA = lots[i], xB = lots[(i + 1) % 3];

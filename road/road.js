@@ -1,9 +1,9 @@
 /* The Road: page app. Builds the 3D world, places one scene per stop, and
    drives the camera left to right (laptop and tablet) or top to bottom (phone). */
 import { THREE, TOKENS, setTheme, tok, roadZ, smooth, clamp, lerp } from './core.js';
-import { buildWorld } from './world.js?v=41';
-import { buildStage } from './stages.js?v=41';
-import { planCities, cityFootprints, buildCities } from './landmarks.js?v=41';
+import { buildWorld } from './world.js?v=43';
+import { buildStage } from './stages.js?v=43';
+import { planCities, cityFootprints, buildCities } from './landmarks.js?v=43';
 import { flagURL, COUNTRY } from './marks.js?v=28';
 
 const C = window.ROAD_CONTENT;
@@ -41,6 +41,7 @@ const STOPS = C.stops.map((s, i) => {
 });
 const CITY_VIEW = { traverse: 1.1, kettering: 1, chrysler: 0.7, ross: 1, equinox: 1.4, 'trailblazer-encore': 1, shanghai: 1 };
 const XMIN = 0, XMAX = STOPS[STOPS.length - 1].x + 80;
+window.__STOPS = STOPS.map(s => [s.id, Math.round(s.x), s.region]);
 const ERA = Object.fromEntries(C.eras.map(e => [e.id, e]));
 const ERAX = Object.fromEntries(ERAS.map(e => [e.id, e]));
 const eraFirst = {}; STOPS.forEach(s => { if (s.era && !(s.era in eraFirst)) eraFirst[s.era] = s.i; });
@@ -268,43 +269,81 @@ document.addEventListener('click', e => {
   window.__resume = { open, close };
 })();
 
-/* work & tools: the brag book in a window over the Road, so the work never leaves the page */
+/* v43: live demos open in a browser window floating over the Road, like the Desktop's.
+   Closing it (×, the red dot, Esc, a click outside or the browser's Back button) returns to the
+   same spot on the Road. Phones keep the full page in a new tab. */
 (function () {
-  let veil = null, frame = null, full = null, lastFocus = null;
+  let veil = null, frame = null, full = null, lastFocus = null, pushed = false;
+  const phone = () => matchMedia('(max-width: 767px)').matches;
   function build() {
-    veil = document.createElement('div'); veil.className = 'rs-veil wk-veil'; veil.hidden = true;
-    veil.setAttribute('role', 'dialog'); veil.setAttribute('aria-modal', 'true'); veil.setAttribute('aria-label', 'Work and tools');
-    veil.innerHTML = `<div class="rs-sheet wk-sheet"><div class="rs-bar"><span class="rs-t">Work &amp; Tools · live demos on synthetic data</span>`
-      + `<a class="wk-full" href="work/brag-book.html" target="_blank" rel="noopener">Full page <span aria-hidden="true">↗</span></a>`
-      + `<button class="rs-x" type="button" aria-label="Close work and tools">×</button></div>`
-      + `<iframe class="wk-frame" title="Work and tools" loading="lazy" allow="fullscreen" allowfullscreen></iframe></div>`;
+    veil = document.createElement('div'); veil.className = 'rs-veil wk-veil fb-veil'; veil.hidden = true;
+    veil.setAttribute('role', 'dialog'); veil.setAttribute('aria-modal', 'true'); veil.setAttribute('aria-label', 'Live demos');
+    veil.innerHTML = `<div class="fb-win"><div class="fb-bar">`
+      + `<button class="fb-dot r" type="button" data-fb="close" aria-label="Close live demos" title="Close"></button><span class="fb-dot y" aria-hidden="true"></span><button class="fb-dot g" type="button" data-fb="full" aria-label="Open live demos as a full page" title="Full page"></button>`
+      + `<button class="fb-btn" type="button" data-fb="close" aria-label="Back to the Road" title="Back to the Road">‹</button>`
+      + `<button class="fb-btn" type="button" disabled aria-hidden="true" tabindex="-1">›</button>`
+      + `<button class="fb-btn" type="button" data-fb="reload" aria-label="Reload" title="Reload">↻</button>`
+      + `<span class="fb-tab"><span>Live demos</span><button class="fb-x" type="button" data-fb="close" aria-label="Close live demos" title="Close">×</button></span>`
+      + `<span class="fb-sp"></span>`
+      + `<a class="fb-btn fb-full" href="work/brag-book.html" target="_blank" rel="noopener" aria-label="Open as a full page" title="Open as a full page">↗</a></div>`
+      + `<iframe class="fb-frame" title="Live demos" allow="fullscreen" allowfullscreen></iframe></div>`;
     document.body.appendChild(veil);
-    frame = veil.querySelector('iframe'); full = veil.querySelector('.wk-full');
-    veil.addEventListener('click', e => { if (e.target === veil) close(); });
-    veil.querySelector('.rs-x').addEventListener('click', close);
+    frame = veil.querySelector('iframe'); full = veil.querySelector('.fb-full');
+    veil.addEventListener('click', e => {
+      if (e.target === veil) { close(); return; }
+      const b = e.target.closest('[data-fb]'); if (!b) return;
+      const act = b.getAttribute('data-fb');
+      if (act === 'close') close();
+      else if (act === 'reload') { try { frame.contentWindow.location.reload(); } catch (err) { frame.src = frame.src; } }
+      else if (act === 'full') { window.open(full.href, '_blank', 'noopener'); }
+    });
   }
   function open(href) {
+    const u = new URL(href || 'work/brag-book.html', location.href).href;
+    if (phone()) { window.open(u, '_blank', 'noopener'); return; }
     if (!veil) build();
     lastFocus = document.activeElement;
-    const u = new URL(href || 'work/brag-book.html', location.href).href;
     if (frame.getAttribute('src') !== u) frame.setAttribute('src', u);
     full.href = u;
+    if (!veil.hidden) return;
     veil.hidden = false; document.documentElement.classList.add('rs-open');
     requestAnimationFrame(() => veil.classList.add('on'));
-    veil.querySelector('.rs-x').focus({ preventScroll: true });
+    try { history.pushState({ mfDemos: 1 }, '', location.href); pushed = true; } catch (e) { pushed = false; }
+    veil.querySelector('.fb-x').focus({ preventScroll: true });
   }
-  function close() {
+  function hide() {
     if (!veil || veil.hidden) return;
     veil.classList.remove('on'); document.documentElement.classList.remove('rs-open');
     setTimeout(() => { veil.hidden = true; }, 200);
     if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
   }
+  function close() {
+    if (!veil || veil.hidden) return;
+    if (pushed) { pushed = false; history.back(); } /* popstate hides it */
+    else hide();
+  }
+  addEventListener('popstate', () => { if (veil && !veil.hidden) { pushed = false; hide(); } });
   document.addEventListener('click', e => {
     const a = e.target.closest && e.target.closest('a[href*="brag-book.html"]');
-    if (!a || a.classList.contains('wk-full') || e.metaKey || e.ctrlKey || e.shiftKey) return;
-    e.preventDefault(); window.open(new URL(a.getAttribute('href'), location.href).href, '_blank', 'noopener'); /* v38: live demos open in a new tab */
+    if (!a || a.classList.contains('fb-full') || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    e.preventDefault(); open(a.getAttribute('href'));
   });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && veil && !veil.hidden) { e.stopImmediatePropagation(); close(); } }, true);
+  /* links inside the demos page: back to the Road closes the window; other pages of the site open here */
+  addEventListener('message', e => {
+    if (e.origin !== location.origin || !frame || e.source !== frame.contentWindow) return;
+    const m = e.data && e.data.mfRoad; if (!m) return;
+    let u; try { u = new URL(m.href, location.href); } catch (err) { return; }
+    if (u.origin !== location.origin) return;
+    const after = () => {
+      if (/\/road\.html$/.test(u.pathname)) { if (u.hash && u.hash !== location.hash) location.hash = u.hash; }
+      else if (/resume\.pdf$/.test(u.pathname) && window.__resume) window.__resume.open();
+      else if (/\/(index\.html)?$/.test(u.pathname) && u.hash === '#contact' && window.__contact) window.__contact.open();
+      else location.href = u.href;
+    };
+    if (pushed) { pushed = false; addEventListener('popstate', function once() { removeEventListener('popstate', once); setTimeout(after, 0); }); history.back(); }
+    else { hide(); after(); }
+  });
   window.__work = { open, close };
 })();
 
@@ -324,7 +363,7 @@ document.addEventListener('click', e => {
       + `<label>Message<textarea name="message" rows="4" required></textarea></label>`
       + `<p class="ct-err" hidden>Please add your name, a valid email and a message.</p>`
       + `<button class="ct-send" type="submit">Send</button></form>`
-      + `<p class="ct-alt">Prefer email? <a href="mailto:${EMAIL}">Email me</a>${LI ? ` · <a href="${LI}" target="_blank" rel="noopener">LinkedIn</a>` : ''}</p></div></div>`;
+      + `<p class="ct-alt">Prefer email? <a href="mailto:${EMAIL}">${esc(EMAIL)}</a>${LI ? ` · <a href="${LI}" target="_blank" rel="noopener">LinkedIn</a>` : ''}</p></div></div>`;
     document.body.appendChild(veil);
     veil.addEventListener('click', e => { if (e.target === veil) close(); });
     veil.querySelector('.rs-x').addEventListener('click', close);
@@ -412,6 +451,7 @@ function start() {
   const sunTex = (sc.right - sc.left) / sun.shadow.mapSize.x, sunTexV = (sc.top - sc.bottom) / sun.shadow.mapSize.y;
 
   const camera = new THREE.PerspectiveCamera(30, 1, 1, 900);
+  if (/[?&]qa\b/.test(location.search)) window.__cam = camera;
 
   /* world and scenes */
   const cities = planCities(STOPS); cityFootprints(cities);
