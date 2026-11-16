@@ -20,7 +20,10 @@
   .meta b { color: var(--ink); font-weight: 600; }
   .back { display: inline-block; margin-top: 28px; font-size: 15px; color: var(--ink); text-decoration: none; border-bottom: 2px solid var(--amber); padding-bottom: 2px; }
   .back:hover { color: var(--amber); }
-</style>
+  /* v38: fill the screen in fullscreen, Firefox included */
+  video:fullscreen { width: 100vw !important; height: 100vh !important; max-width: none !important; max-height: none !important; aspect-ratio: auto !important; object-fit: contain !important; border-radius: 0 !important; background: #000 !important; }
+  video:-moz-full-screen { width: 100vw !important; height: 100vh !important; max-width: none !important; max-height: none !important; aspect-ratio: auto !important; object-fit: contain !important; border-radius: 0 !important; background: #000 !important; }
+  </style>
 </head>
 <body>
 <main class="wrap">

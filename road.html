@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="road/road.css?v=36">
+<link rel="stylesheet" href="road/road.css?v=38">
 <script>
   /* theme before first paint: shared with the desktop page */
   (function () {
@@ -38,14 +38,16 @@
   <span class="bar-title"><span class="mono face"><img src="assets/headshots/pro-blue-gray-avatar.jpg" alt=""></span><span class="bt-name">Marcin Fracz</span> <span class="bar-sub">· The Road</span></span>
   <nav class="bar-links" aria-label="Links">
     <a class="home" id="home-link" href="index.html" aria-label="Back to desktop"><svg class="home-ico" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg><span class="home-label">Desktop</span></a>
-    <a id="work-link" href="work/timeline.html">Work</a>
+    <a class="cur-link" href="road.html" aria-current="page">The Road</a>
+    <a id="demos-link" class="wk-full" href="work/brag-book.html" target="_blank" rel="noopener">Live demos</a>
+    <a id="work-link" href="work/timeline.html">Timeline</a>
     <a id="resume-link" href="assets/resume.pdf" target="_blank" rel="noopener">Resume</a>
     <a id="contact-link" href="index.html#contact">Contact</a>
     <div class="controls" id="controls">
-  <button class="ctl-btn" id="ctl-btn" type="button" aria-expanded="false" aria-controls="ctl-pop" aria-label="View settings" title="View settings: sensors, light and zoom">
+  <button class="ctl-btn" id="ctl-btn" type="button" aria-expanded="false" aria-controls="ctl-pop" aria-label="View settings" title="View settings: sensors, light, zoom, music and tour">
     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
   </button>
-  <div class="ctl-pop" id="ctl-pop" role="group" aria-label="Sensors, light and zoom" hidden>
+  <div class="ctl-pop" id="ctl-pop" role="group" aria-label="View settings, music and tour" hidden>
     <p class="ctl-t">View settings</p>
     <p class="ctl-h">Sensors</p>
     <div class="seg" id="sensor-seg"></div>
@@ -56,6 +58,20 @@
       <button type="button" id="zoom-out" aria-label="Zoom out for a wider view"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg> Wider view</button>
       <button type="button" id="zoom-in" aria-label="Zoom in"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg> Closer</button>
     </div>
+    <p class="ctl-h">Music <span>Off until you pick a track</span></p>
+    <div class="seg music-seg" id="music-seg" role="group" aria-label="Background music">
+      <button type="button" data-t="-1" class="on" aria-pressed="true">Off</button>
+      <button type="button" data-t="0" aria-pressed="false">Open road</button>
+      <button type="button" data-t="1" aria-pressed="false">Night drive</button>
+      <button type="button" data-t="2" aria-pressed="false">Sunday cruise</button>
+    </div>
+    <label class="vol-row"><span>Volume</span><input type="range" id="music-vol" min="0" max="100" step="5" value="40" aria-label="Music volume"></label>
+    <p class="ctl-h">Tour voice</p>
+    <div class="seg" id="voice-seg" role="group" aria-label="Tour voice">
+      <button type="button" data-v="1" aria-pressed="false">On</button>
+      <button type="button" data-v="0" class="on" aria-pressed="true">Off</button>
+    </div>
+    <button type="button" class="tour-menu-btn" id="tour-menu-btn" data-act="tour"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>Show me around</button>
   </div>
 </div>
     <button class="theme-btn" id="theme-btn" type="button" aria-label="Switch Day and Dusk">
@@ -89,8 +105,9 @@
 
 <noscript><p class="noscript">The Road needs JavaScript. <a href="index.html">Back to the desktop</a>.</p></noscript>
 
-<script src="content/road-content.js?v=37"></script>
-<script type="module" src="road/road.js?v=37"></script>
+<script src="content/road-content.js?v=38"></script>
+<script type="module" src="road/road.js?v=38"></script>
+<script type="module" src="road/tour.js?v=38"></script>
 <script src="js/top-nav.js"></script>
 </body>
 </html>

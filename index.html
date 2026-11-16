@@ -20,7 +20,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=35">
+<link rel="stylesheet" href="css/styles.css?v=38">
 </head>
 <body>
 <div class="wallpaper" aria-hidden="true"><img id="wallpaper-img" src="assets/wallpapers/shanghai-mist.jpg" alt=""></div>
@@ -68,6 +68,13 @@
       </div>
     </div>
   </div>
+  <nav class="mb-links" aria-label="Site">
+    <a href="road.html">The Road</a>
+    <a href="work/brag-book.html" target="_blank" rel="noopener">Live demos</a>
+    <a href="work/timeline.html">Timeline</a>
+    <a href="assets/resume.pdf" target="_blank" rel="noopener">Resume</a>
+    <button type="button" data-action="contact">Contact</button>
+  </nav>
   <div class="mb-right">
     <span class="mb-clock" id="topbar-clock"></span>
     <button class="mb-icon-btn" id="mb-wallpaper-btn" title="Wallpaper Settings" aria-label="Wallpaper Settings">
@@ -302,7 +309,7 @@
     <button id="browser-open-tab" title="Open in a new tab" aria-label="Open in a new tab">↗</button>
   </div>
   <div class="browser-body">
-    <iframe id="browser-frame" title="Browser" src="about:blank"></iframe>
+    <iframe id="browser-frame" title="Browser" src="about:blank" allow="fullscreen; autoplay" allowfullscreen></iframe>
     <div class="browser-blocked hidden-window" id="browser-blocked">
       <p><b>This page didn't load here.</b></p>
       <p class="muted">It may block embedding, or be unreachable. You can still open it in a real tab.</p>
@@ -347,6 +354,6 @@
 </div>
 
 <script src="content/content.js?v=36"></script>
-<script src="js/app.js?v=36"></script>
+<script src="js/app.js?v=38"></script>
 </body>
 </html>
