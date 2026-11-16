@@ -100,7 +100,7 @@ body.wp-solid .framed-art { display: none; }
 /* Menu bar — 36px, 13px type */
 .menubar {
   position: relative;
-  z-index: 20;
+  z-index: 10000; /* always above every window, overlay and widget */
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -719,7 +719,7 @@ body.dark .finder-side { border-right-color: rgba(255, 255, 255, 0.1); }
   top: 48px;
   right: 14px;
   width: 340px;
-  z-index: 150;
+  z-index: 10010;
   background: var(--paper);
   backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.6);
@@ -884,7 +884,7 @@ body.dark .browser-tab.active { background: var(--accent); border-color: var(--a
   left: 50%;
   transform: translateX(-50%);
   width: min(520px, 92vw);
-  z-index: 200;
+  z-index: 10020;
   background: var(--paper);
   backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.75);
