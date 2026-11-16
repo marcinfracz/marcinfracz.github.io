@@ -789,6 +789,21 @@ html.is-dark .bar .sun,html:not(.is-dark) .bar .moon{display:none}
   .bar .links a,.bar .links button{flex:none}
   .bar .links .cur{display:none}
 }
+
+/* v45 phone pass: the header scrolls away; only the tool tabs stay on top, on a solid strip, so nothing covers a chart */
+@media (max-width:767px){
+  .bar{position:relative!important;top:auto!important}
+  .bar .pill.links{gap:0}
+  .bar .theme-btn{width:44px!important;height:44px!important}
+  .bar .pill.brand{min-height:44px}
+  .rail{top:0!important;z-index:15;background:var(--bg)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;box-shadow:0 8px 14px -12px rgba(0,0,0,.45);padding-block:4px!important}
+  .rail-btn{min-height:44px}
+  .win-tools button,.seg button,.chips button,.chipset button,.side button,.btn-sm,.copy button{min-height:44px}
+  .ctrl input[type=range]{height:36px}
+  .switch{min-height:44px;display:inline-flex;align-items:center}
+  .slide .win .kpi b,.kpi b{white-space:normal;text-overflow:clip;font-size:17px;line-height:1.2}
+  .more-contact a{display:inline-block;padding:12px 0;margin:-12px 0}
+}
 </style><header class="bar">
   <div class="bar-in">
     <a class="pill brand" href="../index.html" target="_top"><img src="../assets/headshots/pro-blue-gray-avatar.jpg" alt="" width="30" height="30">Marcin Fracz <span>· Live demos</span></a>
@@ -1406,4 +1421,5 @@ try{document.body.style.setProperty('--cur',getComputedStyle(SL[cur]).getPropert
 </script>
 
 <script src="../js/top-nav.js?v=43"></script>
+<script src="../js/phone-menu.js?v=45"></script>
 </body></html>

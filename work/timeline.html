@@ -584,6 +584,56 @@ html[data-theme="dark"] .tile.keep img,html[data-theme="dark"] .lg.keep img,html
 .z-l .bx-y,.z-xl .bx-y{font-size:12px}
 .z-xl .bx>:not(.bx-y):not(.bx-flag){max-width:780px}
 .z-l .bx-y,.z-xl .bx-y{padding-top:4px}
+
+/* v45: phones get a real vertical timeline: one line down the left, every role a tappable card
+   with its logo, title, years and place. The zoomable desktop timeline stays for 768px and up. */
+.vt{display:none}
+@media (max-width:767px){
+  html,body{height:auto;overflow:visible;overscroll-behavior:auto}
+  .stage,.dock,#tip,.tip{display:none!important}
+  .bar{position:relative;top:auto;left:auto;right:auto;padding:calc(env(safe-area-inset-top,0px) + 10px) 14px 0}
+  .pill.links{gap:0}
+  .theme-btn{width:44px!important;height:44px!important}
+  .pill.brand{min-height:44px}
+  .intro{position:relative!important;top:auto!important;left:auto!important;right:auto!important;padding:16px 16px 0;pointer-events:auto}
+  .intro h1{font-size:24px}
+  .intro p{font-size:14px}
+  .lenses{margin:12px -16px 0!important;padding:0 16px 4px!important}
+  .lens{height:44px;font-size:13.5px;padding:0 14px 0 12px}
+  .vt{display:block;position:relative;padding:18px 16px calc(env(safe-area-inset-bottom,0px) + 36px)}
+  .vt-list{position:relative;list-style:none;margin:0;padding:0}
+  .vt-list::before{content:"";position:absolute;left:19px;top:6px;bottom:22px;width:3px;border-radius:3px;background:var(--axis)}
+  .vt-list::after{content:"";position:absolute;left:12.5px;bottom:8px;border-left:8px solid transparent;border-right:8px solid transparent;border-top:13px solid var(--axis)}
+  .vt-ch{display:flex;align-items:baseline;gap:10px;margin:6px 0 10px 44px;padding:0;text-decoration:none;font-weight:800;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink2);min-height:44px;align-items:center}
+  .vt-ch span{font-weight:600;letter-spacing:.04em;color:var(--muted);text-transform:none}
+  .vt-ch.sub{font-size:11px;letter-spacing:.12em;margin-top:2px;color:var(--muted)}
+  .vt-ch.sub::before{content:"";width:14px;height:2px;border-radius:2px;background:var(--acc,var(--muted));align-self:center}
+  .vt-row{position:relative;display:grid;grid-template-columns:40px minmax(0,1fr);gap:10px;align-items:center;margin:0 0 10px;text-decoration:none;color:inherit;transition:opacity .2s}
+  .vt-dot{justify-self:center;width:18px;height:18px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 4px var(--ring);position:relative;z-index:1}
+  .vt-card{display:grid;grid-template-columns:52px minmax(0,1fr);gap:12px;align-items:center;min-height:72px;padding:10px 14px 10px 10px;border-radius:16px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--acc);box-shadow:0 8px 20px -16px rgba(0,0,0,.45)}
+  .vt-card .tile{width:52px;height:44px;min-width:0;max-width:none;margin:0;display:grid;place-items:center}
+  .vt-card .tile img{max-width:44px;max-height:40px;object-fit:contain}
+  .vt-card .tile.mono{font-weight:800;font-size:18px;border-radius:10px;background:var(--surface2)}
+  .vt-t{min-width:0}
+  .vt-t b{display:block;font-size:15px;line-height:1.25}
+  .vt-t .vt-co{display:block;font-size:13px;color:var(--ink2);margin-top:2px}
+  .vt-t .vt-m{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;font-size:12.5px;color:var(--muted);margin-top:3px}
+  .vt-t .vt-m img{width:18px;height:12px;border-radius:2px;object-fit:cover;box-shadow:0 0 0 1px var(--line)}
+  .vt-intl{display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:3px 9px;border-radius:999px;background:color-mix(in srgb,var(--f-digital) 12%,transparent);color:var(--ink);font-size:11.5px;font-weight:700}
+  .vt-intl img{width:16px;height:11px;border-radius:2px;object-fit:cover}
+  .vt-pin .vt-dot{width:34px;height:34px;display:grid;place-items:center;background:var(--surface);overflow:hidden}
+  .vt-pin.deg .vt-dot{background:var(--cap-bg);color:var(--cap-fg)}
+  .vt-pin .vt-dot img{width:100%;height:100%;object-fit:cover}
+  .vt-pin .vt-dot svg{width:17px;height:17px}
+  .vt-pin .vt-p{display:flex;flex-direction:column;justify-content:center;min-height:48px;padding:4px 2px}
+  .vt-pin .vt-p b{font-size:14px}
+  .vt-pin .vt-p span{font-size:12.5px;color:var(--muted)}
+  .vt-pin .vt-p .vt-lg{height:20px;width:auto;max-width:150px;object-fit:contain;object-position:left;margin-bottom:3px}
+  .vt-now .vt-dot{background:var(--now)}
+  .vt-now .vt-p b{font-size:16px}
+  .vt-row.lens-off{opacity:.28}
+  .vt-row.lens-on .vt-card{box-shadow:0 0 0 2px var(--acc),0 10px 24px -14px rgba(0,0,0,.5)}
+}
 </style>
 </head>
 <body>
@@ -1439,6 +1489,42 @@ $('#theme').addEventListener('click', () => {
 /* ---------- v39: capability lenses ---------- */
 const HINT0 = $('#hint').textContent;
 const lensYears = l => { const y = l.ids.reduce((a, id) => a + (SLOT[id] ? SLOT[id].to - SLOT[id].from : 0), 0); return Math.round(y * 2) / 2; };
+
+/* ---------- v45: vertical timeline for phones ---------- */
+const VT = (() => {
+  const box = document.createElement('section'); box.className = 'vt'; box.id = 'vt'; box.setAttribute('aria-label', 'Career timeline, oldest to newest');
+  const pinYear = p => p.at, roleYear = r => r.from;
+  const items = [...ROLES.map(r => ({ k: 'role', y: roleYear(r), r })), ...PINS.map(p => ({ k: 'pin', y: pinYear(p), p }))].sort((a, b) => a.y - b.y);
+  const ri = id => ROLES.findIndex(x => x.id === id);
+  const empTile = id => { const k = ri(id), e = EMP.find(e => k >= ri(e.a) && k <= ri(e.b));
+    return e ? `<span class="tile${lgCls(e.n)}"><img src="${LOGO(e.n)}" alt="${esc(e.t)}"></span>` : tileHTML(id); };
+  const card = r => {
+    const p = PROF[r.id] || {};
+    const intl = CHAPTERS.find(c => c.tier === 3 && c.a === r.id);
+    return `<a class="vt-row" href="#${r.id}" data-open="${r.id}" data-id="${r.id}" style="--acc:${accOf(r.id)}"><span class="vt-dot" aria-hidden="true"></span>
+      <span class="vt-card">${empTile(r.id)}<span class="vt-t"><b>${esc(r.label)}</b><span class="vt-co">${esc(r.co)}${p.group && p.group !== r.co ? ' · ' + esc(p.group) : ''}</span>
+      <span class="vt-m">${r.flag ? `<img src="${flagURL(r.flag)}" alt="">` : ''}${esc(r.years)} · ${esc(r.kicker)}</span>
+      ${intl ? `<span class="vt-intl"><img src="${flagURL(intl.flag)}" alt="">${esc(intl.short)}</span>` : ''}</span></span></a>`;
+  };
+  const pin = p => {
+    const ico = p.kind === 'deg' ? CAP : `<img src="${flagURL(p.c)}" alt="">`;
+    const lg = p.logo ? `<img class="vt-lg" src="${LOGO(p.logo[0])}" alt="${esc(p.logo[2])}">` : '';
+    return `<a class="vt-row vt-pin ${p.kind}" href="#${p.id}" data-open="${p.id}" data-id="${p.role || p.id}"><span class="vt-dot" aria-hidden="true">${ico}</span>
+      <span class="vt-p">${lg}<b>${esc(p.t)}</b><span>${esc(p.kind === 'flag' ? 'Country project · ' + p.sub : p.sub)}</span></span></a>`;
+  };
+  const ch = (id, sub) => { const c = CH[id]; return `<a class="vt-ch${sub ? ' sub' : ''}" href="#${id}" data-open="${id}" style="--acc:${c.acc}">${esc(sub ? c.t : c.short)} <span>${esc(c.years)}</span></a>`; };
+  let html = '<div class="vt-list">' + ch('ch-eng');
+  let gm = false, prog = false;
+  for (const it of items) {
+    if (!gm && it.y >= 2014.4) { gm = true; html += ch('ch-gm'); }
+    if (gm && !prog && it.k === 'role' && it.r.id === 'traverse') { prog = true; html += ch('ch-program', 1); }
+    html += it.k === 'role' ? card(it.r) : pin(it.p);
+  }
+  html += `<div class="vt-row vt-pin vt-now" aria-label="Today"><span class="vt-dot" aria-hidden="true"></span><span class="vt-p"><b>Today</b><span>Exploring new leadership opportunities</span></span></div></div>`;
+  box.innerHTML = html;
+  $('#stage').after(box);
+  return box;
+})();
 $('#lenses').innerHTML = '<span class="lens-lt">Highlight</span><button type="button" class="lens on" data-lens="" aria-pressed="true">All roles</button>' + LENSES.map(l =>
   `<button type="button" class="lens" data-lens="${l.id}" aria-pressed="false">${l.sw ? `<span class="sw" aria-hidden="true">${l.sw.map(f => `<i style="background:var(--f-${f})"></i>`).join('')}</span>` : `<svg viewBox="0 0 24 24" aria-hidden="true">${LI[l.icon]}</svg>`}${esc(l.n)}</button>`).join('');
 let lens = '';
@@ -1446,8 +1532,10 @@ function setLens(id, push) {
   const l = LENS[id] || null; lens = l ? id : '';
   document.querySelectorAll('#lenses .lens').forEach(b => { const on = b.dataset.lens === lens; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
   ROLES.forEach((s, i) => { const inL = !!l && l.ids.includes(s.id); bxEls[i].classList.toggle('lens-off', !!l && !inL); bxEls[i].classList.toggle('lens-on', inL); });
+  VT.querySelectorAll('.vt-row[data-id]').forEach(r => { const inL = !!l && l.ids.includes(r.dataset.id); r.classList.toggle('lens-off', !!l && !inL); r.classList.toggle('lens-on', inL && !r.classList.contains('vt-pin')); });
   const h = $('#hint');
-  if (!l) h.textContent = touchy ? 'Flick to move. Pinch to zoom. Tap any role.' : HINT0;
+  const phone = matchMedia('(max-width:767px)').matches;
+  if (!l) h.textContent = phone ? 'Oldest at the top. Tap any role for the full story.' : touchy ? 'Flick to move. Pinch to zoom. Tap any role.' : HINT0;
   else { const y = lensYears(l), n = l.ids.length;
     h.innerHTML = `<b>${esc(l.n)}</b> · ${l.roles ? `${n} roles` : `about ${String(y).replace('.5', '½')} years across ${n} roles`}${l.d ? ', ' + esc(l.d) : ''}. ${touchy ? 'Tap' : 'Click'} any role.`; }
   if (push !== false) { const u = new URL(location.href); if (lens) u.searchParams.set('lens', lens); else u.searchParams.delete('lens'); history.replaceState(history.state, '', u.pathname + u.search + u.hash); }
@@ -1456,7 +1544,7 @@ $('#lenses').addEventListener('click', e => { const b = e.target.closest('[data-
 { const q = new URLSearchParams(location.search).get('lens'); if (q && LENS[q]) setLens(q, false); }
 
 /* ---------- start ---------- */
-if (touchy && !lens) $('#hint').textContent = 'Flick to move. Pinch to zoom. Tap any role.';
+if (!lens) $('#hint').textContent = matchMedia('(max-width:767px)').matches ? 'Oldest at the top. Tap any role for the full story.' : touchy ? 'Flick to move. Pinch to zoom. Tap any role.' : $('#hint').textContent;
 measure(); buildZoomSeg(); measureLabels(); U = levels[0].U; u0 = candidates()[0]; render(); settled();
 let rt = 0;
 addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => {
@@ -1466,5 +1554,6 @@ const h0 = location.hash.slice(1);
 if (known(h0)) openModal(h0);
 </script>
 <script src="../js/top-nav.js?v=43"></script>
+<script src="../js/phone-menu.js?v=45"></script>
 </body>
 </html>
