@@ -24,30 +24,139 @@
   el("intro-name").textContent = C.intro.name;
   el("intro-title").textContent = C.intro.title;
   el("intro-headline").textContent = C.intro.headline;
-  el("intro-photo").src = C.intro.photo;
+  /* site photo: the default from content, or a pick saved in this browser by the photo picker */
+  var PHOTO_KEY = "mf-site-photo-v1";
+  var HEADSHOTS = C.headshots || [];
+  function photoById(id) { return HEADSHOTS.filter(function (h) { return h.id === id; })[0]; }
+  var pickedPhoto = null;
+  try { if (/[?&]pick\b/.test(window.location.search)) pickedPhoto = photoById(localStorage.getItem(PHOTO_KEY) || ""); } catch (e) {} /* a pick only shows with ?pick; visitors always get the default photo */
+  el("intro-photo").src = pickedPhoto ? pickedPhoto.avatar : C.intro.photo;
   el("intro-buttons").innerHTML = C.intro.buttons.map(function (b) {
-    return '<button data-open="' + esc(b.target) + '">' + esc(b.label) + "</button>";
-  }).join("");
+    return '<button class="intro-link" data-open="' + esc(b.target) + '">' + esc(b.label) + "</button>";
+  }).join('<span class="intro-dot" aria-hidden="true">·</span>');
 
   el("about-body").innerHTML =
     "<h2>" + esc(C.about.title) + "</h2>" +
     C.about.paragraphs.map(function (p) { return "<p>" + esc(p) + "</p>"; }).join("") +
+    (C.about.howIWork ? "<h3>How I work</h3><ul class=\"how\">" + C.about.howIWork.map(function (h) { return "<li>" + esc(h) + "</li>"; }).join("") + "</ul>" : "") +
     "<h3>Education</h3><ul class=\"edu\">" +
     C.work.education.map(function (e) {
       return "<li><b>" + esc(e.school) + "</b> <span>(" + esc(e.year) + ")</span></li>";
     }).join("") + "</ul>";
 
   el("work-note").textContent = C.work.note;
-  el("timeline").innerHTML = C.work.roles.map(function (r) {
-    return '<div class="timeline-item">' +
-      '<div class="years">' + esc(r.years) + "</div>" +
-      "<h4>" + esc(r.role) + "</h4>" +
-      '<div class="employer">' + esc(r.company) + "</div>" +
-      "<p>" + esc(r.detail) + "</p></div>";
-  }).join("");
+  /* ================= Work timeline: a visual map like the About Me slide ================= */
+  var V = C.work.visual;
+  var tlZoom = 1;
+  var FLAG_URL = {};
+  function flagImg(code) { return FLAG_URL[code] ? '<img src="' + FLAG_URL[code] + '" alt="">' : ""; }
+  function renderTimeline() {
+    var host = el("timeline");
+    if (!V) {
+      host.innerHTML = C.work.roles.map(function (r) {
+        return '<div class="timeline-item"><div class="years">' + esc(r.years) + "</div><h4>" + esc(r.role) + "</h4>" +
+          '<div class="employer">' + esc(r.company) + "</div><p>" + esc(r.detail) + "</p></div>";
+      }).join("");
+      return;
+    }
+    host.className = "timeline tlv";
+    var k = tlZoom, pad = 18, gap = 34;
+    var knots = [[V.engineering[0].from, pad]];
+    V.engineering.forEach(function (e) { knots.push([e.to, knots[knots.length - 1][1] + e.w * k]); });
+    var gmX0 = knots[knots.length - 1][1] + gap, gmY0 = V.engineering[V.engineering.length - 1].to, perYr = 116 * k;
+    function X(y) {
+      if (y >= gmY0) return gmX0 + (y - gmY0) * perYr;
+      for (var i = 1; i < knots.length; i++) if (y <= knots[i][0]) {
+        var a = knots[i - 1], b = knots[i]; return a[1] + (y - a[0]) / (b[0] - a[0]) * (b[1] - a[1]);
+      }
+      return knots[knots.length - 1][1];
+    }
+    var end = 2026.6, W = Math.round(X(end) + 40);
+    var h = [];
+    function blk(b, cls) {
+      var x = X(b.from), w = Math.max(X(b.to) - x - 3, cls === "down" ? 172 : 40);
+      return '<a class="tlv-b ' + cls + " f-" + b.focus + '" href="road.html#' + esc(b.road) + '" style="left:' + x.toFixed(1) + "px;width:" + w.toFixed(1) + 'px" title="' + esc(b.label + " · " + b.years) + '">' +
+        (b.flag ? '<span class="tlv-flag">' + flagImg(b.flag) + "</span>" : "") +
+        '<span class="tlv-k">' + esc(b.kicker) + '</span><span class="tlv-t">' + esc(b.label) + '</span><span class="tlv-y">' + esc(b.years) + "</span></a>";
+    }
+    h.push('<p class="tlv-zone up" style="left:' + gmX0 + 'px">Domestic experience</p>');
+    h.push('<p class="tlv-zone down" style="left:' + gmX0 + 'px">International experience</p>');
+    h.push('<p class="tlv-zone up eng" style="left:' + pad + 'px">Engineering, before GM</p>');
+    V.engineering.forEach(function (b) { h.push(blk(b, "up")); });
+    V.domestic.forEach(function (b) { h.push(blk(b, "up")); });
+    V.assignments.forEach(function (b) { h.push(blk(b, "down")); });
+    /* the axis: an arrow per segment and year ticks */
+    h.push('<div class="tlv-axis" style="left:' + pad + "px;width:" + (knots[knots.length - 1][1] - pad) + 'px"></div>');
+    h.push('<div class="tlv-axis gm" style="left:' + gmX0 + "px;width:" + (W - gmX0 - 14) + 'px"></div>');
+    h.push('<span class="tlv-break" style="left:' + (gmX0 - gap / 2 - 6) + 'px">//</span>');
+    var ticks = [2003, 2007, 2010, 2011, 2014];
+    for (var y = 2015; y <= 2026; y++) ticks.push(y);
+    ticks.forEach(function (t) { h.push('<span class="tlv-tick' + (t < gmY0 ? " e" : "") + '" style="left:' + X(t === 2010 ? 2010.4 : t === 2011 ? 2011.4 : t === 2014 ? 2014.4 : t).toFixed(1) + 'px">' + t + "</span>"); });
+    V.degrees.forEach(function (d) {
+      h.push('<a class="tlv-deg" href="road.html#' + esc(d.road) + '" style="left:' + X(d.at).toFixed(1) + 'px" title="' + esc(d.label + " · " + d.years) + '"><span class="tlv-cap" aria-hidden="true">' +
+        '<svg viewBox="0 0 24 24" width="14" height="14"><path d="M12 4 1 9l11 5 9-4.1V16h2V9z" fill="currentColor"/><path d="M6 12.6V16c0 1.7 2.7 3 6 3s6-1.3 6-3v-3.4l-6 2.7z" fill="currentColor"/></svg></span>' +
+        "<b>" + esc(d.label) + "</b><i>" + esc(d.years) + "</i></a>");
+    });
+    V.projects.forEach(function (p) {
+      h.push('<a class="tlv-p" href="road.html#' + esc(p.road) + '" style="left:' + X(p.at).toFixed(1) + 'px" title="' + esc(p.label + " · " + p.sub) + '"><span class="tlv-flag sm">' + flagImg(p.flag) + "</span><b>" + esc(p.label) + "</b><i>" + esc(p.sub) + "</i></a>");
+    });
+    host.style.width = W + "px";
+    host.innerHTML = h.join("") ;
+    var lg = el("tlv-legend");
+    if (!lg) {
+      lg = document.createElement("div"); lg.id = "tlv-legend"; lg.className = "tlv-legend";
+      lg.innerHTML = '<span class="tlv-lt">Focus areas</span>' + V.legend.map(function (l) { return '<span class="tlv-li f-' + l.focus + '">' + esc(l.label) + "</span>"; }).join("");
+      host.parentNode.parentNode.insertBefore(lg, host.parentNode.nextSibling);
+    }
+  }
+  renderTimeline();
+  if (V) {
+    /* round flag badges from the Road's own flag drawings */
+    import("../road/marks.js").then(function (m) {
+      ["US", "EC", "MX", "CA", "CN", "KR"].forEach(function (c) {
+        var cv = document.createElement("canvas"); cv.width = 96; cv.height = 64;
+        m.drawFlag(cv.getContext("2d"), c, 96, 64); FLAG_URL[c] = cv.toDataURL("image/png");
+      });
+      renderTimeline();
+    }).catch(function () {});
+    /* drag to scroll */
+    var vp = document.querySelector("#window-work .timeline-viewport"), dragX = null, moved = 0, sl = 0;
+    vp.addEventListener("pointerdown", function (e) { if (e.button !== 0) return; dragX = e.clientX; sl = vp.scrollLeft; moved = 0; });
+    window.addEventListener("pointermove", function (e) { if (dragX === null) return; var d = e.clientX - dragX; moved = Math.max(moved, Math.abs(d)); if (moved > 4) { vp.classList.add("dragging"); vp.scrollLeft = sl - d; } });
+    window.addEventListener("pointerup", function () { dragX = null; setTimeout(function () { vp.classList.remove("dragging"); }, 0); });
+    vp.addEventListener("click", function (e) { if (moved > 4) { e.preventDefault(); e.stopPropagation(); moved = 0; } }, true);
+  }
 
+  /* tool icons: one small line glyph on a coloured app tile */
+  var GLYPHS = {
+    globe: '<circle cx="12" cy="12" r="8"/><path d="M4 12h16M12 4c2.5 2.6 2.5 13.4 0 16M12 4c-2.5 2.6-2.5 13.4 0 16"/>',
+    link: '<circle cx="9" cy="12" r="5"/><circle cx="15" cy="12" r="5"/>',
+    loop: '<path d="M5 12a7 7 0 0 1 12-5l2 2M19 12a7 7 0 0 1-12 5l-2-2"/><path d="M19 4v5h-5M5 20v-5h5"/>',
+    grid: '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>',
+    clock: '<circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/>',
+    bars: '<path d="M4 6h9M7 12h11M5 18h7"/>',
+    compass: '<circle cx="12" cy="12" r="8"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
+    play: '<circle cx="12" cy="12" r="8"/><path d="M10 8.5l5 3.5-5 3.5z"/>',
+    check: '<path d="M5 6h10M5 12h6M5 18h6"/><path d="M14 16l2.5 2.5L21 13"/>',
+    timeline: '<path d="M3 12h18"/><circle cx="7" cy="12" r="2"/><circle cx="13" cy="12" r="2"/><circle cx="18" cy="12" r="2"/><path d="M7 6v4M13 14v4M18 6v4"/>'
+  };
+  var KIT_COLOR = "#475569";
+  function appIcon(glyph, color, size) {
+    return '<span class="app-ico" style="--app:' + (color || KIT_COLOR) + (size ? ";--s:" + size + "px" : "") + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (GLYPHS[glyph] || GLYPHS.grid) + "</svg></span>";
+  }
+  var TOOLS = C.tools || { systems: [], kit: [] };
+  function hubHref(view) { return "work/brag-book.html#" + view; }
   el("projects-body").innerHTML =
-    "<h2>" + esc(C.projects.title) + "</h2>" +
+    '<div class="proj-head"><h2>' + esc(C.projects.title) + '</h2><p class="muted">Four systems I built, each rebuilt on synthetic data so you can use it.</p></div>' +
+    '<div class="app-grid">' + TOOLS.systems.map(function (t) {
+      return '<a class="app-card" href="' + hubHref(t.id) + '">' + appIcon(t.glyph, t.color) +
+        '<span class="app-txt"><b>' + esc(t.name) + '</b><small>' + esc(t.org) + " · " + esc(t.years) + "</small><span>" + esc(t.blurb) + '</span><em>Open the live rebuild →</em></span></a>';
+    }).join("") + "</div>" +
+    '<p class="notes-section">Everyday kit</p><div class="kit-row">' + TOOLS.kit.map(function (k) {
+      return '<a class="kit-chip" href="' + hubHref(k.live ? "kit" : "more") + '" title="' + esc(k.blurb) + '">' + appIcon(k.glyph, null, 22) + "<span>" + esc(k.name) + (k.live ? ' <i class="live-dot">Live</i>' : "") + "</span></a>";
+    }).join("") +
+    (TOOLS.timeline ? '<a class="kit-chip" href="' + TOOLS.timeline.href + '" title="' + esc(TOOLS.timeline.blurb) + '">' + appIcon("timeline", "#0369a1", 22) + "<span>" + esc(TOOLS.timeline.name) + "</span></a>" : "") + "</div>" +
+    '<p class="notes-section">Personal builds</p>' +
     C.projects.items.map(function (p) {
       return '<div class="project"><h4>' + esc(p.name) + "</h4><p>" + esc(p.detail) + "</p></div>";
     }).join("");
@@ -58,7 +167,7 @@
   el("note-motto-text").textContent = C.notes.motto;
   el("note-resume-text").innerHTML = '<a href="assets/resume.pdf">' + esc(C.notes.resumeNote) + "</a>";
   var email = el("note-email");
-  email.textContent = C.notes.contact.email;
+  email.textContent = "Email me";
   email.href = "mailto:" + C.notes.contact.email;
   var li = el("note-linkedin");
   if (C.notes.contact.linkedin.indexOf("http") === 0) {
@@ -131,7 +240,14 @@
   /* ================= timeline zoom ================= */
   var zoom = 1;
   var timeline = el("timeline");
-  function applyZoom() { timeline.style.transform = "scale(" + zoom + ")"; }
+  function applyZoom() {
+    if (V) {
+      /* re-lay the timeline at the new scale, keeping the same year in the middle */
+      var vp = timeline.parentNode, mid = (vp.scrollLeft + vp.clientWidth / 2) / (timeline.offsetWidth || 1);
+      tlZoom = zoom; renderTimeline();
+      vp.scrollLeft = mid * timeline.offsetWidth - vp.clientWidth / 2;
+    } else timeline.style.transform = "scale(" + zoom + ")";
+  }
   on("zoom-in", "click", function () { zoom = Math.min(zoom + 0.15, 1.6); applyZoom(); });
   on("zoom-out", "click", function () { zoom = Math.max(zoom - 0.15, 0.6); applyZoom(); });
 
@@ -153,7 +269,8 @@
     { id: "contact-win", label: "Contact" },
     { id: "browser", label: "Browser" },
     { id: "wallpaper", label: "Wallpaper Settings" },
-    { id: "widgets", label: "Widget Settings" }
+    { id: "widgets", label: "Widget Settings" },
+    { id: "photos", label: "Choose photo" }
   ];
   function findWindow(name) {
     return el("window-" + name) || el("widget-" + name);
@@ -162,6 +279,7 @@
     return win && !win.classList.contains("hidden-window") && !win.classList.contains("minimised");
   }
   function openWindow(name) {
+    if (name === "work") { openToolPage("work/timeline.html", "Work"); return; }
     if (name === "contact-note") {
       var note = el("note-contact");
       if (note) { bringToFront(note); }
@@ -258,7 +376,7 @@
     if (href) {
       var url = href.getAttribute("data-href");
       if (href.getAttribute("data-newtab")) window.open(url, "_blank", "noopener");
-      else window.location.href = url;
+      else goPage(url);
     }
   });
   /* click anywhere on a window/widget/note brings it to front */
@@ -268,10 +386,17 @@
   }, true);
 
   /* ================= dragging: transform while moving, commit on release ================= */
-  var POS_KEY = "mf-pos-v6";
+  /* v8: a moved window only stays moved for this visit (sessionStorage).
+     Every new visit starts from the same computed layout, and spots saved
+     by earlier versions are removed. */
+  var POS_KEY = "mf-pos-v8";
+  try { ["mf-pos-v5", "mf-pos-v6", "mf-pos-v7", "mf-pos"].forEach(function (k) { localStorage.removeItem(k); }); } catch (e) {}
   var positions = {};
-  try { positions = JSON.parse(localStorage.getItem(POS_KEY) || "{}"); } catch (e) {}
-  function savePositions() { try { localStorage.setItem(POS_KEY, JSON.stringify(positions)); } catch (e) {} }
+  try { positions = JSON.parse(sessionStorage.getItem(POS_KEY) || "{}"); } catch (e) {}
+  function savePositions() { try { sessionStorage.setItem(POS_KEY, JSON.stringify(positions)); } catch (e) {} }
+  /* pinning by left/top must also clear the CSS bottom/right anchors,
+     or a note anchored to the bottom stretches down to the screen edge */
+  function pinAt(node, left, top) { node.style.left = left + "px"; node.style.top = top + "px"; node.style.bottom = "auto"; node.style.right = "auto"; }
   function restorePositions() {
     if (isPhone()) return; /* phone is stacked, saved desktop positions would strand windows */
     var vw = window.innerWidth, vh = window.innerHeight;
@@ -279,12 +404,13 @@
       var node = document.getElementById(id);
       var pos = positions[id];
       if (!node || !pos || typeof pos.left !== "number") return;
+      /* a spot saved on a different screen size would land on top of the default layout here */
+      if (!pos.vw || Math.abs(pos.vw - vw) > 80 || Math.abs(pos.vh - vh) > 80) { delete positions[id]; return; }
       /* clamp stale saved positions into the viewport so a bad save can never strand a window off-screen */
       var left = Math.max(0, Math.min(pos.left, vw - 120));
       var top = Math.max(40, Math.min(pos.top, vh - 80));
-      positions[id] = { left: left, top: top };
-      node.style.left = left + "px";
-      node.style.top = top + "px";
+      positions[id] = { left: left, top: top, vw: pos.vw, vh: pos.vh };
+      pinAt(node, left, top);
       /* only overlay windows need their centring transform cleared;
          notes keep their CSS tilt, desktop windows have none */
       if (node.classList.contains("overlay-window")) node.style.transform = "none";
@@ -310,7 +436,7 @@
     node.style.transform = node.classList.contains("overlay-window") ? "none" : "";
     node.classList.remove("dragging");
     document.body.classList.remove("is-dragging");
-    positions[drag.id] = { left: left, top: top };
+    positions[drag.id] = { left: left, top: top, vw: vw, vh: vh };
     savePositions();
     drag = null;
   }
@@ -384,8 +510,7 @@
       parentRect = el("desktop").getBoundingClientRect();
     }
     /* pin current position in px, clear any centring transform */
-    target.style.left = (rect.left - parentRect.left) + "px";
-    target.style.top = (rect.top - parentRect.top) + "px";
+    pinAt(target, rect.left - parentRect.left, rect.top - parentRect.top);
     target.style.transform = "none";
     bringToFront(target);
     target.classList.add("dragging");
@@ -424,7 +549,7 @@
   var PREF_KEY = "mf-site-prefs-v6";
   var prefs = {
     wallpaper: "shanghai-mist", mode: "framed", dark: false, wallColor: null,
-    widgets: { clocks: { on: true, size: "M" }, weather: { on: false, size: "S" } },
+    widgets: { clocks: { on: true, size: "M" }, weather: { on: false, size: "S" }, career: { on: true, size: "M" }, building: { on: true, size: "M" } },
     welcome: true
   };
   try {
@@ -437,7 +562,7 @@
       Object.keys(prefs.widgets).forEach(function (k) {
         if (saved.widgets[k]) {
           if (typeof saved.widgets[k].on === "boolean") prefs.widgets[k].on = saved.widgets[k].on;
-          if (saved.widgets[k].size) prefs.widgets[k].size = saved.widgets[k].size;
+          /* widget sizes only last for this visit; see SIZE_KEY */
         }
       });
     }
@@ -446,7 +571,20 @@
   /* a widget removed in v16 may still have a saved preference; drop it
      here instead of breaking the widget panel */
   delete prefs.widgets.news;
-  function savePrefs() { try { localStorage.setItem(PREF_KEY, JSON.stringify(prefs)); } catch (e) {} }
+  var SIZE_KEY = "mf-sizes-v1"; /* widget sizes picked or dragged in this visit only */
+  try {
+    var ss = JSON.parse(sessionStorage.getItem(SIZE_KEY) || "{}");
+    Object.keys(prefs.widgets).forEach(function (k) {
+      if (ss[k] && ss[k].size) { prefs.widgets[k].size = ss[k].size; if (ss[k].customWidth) prefs.widgets[k].customWidth = ss[k].customWidth; }
+    });
+  } catch (e) {}
+  function savePrefs() {
+    try { localStorage.setItem(PREF_KEY, JSON.stringify(prefs)); } catch (e) {}
+    try {
+      var ss = {}; Object.keys(prefs.widgets).forEach(function (k) { ss[k] = { size: prefs.widgets[k].size, customWidth: prefs.widgets[k].customWidth }; });
+      sessionStorage.setItem(SIZE_KEY, JSON.stringify(ss));
+    } catch (e) {}
+  }
 
   /* ================= wallpaper ================= */
   /* ================= wallpaper ================= */
@@ -531,7 +669,7 @@
   on("mb-theme-btn", "click", function () { prefs.dark = !prefs.dark; applyTheme(); });
 
   /* ================= widgets ================= */
-  var WIDGET_SIZES = { clocks: { S: 300, M: 480, L: 680 }, weather: { S: 300, M: 300, L: 300 } };
+  var WIDGET_SIZES = { clocks: { S: 300, M: 480, L: 680 }, weather: { S: 300, M: 300, L: 300 }, career: { S: 260, M: 300, L: 360 }, building: { S: 260, M: 300, L: 360 } };
   var SIZE_ORDER = ["S", "M", "L"];
   function applyWidgets() {
     Object.keys(prefs.widgets).forEach(function (key) {
@@ -545,11 +683,95 @@
     });
     renderWidgetPanel();
     savePrefs();
+    placeWeather();
   }
+  /* the weather window sits under the right-hand widgets instead of on top of them,
+     unless the visitor has dragged it somewhere of their own */
+  /* on short laptop screens the career widget is tall enough to reach the "Now building" widget; keep a gap */
+  function stackRight() {
+    var c = el("widget-career"), b = el("widget-building");
+    if (!c || !b || positions["widget-building"]) return;
+    b.style.top = ""; b.classList.remove("nofit");
+    if (isPhone() || window.innerWidth <= 1100 || c.style.display === "none" || b.style.display === "none" || positions["widget-career"]) return;
+    var cr = c.getBoundingClientRect(), br = b.getBoundingClientRect();
+    if (br.top < cr.bottom + 14 && br.left < cr.right && br.right > cr.left) {
+      var pr = (b.offsetParent || document.body).getBoundingClientRect();
+      b.style.top = Math.round(cr.bottom + 14 - pr.top) + "px";
+      /* no room under it on a very short screen: leave it out rather than cover something */
+      if (cr.bottom + 14 + br.height > window.innerHeight - 12) b.classList.add("nofit");
+    }
+  }
+  function placeWeather() {
+    stackRight();
+    var w = el("widget-weather");
+    if (!w || w.style.display === "none") return;
+    w.classList.remove("wx-mini", "nofit");
+    if (isPhone() || positions["widget-weather"] || window.innerWidth <= 1100) { if (!positions["widget-weather"]) w.style.top = w.style.bottom = w.style.left = w.style.right = ""; return; }
+    var anchor = ["career", "building"].map(function (k) { var n = el("widget-" + k); return prefs.widgets[k].on && n && !n.classList.contains("nofit") ? n : null; }).filter(Boolean).pop();
+    var parent = w.offsetParent || document.body, pr = parent.getBoundingClientRect(), vh = window.innerHeight;
+    var art = document.querySelector(".framed-art");
+    var slots = [{ top: anchor ? anchor.getBoundingClientRect().bottom - pr.top + 14 : vh * 0.07, left: "" }];
+    if (art && art.offsetParent) {
+      var ar = art.getBoundingClientRect();
+      slots.push({ top: ar.bottom - pr.top + 14, left: Math.round(ar.left + (ar.width - w.offsetWidth) / 2 - pr.left) + "px" });
+    }
+    function tryAt(sl, mini) {
+      w.classList.toggle("wx-mini", mini);
+      w.style.left = sl.left; w.style.right = sl.left ? "auto" : "";
+      w.style.bottom = "auto"; w.style.top = sl.top + "px";
+      if (sl.top + pr.top + w.offsetHeight > vh - 12) return false;
+      var me = w.getBoundingClientRect(), mr = { l: me.left, t: me.top, r: me.right, b: me.bottom };
+      return !deskRects().some(function (o) { return o.id !== "widget-weather" && hits(mr, o); });
+    }
+    for (var i = 0; i < slots.length; i++) { if (tryAt(slots[i], false) || tryAt(slots[i], true)) return; }
+    /* no free spot on this screen: leave the optional weather window out instead of stacking it on a widget */
+    tryAt(slots[0], true);
+    w.classList.add("nofit");
+  }
+  /* Nothing on the desktop may sit on top of anything else when the page loads or the screen changes size.
+     A saved spot or a resized widget that would cover another item goes back to its default. */
+  var DESK_IDS = ["window-intro", "widget-clocks", "widget-weather", "widget-career", "widget-building", "framed-art", "note-motto", "note-resume", "note-contact"];
+  function deskRects() {
+    return DESK_IDS.map(function (id) {
+      var n = el(id); if (!n || n.offsetParent === null) return null;
+      var cs = getComputedStyle(n); if (cs.display === "none" || cs.visibility === "hidden") return null;
+      var r = n.getBoundingClientRect();
+      if (r.width < 4 || r.height < 4) return null;
+      return { id: id, node: n, l: r.left, t: r.top, r: r.right, b: r.bottom };
+    }).filter(Boolean);
+  }
+  var DEFAULT_SIZE = { clocks: "M", weather: "S", career: "M", building: "M" };
+  function resized(id) { var k = id.slice(7), p = prefs.widgets[k]; return id.indexOf("widget-") === 0 && p && p.size !== DEFAULT_SIZE[k]; }
+  function hits(a, b) { return Math.min(a.r, b.r) - Math.max(a.l, b.l) > 6 && Math.min(a.b, b.b) - Math.max(a.t, b.t) > 6; }
+  function untangle() {
+    if (isPhone() || window.innerWidth <= 1100) return;
+    var changed = false;
+    for (var pass = 0; pass < 8; pass++) {
+      var rs = deskRects(), fix = null;
+      for (var i = 0; i < rs.length && !fix; i++) for (var j = i + 1; j < rs.length && !fix; j++) {
+        if (!hits(rs[i], rs[j])) continue;
+        /* move the one the visitor placed or resized; a clash in the default layout itself is left to the CSS */
+        var a = rs[i], b = rs[j];
+        fix = positions[b.id] ? b : positions[a.id] ? a : resized(b.id) ? b : resized(a.id) ? a : null;
+      }
+      if (!fix) break;
+      changed = true;
+      if (positions[fix.id]) { delete positions[fix.id]; fix.node.style.left = fix.node.style.top = fix.node.style.transform = ""; }
+      else { var k = fix.id.slice(7); prefs.widgets[k].size = DEFAULT_SIZE[k]; delete prefs.widgets[k].customWidth; fix.node.style.width = WIDGET_SIZES[k][DEFAULT_SIZE[k]] + "px"; }
+      placeWeather();
+    }
+    if (changed) { savePositions(); savePrefs(); }
+  }
+  var untangleT = null;
+  window.addEventListener("resize", function () { placeWeather(); clearTimeout(untangleT); untangleT = setTimeout(untangle, 150); });
+  window.addEventListener("load", function () { setTimeout(untangle, 60); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { setTimeout(untangle, 60); });
   function renderWidgetPanel() {
     var labels = {
       clocks: { name: "World Clock", sub: "Detroit, Shanghai, Mexico City" },
-      weather: { name: "Weather", sub: "A window, not a dashboard" }
+      weather: { name: "Weather", sub: "A window, not a dashboard" },
+      career: { name: "Career odometer", sub: "20+ years, three countries" },
+      building: { name: "Now building", sub: "Marcin Hub, the AI loop" }
     };
     var onCount = Object.keys(prefs.widgets).filter(function (k) { return prefs.widgets[k].on; }).length;
     el("widget-panel-count").textContent = onCount + (onCount === 1 ? " widget visible" : " widgets visible");
@@ -622,26 +844,103 @@
     else closeWidgetPanel();
   });
 
-  /* weather (Open-Meteo, no key) */
-  var weatherLoaded = false;
+  /* weather: a Detroit "window" that always renders (sky for local time),
+     with live temperature from Open-Meteo laid on top when the fetch works */
+  var weatherLoaded = false, wxLive = null, wxTimer = null;
+  var WX_COND = { 0: "Clear", 1: "Mostly clear", 2: "Partly cloudy", 3: "Overcast", 45: "Fog", 48: "Fog", 51: "Light drizzle", 53: "Drizzle", 55: "Drizzle", 61: "Light rain", 63: "Rain", 65: "Heavy rain", 66: "Freezing rain", 67: "Freezing rain", 71: "Light snow", 73: "Snow", 75: "Heavy snow", 77: "Snow grains", 80: "Light showers", 81: "Showers", 82: "Heavy showers", 85: "Snow showers", 86: "Snow showers", 95: "Thunderstorm", 96: "Thunderstorm", 99: "Thunderstorm" };
+  var WX_SKYLINE = '<svg class="wx-city" viewBox="0 0 300 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0 60V44h14v-8h10v12h8V30h12v-6h4v6h10v30zM62 60V38h16V22h6v-8h4v8h6v38zM100 60V34h10v-6h8v6h6v26zM128 60V12h8V4h4v8h8v8h6v40zM160 60V30h18v30zM182 60V40h12V26h10v34zM208 60V18h6v-6h10v6h6v42zM234 60V36h14v-6h8v30zM260 60V42h12v-8h10v26zM286 60V46h14v14z"/></svg>';
+  function detroitNow() {
+    var d = new Date(), h = d.getHours(), m = d.getMinutes(), label = "";
+    try {
+      var parts = new Intl.DateTimeFormat("en-US", { timeZone: "America/Detroit", hour: "numeric", minute: "2-digit", hour12: false }).formatToParts(d);
+      parts.forEach(function (p) { if (p.type === "hour") h = +p.value % 24; if (p.type === "minute") m = +p.value; });
+      label = new Intl.DateTimeFormat("en-US", { timeZone: "America/Detroit", hour: "numeric", minute: "2-digit" }).format(d);
+    } catch (e) { label = d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }); }
+    /* rough Detroit sunrise and sunset by month (hours, local clock) */
+    var mo = d.getMonth(), rise = [8, 7.6, 7.8, 7.1, 6.3, 6, 6.2, 6.7, 7.2, 7.7, 7.4, 7.9][mo], set = [17.4, 18, 19.6, 20.2, 20.8, 21.2, 21.1, 20.6, 19.8, 18.9, 17.2, 17][mo];
+    var t = h + m / 60, phase = "night";
+    if (t >= rise - 0.6 && t < rise + 0.8) phase = "dawn";
+    else if (t >= rise + 0.8 && t < set - 0.8) phase = "day";
+    else if (t >= set - 0.8 && t < set + 0.7) phase = "dusk";
+    var frac = phase === "day" || phase === "dawn" || phase === "dusk" ? Math.max(0, Math.min(1, (t - rise) / (set - rise))) : ((t < rise ? t + 24 : t) - set) / (24 - set + rise);
+    return { label: label, phase: phase, frac: Math.max(0, Math.min(1, frac)) };
+  }
+  function renderWeather() {
+    var body = el("weather-body"); if (!body) return;
+    var n = detroitNow(), x = 8 + n.frac * 84, y = 62 - Math.sin(n.frac * Math.PI) * 46;
+    var temp = wxLive ? wxLive.temp + "°" : "";
+    var line = wxLive ? esc(wxLive.cond) : "Live forecast unavailable here";
+    body.innerHTML =
+      '<div class="wx-scene wx-' + n.phase + (wxLive && wxLive.wet ? " wx-wet" : "") + '"><span class="wx-orb ' + (n.phase === "night" ? "moon" : "sun") + '" style="left:' + x.toFixed(1) + "%;top:" + y.toFixed(1) + '%"></span>' + WX_SKYLINE +
+      (temp ? '<span class="weather-temp">' + temp + '<small>F</small></span>' : "") + "</div>" +
+      '<div class="wx-row"><span class="weather-cond">' + line + '</span><span class="wx-time">' + esc(n.label) + " in Detroit</span></div>" +
+      (wxLive ? '<div class="weather-src">Data: Open-Meteo</div>' : "");
+    placeWeather();
+  }
   function loadWeather() {
+    renderWeather();
+    if (!wxTimer) wxTimer = setInterval(renderWeather, 60000);
     if (weatherLoaded) return;
     weatherLoaded = true;
-    fetch("https://api.open-meteo.com/v1/forecast?latitude=42.33&longitude=-83.05&current=temperature_2m,weather_code&temperature_unit=fahrenheit")
-      .then(function (r) { return r.json(); })
+    var ctl = typeof AbortController === "function" ? new AbortController() : null;
+    var wt = setTimeout(function () { if (ctl) ctl.abort(); }, 7000);
+    fetch("https://api.open-meteo.com/v1/forecast?latitude=42.33&longitude=-83.05&current=temperature_2m,weather_code&temperature_unit=fahrenheit", ctl ? { signal: ctl.signal } : undefined)
+      .then(function (r) { clearTimeout(wt); if (!r.ok) throw new Error("weather " + r.status); return r.json(); })
       .then(function (d) {
         var code = d.current && d.current.weather_code;
         var temp = d.current && Math.round(d.current.temperature_2m);
-        var cond = { 0: "Clear", 1: "Mostly clear", 2: "Partly cloudy", 3: "Overcast", 45: "Fog", 48: "Fog", 51: "Light drizzle", 53: "Drizzle", 55: "Drizzle", 61: "Light rain", 63: "Rain", 65: "Heavy rain", 66: "Freezing rain", 67: "Freezing rain", 71: "Light snow", 73: "Snow", 75: "Heavy snow", 77: "Snow grains", 80: "Light showers", 81: "Showers", 82: "Heavy showers", 85: "Snow showers", 86: "Snow showers", 95: "Thunderstorm", 96: "Thunderstorm", 99: "Thunderstorm" }[code] || "—";
-        el("weather-body").innerHTML =
-          '<div class="weather-temp">' + temp + "°F</div>" +
-          '<div class="weather-cond">Detroit · ' + esc(cond) + "</div>" +
-          '<div class="weather-src">Data: Open-Meteo</div>';
+        if (typeof temp !== "number" || isNaN(temp)) throw new Error("weather data");
+        wxLive = { temp: temp, cond: WX_COND[code] || "Detroit", wet: code >= 51 };
+        renderWeather();
       })
-      .catch(function () {
-        el("weather-body").innerHTML = '<div class="weather-cond">Weather unavailable right now.</div><div class="weather-src">Data: Open-Meteo</div>';
-      });
+      .catch(function () { clearTimeout(wt); weatherFail(); });
   }
+  function weatherFail() {
+    /* the window still shows sky and local time; try the forecast again next time it opens */
+    weatherLoaded = false;
+    renderWeather();
+  }
+
+  /* ================= photo picker (preview only) ================= */
+  var pickerOn = false;
+  try { pickerOn = /[?&]pick\b/.test(window.location.search); } catch (e) {}
+  if (pickerOn && HEADSHOTS.length) {
+    var ppBtn = el("photo-pick-btn");
+    ppBtn.hidden = false;
+    ppBtn.addEventListener("click", function () { renderPicker(); openWindow("photos"); });
+  }
+  function currentPhotoId() {
+    var id = null; try { id = localStorage.getItem(PHOTO_KEY); } catch (e) {}
+    return photoById(id || "") ? id : (HEADSHOTS.filter(function (h) { return h.isDefault; })[0] || HEADSHOTS[0]).id;
+  }
+  function showBig(h) {
+    el("pp-big").src = h.portrait || h.avatar; el("pp-big").alt = h.label;
+    el("pp-cap").textContent = h.label + (h.source ? " · " + h.source : "");
+  }
+  function renderPicker() {
+    var cur = currentPhotoId();
+    el("pp-grid").innerHTML = HEADSHOTS.map(function (h) {
+      return '<button type="button" class="pp-item' + (h.id === cur ? " selected" : "") + '" data-photo="' + esc(h.id) + '" aria-pressed="' + (h.id === cur) + '">' +
+        '<img src="' + esc(h.avatar) + '" alt="" loading="lazy"><span>' + esc(h.label) + "</span></button>";
+    }).join("");
+    showBig(photoById(cur));
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-photo]");
+    if (!b) return;
+    var h = photoById(b.getAttribute("data-photo"));
+    if (!h) return;
+    try { localStorage.setItem(PHOTO_KEY, h.id); } catch (err) {}
+    el("intro-photo").src = h.avatar;
+    document.querySelectorAll(".pp-item").forEach(function (n) {
+      var on = n === b; n.classList.toggle("selected", on); n.setAttribute("aria-pressed", on);
+    });
+    showBig(h);
+  });
+  document.addEventListener("mouseover", function (e) {
+    var b = e.target.closest && e.target.closest("[data-photo]");
+    if (b) showBig(photoById(b.getAttribute("data-photo")));
+  });
 
   /* ================= welcome ================= */
   function applyWelcome() {
@@ -708,7 +1007,8 @@
     else if (a === "open-notes-win") openWindow("notes-win");
     else if (a === "open-terminal") openWindow("terminal");
     else if (a === "open-browser") openWindow("browser");
-    else if (a === "open-work-showcase") browserOpenTab(BROWSER_HOME, "Work Showcase");
+    else if (a === "open-work-showcase") goPage("road.html");
+    else if (a === "open-brag") browserOpenTab(BRAG_URL, "Work & Tools");
     else if (a === "contact") openWindow("contact-win");
     else if (a === "search") openPalette();
     else if (a === "wallpaper-settings") openWindow("wallpaper");
@@ -738,7 +1038,7 @@
     else if (a === "reset-wallpaper") { prefs.wallpaper = "shanghai-mist"; prefs.mode = "framed"; prefs.wallColor = null; applyWallpaper(); }
     else if (a === "reset-widgets") {
       markPanelClick();
-      prefs.widgets = { clocks: { on: true, size: "M" }, weather: { on: false, size: "S" } };
+      prefs.widgets = { clocks: { on: true, size: "M" }, weather: { on: false, size: "S" }, career: { on: true, size: "M" }, building: { on: true, size: "M" } };
       applyWidgets();
     }
     else if (a === "close-widget-panel") closeWidgetPanel();
@@ -752,13 +1052,26 @@
 
   /* ================= finder ================= */
   var finderCat = "start";
+  /* the tools appear as files: double-click opens the live rebuild in the browser window */
+  function finderItems() {
+    var sys = TOOLS.systems.map(function (t) {
+      return { id: "tool-" + t.id, name: t.name, app: t.glyph, color: t.color, category: "tools", href: hubHref(t.id),
+        preview: "<b>" + esc(t.name) + "</b> — " + esc(t.blurb) + ' <span class="fp-meta">' + esc(t.org) + " · " + esc(t.years) + ". Double-click to open the live rebuild.</span>" };
+    });
+    var kit = TOOLS.kit.map(function (k) {
+      return { id: "kit-" + k.id, name: k.name, app: k.glyph, category: "kit", href: hubHref(k.live ? "kit" : "more"),
+        preview: "<b>" + esc(k.name) + "</b> — " + esc(k.blurb) + ' <span class="fp-meta">Double-click to open the everyday kit.</span>' };
+    });
+    return (C.finder || []).concat(sys, kit);
+  }
   function renderFinder() {
-    var items = (C.finder || []).filter(function (it) {
-      return finderCat === "start" || it.category === finderCat;
+    var items = finderItems().filter(function (it) {
+      return it.category === finderCat;
     });
     el("finder-grid").innerHTML = items.map(function (it, i) {
+      var ico = it.app ? appIcon(it.app, it.color || (it.app === "timeline" ? "#0369a1" : null), 40) : esc(it.icon);
       return '<button class="finder-item' + (i === 0 ? " selected" : "") + '" data-finder="' + it.id + '">' +
-        '<span class="fi-icon">' + esc(it.icon) + '</span><span class="fi-name">' + esc(it.name) + "</span></button>";
+        '<span class="fi-icon">' + ico + '</span><span class="fi-name">' + esc(it.name) + "</span></button>";
     }).join("");
     var first = items[0];
     el("finder-preview").innerHTML = first ? first.preview : "";
@@ -767,7 +1080,7 @@
     });
   }
   function finderSelect(id) {
-    var it = (C.finder || []).find(function (x) { return x.id === id; });
+    var it = finderItems().find(function (x) { return x.id === id; });
     if (!it) return;
     el("finder-preview").innerHTML = it.preview;
     document.querySelectorAll(".finder-item").forEach(function (b) {
@@ -783,8 +1096,11 @@
   document.addEventListener("dblclick", function (e) {
     var item = e.target.closest("[data-finder]");
     if (!item) return;
-    var it = (C.finder || []).find(function (x) { return x.id === item.getAttribute("data-finder"); });
-    if (it && it.target) openWindow(it.target);
+    var it = finderItems().find(function (x) { return x.id === item.getAttribute("data-finder"); });
+    if (!it) return;
+    if (it.nav) { finderCat = it.nav; renderFinder(); return; }
+    if (it.href) { openToolPage(it.href, it.name); return; }
+    if (it.target) openWindow(it.target);
   });
   renderFinder();
 
@@ -795,7 +1111,7 @@
       { tag: "Motto", text: C.notes.motto },
       { tag: "Resume", text: C.notes.resumeNote, href: "assets/resume.pdf" },
       { tag: "Sizzle Reel", text: C.notes.reelNote, href: "reel.html" },
-      { tag: "Contact", text: C.notes.contact.email + " · LinkedIn" }
+      { tag: "Contact", text: "Email · LinkedIn" }
     ];
     el("notes-body").innerHTML =
       '<p class="notes-section">Pinned on desktop · ' + pinned.length + "</p><ul class=\"notes-list\">" +
@@ -822,13 +1138,13 @@
   }
   termInit();
   var TERM_COMMANDS = {
-    help: "whoami · now · history · links · projects · contact · clear · exit",
+    help: "whoami · now · history · tools · open <tool> · links · projects · contact · clear · exit",
     whoami: "Marcin Fracz · strategist, global software & AI.",
     now: "Exploring new leadership opportunities. Building with AI.",
-    history: "2003–2014 Engineering · 2014–2018 GM crossovers · 2018–2020 Encore GX & Trailblazer · 2020–2022 Connected & OTA · 2022–2025 SAIC-GM Shanghai · 2025 GM Global Planning & OnStar",
-    links: "linkedin.com/in/marcinfracz · marcinfracz.github.io/work",
-    projects: "Marcin Hub · OpenAutoLink · 3D Prints",
-    contact: "marcin.fracz@gmail.com",
+    history: "2003–2014 Engineering · 2014–2016 Chevrolet product, CX and GM de Mexico · 2017–2020 GM crossovers, Encore GX and Trailblazer · 2020–2022 Connected & OTA · 2022–2025 SAIC-GM Shanghai · 2025–2026 OnStar International",
+    links: "linkedin.com/in/marcinfracz · marcinfracz.github.io/road.html",
+    projects: "Export Command Center · JV Strategy Room · Subscription Lab · Portfolio Made Visible · Marcin Hub · OpenAutoLink · 3D Prints",
+    contact: "Open the Contact window, or find me at linkedin.com/in/marcinfracz",
     coffee: "Brewing… ☕ (just kidding, this terminal makes no coffee.)",
     sudo: "Nice try. This terminal has no sudo.",
     "rm -rf /": "Nope. Not on my watch."
@@ -842,6 +1158,20 @@
     if (!cmd) return;
     if (cmd === "clear") { termBody.textContent = ""; return; }
     if (cmd === "exit") { closeWindow("terminal"); return; }
+    if (cmd === "tools" || cmd === "ls") {
+      var pad = function (x) { return ("  " + x + "            ").slice(0, 12); };
+      termPrint(TOOLS.systems.map(function (t) { return pad(t.id) + t.name; }).join("\n") + "\n" + pad("kit") + "Everyday kit (" + TOOLS.kit.length + " tools)\n" + pad("timeline") + "Career timeline explorer\nType 'open export' to launch one.");
+      return;
+    }
+    var m = cmd.match(/^open\s+(\S+)/);
+    if (m) {
+      var key = m[1], sys = TOOLS.systems.filter(function (t) { return t.id === key; })[0];
+      if (sys) { termPrint("Opening " + sys.name + "…"); openToolPage(hubHref(sys.id), sys.name); return; }
+      if (key === "kit") { termPrint("Opening the everyday kit…"); openToolPage(hubHref("kit"), "Everyday kit"); return; }
+      if (key === "timeline") { termPrint("Opening the career timeline…"); openToolPage("work/timeline.html", "Career timeline"); return; }
+      if (key === "road") { termPrint("Starting the drive…"); goPage("road.html"); return; }
+      termPrint("open: no tool called '" + key + "'. Type 'tools' for the list."); return;
+    }
     termPrint(TERM_COMMANDS[cmd] || ("command not found: " + cmd + " — type 'help'"));
   });
 
@@ -856,18 +1186,28 @@
   });
 
   /* ================= browser: a real browser window inside the desktop ================= */
-  var BROWSER_HOME = "https://marcinfracz.github.io/work/";
+  var BROWSER_HOME = new URL("road.html", window.location.href).href;
   var browserHistory = [], browserIndex = -1, browserCurrent = "";
   var frame = el("browser-frame"), urlBar = el("browser-url");
-  var RESUME_URL = "https://marcinfracz.github.io/assets/resume.pdf";
-  var REEL_URL = "https://marcinfracz.github.io/reel.html";
+  var RESUME_URL = new URL("assets/resume.pdf", window.location.href).href;
+  var REEL_URL = new URL("reel.html", window.location.href).href;
+  var BRAG_URL = new URL("work/brag-book.html", window.location.href).href;
+  var TIMELINE_URL = new URL("work/timeline.html", window.location.href).href;
+  /* work pages open in the browser window on a desktop, and as a page on a phone */
+  function openToolPage(href, label) {
+    var u = new URL(href, window.location.href).href;
+    if (isPhone()) { window.location.href = u; return; }
+    browserOpenTab(u, label || "Work & Tools");
+  }
   var browserTabs = []; /* {id, title, url, history, index} — one history stack per tab */
   var browserActiveId = null;
   var browserTabSeq = 0;
   function browserTitleFor(url) {
-    if (url === BROWSER_HOME) return "Work Showcase";
+    if (url === BROWSER_HOME) return "The Road";
     if (url === RESUME_URL) return "Resume";
     if (url === REEL_URL) return "Sizzle Reel";
+    if (url.split("#")[0] === BRAG_URL) return "Work & Tools";
+    if (url.split("#")[0] === TIMELINE_URL) return "Work";
     try { return new URL(url).hostname.replace(/^www\./, ""); } catch (e) { return url; }
   }
   function browserActiveTab() {
@@ -903,7 +1243,7 @@
     if (isPhone()) {
       /* phone: no browser-in-a-browser. Work goes to the real page,
          Resume / Reel open in a new tab so the site stays open. */
-      if (url === BROWSER_HOME) window.location.href = url;
+      if (url === BROWSER_HOME || url.split("#")[0] === BRAG_URL) window.location.href = url;
       else window.open(url, "_blank", "noopener");
       return;
     }
@@ -985,7 +1325,7 @@
   function browserNavigate(raw) { browserGo(browserNormalize(raw), true); }
   function browserInit() {
     if (!browserTabs.length) {
-      var t = { id: ++browserTabSeq, title: "Work Showcase", url: BROWSER_HOME, history: [BROWSER_HOME], index: 0 };
+      var t = { id: ++browserTabSeq, title: "The Road", url: BROWSER_HOME, history: [BROWSER_HOME], index: 0 };
       browserTabs.push(t);
       browserLoadTab(t);
     } else {
@@ -1021,6 +1361,10 @@
   document.addEventListener("click", function (e) {
     var a = e.target.closest('a[href$="resume.pdf"]');
     if (a && !isPhone()) { e.preventDefault(); browserOpenTab(RESUME_URL, "Resume"); return; }
+    var bb = e.target.closest('a[href*="brag-book.html"], [data-brag]');
+    if (bb) { e.preventDefault(); var nm = bb.querySelector && bb.querySelector(".app-txt b, .kit-chip span"); openToolPage(bb.href || BRAG_URL, nm ? nm.textContent.replace(/\s*Live$/, "") : "Work & Tools"); return; }
+    var tl = e.target.closest('a[href*="work/timeline.html"]');
+    if (tl) { e.preventDefault(); openToolPage(tl.href, "Work"); return; }
     var r = e.target.closest('a[href$="reel.html"]');
     if (r && !isPhone()) { e.preventDefault(); browserOpenTab(REEL_URL, "Sizzle Reel"); return; }
     var x = e.target.closest("[data-browser-tab-close]");
@@ -1029,13 +1373,31 @@
     if (tb) browserSwitchTab(parseInt(tb.getAttribute("data-browser-tab"), 10));
   });
 
+  /* page links to the Road go by script, so a host frame that takes over plain links (the private
+     preview does) can't stop them; if the host blocks the move, the Road opens in the browser window */
+  function goPage(href) {
+    var u = new URL(href, window.location.href).href, left = false;
+    var mark = function () { left = true; };
+    window.addEventListener("beforeunload", mark, { once: true }); window.addEventListener("pagehide", mark, { once: true });
+    try { window.location.assign(u); } catch (err) {}
+    setTimeout(function () { if (!left && !isPhone()) browserOpenTab(u, "The Road"); }, 900);
+  }
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest && e.target.closest("a[href]");
+    if (!a || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.button || (a.target && a.target !== "_self") || a.hasAttribute("download")) return;
+    if (!/^road\.html(#[\w-]*)?$/.test(a.getAttribute("href"))) return;
+    e.preventDefault(); goPage(a.getAttribute("href"));
+  });
+
   /* ================= search palette ================= */
   var PALETTE_ITEMS = [
     { label: "About Marcin", hint: "Window", run: function () { openWindow("about"); } },
     { label: "Work", hint: "Window", run: function () { openWindow("work"); } },
+    { label: "Work & Tools: four live demos", hint: "Page", run: function () { browserOpenTab(BRAG_URL, "Work & Tools"); } },
     { label: "Browser", hint: "Window", run: function () { openWindow("browser"); } },
-    { label: "Work Showcase", hint: "Browser", run: function () { browserOpenTab(BROWSER_HOME, "Work Showcase"); } },
+    { label: "The Road: career story", hint: "Page", run: function () { goPage("road.html"); } },
     { label: "Projects", hint: "Window", run: function () { openWindow("projects"); } },
+    { label: "Career timeline explorer", hint: "Page", run: function () { openToolPage("work/timeline.html", "Career timeline"); } },
     { label: "Marcin Hub", hint: "Project", run: function () { openWindow("projects"); } },
     { label: "OpenAutoLink", hint: "Project", run: function () { openWindow("projects"); } },
     { label: "3D Prints", hint: "Project", run: function () { openWindow("projects"); } },
@@ -1050,6 +1412,12 @@
     { label: "Light Appearance", hint: "View", run: function () { prefs.dark = false; applyTheme(); } },
     { label: "Show Desktop", hint: "View", run: showDesktop }
   ];
+  TOOLS.systems.forEach(function (t) {
+    PALETTE_ITEMS.splice(3, 0, { label: t.name, hint: "Live demo", run: function () { openToolPage(hubHref(t.id), t.name); } });
+  });
+  TOOLS.kit.forEach(function (k) {
+    PALETTE_ITEMS.push({ label: k.name, hint: "Tool", run: function () { openToolPage(hubHref(k.live ? "kit" : "more"), k.live ? "Everyday kit" : "More I built"); } });
+  });
   var paletteSel = 0;
   function renderPalette() {
     var q = el("palette-input").value.trim().toLowerCase();
@@ -1091,7 +1459,12 @@
   /* keyboard */
   document.addEventListener("keydown", function (e) {
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); openPalette(); }
-    else if (e.key === "Escape") { closeMenus(); closePalette(); closeWidgetPanel(); }
+    else if (e.key === "Escape") {
+      var busy = !el("palette").classList.contains("hidden-window") || !el("widget-panel").classList.contains("hidden-window") || document.querySelector(".menu.open");
+      closeMenus(); closePalette(); closeWidgetPanel();
+      var tag = (e.target && e.target.tagName) || "";
+      if (!busy && !/INPUT|TEXTAREA|SELECT/.test(tag)) { var fw = frontWindow(); if (fw && fw !== "intro") closeWindow(fw); }
+    }
   });
   document.addEventListener("click", function (e) {
     var pal = el("palette");
@@ -1099,4 +1472,29 @@
     var wp = el("widget-panel");
     if (!panelClick && !wp.classList.contains("hidden-window") && !e.target.closest("#widget-panel") && !e.target.closest("#mb-widgets-btn") && !e.target.closest(".menu")) closeWidgetPanel();
   });
+  /* ================= v23: field notes, parts, loop, deep links ================= */
+  (function () {
+    var notes = (C.notes && C.notes.field) || ["Find the gap. Build the mechanism. Bring the decision."];
+    var ni = 0, nt = el("note-motto-text");
+    function nextNote() { ni = (ni + 1) % notes.length; if (nt) { nt.style.opacity = 0; setTimeout(function () { nt.textContent = notes[ni]; nt.style.opacity = 1; }, 250); } }
+    if (nt) { nt.textContent = notes[0]; nt.style.transition = "opacity .25s"; }
+    var noteEl = el("note-motto");
+    if (noteEl) noteEl.addEventListener("dblclick", nextNote);
+    var parts = (C.widgets && C.widgets.parts) || [];
+    var pi = 0, pe = el("career-part");
+    function nextPart() { if (!pe || !parts.length) return; pi = (pi + 1) % parts.length; pe.style.opacity = 0; setTimeout(function () { pe.innerHTML = "<b>" + esc(parts[pi].name) + "</b><span>" + esc(parts[pi].detail) + "</span>"; pe.style.opacity = 1; }, 250); }
+    if (pe && parts.length) { pe.innerHTML = "<b>" + esc(parts[0].name) + "</b><span>" + esc(parts[0].detail) + "</span>"; pe.style.transition = "opacity .25s"; pe.addEventListener("click", nextPart); }
+    var loop = el("build-loop"), li = 0;
+    function stepLoop() { if (!loop) return; var items = loop.querySelectorAll("li"); items.forEach(function (x, i) { x.classList.toggle("on", i === li); }); li = (li + 1) % items.length; }
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    stepLoop();
+    if (!reduce) { setInterval(nextNote, 7000); setInterval(nextPart, 5000); setInterval(stepLoop, 1400); }
+    function openFromHash() {
+      var h = (window.location.hash || "").replace("#", "");
+      var map = { contact: "contact-win", about: "about", work: "work", projects: "projects", notes: "notes-win", howiwork: "about" };
+      if (map[h]) openWindow(map[h]);
+    }
+    openFromHash();
+    window.addEventListener("hashchange", openFromHash);
+  })();
 })();
