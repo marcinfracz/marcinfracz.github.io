@@ -5,27 +5,38 @@ window.SITE_CONTENT = {
     name: "Marcin Fracz",
     title: "Automotive product & software strategy leader · GM · SAIC-GM Shanghai",
     headline: "Strategist transforming global software and AI ecosystems with high-velocity, cross-border execution. Exploring new leadership opportunities.",
-    photo: "assets/profile.jpg",
+    photo: "assets/headshots/pro-blue-gray-avatar.jpg",
     buttons: [
       { label: "About", target: "about" },
       { label: "Work", target: "work" },
       { label: "Projects", target: "projects" }
     ]
   },
+  /* Site photo (web size). */
+  headshots: [
+    { id: "pro-blue-gray", label: "Headshot", source: "blue-gray studio background", avatar: "assets/headshots/pro-blue-gray-avatar.jpg", portrait: "assets/headshots/pro-blue-gray.jpg", isDefault: true }
+  ],
   about: {
     title: "About",
     paragraphs: [
       "Engineer turned product manager turned software strategy leader, now building with AI.",
       "I started in engineering, moved into product management, then led software strategy in Shanghai, and today I build AI-powered tools and products. I like the full arc: from how something is built, to why it matters, to how it ships.",
-      "Most of my career has been in automotive, at the intersection of software, product, and global markets."
+      "Most of my career has been in automotive, at the intersection of software, product, and global markets.",
+      "Kettering University BSME, 2007, cum laude. Michigan Ross MBA, 2014, including a consulting project on site in Canada through Ross MAP. Fluent in Polish."
+    ],
+    howIWork: [
+      "Decision surface, not a dashboard.",
+      "Equity mining: the lowest-complexity path to the biggest impact.",
+      "Staged plan with tripwires.",
+      "Three layers and a gate."
     ]
   },
   work: {
     title: "Work",
-    note: "Drag the timeline to scroll. Use + / - to zoom.",
+    note: "Drag the timeline to scroll. Use + / - to zoom. Tap a role to drive to it on the Road.",
     roles: [
       {
-        company: "Federal-Mogul, Chrysler, Johnson Controls",
+        company: "Federal-Mogul, Chrysler Group, Johnson Controls",
         role: "Engineering",
         years: "2003-2014",
         detail: "Powertrain and vehicle interiors."
@@ -61,8 +72,48 @@ window.SITE_CONTENT = {
         detail: "Global planning and OnStar product marketing."
       }
     ],
+    /* the visual timeline in the Work window, after the About Me deck slide.
+       focus: product | cx | field | digital | eng. Dates are approximate positions. */
+    visual: {
+      legend: [
+        { focus: "product", label: "Product" },
+        { focus: "cx", label: "CX" },
+        { focus: "field", label: "Field / Sales / Ops" },
+        { focus: "digital", label: "Software & Digital" },
+        { focus: "eng", label: "Engineering" }
+      ],
+      engineering: [
+        { from: 2003, to: 2007.7, w: 130, focus: "eng", kicker: "Federal-Mogul", label: "Engineering Co-op", years: "2003-2007", road: "fm-coop" },
+        { from: 2007.7, to: 2010.4, w: 124, focus: "eng", kicker: "Federal-Mogul", label: "Product Engineer", years: "2007-2010", road: "federal-mogul" },
+        { from: 2010.4, to: 2011.4, w: 124, focus: "eng", kicker: "Chrysler Group", label: "Design Release Engineer", years: "2010-2011", road: "chrysler" },
+        { from: 2011.4, to: 2014.4, w: 156, focus: "eng", kicker: "Johnson Controls", label: "Senior Product Engineer", years: "2011-2014", road: "johnson-controls" }
+      ],
+      degrees: [
+        { at: 2007, label: "BSME, Kettering", years: "2007", road: "kettering" },
+        { at: 2014, label: "MBA, Michigan Ross", years: "2014", road: "ross" }
+      ],
+      domestic: [
+        { from: 2014.4, to: 2015.4, focus: "product", kicker: "Chevrolet · U.S.", label: "Product Marketing, Traverse", years: "2014-2015", road: "traverse", flag: "US" },
+        { from: 2015.4, to: 2016.4, focus: "cx", kicker: "Chevrolet · Global", label: "Global Customer Experience", years: "2015-2016", road: "customer-experience" },
+        { from: 2017, to: 2019, focus: "product", kicker: "GM · Global", label: "Global Product Manager, compact & mid crossovers", years: "2017-2018", road: "equinox" },
+        { from: 2019, to: 2020.6, focus: "product", kicker: "Buick · Chevrolet", label: "Product Manager, Encore GX & Trailblazer", years: "2019-2020", road: "trailblazer-encore" },
+        { from: 2020.6, to: 2022.6, focus: "digital", kicker: "GM · U.S.", label: "Business Strategy Manager, Connected & OTA Services", years: "2020-2022", road: "connected" },
+        { from: 2025.4, to: 2026.4, focus: "digital", kicker: "OnStar · International", label: "Manager, OnStar Product Marketing", years: "2025-2026", road: "onstar" }
+      ],
+      projects: [
+        { at: 2012.8, flag: "CA", label: "Canada", sub: "Ross MAP project", road: "ross" },
+        { at: 2015.7, flag: "EC", label: "Ecuador", sub: "Global project", road: "customer-experience" },
+        { at: 2017.5, flag: "CA", label: "Canada", sub: "Global project", road: "equinox" },
+        { at: 2018.4, flag: "CN", label: "China", sub: "Global project", road: "equinox" },
+        { at: 2019.6, flag: "KR", label: "Korea", sub: "Global project", road: "trailblazer-encore" }
+      ],
+      assignments: [
+        { from: 2016.42, to: 2016.96, focus: "field", flag: "MX", kicker: "Assignment 1 · GM de Mexico", label: "Dealer Business Development", years: "2016", road: "mexico" },
+        { from: 2022.6, to: 2025.4, focus: "digital", flag: "CN", kicker: "Assignment 2 · SAIC-GM", label: "Deputy Director, Software Strategy", years: "2022-2025", road: "shanghai" }
+      ]
+    },
     education: [
-      { school: "MBA, Michigan Ross", year: "2014" },
+      { school: "MBA, Michigan Ross, with a Ross MAP consulting project for IdeaConnection in Victoria, BC", year: "2014" },
       { school: "BSME, Kettering University, cum laude", year: "2007" }
     ]
   },
@@ -83,6 +134,28 @@ window.SITE_CONTENT = {
       }
     ]
   },
+  /* the tools he built: shown in Projects, Finder, the palette and the terminal.
+     Every system opens its live rebuild (synthetic data) in the Work hub. */
+  tools: {
+    systems: [
+      { id: "export", name: "Export Command Center", org: "OnStar International", years: "2025–2026", color: "#2563eb", glyph: "globe",
+        blurb: "Which connected and ADAS features ship on which China-built vehicle, in which market, and who pays." },
+      { id: "jv", name: "JV Strategy Room", org: "SAIC-GM · Shanghai", years: "2022–2025", color: "#c2410c", glyph: "link",
+        blurb: "A new software organization, and the customer research behind what drivers in China would pay for." },
+      { id: "ota", name: "Subscription Lab", org: "Connected & OTA Services", years: "2020–2022", color: "#0f766e", glyph: "loop",
+        blurb: "Trials, conversion and the Super Cruise monetization strategy for features sold after the sale." },
+      { id: "pmv", name: "Portfolio Made Visible", org: "OnStar International", years: "2025–2026", color: "#7c3aed", glyph: "grid",
+        blurb: "A solo, AI-agent-built rebuild of a planning tool that once took a business team plus seven developers." }
+    ],
+    kit: [
+      { id: "tz", name: "Global meeting planner", glyph: "clock", live: true, blurb: "Finds the hour that works in Detroit, Shanghai and Mexico City. Live in the kit." },
+      { id: "gantt", name: "Production rollout timeline", glyph: "bars", blurb: "A Gantt view of program launches by market, embedded in the team's site." },
+      { id: "workshop", name: "Export ADAS strategy workshop", glyph: "compass", blurb: "Aligned product, planning, regional and policy leaders on L2 to L2++, delivered as a live app." },
+      { id: "films", name: "Narrated demo films", glyph: "play", blurb: "One script file becomes a narrated, captioned walkthrough." },
+      { id: "closeout", name: "Meeting close-out workflows", glyph: "check", blurb: "Turns scattered discussion into decisions, owners and hand-off notes." }
+    ],
+    timeline: { name: "Career timeline explorer", href: "work/timeline.html", blurb: "Every role since 2003 on one zoomable line, with the international assignments." }
+  },
   widgets: {
     clocksTitle: "World Clock",
     clocksSub: "Detroit · Shanghai · Mexico City",
@@ -90,6 +163,12 @@ window.SITE_CONTENT = {
       { label: "Detroit", timeZone: "America/Detroit" },
       { label: "Shanghai", timeZone: "Asia/Shanghai" },
       { label: "Mexico City", timeZone: "America/Mexico_City" }
+    ],
+    parts: [
+      { name: "3.6L Pentastar V6 head gaskets", detail: "Left and right bank, designed and tested. The engine passed 10 million built by 2019." },
+      { name: "5.7L HEMI V8 cast riser and valve cover gaskets", detail: "Helped finish the design as a co-op." },
+      { name: "GM 1.4L head gasket", detail: "Led global teams; $500k saved." },
+      { name: "Nissan Titan and Armada seat systems", detail: "Launched ahead of schedule; 2.2% saved per seat." }
     ],
   },
   wallpaperSettings: {
@@ -142,6 +221,14 @@ window.SITE_CONTENT = {
   },
   notes: {
     motto: "Build it, ship it,\nlearn from it.",
+    field: [
+      "Find the gap. Build the mechanism. Bring the decision.",
+      "Market-first, not hardware-first.",
+      "One living link beats the deck pile.",
+      "The window is real. It is not infinite.",
+      "A student of the automotive industry.",
+      "Build it, ship it, learn from it."
+    ],
     resumeNote: "Resume (PDF)",
     reelNote: "Sizzle Reel (1:41)",
     contact: {
@@ -151,9 +238,11 @@ window.SITE_CONTENT = {
   },
   finder: [
     { id: "now", name: "Now.txt", icon: "📄", category: "start", target: null, preview: "<b>Now.txt</b> — Exploring new leadership opportunities in automotive strategy, product and AI. Building with AI, shipping small tools, and learning in public." },
-    { id: "projects", name: "Projects", icon: "📁", category: "projects", target: "projects", preview: "<b>Projects</b> — Marcin Hub, OpenAutoLink and 3D prints. Double-click to open." },
+    { id: "live-demos", name: "Live Demos", icon: "📁", category: "start", nav: "tools", preview: "<b>Live Demos</b> — Four systems I built, each rebuilt on synthetic data so you can use it. Double-click to open the folder." },
+    { id: "kit-folder", name: "Everyday Kit", icon: "📁", category: "start", nav: "kit", preview: "<b>Everyday Kit</b> — The small single-file tools behind a global team that never shared a time zone. Double-click to open the folder." },
+    { id: "projects", name: "Projects", icon: "📁", category: "start", target: "projects", preview: "<b>Projects</b> — The live demos, the everyday kit and personal builds. Double-click to open." },
     { id: "work-index", name: "Work Index", icon: "📁", category: "work", target: "work", preview: "<b>Work Index</b> — Twenty-three years across engineering, product and software strategy, from powertrain to Shanghai. Double-click to open the timeline." },
-    { id: "uses", name: "Uses", icon: "🛠️", category: "uses", target: null, preview: "<b>Uses</b> — The tools and setup behind the work. (Coming soon.)" },
+    { id: "timeline-app", name: "Timeline Explorer", app: "timeline", category: "work", href: "work/timeline.html", preview: "<b>Career timeline explorer</b> — Every role since 2003 on one zoomable line, with the international assignments. Double-click to open." },
     { id: "colophon", name: "Colophon", icon: "📝", category: "start", target: null, preview: "<b>Colophon</b> — This site is a fake desktop: plain HTML, CSS and vanilla JavaScript, hosted on GitHub Pages. No framework, no build step. Desktop concept inspired by Zain Haseeb. Built with AI." },
     { id: "marcin-hub", name: "Marcin Hub", icon: "🤖", category: "projects", target: "projects", preview: "<b>Marcin Hub</b> — AI-built portfolio tools. Double-click to open Projects." },
     { id: "openautolink", name: "OpenAutoLink", icon: "🚗", category: "projects", target: "projects", preview: "<b>OpenAutoLink</b> — Testing OpenAutoLink, an open-source Android Automotive app, on my own EV. Double-click to open Projects." },
