@@ -10,7 +10,8 @@
 
   var css = document.createElement('style');
   css.textContent =
-    '.pm-btn{display:none}' +
+    /* v45b: off the phone breakpoint the button, menu and shade never show, whatever the page's own styles say */
+    'html:not(.pm-on) .pm-btn, html:not(.pm-on) .pm-sheet, html:not(.pm-on) .pm-shade, .pm-sheet[hidden], .pm-shade[hidden]{display:none!important}' +
     '@media (max-width:767px){' +
     ' html.pm-on nav.pill.links>a, html.pm-on nav.pill.links>.sep,' +
     ' html.pm-on nav.bar-links>a, html.pm-on nav.mb-links{display:none!important}' +
