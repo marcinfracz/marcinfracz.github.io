@@ -1144,7 +1144,7 @@
     history: "2003–2014 Engineering · 2014–2016 Chevrolet product, CX and GM de Mexico · 2017–2020 GM crossovers, Encore GX and Trailblazer · 2020–2022 Connected & OTA · 2022–2025 SAIC-GM Shanghai · 2025–2026 OnStar International",
     links: "linkedin.com/in/marcinfracz · marcinfracz.github.io/road.html",
     projects: "Export Command Center · JV Strategy Room · Subscription Lab · Portfolio Made Visible · Marcin Hub · OpenAutoLink · 3D Prints",
-    contact: "Open the Contact window, or find me at linkedin.com/in/marcinfracz",
+    contact: "marcin.fracz@gmail.com",
     coffee: "Brewing… ☕ (just kidding, this terminal makes no coffee.)",
     sudo: "Nice try. This terminal has no sudo.",
     "rm -rf /": "Nope. Not on my watch."
@@ -1196,6 +1196,8 @@
   /* work pages open in the browser window on a desktop, and as a page on a phone */
   function openToolPage(href, label) {
     var u = new URL(href, window.location.href).href;
+    /* v38: live demos open in their own tab, so the site stays one Back press away */
+    if (u.indexOf("brag-book.html") >= 0) { window.open(u, "_blank", "noopener"); return; }
     if (isPhone()) { window.location.href = u; return; }
     browserOpenTab(u, label || "Work & Tools");
   }
@@ -1207,7 +1209,7 @@
     if (url === RESUME_URL) return "Resume";
     if (url === REEL_URL) return "Sizzle Reel";
     if (url.split("#")[0] === BRAG_URL) return "Work & Tools";
-    if (url.split("#")[0] === TIMELINE_URL) return "Work";
+    if (url.split("#")[0] === TIMELINE_URL) return "Timeline";
     try { return new URL(url).hostname.replace(/^www\./, ""); } catch (e) { return url; }
   }
   function browserActiveTab() {
@@ -1364,7 +1366,7 @@
     var bb = e.target.closest('a[href*="brag-book.html"], [data-brag]');
     if (bb) { e.preventDefault(); var nm = bb.querySelector && bb.querySelector(".app-txt b, .kit-chip span"); openToolPage(bb.href || BRAG_URL, nm ? nm.textContent.replace(/\s*Live$/, "") : "Work & Tools"); return; }
     var tl = e.target.closest('a[href*="work/timeline.html"]');
-    if (tl) { e.preventDefault(); openToolPage(tl.href, "Work"); return; }
+    if (tl) { e.preventDefault(); openToolPage(tl.href, "Timeline"); return; }
     var r = e.target.closest('a[href$="reel.html"]');
     if (r && !isPhone()) { e.preventDefault(); browserOpenTab(REEL_URL, "Sizzle Reel"); return; }
     var x = e.target.closest("[data-browser-tab-close]");
@@ -1484,6 +1486,20 @@
     var pi = 0, pe = el("career-part");
     function nextPart() { if (!pe || !parts.length) return; pi = (pi + 1) % parts.length; pe.style.opacity = 0; setTimeout(function () { pe.innerHTML = "<b>" + esc(parts[pi].name) + "</b><span>" + esc(parts[pi].detail) + "</span>"; pe.style.opacity = 1; }, 250); }
     if (pe && parts.length) { pe.innerHTML = "<b>" + esc(parts[0].name) + "</b><span>" + esc(parts[0].detail) + "</span>"; pe.style.transition = "opacity .25s"; pe.addEventListener("click", nextPart); }
+    /* v38: the highlight box keeps the height of its longest entry, so the widget never changes size */
+    function sizePart() {
+      if (!pe || !parts.length || !pe.offsetWidth) return;
+      var keep = pe.innerHTML, mx = 0; pe.style.minHeight = "0px";
+      parts.forEach(function (p) { pe.innerHTML = "<b>" + esc(p.name) + "</b><span>" + esc(p.detail) + "</span>"; mx = Math.max(mx, pe.offsetHeight); });
+      pe.innerHTML = keep; pe.style.minHeight = mx + "px";
+    }
+    if (pe && parts.length) {
+      sizePart();
+      var lastW = pe.offsetWidth;
+      if ("ResizeObserver" in window) new ResizeObserver(function () { if (pe.offsetWidth !== lastW) { lastW = pe.offsetWidth; sizePart(); } }).observe(pe);
+      else window.addEventListener("resize", sizePart);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(sizePart);
+    }
     var loop = el("build-loop"), li = 0;
     function stepLoop() { if (!loop) return; var items = loop.querySelectorAll("li"); items.forEach(function (x, i) { x.classList.toggle("on", i === li); }); li = (li + 1) % items.length; }
     var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
