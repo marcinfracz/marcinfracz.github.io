@@ -26,12 +26,14 @@ html[data-theme="dark"]{
 }
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%}
+body{min-height:100vh;min-height:100dvh}
+@media (min-width:768px){body{display:flex;flex-direction:column;justify-content:center}body>.wrap{width:100%;box-sizing:border-box}}
 html{background:var(--bg2)}
 body{font:15px/1.55 var(--font);color:var(--ink);background:linear-gradient(180deg,var(--bg1),var(--bg2)) fixed;-webkit-font-smoothing:antialiased}
 a{color:inherit}
 img{display:block}
-.wrap{max-width:1640px;min-height:100vh;margin:0 auto;display:flex;flex-direction:column;justify-content:center;padding:clamp(18px,3.5vh,44px) max(clamp(24px,3.4vw,56px),env(safe-area-inset-right,0px)) clamp(18px,3.5vh,40px) max(clamp(24px,3.4vw,56px),env(safe-area-inset-left,0px))}
-.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:clamp(28px,3.6vw,64px);align-items:start}
+.wrap{max-width:1520px;margin:0 auto;padding:clamp(28px,4.2vh,56px) max(clamp(28px,4vw,72px),env(safe-area-inset-right,0px)) clamp(24px,3.5vh,44px) max(clamp(28px,4vw,72px),env(safe-area-inset-left,0px))}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:clamp(32px,4vw,72px);align-items:start}
 
 .top{display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(20px,2vw,30px);align-items:center}
 .who img.me{width:clamp(120px,min(26vh,13vw),280px);aspect-ratio:4/5;height:auto;border-radius:20px;object-fit:cover;object-position:50% 22%;box-shadow:0 0 0 4px var(--ring),0 24px 44px -24px rgba(0,0,0,.6)}
@@ -45,21 +47,23 @@ h1{margin:0;white-space:nowrap;font-size:clamp(30px,min(3.1vw,5.6vh),54px);line-
 .links a{text-decoration:none;border-bottom:1.5px solid transparent;padding-bottom:1px}
 .links a:hover,.links a:focus-visible{border-bottom-color:currentColor;outline:none}
 
-.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:0}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(12px,1.4vw,20px);margin:0}
 .stat{border-left:2px solid var(--line);padding:2px 0 2px 14px}
 .stat b{display:block;font-size:clamp(22px,min(2vw,3.6vh),32px);line-height:1.05;letter-spacing:-.02em;font-weight:800}
 .stat span{display:block;margin-top:4px;font-size:12.5px;line-height:1.35;color:var(--ink2)}
 .sec{display:flex;align-items:center;gap:14px;margin:clamp(16px,2.8vh,30px) 0 clamp(8px,1.3vh,14px);font-size:11.5px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
 .sec::after{content:"";flex:1;height:1px;background:var(--line)}
-.areas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.areas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(14px,2vh,20px) clamp(18px,2vw,32px)}
 .area{border-top:3px solid var(--c);padding:clamp(8px,1.4vh,14px) 2px 0}
 .area h2{margin:0 0 4px;font-size:15.5px;font-weight:800;letter-spacing:-.005em}
-.area p{margin:0;font-size:13.5px;line-height:1.45;color:var(--ink2)}
+.area p{margin:0;font-size:13.5px;line-height:1.45;color:var(--ink2);max-width:46ch}
 .two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(18px,2vw,32px)}
 ul.how,ul.edu{margin:0;padding:0;list-style:none}
 ul.how li{position:relative;padding:0 0 0 18px;margin:0 0 clamp(5px,.9vh,8px);font-size:14.5px;font-weight:600;line-height:1.4}
 ul.how li::before{content:"";position:absolute;left:0;top:.5em;width:7px;height:7px;border-radius:2px;background:var(--gold)}
-ul.edu li{margin:0 0 clamp(6px,1vh,10px);font-size:14px;line-height:1.4;color:var(--ink2)}
+ul.edu li{display:grid;grid-template-columns:52px minmax(0,1fr);column-gap:14px;align-items:center;margin:0 0 clamp(10px,1.6vh,16px);font-size:14px;line-height:1.4;color:var(--ink2)}
+ul.edu .mark{width:52px;height:44px;object-fit:contain;filter:brightness(0);opacity:.82}
+html[data-theme="dark"] ul.edu .mark{filter:brightness(0) invert(1);opacity:.88}
 ul.edu li b{display:block;color:var(--ink);font-size:14.5px}
 .foot{margin-top:clamp(18px,3vh,30px);padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
 .foot a{color:var(--ink2);font-weight:700}
@@ -84,8 +88,8 @@ ul.edu li b{display:block;color:var(--ink);font-size:14.5px}
           <p class="lead">Automotive product and software strategy leader. 20+ years from engineering to product, customer experience and software strategy, across the US, Mexico and China.</p>
         </div>
       </div>
-      <p class="body">I started as a mechanical engineer on production engines and vehicle seating, then earned an MBA at Michigan Ross to move into product strategy. At GM I led product marketing for global crossovers, a national dealer program in Mexico and connected services strategy. In Shanghai I was Deputy Director of Software Strategy at GM's joint venture, and most recently I owned OnStar connected services for China-built GM export vehicles across 8 regions.</p>
-      <p class="body">I like the full arc: how something is built, why it matters to the customer, and how it ships. I also build working tools with AI; a few are on this site as live demos.</p>
+      <p class="body">I started as a mechanical engineer on production engines, then moved into product strategy after an MBA at Michigan Ross. At GM I led crossover product marketing, a national dealer program in Mexico and connected services strategy. I was Deputy Director of Software Strategy at GM's Shanghai joint venture, then owned OnStar connected services for China-built exports across 8 regions.</p>
+      <p class="body">I like the full arc: how it's built, why customers care, and how it ships. I also build working AI tools; a few are live demos here.</p>
       <ul class="links">
         <li><a href="assets/resume.pdf" data-tab="Resume">Resume</a></li>
         <li><a href="road.html" data-tab="The Road">The Road</a></li>
@@ -105,27 +109,26 @@ ul.edu li b{display:block;color:var(--ink);font-size:14.5px}
 
       <p class="sec">Where I add value</p>
       <div class="areas">
-        <div class="area" style="--c:#2E9C8F"><h2>Product</h2><p>Content and pricing for the Chevrolet Traverse and GM's global crossovers; two Korea-built launches through the supply crisis.</p></div>
-        <div class="area" style="--c:#D9A21B"><h2>Customer experience</h2><p>Chevrolet's global dealer experience strategy, from a benchmark in Ecuador to a culture program with the Disney Institute.</p></div>
-        <div class="area" style="--c:#C8693A"><h2>Field, sales &amp; operations</h2><p>The national rollout of Business Development Centers across GM Mexico's dealers, with 350+ dealer visits.</p></div>
-        <div class="area" style="--c:#7357D8"><h2>Software &amp; digital</h2><p>Connected and OTA strategy, software strategy at SAIC-GM in Shanghai, and OnStar for export markets.</p></div>
+        <div class="area" style="--c:#2E9C8F"><h2>Product</h2><p>Traverse and global crossover content and pricing; two Korea-built launches through the supply crisis.</p></div>
+        <div class="area" style="--c:#D9A21B"><h2>Customer experience</h2><p>Chevrolet's global dealer experience strategy, from an Ecuador benchmark to a Disney Institute program.</p></div>
+        <div class="area" style="--c:#C8693A"><h2>Field, sales &amp; operations</h2><p>National rollout of Business Development Centers across GM Mexico dealers; 350+ dealer visits.</p></div>
+        <div class="area" style="--c:#7357D8"><h2>Software &amp; digital</h2><p>Connected and OTA strategy, SAIC-GM software strategy, and OnStar for export markets.</p></div>
       </div>
 
       <div class="two">
         <div>
           <p class="sec">How I work</p>
           <ul class="how">
-            <li>Decision surface, not a dashboard.</li>
-            <li>Equity mining: the lowest-complexity path to the biggest impact.</li>
-            <li>Staged plan with tripwires.</li>
-            <li>Three layers and a gate.</li>
+            <li>Start from the decision leaders need to make.</li>
+            <li>Find the simplest path to the biggest impact.</li>
+            <li>Plan in stages, with clear points to adjust.</li>
           </ul>
         </div>
         <div>
           <p class="sec">Education</p>
           <ul class="edu">
-            <li><b>MBA, Michigan Ross (2014)</b>Marketing &amp; Strategy, with a Ross MAP consulting project for IdeaConnection in Victoria, BC</li>
-            <li><b>BSME, Kettering University (2007)</b>Cum laude, with four years of engineering co-op at Federal-Mogul</li>
+            <li><img class="mark" src="assets/road/logos/ross-stack.png" alt="" aria-hidden="true"><span><b>MBA, Michigan Ross (2014)</b>Marketing &amp; Strategy; Ross MAP consulting project for IdeaConnection in Victoria, BC</span></li>
+            <li><img class="mark" src="assets/road/logos/kettering.png" alt="" aria-hidden="true"><span><b>BSME, Kettering University (2007)</b>Cum laude; four years of engineering co-op at Federal-Mogul</span></li>
           </ul>
         </div>
       </div>
