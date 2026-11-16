@@ -24,7 +24,8 @@ const wait = ms => new Promise(r => setTimeout(r, ms));
 /* ---------------- music: three gentle generated tracks ---------------- */
 const Music = (() => {
   let ctx = null, master = null, bus = null, delay = null, timer = null, el = null, elSrc = null;
-  let track = -1, nextT = 0, step = 0, vol = typeof prefs.vol === 'number' ? prefs.vol : 0.4, duck = 1;
+  let track = -1, nextT = 0, step = 0, vol = typeof prefs.master === 'number' ? prefs.master : 0.9, duck = 1; /* v40: one master level; music always sits at a fixed share of the voice, no ducking */
+  const MUSIC_SHARE = 0.22;
   const hz = n => 440 * Math.pow(2, (n - 69) / 12);
   const SONGS = [
     { bpm: 84, bars: 2, chords: [[62, 66, 69, 74], [57, 61, 64, 69], [59, 62, 66, 71], [55, 59, 62, 67]] }, // D A Bm G
@@ -113,7 +114,7 @@ const Music = (() => {
     const s16 = 60 / SONGS[track].bpm / 4;
     while (nextT < ctx.currentTime + 0.4) { play16(nextT, step); nextT += s16; step++; }
   }
-  function level() { if (!master) return; const v = track >= 0 ? vol * duck * 0.9 : 0; master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setTargetAtTime(v, ctx.currentTime, 0.4); if (el) el.volume = Math.min(1, vol * duck); }
+  function level() { if (!master) return; const v = track >= 0 ? vol * MUSIC_SHARE * 0.9 : 0; master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setTargetAtTime(v, ctx.currentTime, 0.4); if (el) el.volume = Math.min(1, vol * MUSIC_SHARE); if (window.__tourVoiceLevel) window.__tourVoiceLevel(vol); }
   function stopFile() { if (el) { el.pause(); el = null; } }
   function set(i) {
     init(); if (!ctx) return;
@@ -124,7 +125,7 @@ const Music = (() => {
     if (i >= 0) {
       const f = AUDIO.tracks[i] && AUDIO.tracks[i].file;
       const gen = () => { el = null; if (track !== i) return; nextT = ctx.currentTime + 0.12; step = 0; clearInterval(timer); timer = setInterval(tick, 100); tick(); level(); };
-      if (f) { el = new Audio(f); el.loop = true; el.volume = Math.min(1, vol * duck); el.onerror = gen; el.play().catch(gen); }
+      if (f) { el = new Audio(f); el.loop = true; el.volume = Math.min(1, vol * MUSIC_SHARE); el.onerror = gen; el.play().catch(gen); }
       else gen();
     }
     level();
@@ -132,8 +133,8 @@ const Music = (() => {
   return {
     set, get track() { return track; },
     get vol() { return vol; },
-    setVol(v) { vol = v; prefs.vol = v; savePrefs(); level(); },
-    duck(on) { duck = on ? 0.45 : 1; level(); },
+    setVol(v) { vol = v; prefs.master = v; savePrefs(); level(); if (window.__tourVoiceLevel) window.__tourVoiceLevel(v); },
+    duck() { /* v40: no ducking, the music level never moves */ },
   };
 })();
 
@@ -156,7 +157,7 @@ const Voice = (() => {
     return new Promise(res => {
       const done = ok => { Music.duck(false); res(ok); };
       if (AUDIO.voice) {
-        const a = new Audio(`${AUDIO.voice}tour-${id}.mp3`); cur = a;
+        const a = new Audio(`${AUDIO.voice}tour-${id}.mp3`); cur = a; a.volume = Math.min(1, Music.vol);
         a.onended = () => done(true); a.onerror = () => speak(); /* a missing file falls back to the browser voice */
         Music.duck(true); a.play().catch(() => speak()); return;
       }
@@ -166,7 +167,7 @@ const Voice = (() => {
       const u = new SpeechSynthesisUtterance(text.replace(/Marcin/g, 'Marsin')); /* said MAR-sin */
       if (!chosen) chosen = pick();
       if (chosen) u.voice = chosen;
-      u.rate = 1.02; u.pitch = 1;
+      u.rate = 1.02; u.pitch = 1; u.volume = Math.min(1, Music.vol);
       let fin = false; const end = ok => { if (!fin) { fin = true; done(ok); } };
       u.onend = () => end(true); u.onerror = () => end(false);
       setTimeout(() => end(false), 1000 + text.split(' ').length * 520); // never hang on a silent engine
@@ -174,6 +175,7 @@ const Voice = (() => {
       }
     });
   }
+  window.__tourVoiceLevel = v => { if (cur && cur.pause) cur.volume = Math.min(1, v); };
   return { say, stop, get on() { return on; }, set(v) { on = v; prefs.voice = v; savePrefs(); if (!v) stop(); } };
 })();
 

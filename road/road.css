@@ -817,3 +817,13 @@ video:-moz-full-screen { width: 100vw !important; height: 100vh !important; max-
   html.at-start .bar-title .mono.face { opacity: 1; transform: none; width: 30px; margin-right: 9px; }
   .card.start { top: 10px; max-height: calc(100vh - 30px); }
 }
+
+/* v40: flat logos. The full-colour marks lose their white chip; in dusk they turn white like the rest, PATAC keeps its own badge */
+html .co-logo.color { background: none; box-shadow: none; padding: 0; border-radius: 0; place-items: center start; }
+html .story-co .co-logo.color { padding: 0; border-radius: 0; }
+html .st-marks img.color, html[data-theme="dusk"] .st-marks img.color { background: none; box-shadow: none; padding: 0; border-radius: 0; }
+html[data-theme="dusk"] .co-logo.color img, html[data-theme="dusk"] .st-marks img.color, html[data-theme="dusk"] .co-marks img.color { filter: brightness(0) invert(1); opacity: .92; }
+html[data-theme="dusk"] .co-logo.color img[src*="patac"], html[data-theme="dusk"] .st-marks img.m-patac.color, html[data-theme="dusk"] .co-marks img.color[src*="patac"] { filter: none; opacity: 1; }
+/* v40: country lines are plain text with a flag, not pills; only actions look clickable */
+.flags { gap: 4px 16px; }
+.flags li, .flags li.trip { padding: 0; background: none; box-shadow: none; border-radius: 0; }
