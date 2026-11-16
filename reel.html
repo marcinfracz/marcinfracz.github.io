@@ -31,17 +31,24 @@
   <h1>Sizzle Reel<span class="accent">.</span></h1>
   <p class="lede">Hardware and data grounding. Global product leadership. Strategic execution. All amplified by AI. One minute, forty-one seconds.</p>
   <div class="player">
-    <video controls preload="metadata" poster="assets/sizzle-poster.jpg" playsinline>
+    <video id="reel" controls preload="metadata" poster="assets/sizzle-poster.jpg" playsinline>
       <source src="assets/sizzle-reel-v4.mp4" type="video/mp4">
       Your browser does not support the video tag.
     </video>
   </div>
   <div class="meta">
-    <span>Length <b>1:41</b></span>
+    <span>Length <b id="reel-len">1:41</b></span>
     <span>Format <b>1080p</b></span>
     <span>Voice <b>AI narration</b></span>
   </div>
   <a class="back" href="./">Back to the desktop</a>
 </main>
+<script src="js/reel-src.js?v=41"></script>
+<script>
+  /* the reel's file is set in one place, js/reel-src.js */
+  (function () { var R = window.MF_REEL; if (!R) return; var v = document.getElementById("reel");
+    if (v.querySelector("source").getAttribute("src") !== R.src) { v.querySelector("source").setAttribute("src", R.src); v.poster = R.poster; v.load(); }
+    if (R.length) document.getElementById("reel-len").textContent = R.length; })();
+</script>
 </body>
 </html>
