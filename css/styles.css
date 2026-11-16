@@ -1268,3 +1268,100 @@ body.dark .mb-links a:hover, body.dark .mb-links button:hover { background: rgba
 /* v38: a video in fullscreen fills the screen in every browser, Firefox included */
 video:fullscreen { width: 100vw !important; height: 100vh !important; max-width: none !important; max-height: none !important; aspect-ratio: auto !important; object-fit: contain !important; border-radius: 0 !important; background: #000 !important; }
 video:-moz-full-screen { width: 100vw !important; height: 100vh !important; max-width: none !important; max-height: none !important; aspect-ratio: auto !important; object-fit: contain !important; border-radius: 0 !important; background: #000 !important; }
+
+/* ================= v42: layered desk layout (his chosen arrangement) ================= */
+/* Measured from his own arrangement on a 1384x862 window and kept proportional:
+   career top left, the welcome window floating over it, clock and art in the middle,
+   resume note, weather and "Now building" down the right, notes along the bottom. */
+@media (min-width: 1280px) {
+  #widget-career { left: 10.1%; right: auto; top: 6.3%; }
+  #window-intro { left: 24%; top: 14.4%; }
+  #widget-clocks { left: 39.7%; top: 5%; max-width: calc(57.3vw - 320px); }
+  .framed-art { left: 39.7%; right: calc(3% + 322px); top: 30.9%; }
+  #note-resume { left: auto; right: 5.3%; top: 5.9%; bottom: auto; }
+  #widget-weather { left: auto; right: 3%; top: 24.9%; bottom: auto; }
+  #widget-building { right: 3%; top: 65.9%; }
+  #note-motto { left: 9.5%; top: 83.2%; bottom: auto; width: 265px; }
+  #note-contact { left: 59.9%; right: auto; top: 87.3%; bottom: auto; }
+}
+
+/* ================= v42: wallpaper styles ================= */
+body.wp-frame-black .framed-art img { border-color: #141414; }
+body.wp-frame-none .framed-art img { border-width: 0; border-radius: 6px; }
+body.wp-soften-0 .wallpaper::after { display: none !important; }
+body.wp-soften-2.wp-full .wallpaper::after { background: rgba(232, 226, 213, 0.6); }
+body.dark.wp-soften-2.wp-full .wallpaper::after { background: rgba(20, 18, 16, 0.72); }
+.wallpaper img { transition: filter .3s ease, transform .3s ease; }
+body.wp-blur .wallpaper img { filter: blur(16px); transform: scale(1.08); }
+
+/* ================= v42: wallpaper settings window ================= */
+#window-wallpaper { width: min(760px, 94vw); max-width: 760px; }
+#window-wallpaper .window-body { max-height: min(78vh, 760px); overflow-y: auto; }
+.wps-modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
+.wps-mode {
+  display: flex; flex-direction: column; align-items: stretch; gap: 8px;
+  font: inherit; font-size: 13px; font-weight: 600; color: var(--ink);
+  padding: 8px 8px 10px; border-radius: 12px; cursor: pointer; text-align: center;
+  border: 1px solid rgba(28, 25, 23, 0.12); background: transparent;
+}
+.wps-mode:hover { border-color: rgba(37, 99, 235, 0.5); }
+.wps-mode.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.wps-mini { display: block; position: relative; height: 54px; border-radius: 8px; overflow: hidden; }
+.wps-mini i { position: absolute; display: block; }
+.wps-mini-framed { background: #dfe5ec; }
+.wps-mini-framed i { left: 32%; right: 32%; top: 22%; bottom: 22%; border: 3px solid #fff; background: linear-gradient(160deg, #6f8aa6, #2f4660); box-shadow: 0 3px 8px rgba(15, 23, 42, .25); }
+.wps-mini-full { background: linear-gradient(160deg, #8fa7bf, #2f4660); }
+.wps-mini-full i { left: 8px; top: 8px; width: 34%; height: 9px; border-radius: 3px; background: rgba(255, 255, 255, .7); }
+.wps-mini-solid { background: #00274C; }
+.wps-mini-solid i { left: 8px; top: 8px; width: 34%; height: 9px; border-radius: 3px; background: rgba(255, 255, 255, .5); }
+.wps-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 4px 0 10px; flex-wrap: wrap; }
+.wps-title { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.wps-tabs { display: flex; gap: 2px; flex-wrap: wrap; }
+.wps-tabs button {
+  font: inherit; font-size: 13px; font-weight: 600; color: var(--muted); background: none; border: 0;
+  padding: 4px 8px; border-radius: 6px; cursor: pointer; border-bottom: 2px solid transparent; border-radius: 0;
+}
+.wps-tabs button.on { color: var(--ink); border-bottom-color: var(--accent); }
+.wps-images { display: grid; grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); gap: 10px; margin-bottom: 18px; }
+.wps-img { display: flex; flex-direction: column; gap: 6px; padding: 0; background: none; border: 0; cursor: pointer; font: inherit; text-align: left; color: var(--ink); }
+.wps-thumb { display: block; width: 100%; aspect-ratio: 16 / 10; border-radius: 8px; background-size: cover; background-position: center; outline: 1px solid rgba(28, 25, 23, .1); outline-offset: -1px; }
+.wps-img:hover .wps-thumb { outline: 2px solid rgba(37, 99, 235, .5); }
+.wps-img.on .wps-thumb { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wps-name { font-size: 12px; font-weight: 500; color: var(--ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wps-img.on .wps-name { color: var(--ink); font-weight: 600; }
+.wps-group { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+.wps-glabel { flex: 0 0 118px; font-size: 12.5px; color: var(--muted); }
+.wps-swatches { display: flex; flex-wrap: wrap; gap: 9px; }
+.wps-sw {
+  width: 30px; height: 30px; border-radius: 50%; cursor: pointer; padding: 0;
+  border: 1px solid rgba(28, 25, 23, .14);
+}
+.wps-sw.auto { background: linear-gradient(135deg, #E4E8ED 0 50%, #1c1917 50% 100%); }
+.wps-sw:hover { transform: scale(1.08); }
+.wps-sw.on { box-shadow: 0 0 0 2px var(--paper-solid, #fff), 0 0 0 4px var(--accent); }
+.wps-current { margin: 2px 0 14px 132px; font-size: 12.5px; color: var(--ink-soft); min-height: 1em; }
+.wps-opts { display: flex; flex-wrap: wrap; gap: 10px 26px; margin: 2px 0 6px; }
+.wps-row { display: flex; align-items: center; gap: 10px; }
+.wps-label { font-size: 12.5px; color: var(--muted); }
+.wps-seg { display: inline-flex; padding: 2px; border-radius: 9px; background: rgba(28, 25, 23, .06); }
+.wps-seg button { font: inherit; font-size: 12.5px; font-weight: 600; color: var(--ink-soft); background: none; border: 0; padding: 5px 12px; border-radius: 7px; cursor: pointer; }
+.wps-seg button.on { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(15, 23, 42, .15); }
+.wps-mode:focus-visible, .wps-img:focus-visible, .wps-sw:focus-visible, .wps-seg button:focus-visible, .wps-tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+body.dark .wps-mode { border-color: rgba(255, 255, 255, .14); }
+body.dark .wps-mode.on { border-color: #60a5fa; box-shadow: 0 0 0 1px #60a5fa; }
+body.dark .wps-mini-framed { background: #2a2623; }
+body.dark .wps-sw { border-color: rgba(255, 255, 255, .2); }
+body.dark .wps-sw.on { box-shadow: 0 0 0 2px #1f1c1a, 0 0 0 4px #60a5fa; }
+body.dark .wps-seg { background: rgba(255, 255, 255, .08); }
+body.dark .wps-seg button.on { background: #44403c; color: #f5f5f4; }
+body.dark .wps-thumb { outline-color: rgba(255, 255, 255, .12); }
+body.dark .wps-img.on .wps-thumb, body.dark .wps-tabs button.on { outline-color: #60a5fa; border-bottom-color: #60a5fa; }
+@media (max-width: 600px) {
+  .wps-modes { gap: 6px; }
+  .wps-mode { font-size: 12px; padding: 6px 6px 8px; }
+  .wps-mini { height: 40px; }
+  .wps-images { grid-template-columns: repeat(2, 1fr); }
+  .wps-group { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .wps-glabel { flex: none; }
+  .wps-current { margin-left: 0; }
+}
