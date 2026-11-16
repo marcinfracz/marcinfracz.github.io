@@ -1365,3 +1365,20 @@ body.dark .wps-img.on .wps-thumb, body.dark .wps-tabs button.on { outline-color:
   .wps-glabel { flex: none; }
   .wps-current { margin-left: 0; }
 }
+
+/* v45 phone pass (under 768px): one Menu button holds the site links and the apps (js/phone-menu.js),
+   so the floating dock is gone and nothing sits over the cards. Bigger tap targets. */
+@media (max-width: 767px) {
+  html.pm-on .desktop { padding-bottom: 28px; }
+  .menubar { height: 52px; }
+  .menubar .pm-btn { height: 44px; font-size: 15px; padding: 0 12px; }
+  .mb-right .mb-icon-btn { width: 44px; height: 44px; justify-content: center; }
+  .intro-links a, .intro-links button { display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px; }
+  .window-bar .bar-btn, .widget-bar .bar-btn { min-width: 44px; min-height: 40px; font-size: 18px; }
+  .intro-actions .ia { min-height: 48px; }
+}
+
+/* v45 phone: small links on widgets and notes get a 44px tap area without moving the text */
+@media (max-width: 767px) {
+  .career-road, .handwritten a, #note-email, #note-linkedin { display: inline-block; padding: 13px 0; margin: -13px 0; }
+}
