@@ -359,7 +359,7 @@ window.ROAD_CONTENT = {
     next: "Next stop",
     back: "Back to the desktop",
     day: "Day", dusk: "Dusk",
-    sensors: ["All", "Vision", "Radar", "LiDAR", "V2X"],
+    sensors: ["All", "Vision", "Radar", "LiDAR", "V2X", "Off"],
     sources: "Sources",
     noGL: "This browser can't draw the 3D road, so here is the story on its own."
   }
