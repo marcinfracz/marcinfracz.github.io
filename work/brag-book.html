@@ -1,4 +1,61 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><style>
+/* v43: smaller demo windows, and every view laid out to fit without scrolling */
+.mini-h{font:500 11px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:16px 0 0}
+#winB .bwrap .hbars{margin-top:10px!important}
+@media (min-width:1101px){.deck{max-width:1300px}}
+@media (min-width:768px){
+  .slide .s-demo>.win{max-width:920px}
+  .slide .win .panel{padding:14px 16px}
+  .slide .win .kpi{padding:8px 12px}
+  .slide .win .kpi b{font-size:20px}
+  .slide .win .chart{max-height:var(--chartH,330px)}
+  /* Export: network = KPIs on top, map and region table side by side */
+  #winA [data-panel="net"]:not([hidden]){display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);grid-template-areas:"k k" "m t" "n n";gap:12px 18px;align-items:center}
+  #winA [data-panel="net"]>.kpis{grid-area:k}
+  #winA [data-panel="net"]>.map-wrap{grid-area:m;margin-top:0!important}
+  #winA [data-panel="net"]>.tbl-wrap{grid-area:t;margin-top:0!important;align-self:start}
+  #winA [data-panel="net"]>.panel-note{grid-area:n;margin-top:0}
+  #winA [data-panel="net"]>:not(.kpis):not(.map-wrap):not(.tbl-wrap):not(.panel-note){grid-column:1/-1}
+  #netTbl th:nth-child(4),#netTbl td:nth-child(4){display:none}
+  #netTbl td{padding:6px 8px}
+  /* Export: who pays = levers on the left, the case on the right */
+  #winA [data-panel="pay"]:not([hidden]){display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.2fr);grid-template-areas:"p p" "c k" "s g" "x y" "n n";gap:10px 22px;align-items:start}
+  #winA [data-panel="pay"]>p:first-child{grid-area:p;margin:0}
+  #winA [data-panel="pay"]>.chipset{grid-area:c;margin-top:0!important}
+  #winA [data-panel="pay"]>.ctrls{grid-area:s;margin-top:0!important;grid-template-columns:1fr;gap:10px}
+  #winA [data-panel="pay"]>.check{grid-area:x;margin-top:0}
+  #winA [data-panel="pay"]>.kpis{grid-area:k;margin-top:0!important}
+  #winA [data-panel="pay"]>.chart{grid-area:g;margin-top:0!important}
+  #winA [data-panel="pay"]>.key{grid-area:y;margin-top:0}
+  #winA [data-panel="pay"]>.panel-note{grid-area:n;margin-top:0}
+  /* JV: research map = KPIs stacked beside a compact map */
+  #winB [data-panel="map"]:not([hidden]){display:grid;grid-template-columns:minmax(0,.62fr) minmax(0,1.38fr);grid-template-areas:"k m" "n m";gap:12px 22px;align-items:start}
+  #winB [data-panel="map"]>.kpis{grid-area:k;grid-template-columns:1fr}
+  #winB [data-panel="map"]>.map-wrap{grid-area:m;margin-top:0!important}
+  #winB [data-panel="map"]>.panel-note{grid-area:n;margin-top:0}
+  #bKpis .kpi b{font-size:22px}
+  /* JV: willingness = the heat table and the selected tier side by side */
+  #winB [data-panel="wtp"]:not([hidden]){display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);grid-template-areas:"h b" "n n";gap:12px 28px;align-items:start}
+  #winB [data-panel="wtp"]>.heat{grid-area:h}
+  #winB [data-panel="wtp"]>.bwrap{grid-area:b}
+  #winB [data-panel="wtp"]>.panel-note{grid-area:n;margin-top:4px}
+  #winB .bwrap .hbars{margin-top:0!important;gap:14px}
+  #winB .bwrap .hb{grid-template-columns:minmax(0,1fr) 44px;gap:4px 10px}
+  #winB .bwrap .hb .track{grid-column:1/-1;grid-row:2}
+  #winB .heat{grid-template-columns:minmax(0,1fr) repeat(3,minmax(60px,86px))}
+  #winB .heat .f{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #winB .heat .c{padding:13px 6px}
+  #winB .bwrap .mini-h{margin-top:4px}
+  /* Subscription Lab: three levers in one row, KPIs in one row */
+  #winC .ctrls{grid-template-columns:repeat(3,minmax(0,1fr))}
+  #winC{--chartH:310px}
+}
+@media (min-width:768px) and (max-width:900px){
+  #winA [data-panel="pay"]:not([hidden]){grid-template-columns:1fr;grid-template-areas:"p" "c" "s" "x" "k" "g" "y" "n"}
+  #winC .ctrls{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+</style>
+</head><body>
 <title>Marcin Fracz · Work</title>
 <meta name="description" content="Four systems Marcin Fracz built across OnStar International, SAIC-GM and GM connected services, rebuilt as working demos on synthetic data.">
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -836,7 +893,7 @@ html.is-dark .bar .sun,html:not(.is-dark) .bar .moon{display:none}
           </div>
           <div class="panel" data-panel="wtp" hidden>
             <div class="heat" id="heat"></div>
-            <div class="hbars" id="bBars" style="margin-top:18px"></div>
+            <div class="bwrap"><p class="mini-h" id="bBarsH">Selected tier, ranked</p><div class="hbars" id="bBars" style="margin-top:18px"></div></div>
             <p class="panel-note">Share of surveyed buyers willing to pay for each upgrade. The selected tier is outlined.</p>
           </div>
         </div>
@@ -1135,7 +1192,7 @@ const bars=$('#bBars');const bEls=feats.map(f=>{const r=document.createElement('
 function drawB(){
   const cs=cities.filter(c=>c[3]===tier);const n=cs.reduce((a,c)=>a+c[4],0);
   cnMap.markers=cities.map(c=>({lon:c[1],lat:c[2],r:3+c[4]/40,color:tierCol[c[3]],label:c[0],side:c[5],dim:c[3]!==tier,fillA:.85}));cnMap.frame(performance.now());
-  const v=wtp[tier];const mx=Math.max(...v);
+  const v=wtp[tier];const mx=Math.max(...v);{const bh=document.getElementById('bBarsH');if(bh)bh.textContent=tiersN[tier]+' buyers';}
   $('#bKpis').innerHTML='';[['Cities',cs.length,''],['Respondents',n.toLocaleString(),''],['Top upgrade',feats[v.indexOf(mx)].replace(/ \(.*\)/,''),'pos'],['Avg. willing',Math.round(v.reduce((a,b)=>a+b)/v.length)+'%','']].forEach(([k,val,c])=>{const d=document.createElement('div');d.className='kpi';d.innerHTML='<small></small><b></b>';d.firstChild.textContent=k;d.lastChild.textContent=val;if(c)d.lastChild.className=c;if(k==='Top upgrade')d.lastChild.style.fontSize='15px';$('#bKpis').appendChild(d)});
   const h=$('#heat');h.innerHTML='';const hd=document.createElement('div');hd.className='h';h.appendChild(hd);tiersN.forEach(t=>{const e=document.createElement('div');e.className='h';e.style.textAlign='center';e.textContent=t;h.appendChild(e)});
   feats.forEach((f,i)=>{const fe=document.createElement('div');fe.className='f';fe.textContent=f;h.appendChild(fe);[0,1,2].forEach(t=>{const val=wtp[t][i];const c=document.createElement('div');c.className='c'+(t===tier?' sel':'');c.textContent=val+'%';
@@ -1324,7 +1381,7 @@ function fitAll(){const root=$('#slides');if(!root)return;
     root.style.setProperty('--infoH',mx+'px');root.style.setProperty('--winH',Math.round(Math.min(720,Math.max(500,innerHeight-130)))+'px');return}
   root.style.removeProperty('--infoH');
   const rt=root.getBoundingClientRect().top+window.scrollY+8;
-  const fr=0;const h=Math.round(Math.min(780,Math.max(500,innerHeight-rt-44-fr)));root.style.setProperty('--winH',h+'px')}
+  const fr=0;const h=Math.round(Math.min(620,Math.max(480,innerHeight-rt-60-fr)));root.style.setProperty('--winH',h+'px')}
 let fitT;addEventListener('resize',()=>{clearTimeout(fitT);fitT=setTimeout(fitAll,80)});
 document.fonts&&document.fonts.ready.then(fitAll);setTimeout(fitAll,300);
 /* v34: the most visual demos play on their own until a visitor takes over */
@@ -1348,5 +1405,5 @@ try{document.body.style.setProperty('--cur',getComputedStyle(SL[cur]).getPropert
 })();
 </script>
 
-<script src="../js/top-nav.js?v=41"></script>
+<script src="../js/top-nav.js?v=43"></script>
 </body></html>

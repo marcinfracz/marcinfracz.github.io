@@ -21,7 +21,7 @@
 </script>
 <style>
 :root{
-  --bg1:#eef1f5;--bg2:#dfe5ec;--ink:#1e2124;--ink2:#4a5360;--muted:#6b7684;--line:rgba(30,33,36,.14);
+  --bg1:#eef1f5;--bg2:#dfe5ec;--ink:#1e2124;--ink2:#4a5360;--muted:#6b7684;--line:rgba(30,33,36,.14);--rule:rgba(30,33,36,.3);
   --glass:rgba(255,255,255,.78);--glass-line:rgba(30,33,36,.10);--surface:#fbfbfa;--surface2:#f1f3f5;
   --axis:#3b4250;--axis-e:#8d9aab;--star:rgba(60,72,90,.16);
   --f-product:#6b7380;--f-cx:#99730f;--f-field:#11804a;--f-digital:#0d2463;--f-eng:#66788f;--now:#2fa36b;
@@ -30,7 +30,7 @@
   color-scheme:light;
 }
 html[data-theme="dark"]{
-  --bg1:#141a24;--bg2:#0a0e15;--ink:#eef1f5;--ink2:#c3cad4;--muted:#8c96a4;--line:rgba(255,255,255,.14);
+  --bg1:#141a24;--bg2:#0a0e15;--ink:#eef1f5;--ink2:#c3cad4;--muted:#8c96a4;--line:rgba(255,255,255,.14);--rule:rgba(255,255,255,.3);
   --glass:rgba(22,28,38,.78);--glass-line:rgba(255,255,255,.10);--surface:#171c25;--surface2:#1e2530;
   --axis:#c9cfd8;--axis-e:#6f7b8c;--star:rgba(220,230,255,.22);
   --f-digital:#2a4aa8;--ring:#141a24;--shade:rgba(0,0,0,.8);
@@ -229,7 +229,7 @@ html[data-theme="dark"] .sheet{--acc-ink:color-mix(in srgb,var(--acc) 45%,#fff)}
 .m-body{padding:22px 30px 8px}
 .m-sum{margin:0;font-size:16px;line-height:1.6;max-width:78ch;color:var(--ink)}
 .m-h{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:24px 0 10px}
-.m-h::after{content:"";flex:1;height:1px;background:var(--line)}
+.m-h::after{content:"";flex:1;height:1px;background:var(--rule)}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
 .kpi{display:grid;grid-template-columns:40px minmax(0,1fr);gap:12px;align-items:start;padding:14px 16px;border-radius:14px;background:var(--surface2);border:1px solid var(--line)}
 .badge{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--acc) 16%,transparent);color:var(--acc-ink)}
@@ -292,12 +292,14 @@ html[data-theme="dark"] .map .land{stroke:color-mix(in srgb,var(--ink) 11%,trans
 .arcx g.c-hit:hover rect.r{opacity:.75}
 .arcx rect.r.on{opacity:1}
 .arcx .yr{font:600 10px var(--font);fill:var(--muted)}
-.arcx .ax{stroke:var(--line);stroke-width:1}
+.arcx .ax{stroke:var(--ink2);stroke-width:1.6}
+.arcx .ax-h{fill:var(--ink2)}
+.arcx .tk{stroke:var(--ink2);stroke-width:1.2}
 .arcx foreignObject .rf{box-shadow:0 0 0 1px var(--ring)}
 .arcx .here{font:800 11.5px var(--font);fill:var(--acc-ink)}
 .arcx .ptr{fill:var(--acc-ink)}
 .arcx .ptr-b{fill:none;stroke:var(--acc-ink);stroke-width:1.6;stroke-linejoin:round}
-.arcx .today line{stroke:var(--ink2);stroke-width:1.2;stroke-dasharray:3 3}
+.arcx .today line{stroke:var(--ink2);stroke-width:1.2;stroke-dasharray:3 3;opacity:.7}
 .arcx .today circle{fill:var(--ink2)}
 .arcx .today text{font:800 10px var(--font);letter-spacing:.06em;text-transform:uppercase;fill:var(--ink2)}
 /* stories */
@@ -1234,28 +1236,30 @@ function mapHTML(list, note, wide) {
 }
 
 /* career arc: every role on one strip, this one lit, each bar a link */
-const AX0 = 2003, AX1 = 2027.2, AW = 1000;
-const ax = y => 6 + (y - AX0) / (AX1 - AX0) * (AW - 12);
+/* v43: a real time line with an arrowhead above the bars; today sits at the end of the last role */
+const AX0 = 2003, AW = 1000;
+const ARC_END = () => Math.max(...ROLES.map(s => s.to));
 function arcHTML(on, note, aw = AW) {
-  const ax = y => 6 + (y - AX0) / (AX1 - AX0) * (aw - 12);
-  const set = new Set(on);
-  const bars = ROLES.map(s => { const y = 18, x = ax(s.from), w = Math.max(3, ax(s.to) - x - 2), st = STOP[s.id] || {};
-    return `<g class="c-hit" data-open="${s.id}" data-tt="${esc(st.role || s.label)}" data-ts="${esc((PROF[s.id] || {}).company || s.co)} · ${esc(s.years)}"><rect class="r${set.has(s.id) ? ' on' : ''}" x="${x.toFixed(1)}" y="${y}" width="${w.toFixed(1)}" height="22" fill="var(--f-${s.focus})"/>${s.flag ? `<foreignObject x="${(x + w / 2 - 7).toFixed(1)}" y="1" width="14" height="14">${chick(s.flag)}</foreignObject>` : ''}</g>`; }).join('');
+  const end = ARC_END(), X1 = end + 1.1;
+  const ax = y => 6 + (y - AX0) / (X1 - AX0) * (aw - 24);
+  const set = new Set(on), AY = 24, BY = 44, BH = 22;
+  const bars = ROLES.map(s => { const x = ax(s.from), w = Math.max(3, ax(s.to) - x - 2), st = STOP[s.id] || {};
+    return `<g class="c-hit" data-open="${s.id}" data-tt="${esc(st.role || s.label)}" data-ts="${esc((PROF[s.id] || {}).company || s.co)} · ${esc(s.years)}"><rect class="r${set.has(s.id) ? ' on' : ''}" x="${x.toFixed(1)}" y="${BY}" width="${w.toFixed(1)}" height="${BH}" fill="var(--f-${s.focus})"/>${s.flag ? `<foreignObject x="${(x + w / 2 - 7).toFixed(1)}" y="${BY - 15}" width="14" height="14">${chick(s.flag)}</foreignObject>` : ''}</g>`; }).join('');
   const lit = ROLES.filter(s => set.has(s.id));
-  /* v41: a pointer under the lit bar (a bracket for a chapter) and a dashed line for today */
   let here = '';
-  if (lit.length) { const a = Math.min(...lit.map(s => s.from)), b = Math.max(...lit.map(s => s.to)); const xa = ax(a), xb = ax(b) - 2, cx = (xa + xb) / 2, lx = Math.min(aw - 40, Math.max(40, cx));
-    const mark = lit.length > 1 ? `<path class="ptr-b" d="M${xa.toFixed(1)} 44V48H${xb.toFixed(1)}V44M${cx.toFixed(1)} 48V52"/>` : `<path class="ptr" d="M${cx.toFixed(1)} 43l8 10h-16z"/>`;
-    here = `${mark}<text class="here" x="${lx.toFixed(1)}" y="65" text-anchor="middle">${esc(lit.length > 1 ? 'This chapter' : 'This role')}</text>`; }
-  const d = new Date(), tY = Math.min(AX1 - .15, d.getFullYear() + (d.getMonth() + d.getDate() / 31) / 12), tx = ax(tY);
-  const today = `<g class="today"><line x1="${tx.toFixed(1)}" x2="${tx.toFixed(1)}" y1="8" y2="82"/><circle cx="${tx.toFixed(1)}" cy="82" r="3.5"/><text x="${(tx - 5).toFixed(1)}" y="14" text-anchor="end">Today</text></g>`;
-  const pin = (yr, id, lbl) => `<g class="c-hit" data-open="${id}" data-tt="${esc(lbl)}" data-ts="${Math.floor(yr)}"><circle cx="${ax(yr).toFixed(1)}" cy="82" r="${set.has(id) ? 6 : 4.5}" fill="var(--cap-bg)" stroke="var(--cap-fg)" stroke-width="${set.has(id) ? 2.5 : 1.5}"/></g>`;
-  const ticks = [2003, 2007, 2011, 2015, 2019, 2023].map(y => `<text class="yr" x="${ax(y).toFixed(1)}" y="102" text-anchor="middle">${y}</text>`).join('');
-  return `<div class="card full"><div class="card-h"><b>Career arc</b><span>${esc(note || 'Flags mark international roles. Tap a bar to open it.')}</span></div>
-    <svg class="chart arcx" viewBox="0 0 ${aw} 106" role="img" aria-label="Career arc, 2003 to today">
-      <line class="ax" x1="6" x2="${aw - 6}" y1="82" y2="82"/>${today}${bars}${here}
-      ${pin(2007, 'kettering', 'BSME, Kettering')}${pin(2014.25, 'ross', 'MBA, Michigan Ross')}
-      ${ticks}</svg></div>`;
+  if (lit.length) { const a = Math.min(...lit.map(s => s.from)), b = Math.max(...lit.map(s => s.to)); const xa = ax(a), xb = ax(b) - 2, cx = (xa + xb) / 2, lx = Math.min(aw - 40, Math.max(40, cx)), y0 = BY + BH + 3;
+    const mark = lit.length > 1 ? `<path class="ptr-b" d="M${xa.toFixed(1)} ${y0}V${y0 + 4}H${xb.toFixed(1)}V${y0}M${cx.toFixed(1)} ${y0 + 4}V${y0 + 8}"/>` : `<path class="ptr" d="M${cx.toFixed(1)} ${y0}l8 10h-16z"/>`;
+    here = `${mark}<text class="here" x="${lx.toFixed(1)}" y="${y0 + 23}" text-anchor="middle">${esc(lit.length > 1 ? 'This chapter' : 'This role')}</text>`; }
+  const tx = ax(end) - 1;
+  const today = `<g class="today"><line x1="${tx.toFixed(1)}" x2="${tx.toFixed(1)}" y1="${AY}" y2="${BY + BH}"/><circle cx="${tx.toFixed(1)}" cy="${AY}" r="3.5"/><text x="${tx.toFixed(1)}" y="${AY - 9}" text-anchor="middle">Today</text></g>`;
+  const pin = (yr, id, lbl) => `<g class="c-hit" data-open="${id}" data-tt="${esc(lbl)}" data-ts="${Math.floor(yr)}"><circle cx="${ax(yr).toFixed(1)}" cy="${AY}" r="${set.has(id) ? 6 : 4.5}" fill="var(--cap-bg)" stroke="var(--cap-fg)" stroke-width="${set.has(id) ? 2.5 : 1.5}"/></g>`;
+  const ticks = [2003, 2007, 2011, 2015, 2019, 2023].map(y => `<line class="tk" x1="${ax(y).toFixed(1)}" x2="${ax(y).toFixed(1)}" y1="${AY - 4}" y2="${AY + 4}"/><text class="yr" x="${ax(y).toFixed(1)}" y="${AY - 9}" text-anchor="${y === 2003 ? 'start' : 'middle'}">${y}</text>`).join('');
+  const xe = aw - 4;
+  const axis = `<line class="ax" x1="6" x2="${xe - 8}" y1="${AY}" y2="${AY}"/><path class="ax-h" d="M${xe} ${AY}l-11 -5.5v11z"/>`;
+  return `<div class="card full"><div class="card-h"><b>Career arc</b>${note ? `<span>${esc(note)}</span>` : ''}</div>
+    <svg class="chart arcx" viewBox="0 0 ${aw} ${BY + BH + 30}" role="img" aria-label="Career arc, 2003 to today">
+      ${axis}${ticks}${today}${bars}${here}
+      ${pin(2007, 'kettering', 'BSME, Kettering')}${pin(2014.25, 'ross', 'MBA, Michigan Ross')}</svg></div>`;
 }
 
 /* charts built only from the figures already on the site */
@@ -1321,7 +1325,7 @@ function roleHTML(id) {
   const m = s.more, more = m && m.blocks ? `<details class="m-more"><summary>${esc(m.title || 'More')}</summary>${m.blocks.map(b => `<h4>${esc(b.h)}</h4><p>${esc(b.p)}</p>`).join('')}${m.sources && m.sources.length ? '<div class="src">' + m.sources.map(x => `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.label)}</a>`).join('') + '</div>' : ''}</details>` : '';
   const i = ORDER.indexOf(id), pv = ORDER[i - 1], nx = ORDER[i + 1];
   const chart = chartHTML(id), map = PLACES[id] ? mapHTML(PLACES[id], id === 'onstar' ? '8 export regions' : '', !chart && PLACES[id].length > 4) : '';
-  const arc = arcHTML([id], innerWidth < 600 ? 'Tap a bar to open it' : '', innerWidth < 600 ? 480 : AW);
+  const arc = arcHTML([id], '', innerWidth < 600 ? 480 : AW);
   return `${stickHTML(tileHTML(id), `${esc(p.company || s.title)}${p.group ? ' · ' + esc(p.group) : ''}`, s.role || s.title)}${X_BTN}<header class="m-top"><div class="m-hgrid">${tileHTML(id)}<div>
       <p class="eyebrow">${esc(p.company || s.title)}${p.group ? ' · ' + esc(p.group) : ''}</p>
       <h2 class="m-role" id="m-title">${esc(s.role || s.title)}</h2>
@@ -1461,6 +1465,6 @@ if (document.fonts) document.fonts.ready.then(() => { measureLabels(); render();
 const h0 = location.hash.slice(1);
 if (known(h0)) openModal(h0);
 </script>
-<script src="../js/top-nav.js?v=41"></script>
+<script src="../js/top-nav.js?v=43"></script>
 </body>
 </html>
