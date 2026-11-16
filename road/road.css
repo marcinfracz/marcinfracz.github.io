@@ -758,3 +758,54 @@ html.zoomed .fly-photo { display: none; }
 /* v33: chapter-colored text is darkened in the light theme so it stays readable (WCAG AA) */
 html:not([data-theme="dusk"]) .co-era { color: color-mix(in srgb, var(--era, var(--accent)) 58%, #1E2124); }
 html:not([data-theme="dusk"]) .era-cap .cp-yr, html:not([data-theme="dusk"]) .ov-eh em { color: color-mix(in srgb, var(--c) 58%, #1E2124); }
+
+/* ---------- v38: the same site links as every other page ---------- */
+.bar-links > a[aria-current="page"] { font-weight: 800; color: var(--ink); box-shadow: inset 0 -2px 0 var(--accent); border-radius: 0; }
+@media (max-width: 767px) {
+  .bar { gap: 8px; }
+  .bar-links { min-width: 0; flex: 1 1 auto; justify-content: flex-start; overflow-x: auto; scrollbar-width: none; -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent); mask-image: linear-gradient(90deg, #000 88%, transparent); }
+  .bar-links::-webkit-scrollbar { display: none; }
+  .bar-links > a { flex: none; padding: 0 9px; }
+  #resume-link { display: inline-flex; }
+  .bar-links .cur-link { display: none; }
+  .bar-title .bt-name { display: none; }
+}
+
+/* v38: Show me around tour, music and voice settings */
+.tour-btn svg { flex: none; }
+.tour-ring { position: fixed; z-index: 60; pointer-events: none; border-radius: 16px; border: 2px solid var(--accent); box-shadow: 0 0 0 5px var(--accent-soft); opacity: 0; transition: left .35s ease, top .35s ease, width .35s ease, height .35s ease, opacity .25s ease; }
+.tour-ring.on { opacity: 1; }
+.tour-box { position: fixed; z-index: 61; bottom: 22px; left: 50%; width: 440px; padding: 14px 16px 14px; border-radius: 18px; background: var(--surface); color: var(--ink); box-shadow: 0 18px 50px rgba(15,20,26,.28), 0 0 0 1px var(--line); font-family: Inter, system-ui, sans-serif; }
+.tour-box[hidden] { display: none; }
+.tb-top { display: flex; align-items: center; gap: 10px; }
+.tb-n { font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
+.tb-bar { flex: 1; height: 4px; border-radius: 4px; background: var(--surface-2); overflow: hidden; }
+.tb-bar i { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 4px; }
+.tb-ic { width: 30px; height: 30px; flex: none; border: 0; border-radius: 999px; background: none; color: var(--ink-2); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 20px; line-height: 1; }
+.tb-ic:hover { background: var(--accent-soft); color: var(--ink); }
+.tb-ic .x { display: none; } .tb-ic.off .x { display: inline; } .tb-ic.off .w { display: none; }
+.tb-t { margin: 10px 0 12px; font-size: 15px; line-height: 1.45; font-weight: 500; color: var(--ink); min-height: 3em; }
+.tb-acts { display: flex; gap: 8px; justify-content: flex-end; }
+.tb-btn { height: 34px; padding: 0 14px; border: 0; border-radius: 999px; cursor: pointer; font: 700 13px/1 Inter, system-ui, sans-serif; color: var(--ink); background: var(--surface-2); }
+.tb-btn:hover { background: var(--accent-soft); }
+.tb-btn:disabled { opacity: .4; cursor: default; }
+.tb-btn.primary { background: var(--accent); color: #1E2124; }
+.tour-box button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.bar-links > a.tour-hl { background: var(--accent); color: #1E2124; }
+@media (max-width: 767px) {
+  .tour-box { left: 10px !important; right: 10px; width: auto !important; bottom: calc(10px + env(safe-area-inset-bottom)); padding: 12px 14px; }
+  .tb-t { font-size: 14.5px; }
+  #flow .card-actions { margin-top: 12px; }
+}
+.music-seg { display: grid !important; grid-template-columns: 1fr 1fr; }
+.vol-row { display: flex; align-items: center; gap: 10px; padding: 2px 4px; font-size: 12px; font-weight: 700; color: var(--ink-3); }
+.vol-row input { flex: 1; accent-color: var(--accent); }
+.tour-menu-btn { margin-top: 4px; height: 34px; border: 0; border-radius: 12px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 7px; font: 700 13px/1 Inter, system-ui, sans-serif; color: #1E2124; background: var(--accent); }
+.tour-menu-btn:hover { filter: brightness(1.05); }
+.ctl-btn.music-on::after { content: ""; position: absolute; top: 4px; right: 3px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+.ctl-btn { position: relative; }
+.ctl-pop { max-height: calc(100vh - 80px); overflow-y: auto; }
+
+/* v38: a video in fullscreen fills the screen in every browser, Firefox included */
+video:fullscreen { width: 100vw !important; height: 100vh !important; max-width: none !important; max-height: none !important; aspect-ratio: auto !important; object-fit: contain !important; border-radius: 0 !important; background: #000 !important; }
+video:-moz-full-screen { width: 100vw !important; height: 100vh !important; max-width: none !important; max-height: none !important; aspect-ratio: auto !important; object-fit: contain !important; border-radius: 0 !important; background: #000 !important; }

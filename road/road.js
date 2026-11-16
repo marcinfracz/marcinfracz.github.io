@@ -2,8 +2,8 @@
    drives the camera left to right (laptop and tablet) or top to bottom (phone). */
 import { THREE, TOKENS, setTheme, tok, roadZ, smooth, clamp, lerp } from './core.js';
 import { buildWorld } from './world.js?v=33';
-import { buildStage } from './stages.js?v=36';
-import { planCities, cityFootprints, buildCities } from './landmarks.js?v=28';
+import { buildStage } from './stages.js?v=38';
+import { planCities, cityFootprints, buildCities } from './landmarks.js?v=38';
 import { flagURL, COUNTRY } from './marks.js?v=28';
 
 const C = window.ROAD_CONTENT;
@@ -85,7 +85,7 @@ const COLOR = new Set(['sgm', 'patac', 'sgmw', 'ross-stack', 'ideaconnection']);
 const SEAL = new Set(['kettering-seal']);
 const md = t => esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
 function logoHTML(p) {
-  if (p.logo) return `<span class="co-logo${SQUARE.has(p.logo) ? ' sq' : ''}${COLOR.has(p.logo) ? ' color' : ''}${SEAL.has(p.logo) ? ' seal' : ''}"><img src="assets/road/logos/${p.logo}.png" alt="${esc(p.company)}"></span>`;
+  if (p.logo) return `<span class="co-logo${SQUARE.has(p.logo) ? ' sq' : ''}${COLOR.has(p.logo) ? ' color' : ''}${SEAL.has(p.logo) ? ' seal' : ''}"><img src="assets/road/logos/${p.logo}.png?v=38" alt="${esc(p.company)}"></span>`;
   return `<span class="co-logo mono" aria-hidden="true">${esc(p.mono || p.company.charAt(0))}</span>`;
 }
 const MARK_NAME = { nissan: 'Nissan', chevrolet: 'Chevrolet', buick: 'Buick', cadillac: 'Cadillac', onstar: 'OnStar', sgm: 'SAIC-GM', sgmw: 'SAIC-GM-Wuling', patac: 'PATAC, Pan Asia Technical Automotive Center', momenta: 'Momenta', ideaconnection: 'IdeaConnection' };
@@ -165,6 +165,7 @@ function buildFlow(withGL) {
     const meta = metaLine(s); if (meta) inner += `<p class="meta">${meta}</p>`;
     if (s.what) inner += `<p class="what">${esc(s.what)}</p>`;
     inner += flagsHTML(s);
+    if (s.i === 0) inner += `<div class="card-actions"><button class="btn tour-btn" type="button" data-act="tour">Show me around</button></div>`;
     inner += winsHTML(s) + calloutsHTML(s);
     if (s.reel) inner += `<div class="reel"><video src="${esc(s.reel.src)}" ${s.reel.poster ? `poster="${esc(s.reel.poster)}"` : ''} controls playsinline preload="none" aria-label="${esc(s.reel.label)}"></video></div>`;
     if (s.reel) inner += `<div class="card-actions"><a class="btn primary" href="index.html">${esc(UI.back)}</a><a class="btn" href="${esc(UI.resumeHref)}" target="_blank" rel="noopener">${esc(UI.resume)}</a></div>`;
@@ -212,7 +213,7 @@ let pageVeil = null;
 function showPage(u) {
   if (!pageVeil) {
     pageVeil = document.createElement('div'); pageVeil.className = 'pg-veil';
-    pageVeil.innerHTML = `<iframe title="Desktop"></iframe><button class="pg-back" type="button">‹ The Road</button>`;
+    pageVeil.innerHTML = `<iframe title="Desktop" allow="fullscreen; autoplay" allowfullscreen></iframe><button class="pg-back" type="button">‹ The Road</button>`;
     document.body.appendChild(pageVeil);
     pageVeil.querySelector('.pg-back').addEventListener('click', () => { pageVeil.hidden = true; document.documentElement.classList.remove('rs-open'); });
   }
@@ -279,7 +280,7 @@ document.addEventListener('click', e => {
     veil.innerHTML = `<div class="rs-sheet wk-sheet"><div class="rs-bar"><span class="rs-t">Work &amp; Tools · live demos on synthetic data</span>`
       + `<a class="wk-full" href="work/brag-book.html" target="_blank" rel="noopener">Full page <span aria-hidden="true">↗</span></a>`
       + `<button class="rs-x" type="button" aria-label="Close work and tools">×</button></div>`
-      + `<iframe class="wk-frame" title="Work and tools" loading="lazy"></iframe></div>`;
+      + `<iframe class="wk-frame" title="Work and tools" loading="lazy" allow="fullscreen" allowfullscreen></iframe></div>`;
     document.body.appendChild(veil);
     frame = veil.querySelector('iframe'); full = veil.querySelector('.wk-full');
     veil.addEventListener('click', e => { if (e.target === veil) close(); });
@@ -304,7 +305,7 @@ document.addEventListener('click', e => {
   document.addEventListener('click', e => {
     const a = e.target.closest && e.target.closest('a[href*="brag-book.html"]');
     if (!a || a.classList.contains('wk-full') || e.metaKey || e.ctrlKey || e.shiftKey) return;
-    e.preventDefault(); open(a.getAttribute('href'));
+    e.preventDefault(); window.open(new URL(a.getAttribute('href'), location.href).href, '_blank', 'noopener'); /* v38: live demos open in a new tab */
   });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && veil && !veil.hidden) { e.stopImmediatePropagation(); close(); } }, true);
   window.__work = { open, close };
@@ -616,7 +617,7 @@ function start() {
       if (cur === 0) {
         h = `<div class="hero"><span class="hero-photo"><img src="${HEADSHOT}" alt="Marcin Fracz"></span><div class="hero-txt"><p class="kicker">${esc(s.kicker || '')}</p><h1>${esc(s.title)}</h1>${s.tag ? `<p class="hero-tag">${esc(s.tag)}</p>` : ''}</div></div>`
           + `<p class="role">${esc(s.role || '')}</p>` + (s.what ? `<p class="what">${esc(s.what)}</p>` : '') + flagsHTML(s)
-          + `<div class="card-actions"><button class="btn primary go-btn" type="button" data-act="next">Start the drive <span aria-hidden="true">→</span></button></div>`
+          + `<div class="card-actions"><button class="btn primary go-btn" type="button" data-act="next">Start the drive <span aria-hidden="true">→</span></button><button class="btn tour-btn" type="button" data-act="tour"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>Show me around</button></div>`
           + `<p class="hint-mini"><span class="kbd">←</span><span class="kbd">→</span> or scroll to drive <span class="dot" aria-hidden="true">·</span> <span class="kbd">−</span><span class="kbd">+</span> wider view</p>`;
         card.innerHTML = h;
         card.classList.remove('finale', 'ms'); card.classList.add('start');
@@ -1192,5 +1193,5 @@ function start() {
     first = false;
   }
   frame();
-  window.__road = { go, at: x => { pos = prevPos = target = x; vel = 0; }, setZoom, get zoom() { return zOut; }, get cur() { return cur; }, get pos() { return pos; }, setTheme: n => { themeName = n; root.setAttribute('data-theme', n); applyTheme(); }, world };
+  window.__road = { go, at: x => { pos = prevPos = target = x; vel = 0; }, setZoom, get zoom() { return zOut; }, get cur() { return cur; }, get pos() { return pos; }, get story() { return storyK; }, next: () => go(base + 1), nudge, openStory, closeStory: () => closeStory(), setCtl, toStart, stops: STOPS.length, setTheme: n => { themeName = n; root.setAttribute('data-theme', n); applyTheme(); }, world };
 }

@@ -4,7 +4,7 @@
 import { THREE, reg, mat, ownMat, glowMat, mesh, at, box, cyl, sph, grp, label, canvasTex, tok, smooth, clamp, lerp, roadZ } from './core.js';
 import { vehicleGeo } from './world.js';
 import { drawFlag, drawMark, onLogo } from './marks.js?v=28';
-import { ketteringAB, bulldog, bulldogPoster, rossBuilding, burOak, blockMSign, wavingFlag, wave, signPanel, MAIZE, BLUE } from './landmarks.js?v=28';
+import { ketteringAB, bulldog, bulldogPoster, rossBuilding, burOak, blockMSign, wavingFlag, wave, signPanel, MAIZE, BLUE } from './landmarks.js?v=38';
 
 const pin = (parent, x, y, z) => { const o = new THREE.Object3D(); o.position.set(x, y, z); parent.add(o); return o; };
 const vmesh = (type, s = 1, key = 'obj') => { const m = mesh(vehicleGeo(type), mat(key, { vertexColors: true })); m.scale.setScalar(s); return m; };
@@ -344,10 +344,10 @@ B.ross = () => {
   const lamp = mesh(new THREE.ConeGeometry(1.4, 4, 16, 1, true).rotateZ(Math.PI / 2), glowMat('sun', 0.18), false); car.add(lamp); lamp.position.set(3.2, 0.9, 0);
   const crowd = []; for (let i = 0; i < 12; i++) { const p = person(i % 3 === 0 ? 'accent' : 'obj', 0.8); g.add(p); crowd.push(p); }
   // the next exit: General Motors
-  const sign = grp(cyl(0.12, 0.14, 4.4, 'objDark', -2, 0, 0), cyl(0.12, 0.14, 4.4, 'objDark', 2, 0, 0));
-  const sp = signPanel('Next: General Motors  →', 6.2, 1.5); sp.position.set(0, 4.9, 0.1); sign.add(sp);
-  sign.add(box(6.4, 1.7, 0.1, 'objDark', 0, 4.05, -0.02));
-  at(sign, 13, 0, 6.5, -0.2); g.add(sign);
+  const sign = grp(cyl(0.14, 0.16, 4.6, 'objDark', -2.8, 0, 0), cyl(0.14, 0.16, 4.6, 'objDark', 2.8, 0, 0));
+  const sp = signPanel('Next: General Motors  →', 8.4, 1.9); sp.position.set(0, 5.35, 0.1); sign.add(sp);
+  sign.add(box(8.6, 2.1, 0.1, 'objDark', 0, 4.3, -0.02));
+  at(sign, 7.6, 0, 6.2, -0.12); g.add(sign);
   const caps = []; for (let i = 0; i < 4; i++) { const c = grp(box(1, 0.08, 1, 'objDark'), cyl(0.3, 0.3, 0.3, 'objDark', 0, -0.3, 0, 8)); g.add(c); caps.push(c); }
   // v36: Ross MAP, fall 2012: a week on site in Victoria, British Columbia.
   // The BC Parliament Buildings on the Inner Harbour, a floatplane and Canadian flags.
@@ -365,7 +365,7 @@ B.ross = () => {
   g.add(vic);
   const lVic = label('CANADA · Victoria, British Columbia', { size: 20, key: 'ink', bg: 'card', scale: 0.56, weight: 800 }); lVic.position.set(19, 6.6, 1); g.add(lVic);
   return {
-    group: g, anchors: { ross: pin(ross, -5.5, 7.6, 3.6), next: pin(sign, 0, 6, 0), victoria: pin(parl, 0, 10, 0.3) },
+    group: g, anchors: { ross: pin(ross, -5.5, 7.6, 3.6), next: pin(sign, 0, 7.4, 0), victoria: pin(parl, 0, 10, 0.3) },
     update(t) {
       caFlags.forEach(f => waveFlag(f, t));
       { const q = (t * 0.05) % 1, x = lerp(14, 40, q); fplane.position.set(x, 0.55 + Math.sin(t * 1.6) * 0.06 + (q > 0.8 ? (q - 0.8) * 30 : 0), -6); fplane.rotation.set(0, 0, q > 0.8 ? 0.18 : 0); }

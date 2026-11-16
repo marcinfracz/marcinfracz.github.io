@@ -121,7 +121,7 @@ export function wave(f, t) {
 
 /* a flat sign face: colored panel with one line of text */
 export function signPanel(text, w, h, bg = '#2F6B4F', fg = '#FFFFFF') {
-  const t = texOf(512, Math.round(512 * h / w), (c, W, H) => { c.fillStyle = bg; c.fillRect(0, 0, W, H); c.strokeStyle = fg; c.lineWidth = 6; c.strokeRect(8, 8, W - 16, H - 16); c.fillStyle = fg; c.font = `800 ${Math.round(H * 0.42)}px Inter, Arial, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(text, W / 2, H / 2 + 2); });
+  const t = texOf(512, Math.round(512 * h / w), (c, W, H) => { c.fillStyle = bg; c.fillRect(0, 0, W, H); c.strokeStyle = fg; c.lineWidth = 6; c.strokeRect(8, 8, W - 16, H - 16); c.fillStyle = fg; let fs = Math.round(H * 0.42); c.font = `800 ${fs}px Inter, Arial, sans-serif`; while (fs > 10 && c.measureText(text).width > W - 56) { fs -= 2; c.font = `800 ${fs}px Inter, Arial, sans-serif`; } c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(text, W / 2, H / 2 + 2); });
   const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), texMat(t)); return m;
 }
 
