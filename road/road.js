@@ -184,27 +184,24 @@ const HEADSHOT = 'assets/headshots/pro-blue-gray-avatar.jpg';
   const img = new Image(); img.alt = ''; img.decoding = 'async'; img.src = HEADSHOT; face.appendChild(img);
 })();
 /* round 27: the large start photo flies into the name pill when the drive starts, and back at the start */
-function faceRect(el) {
-  /* the pill's photo collapses while the start box shows it, so its landing spot is worked out from the pill */
-  if (!el || !el.closest('.bar-title')) return el ? el.getBoundingClientRect() : null;
-  const t = el.closest('.bar-title').getBoundingClientRect(), s = 30;
-  return { left: t.left + 4, top: t.top + (t.height - s) / 2, width: s, height: s };
-}
+/* v39: one smooth move. The photo is drawn at its larger size and scaled between the two spots,
+   with no arc, so it stays sharp and glides straight between the start box and the name pill. */
 function flyPhoto(from, to) {
   if (!from || !to) return;
-  const a = faceRect(from), b = faceRect(to);
+  const a = from.getBoundingClientRect(), b = to.getBoundingClientRect();
   if (!a.width || !b.width) return;
   const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  to.style.visibility = 'hidden';
-  if (reduce || !document.body.animate) { to.style.visibility = ''; return; }
+  if (reduce || !document.body.animate) return;
+  const L = a.width >= b.width ? a : b;
+  const at = q => `translate(${q.left - L.left}px, ${q.top - L.top}px) scale(${q.width / L.width})`;
   const f = new Image(); f.src = HEADSHOT; f.alt = ''; f.className = 'fly-photo';
-  Object.assign(f.style, { left: a.left + 'px', top: a.top + 'px', width: a.width + 'px', height: a.height + 'px' });
+  Object.assign(f.style, { left: L.left + 'px', top: L.top + 'px', width: L.width + 'px', height: L.height + 'px', transformOrigin: '0 0', transform: at(a) });
   document.body.appendChild(f);
-  const dx = b.left + b.width / 2 - (a.left + a.width / 2), dy = b.top + b.height / 2 - (a.top + a.height / 2), k = b.width / a.width;
-  const an = f.animate([{ transform: 'translate(0,0) scale(1)' }, { transform: `translate(${dx * .55}px, ${dy * .55 - 26}px) scale(${(1 + k) / 2})`, offset: .55 }, { transform: `translate(${dx}px, ${dy}px) scale(${k})` }],
-    { duration: 820, easing: 'cubic-bezier(.45,.05,.25,1)', fill: 'forwards' });
-  const done = () => { to.style.visibility = ''; f.remove(); };
-  an.onfinish = done; setTimeout(done, 1200);
+  from.style.visibility = 'hidden'; to.style.visibility = 'hidden';
+  const an = f.animate([{ transform: at(a) }, { transform: at(b) }], { duration: 640, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' });
+  let fin = false;
+  const done = () => { if (fin) return; fin = true; to.style.visibility = ''; from.style.visibility = ''; f.remove(); };
+  an.onfinish = done; setTimeout(done, 900);
 }
 
 /* page links (Desktop, Road) go by script, so a host frame that takes over plain links (the private
@@ -441,16 +438,21 @@ function start() {
 
   /* ---------- HUD ---------- */
   const sensorSeg = $('#sensor-seg'), lightSeg = $('#light-seg');
-  const MODES = ['all', 'vision', 'radar', 'lidar', 'v2x'];
+  const MODES = ['all', 'vision', 'radar', 'lidar', 'v2x', 'off'];
+  /* v39: an Off choice hides every sensor visual; the choice is remembered like the light setting */
+  let sensSaved = 'all'; try { sensSaved = localStorage.getItem('road.sensors') || 'all'; } catch (e) {}
+  if (!MODES.includes(sensSaved)) sensSaved = 'all';
+  world.setMode(sensSaved);
   MODES.forEach((m, k) => {
-    const b = el('button', m === 'all' ? 'on' : '', (m === 'all' ? '' : '<i></i>') + esc(UI.sensors[k]));
-    b.type = 'button'; b.dataset.m = m; b.setAttribute('aria-pressed', m === 'all');
+    const lab = UI.sensors[k] || (m === 'off' ? 'Off' : m);
+    const b = el('button', m === sensSaved ? 'on' : '', (m === 'all' || m === 'off' ? '' : '<i></i>') + esc(lab));
+    b.type = 'button'; b.dataset.m = m; b.setAttribute('aria-pressed', m === sensSaved);
     if (m === 'vision') b.querySelector('i').style.color = 'var(--accent)';
     if (m === 'radar') b.querySelector('i').style.color = '#22D3EE';
     if (m === 'lidar') b.querySelector('i').style.color = 'var(--ink-3)';
     if (m === 'v2x') b.querySelector('i').style.color = 'var(--cobalt)';
     b.addEventListener('click', () => {
-      world.setMode(m);
+      world.setMode(m); try { localStorage.setItem('road.sensors', m); } catch (e) {}
       sensorSeg.querySelectorAll('button').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); });
     });
     sensorSeg.appendChild(b);
@@ -588,7 +590,8 @@ function start() {
     const barFace = document.querySelector('.bar-title .mono');
     if (was === 0 && cur !== 0 && !renderCard.flown) flyPhoto(card.querySelector('.hero-photo img'), barFace);
     renderCard.flown = false;
-    root.classList.toggle('at-start', cur === 0);
+    /* v39: at the start the big box stands where the name pill goes, and the pill shows only once the drive starts */
+    if (cur !== 0 || was < 0) root.classList.toggle('at-start', cur === 0);
     if (storyK !== null) { storyK = null; card.classList.remove('story'); }
     card.classList.add('out');
     clearTimeout(renderCard.t);
@@ -626,14 +629,14 @@ function start() {
           /* the photo leaves for the name pill the moment the drive starts */
           const img = card.querySelector('.hero-photo img');
           root.classList.remove('at-start'); flyPhoto(img, document.querySelector('.bar-title .mono'));
-          if (img) img.style.visibility = 'hidden'; renderCard.flown = true;
-          setTimeout(() => { if (cur === 0) card.classList.add('out'); }, 420);
+          renderCard.flown = true;
+          card.classList.add('out');
           go(base + 1);
         }));
         buildMarkers(s);
         card.classList.remove('out');
         resize();
-        if (was > 0) requestAnimationFrame(() => flyPhoto(barFace, card.querySelector('.hero-photo img')));
+        if (was > 0) { flyPhoto(barFace, card.querySelector('.hero-photo img')); root.classList.add('at-start'); }
         return;
       }
       if (s.id === 'finale') {

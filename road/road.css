@@ -161,7 +161,7 @@ button { font: inherit; color: inherit; }
 .seg button.on { background: var(--ink); color: var(--surface); }
 @media (min-width: 768px) { html:not(.no-gl) .bar .theme-btn { display: none; } }
 @media (max-width: 1180px) {
-  #sensor-seg button:not([data-m="all"]) { padding: 0 8px; font-size: 0; gap: 0; }
+  #sensor-seg button:not([data-m="all"]):not([data-m="off"]) { padding: 0 8px; font-size: 0; gap: 0; }
   #sensor-seg button i { width: 9px; height: 9px; }
 }
 @media (max-width: 960px) { .era.on .yr { display: none; } }
@@ -809,3 +809,11 @@ html:not([data-theme="dusk"]) .era-cap .cp-yr, html:not([data-theme="dusk"]) .ov
 /* v38: a video in fullscreen fills the screen in every browser, Firefox included */
 video:fullscreen { width: 100vw !important; height: 100vh !important; max-width: none !important; max-height: none !important; aspect-ratio: auto !important; object-fit: contain !important; border-radius: 0 !important; background: #000 !important; }
 video:-moz-full-screen { width: 100vw !important; height: 100vh !important; max-width: none !important; max-height: none !important; aspect-ratio: auto !important; object-fit: contain !important; border-radius: 0 !important; background: #000 !important; }
+
+/* v39: at the start the big box takes the top left, with no name pill; the pill fades in once the drive starts */
+@media (min-width: 768px) {
+  .bar-title { transition: opacity .3s ease .2s, visibility 0s linear 0s; }
+  html.at-start .bar-title { opacity: 0; visibility: hidden; transition: opacity .2s ease, visibility 0s linear .2s; }
+  html.at-start .bar-title .mono.face { opacity: 1; transform: none; width: 30px; margin-right: 9px; }
+  .card.start { top: 10px; max-height: calc(100vh - 30px); }
+}
