@@ -46,3 +46,21 @@
     send({ href: u.href, title: '' });
   }, true);
 })();
+
+/* v43: inside the Road's live demos window, The Road closes the window, the Resume and Contact
+   open the Road's own sheets, and other pages of this site replace the Road. */
+(function () {
+  var inRoad = false;
+  try { inRoad = window.parent !== window && window.parent.location.origin === location.origin && /\/road\.html$/.test(window.parent.location.pathname); } catch (e) {}
+  if (!inRoad) return;
+  window.addEventListener('click', function (e) {
+    if (e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href]');
+    if (!a || a.hasAttribute('download') || a.hasAttribute('data-ext')) return;
+    var u; try { u = new URL(a.getAttribute('href'), location.href); } catch (err) { return; }
+    if (!/^https?:$/.test(u.protocol) || u.origin !== location.origin) return;
+    if (u.pathname === location.pathname && u.search === location.search) return;
+    e.preventDefault(); e.stopPropagation();
+    window.parent.postMessage({ mfRoad: { href: u.href } }, location.origin);
+  }, true);
+})();

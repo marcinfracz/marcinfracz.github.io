@@ -280,6 +280,8 @@
   }
   function openWindow(name) {
     if (name === "work") { openToolPage("work/timeline.html", "Work"); return; }
+    /* v43: About is a page in the browser window, like Start and the Timeline */
+    if (name === "about") { openToolPage("about.html", "About"); return; }
     if (name === "contact-note") {
       var note = el("note-contact");
       if (note) { bringToFront(note); }
@@ -1219,7 +1221,7 @@
     history: "2003–2014 Engineering · 2014–2016 Chevrolet product, CX and GM de Mexico · 2017–2020 GM crossovers, Encore GX and Trailblazer · 2020–2022 Connected & OTA · 2022–2025 SAIC-GM Shanghai · 2025–2026 OnStar International",
     links: "linkedin.com/in/marcinfracz · marcinfracz.github.io/road.html",
     projects: "Export Command Center · JV Strategy Room · Subscription Lab · Portfolio Made Visible · Marcin Hub · OpenAutoLink · 3D Prints",
-    contact: "marcin.fracz@gmail.com",
+    contact: "Open Contact from the menu bar, or LinkedIn: linkedin.com/in/marcinfracz",
     coffee: "Brewing… ☕ (just kidding, this terminal makes no coffee.)",
     sudo: "Nice try. This terminal has no sudo.",
     "rm -rf /": "Nope. Not on my watch."
@@ -1287,6 +1289,7 @@
     if (url === REEL_URL) return "Sizzle Reel";
     if (url.split("#")[0] === BRAG_URL) return "Live demos";
     if (url.split("#")[0] === TIMELINE_URL) return "Timeline";
+    if (url.split("#")[0] === new URL("about.html", window.location.href).href) return "About";
     try { return new URL(url).hostname.replace(/^www\./, ""); } catch (e) { return url; }
   }
   function browserActiveTab() {
