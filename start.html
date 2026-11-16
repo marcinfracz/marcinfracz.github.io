@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Marcin Fracz · Start</title>
+<meta name="description" content="Marcin Fracz: automotive product and software strategy leader. The Road, the career timeline, live demos and the resume, all in one place.">
+<link rel="icon" href="assets/favicon.png">
+<meta name="theme-color" content="#E9EDF2">
+<script>
+  /* theme before first paint: shared with the desktop, the Road and the Timeline */
+  (function () {
+    var dark = false;
+    try { var p = JSON.parse(localStorage.getItem("mf-site-prefs-v6") || "{}"); if (typeof p.dark === "boolean") dark = p.dark; } catch (e) {}
+    document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+  })();
+</script>
+<style>
+:root{
+  --bg1:#eef1f5;--bg2:#dfe5ec;--ink:#1e2124;--ink2:#4a5360;--muted:#6b7684;--line:rgba(30,33,36,.12);
+  --card:rgba(255,255,255,.82);--card-hi:#fff;--card-line:rgba(30,33,36,.09);--star:rgba(60,72,90,.14);
+  --navy:#0d2463;--slate:#56677d;--gold:#99730f;--green:#11804a;--ring:#fff;
+  --font:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color-scheme:light
+}
+html[data-theme="dark"]{
+  --bg1:#141a24;--bg2:#0a0e15;--ink:#eef1f5;--ink2:#c3cad4;--muted:#8c96a4;--line:rgba(255,255,255,.12);
+  --card:rgba(24,30,41,.86);--card-hi:#1d2431;--card-line:rgba(255,255,255,.09);--star:rgba(220,230,255,.18);
+  --navy:#3b5cc4;--slate:#7f91a8;--gold:#c99a24;--green:#2fa36b;--ring:#141a24;color-scheme:dark
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{font:15px/1.5 var(--font);color:var(--ink);background:radial-gradient(120% 90% at 50% 0%,var(--bg1),var(--bg2)) fixed;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background-image:radial-gradient(var(--star) 1px,transparent 1.4px);background-size:34px 34px}
+a{color:inherit}
+.wrap{position:relative;max-width:1060px;margin:0 auto;padding:clamp(28px,6vh,64px) max(20px,env(safe-area-inset-right,0px)) 48px max(20px,env(safe-area-inset-left,0px))}
+
+.me{display:flex;align-items:center;gap:20px;margin-bottom:clamp(26px,5vh,44px)}
+.me img{width:76px;height:76px;border-radius:50%;object-fit:cover;flex:none;box-shadow:0 0 0 3px var(--ring),0 10px 26px -14px rgba(0,0,0,.5)}
+.me h1{margin:0;font-size:clamp(26px,3.2vw,34px);line-height:1.1;letter-spacing:-.02em;font-weight:800}
+.me p{margin:6px 0 0;color:var(--ink2);font-size:15.5px;max-width:640px}
+
+.eyebrow{margin:0 0 12px;font-size:11px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.feature{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:30px}
+.tile{position:relative;display:flex;flex-direction:column;gap:6px;text-decoration:none;background:var(--card);border:1px solid var(--card-line);border-radius:18px;padding:20px 20px 18px;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 10px 28px -20px rgba(10,16,28,.5);transition:transform .18s ease,box-shadow .18s ease,background .18s ease}
+.tile:hover{transform:translateY(-2px);background:var(--card-hi);box-shadow:0 18px 36px -20px rgba(10,16,28,.55)}
+.tile:focus-visible{outline:3px solid var(--navy);outline-offset:3px}
+.ic{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;color:#fff;background:var(--c,var(--navy));margin-bottom:8px;flex:none}
+.ic svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.tile b{font-size:17px;letter-spacing:-.01em}
+.tile span{color:var(--ink2);font-size:14px;line-height:1.45}
+.tile .go{font-style:normal;position:absolute;top:18px;right:18px;font-size:12px;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:4px}
+.tile .go svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+.quick{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.quick .tile{flex-direction:row;align-items:center;gap:14px;padding:14px 16px;border-radius:15px}
+.quick .ic{width:40px;height:40px;border-radius:11px;margin:0}
+.quick .ic svg{width:20px;height:20px}
+.quick .tx{display:flex;flex-direction:column;min-width:0}
+.quick b{font-size:15px}
+.quick span{font-size:13px}
+.quick .go{position:static;margin-left:auto;align-self:center}
+.foot{margin-top:28px;color:var(--muted);font-size:13px}
+.foot a{color:var(--ink2);font-weight:600}
+@media (max-width:860px){.feature{grid-template-columns:1fr}.quick{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.quick{grid-template-columns:1fr}.me{gap:14px}.me img{width:60px;height:60px}.me p{font-size:14.5px}}
+@media (prefers-reduced-motion:reduce){.tile{transition:none}.tile:hover{transform:none}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="me">
+    <img src="assets/headshots/pro-blue-gray-avatar.jpg" alt="Marcin Fracz">
+    <div>
+      <h1>Marcin Fracz</h1>
+      <p>Automotive product and software strategy leader. 20+ years across engineering, vehicle and software product marketing, and global joint ventures at GM, SAIC-GM and OnStar.</p>
+    </div>
+  </header>
+
+  <p class="eyebrow">Start here</p>
+  <div class="feature">
+    <a class="tile" href="road.html" data-tab="The Road">
+      <i class="ic" style="--c:var(--navy)" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 3 5 21M16 3l3 18M12 4v3M12 10.5v3M12 17v3"/></svg></i>
+      <b>The Road</b>
+      <span>The career story, stop by stop: what I led, where, and what changed because of it.</span>
+      <em class="go" aria-hidden="true">Open<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></em>
+    </a>
+    <a class="tile" href="work/timeline.html" data-tab="Timeline">
+      <i class="ic" style="--c:var(--slate)" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 17h18"/><rect x="4" y="7" width="5" height="6" rx="1.5"/><rect x="10" y="7" width="4" height="6" rx="1.5"/><rect x="15" y="7" width="5" height="6" rx="1.5"/></svg></i>
+      <b>Timeline</b>
+      <span>Every role from 2003 to now on one line. Highlight by capability, from product marketing to engineering.</span>
+      <em class="go" aria-hidden="true">Open<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></em>
+    </a>
+    <a class="tile" href="work/brag-book.html" target="_blank" rel="noopener" data-ext>
+      <i class="ic" style="--c:var(--green)" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2.5"/><path d="M7 14l3-3 2.5 2 4.5-4.5M8 21h8"/></svg></i>
+      <b>Live demos</b>
+      <span>Working tools I built for export launches, JV strategy and portfolio planning, on synthetic data.</span>
+      <em class="go" aria-hidden="true">New tab<svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></em>
+    </a>
+  </div>
+
+  <p class="eyebrow">Quick links</p>
+  <div class="quick">
+    <a class="tile" href="assets/resume.pdf" data-tab="Resume">
+      <i class="ic" style="--c:var(--navy)" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M10 12h5M10 16h5"/></svg></i>
+      <span class="tx"><b>Resume</b><span>PDF</span></span>
+      <em class="go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></em>
+    </a>
+    <a class="tile" href="work/timeline.html?lens=product-marketing" data-tab="Timeline">
+      <i class="ic" style="--c:var(--slate)" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 14V10l11-5v14L4 14zM15 8.5h2a3 3 0 0 1 0 7h-2M7 14.5 8.5 20h3L10 15.6"/></svg></i>
+      <span class="tx"><b>Product marketing</b><span>Vehicle and software roles, highlighted</span></span>
+      <em class="go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></em>
+    </a>
+    <a class="tile" href="reel.html" data-tab="Sizzle Reel">
+      <i class="ic" style="--c:var(--gold)" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M10 9.5v5l4.5-2.5z"/></svg></i>
+      <span class="tx"><b>Sizzle reel</b><span>The short video version</span></span>
+      <em class="go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></em>
+    </a>
+    <a class="tile" href="road.html#ross" data-tab="The Road">
+      <i class="ic" style="--c:var(--green)" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M15.5 8.5 13.5 13.5 8.5 15.5 10.5 10.5z"/></svg></i>
+      <span class="tx"><b>Ross MAP · IdeaConnection</b><span>Market entry strategy, on site in Canada</span></span>
+      <em class="go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></em>
+    </a>
+    <a class="tile" href="index.html#contact" target="_top" data-act="contact">
+      <i class="ic" style="--c:var(--navy)" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></svg></i>
+      <span class="tx"><b>Contact</b><span>Send me a note</span></span>
+      <em class="go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></em>
+    </a>
+    <a class="tile" href="https://www.linkedin.com/in/marcinfracz/" target="_blank" rel="noopener" data-ext>
+      <i class="ic" style="--c:#0a66c2" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 10.5V17M8 7.5v.01M12 17v-6.5M12 13.5c0-1.8 1.2-3 2.7-3s2.3 1 2.3 2.8V17"/></svg></i>
+      <span class="tx"><b>LinkedIn</b><span>Opens in a new tab</span></span>
+      <em class="go" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></em>
+    </a>
+  </div>
+  <p class="foot">Prefer the whole picture? <a href="index.html" target="_top">Open the Desktop</a>.</p>
+</main>
+<script>
+  /* Inside the Desktop's browser window, site links open as new tabs there.
+     On its own, each link simply opens its page. */
+  (function () {
+    var inDesk = false;
+    try { inDesk = window.parent !== window && window.parent.location.origin === location.origin && /\/(index\.html)?$/.test(window.parent.location.pathname); } catch (e) {}
+    if (!inDesk) return;
+    document.addEventListener("click", function (e) {
+      var a = e.target.closest && e.target.closest("a.tile");
+      if (!a || a.hasAttribute("data-ext") || e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
+      e.preventDefault();
+      var msg = a.getAttribute("data-act") === "contact" ? { act: "contact" } : { href: a.href, title: a.getAttribute("data-tab") || "" };
+      window.parent.postMessage({ mfStart: msg }, location.origin);
+    });
+  })();
+</script>
+</body>
+</html>
