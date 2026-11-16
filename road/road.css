@@ -868,3 +868,20 @@ html[data-theme="dusk"] .co-logo.color img[src*="patac"], html[data-theme="dusk"
   .card-actions .btn { min-height: 44px; }
   .wk-pills .wk-pill { min-height: 44px; display: inline-flex; align-items: center; }
 }
+
+/* v46 rail: Start and End read cleanly; round step buttons in the bottom-right corner */
+.vrail .start-btn { width: 50px; height: 44px; gap: 3px; border-radius: 12px; font-size: 10.5px; font-weight: 800; letter-spacing: .02em; text-transform: none; line-height: 1; }
+.vrail .start-btn svg { width: 15px; height: 15px; }
+@media (max-height: 640px) { .vrail .start-btn { height: 32px; } }
+.road-step { position: fixed; right: 66px; bottom: 22px; z-index: 4; display: flex; gap: 10px; }
+.road-step .step-btn { width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; display: grid; place-items: center; cursor: pointer;
+  background: var(--glass); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: var(--shadow); color: var(--ink); transition: background .15s ease, color .15s ease; }
+.road-step .step-btn:hover { background: var(--accent); color: #1E2124; }
+.road-step .step-btn:disabled { opacity: .35; cursor: default; background: var(--glass); color: var(--ink); }
+.road-step .step-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+@media (max-width: 767px) { .road-step { display: none !important; } }
+.no-gl .road-step { display: none !important; }
+.road-step .step-btn.tour-hl, .vrail .start-btn.tour-hl { outline: 3px solid var(--accent); outline-offset: 3px; animation: tourPulse 1.2s ease-in-out infinite; }
+@keyframes tourPulse { 50% { outline-offset: 6px; } }
+.tb-note { margin: -4px 0 12px; font-size: 13.5px; line-height: 1.4; color: var(--ink-2, var(--ink)); }
+.tb-note[hidden] { display: none; }

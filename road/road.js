@@ -327,7 +327,7 @@ document.addEventListener('click', e => {
     const a = e.target.closest && e.target.closest('a[href*="brag-book.html"]');
     if (!a || a.classList.contains('fb-full') || e.metaKey || e.ctrlKey || e.shiftKey) return;
     e.preventDefault(); open(a.getAttribute('href'));
-  });
+  }, true); /* v45b: capture, so the page's base target="_top" rule never sends a demo or kit full page */
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && veil && !veil.hidden) { e.stopImmediatePropagation(); close(); } }, true);
   /* links inside the demos page: back to the Road closes the window; other pages of the site open here */
   addEventListener('message', e => {
@@ -752,7 +752,7 @@ function start() {
         : `<b class="cp-co">${cur === 0 ? 'Start' : 'Finish'}</b>`;
       cap.style.setProperty('--c', ce ? ce.color : 'var(--accent)');
     }
-    prevBtn.disabled = cur === 0; nextBtn.disabled = cur === STOPS.length - 1;
+    prevBtn.disabled = cur === 0; nextBtn.disabled = cur === STOPS.length - 1; { const a = $('#step-prev'), z = $('#step-next'); if (a) a.disabled = cur === 0; if (z) z.disabled = cur === STOPS.length - 1; }
     requestAnimationFrame(measureEras);
     if (cur !== STOPS.length - 1) { const v = document.querySelector('#reel'); if (v) v.pause(); }
   }
@@ -1076,6 +1076,11 @@ function start() {
   if (startBtn) startBtn.addEventListener('click', toStart);
   prevBtn.addEventListener('click', () => go(base - 1));
   nextBtn.addEventListener('click', () => go(base + 1));
+  /* v46: End jumps to the last stop; the round buttons bottom right step like the rail arrows */
+  const endBtn = $('#end-btn'), stepPrev = $('#step-prev'), stepNext = $('#step-next');
+  if (endBtn) endBtn.addEventListener('click', () => { setZoom(0); go(STOPS.length - 1); });
+  if (stepPrev) stepPrev.addEventListener('click', () => go(base - 1));
+  if (stepNext) stepNext.addEventListener('click', () => go(base + 1));
   addEventListener('hashchange', () => { const i = stopFromHash(); if (i >= 0 && i !== cur) go(i); });
 
   /* phone: the page scrolls down; the camera follows */

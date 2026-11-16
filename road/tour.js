@@ -190,11 +190,11 @@ const DESK = [
   { id: 'd01', t: 'Welcome to The Road. Marcin\'s career is laid out as a drive, one stop for each chapter. I\'ll drive it for you. You can skip at any time.', el: '#card' },
   { id: 'd02', t: 'Start the drive takes you to the first stop. Each stop shows the company, the role, the years and the results.', el: '#card',
     run: async () => { const b = $('#card [data-act="next"]'); if (b && R().cur === 0) b.click(); else R().go(1); await wait(1500); } },
-  { id: 'd03', t: 'To keep driving, scroll, use the arrow keys, or drag the road. Here\'s the next stop.', el: '#card',
+  { id: 'd03', t: 'To keep driving, scroll, use the arrow keys, or drag the road. Here\'s the next stop.', el: '#card', note: 'You can also use the round arrow buttons in the bottom-right corner.', hl: ['#step-prev', '#step-next'],
     run: async () => { for (let i = 0; i < 9; i++) { R().nudge(9); await wait(70); } await wait(1200); } },
   { id: 'd04', t: 'Each stop has a few short stories. Open one to see the work behind the result. The lettered pins in the scene match the stories.', el: '#card',
     run: async () => { R().openStory(0); await wait(2600); if (R().story !== null) R().openStory(1); } },
-  { id: 'd05', t: 'The rail on the right is the whole career. Point at it to see each stop, and click to jump. Here\'s business school at Michigan Ross.', el: '#chapters',
+  { id: 'd05', t: 'The rail on the right is the whole career. Point at it to see each stop, and click to jump. Here\'s business school at Michigan Ross.', el: '#chapters', note: 'Start and End, at the top and bottom of the rail, jump to the first and last stop.', hl: ['#start-btn', '#end-btn'],
     run: async () => { R().closeStory(); const tk = document.querySelectorAll('#progress .vr-tick')[stopIx('ross')]; hoverOn(tk, true); await wait(1400); hoverOn(tk, false); R().go(stopIx('ross')); await wait(1200); } },
   { id: 'd06', t: 'For the big picture, zoom out with the minus key, a pinch, or Control and scroll.', el: null,
     run: async () => { R().setZoom(1); await wait(2400); } },
@@ -246,6 +246,7 @@ function build() {
     <button type="button" class="tb-ic" id="tb-voice" aria-pressed="true" aria-label="Voice on" title="Voice"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H3v6h3l5 4z"/><path class="w" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/><path class="x" d="M16 9l5 6M21 9l-5 6"/></svg></button>
     <button type="button" class="tb-ic" id="tb-x" aria-label="End the tour" title="End the tour">×</button></div>
     <p class="tb-t" id="tb-t" aria-live="polite"></p>
+    <p class="tb-note" id="tb-note" hidden></p>
     <div class="tb-acts"><button type="button" class="tb-btn" id="tb-back">Back</button><button type="button" class="tb-btn" id="tb-pause" aria-pressed="false">Pause</button><button type="button" class="tb-btn primary" id="tb-next">Next</button></div>`;
   document.body.append(ring, ui);
   $('#tb-x').addEventListener('click', () => end());
@@ -296,6 +297,8 @@ async function show(i) {
   $('#tb-back').disabled = i === 0;
   $('#tb-next').textContent = i === steps.length - 1 ? 'Done' : 'Next';
   root.querySelectorAll('.tour-hl').forEach(x => x.classList.remove('tour-hl'));
+  { const n = $('#tb-note'); if (n) { n.textContent = st.note || ''; n.hidden = !st.note; } }
+  (st.hl || []).forEach(q => { const e = $(q); if (e) e.classList.add('tour-hl'); });
   const t0 = performance.now();
   const spoken = paused ? Promise.resolve(false) : Voice.say(st.t, st.id);
   const words = st.t.split(/\s+/).length;
