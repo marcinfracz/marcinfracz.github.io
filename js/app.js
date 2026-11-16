@@ -1186,7 +1186,8 @@
   });
 
   /* ================= browser: a real browser window inside the desktop ================= */
-  var BROWSER_HOME = new URL("road.html", window.location.href).href;
+  var BROWSER_HOME = new URL("start.html", window.location.href).href; /* v39: the browser opens on a launchpad of links */
+  var ROAD_URL = new URL("road.html", window.location.href).href;
   var browserHistory = [], browserIndex = -1, browserCurrent = "";
   var frame = el("browser-frame"), urlBar = el("browser-url");
   var RESUME_URL = new URL("assets/resume.pdf", window.location.href).href;
@@ -1205,7 +1206,8 @@
   var browserActiveId = null;
   var browserTabSeq = 0;
   function browserTitleFor(url) {
-    if (url === BROWSER_HOME) return "The Road";
+    if (url === BROWSER_HOME) return "Start";
+    if (url.split("#")[0] === ROAD_URL) return "The Road";
     if (url === RESUME_URL) return "Resume";
     if (url === REEL_URL) return "Sizzle Reel";
     if (url.split("#")[0] === BRAG_URL) return "Work & Tools";
@@ -1245,7 +1247,7 @@
     if (isPhone()) {
       /* phone: no browser-in-a-browser. Work goes to the real page,
          Resume / Reel open in a new tab so the site stays open. */
-      if (url === BROWSER_HOME || url.split("#")[0] === BRAG_URL) window.location.href = url;
+      if (url === BROWSER_HOME || url.split("#")[0] === ROAD_URL || url.split("#")[0] === BRAG_URL) window.location.href = url;
       else window.open(url, "_blank", "noopener");
       return;
     }
@@ -1327,7 +1329,7 @@
   function browserNavigate(raw) { browserGo(browserNormalize(raw), true); }
   function browserInit() {
     if (!browserTabs.length) {
-      var t = { id: ++browserTabSeq, title: "The Road", url: BROWSER_HOME, history: [BROWSER_HOME], index: 0 };
+      var t = { id: ++browserTabSeq, title: "Start", url: BROWSER_HOME, history: [BROWSER_HOME], index: 0 };
       browserTabs.push(t);
       browserLoadTab(t);
     } else {
@@ -1356,6 +1358,18 @@
     else if (e.key === "Escape") { urlBar.value = browserCurrent; urlBar.blur(); }
   });
   urlBar.addEventListener("focus", function () { urlBar.select(); });
+  /* v39: links on the launchpad open as new tabs in this window (only same-site pages, only from the frame) */
+  window.addEventListener("message", function (e) {
+    if (e.origin !== window.location.origin || e.source !== frame.contentWindow) return;
+    var m = e.data && e.data.mfStart;
+    if (!m) return;
+    if (m.act === "contact") { openWindow("contact-win"); return; }
+    var u;
+    try { u = new URL(m.href, window.location.href); } catch (err) { return; }
+    if (u.origin !== window.location.origin) return;
+    var title = typeof m.title === "string" && m.title.length < 40 ? m.title : "";
+    browserOpenTab(u.href, title || browserTitleFor(u.href));
+  });
   frame.addEventListener("load", function () {
     clearTimeout(browserLoadTimer);
     browserHideBlocked(); /* the page loaded; a site that blocks embedding fires load too and shows its own refusal inside the frame */
