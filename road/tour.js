@@ -208,17 +208,32 @@ const DESK = [
   { id: 'd11', t: 'That\'s the tour. Start the drive whenever you\'re ready.', el: '#card',
     run: async () => { R().toStart(); await wait(900); } },
 ];
+/* v45: the phone tour follows the vertical page. Each line scrolls to what it talks about and
+   rings it in the space between the top bar and the tour box: the welcome card, the first stops
+   one after another, a stop's stories, the day and dusk button, then the Menu with every page.
+   Same recorded lines; the menu step uses the desktop line, which never mentions swiping. */
+let phoneEl = null;
+const barBottom = () => { const b = document.querySelector('.bar'); return b ? b.getBoundingClientRect().bottom : 56; };
+const goTo = el => { /* fits el between the bar and the tour box when it can, else puts its top under the bar */
+  if (!el) return; const r = el.getBoundingClientRect(), box = document.querySelector('.tour-box');
+  const room = (box && !box.hidden ? box.getBoundingClientRect().top : innerHeight) - 12;
+  const at = Math.max(barBottom() + 10, room - r.height);
+  scrollTo({ top: Math.max(0, r.top + scrollY - at), behavior: reduced ? 'auto' : 'smooth' }); };
+const stopSec = n => document.querySelectorAll('#flow > section')[n] || null;
+const menuOpen = on => { const sh = document.getElementById('pm-sheet'), bt = document.querySelector('.pm-btn'); if (!sh || !bt) return; if (on === sh.hidden) bt.click(); };
 const PHONE = [
-  { id: 'p01', t: 'Welcome to The Road. Marcin\'s career is laid out as a drive, one stop for each chapter. I\'ll show you around. You can skip at any time.', el: '#m-start .fcard' },
-  { id: 'p02', t: 'Scroll down to drive. Each stop shows the company, the role, the years and the results.', el: () => document.querySelector('#flow section:nth-child(2) .fcard'),
-    run: async () => { const s = document.querySelector('#flow section:nth-child(2)'); if (s) s.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' }); await wait(1200); } },
-  { id: 'p03', t: 'Each stop lists a few short stories: the work behind the result, with the brands and products involved.', el: () => document.querySelector('#flow section:nth-child(2) .card-callouts') || document.querySelector('#flow section:nth-child(2) .fcard'),
-    run: async () => { const d = document.querySelector('#flow section:nth-child(2) .card-callouts'); if (d) d.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' }); await wait(1000); } },
+  { id: 'p01', t: 'Welcome to The Road. Marcin\'s career is laid out as a drive, one stop for each chapter. I\'ll show you around. You can skip at any time.', el: () => phoneEl,
+    run: async () => { phoneEl = document.querySelector('#m-start .fcard'); goTo(phoneEl); await wait(500); } },
+  { id: 'p02', t: 'Scroll down to drive. Each stop shows the company, the role, the years and the results.', el: () => phoneEl,
+    run: async my => { for (let n = 1; n <= 3; n++) { const s = stopSec(n); if (!s) break; phoneEl = s.querySelector('.fcard') || s; goTo(phoneEl); await wait(2200); if (my !== token) return; } } },
+  { id: 'p03', t: 'Each stop lists a few short stories: the work behind the result, with the brands and products involved.', el: () => phoneEl,
+    run: async () => { const s = stopSec(3) || stopSec(1); const d = s && (s.querySelector('.card-callouts') || s.querySelector('.fcard')); phoneEl = d; goTo(d); await wait(1000); } },
   { id: 'p04', t: 'The moon button switches between day and dusk.', el: '#theme-btn',
     run: async () => { theme0 = theme0 || root.getAttribute('data-theme'); click('#theme-btn'); await wait(2400); if (root.getAttribute('data-theme') !== theme0) click('#theme-btn'); } },
-  { id: 'p05', t: 'Up top, you can always reach the Desktop, live demos, the timeline, his resume, and how to get in touch. Swipe the links sideways to see them all.', el: '.bar-links', links: true },
-  { id: 'p06', t: 'That\'s the tour. Scroll down to start the drive.', el: '#m-start .fcard',
-    run: async () => { scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }); await wait(700); } },
+  { id: 'd10', t: 'Up top, you can always reach the Desktop, live demos of tools Marcin built, the timeline, his resume, and how to get in touch.', el: '#pm-sheet', links: true, menu: true,
+    run: async () => { menuOpen(true); await wait(400); } },
+  { id: 'p06', t: 'That\'s the tour. Scroll down to start the drive.', el: () => phoneEl,
+    run: async () => { phoneEl = document.querySelector('#m-start .fcard'); goTo(phoneEl); await wait(700); } },
 ];
 
 let ui = null, ring = null, steps = [], at = -1, running = false, paused = false, timer = null, token = 0, raf = 0, lastFocus = null;
@@ -253,8 +268,10 @@ function place() {
   const st = steps[at], e = st && target(st);
   if (e) {
     const r = e.getBoundingClientRect(), p = 6;
-    if (r.width && r.height) {
-      ring.style.cssText = `left:${r.left - p}px;top:${r.top - p}px;width:${r.width + p * 2}px;height:${r.height + p * 2}px`;
+    let top = r.top - p, bot = r.bottom + p;
+    if (isPhone() && !e.closest('.bar, #pm-sheet')) { top = Math.max(top, barBottom() + 4); bot = Math.min(bot, ui.getBoundingClientRect().top - 8); }
+    if (r.width && r.height && bot - top > 20) {
+      ring.style.cssText = `left:${r.left - p}px;top:${top}px;width:${r.width + p * 2}px;height:${bot - top}px`;
       ring.classList.add('on');
     } else ring.classList.remove('on');
   } else ring.classList.remove('on');
@@ -284,13 +301,15 @@ async function show(i) {
   const words = st.t.split(/\s+/).length;
   const readMs = Math.max(3800, words * 300);
   fillTo(paused ? null : readMs);
-  try { if (st.run) await st.run(); } catch (e) {}
+  if (isPhone() && !st.menu) menuOpen(false);
+  try { if (st.run) await st.run(my); } catch (e) {}
   if (my !== token) return;
   if (st.links) {
-    for (const a of document.querySelectorAll('.bar-links > a')) {
+    const sheetOn = isPhone() && document.getElementById('pm-sheet') && !document.getElementById('pm-sheet').hidden;
+    for (const a of document.querySelectorAll(sheetOn ? '#pm-sheet a' : '.bar-links > a')) {
       if (my !== token) return;
-      a.classList.add('tour-hl'); if (isPhone()) a.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
-      await wait(650); a.classList.remove('tour-hl');
+      a.classList.add('tour-hl');
+      await wait(sheetOn ? 900 : 650); a.classList.remove('tour-hl');
     }
   }
   if (paused || my !== token) return;
@@ -322,6 +341,7 @@ function end() {
   if (!running) return;
   token++; clearTimeout(timer); Voice.stop(); cancelAnimationFrame(raf);
   running = false; ui.hidden = true; ring.classList.remove('on'); root.classList.remove('touring');
+  if (isPhone()) menuOpen(false);
   root.querySelectorAll('.tour-hl').forEach(x => x.classList.remove('tour-hl'));
   if (theme0 && root.getAttribute('data-theme') !== theme0) click('#theme-btn');
   theme0 = null;

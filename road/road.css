@@ -852,3 +852,19 @@ html[data-theme="dusk"] .co-logo.color img[src*="patac"], html[data-theme="dusk"
 [data-theme="dusk"] .fb-btn { background: #242C38; border-color: rgba(255,255,255,.14); color: #EEF1F5; }
 [data-theme="dusk"] .fb-btn:not(:disabled):hover { background: #2C3542; }
 [data-theme="dusk"] .fb-frame { background: #0F141C; }
+
+/* v45 phone tour: a compact box, and the ring and box sit above the Menu sheet */
+.tour-ring, .tour-box { z-index: 10070; }
+.pm-sheet a.tour-hl { background: var(--accent-soft); box-shadow: inset 0 0 0 2px var(--accent); }
+@media (max-width: 767px) {
+  .tour-box { padding: 10px 12px; }
+  .tour-box .tb-t { font-size: 14.5px; line-height: 1.4; margin: 6px 0 8px; }
+  .tour-box .tb-btn { min-height: 44px; }
+  .tour-box .tb-ic { min-width: 44px; min-height: 44px; }
+}
+/* v45 phone tap targets: 44px for the small buttons and work pills */
+@media (max-width: 767px) {
+  .bar-links .theme-btn { width: 44px; height: 44px; }
+  .card-actions .btn { min-height: 44px; }
+  .wk-pills .wk-pill { min-height: 44px; display: inline-flex; align-items: center; }
+}
