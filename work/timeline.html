@@ -294,7 +294,12 @@ html[data-theme="dark"] .map .land{stroke:color-mix(in srgb,var(--ink) 11%,trans
 .arcx .yr{font:600 10px var(--font);fill:var(--muted)}
 .arcx .ax{stroke:var(--line);stroke-width:1}
 .arcx foreignObject .rf{box-shadow:0 0 0 1px var(--ring)}
-.arcx .here{font:800 10.5px var(--font);fill:var(--acc-ink)}
+.arcx .here{font:800 11.5px var(--font);fill:var(--acc-ink)}
+.arcx .ptr{fill:var(--acc-ink)}
+.arcx .ptr-b{fill:none;stroke:var(--acc-ink);stroke-width:1.6;stroke-linejoin:round}
+.arcx .today line{stroke:var(--ink2);stroke-width:1.2;stroke-dasharray:3 3}
+.arcx .today circle{fill:var(--ink2)}
+.arcx .today text{font:800 10px var(--font);letter-spacing:.06em;text-transform:uppercase;fill:var(--ink2)}
 /* stories */
 .stories{display:grid;grid-template-columns:repeat(var(--n,2),minmax(0,1fr));gap:12px;margin:0;padding:0;list-style:none}
 .stories.many .story{grid-template-columns:1fr;gap:10px;padding:14px;align-content:start}
@@ -535,6 +540,18 @@ html[data-theme="dark"] .tile.keep img,html[data-theme="dark"] .lg.keep img,html
 .places li{padding:0;background:none;border-radius:0}
 .places li.hot{background:none;color:var(--ink);text-decoration:underline;text-underline-offset:3px}
 @media (max-width:600px){.chip{font-size:13px}.chip.tag{font-size:12px}.m-acts{gap:10px 18px}.lnk{white-space:normal}}
+/* v41: one tight header. The Road button sits beside the title block; the flag rides on the place */
+.m-hgrid{grid-template-columns:auto minmax(0,1fr) auto}
+.m-hgrid>.m-acts{margin:0;align-self:end;flex-direction:column;align-items:flex-end;gap:8px;max-width:300px}
+.m-hgrid>.m-acts .lnk{white-space:normal;text-align:right}
+.chip img{border-radius:3px;width:20px;height:14px}
+.gauge.stat{grid-template-columns:minmax(0,132px) minmax(0,1fr)}
+.gauge.stat .c-big{font-weight:800;fill:var(--ink);letter-spacing:-.02em}
+.viz .ch-list{margin:0}
+@media (max-width:980px){.m-hgrid{grid-template-columns:auto minmax(0,1fr)}.m-hgrid>.m-acts{grid-column:2;flex-direction:row;flex-wrap:wrap;align-items:center;justify-self:start;max-width:none}.m-hgrid>.m-acts .lnk{text-align:left}}
+.sheet.sm .viz{grid-template-columns:1fr}
+.sheet.sm .m-hgrid{grid-template-columns:auto minmax(0,1fr)}.sheet.sm .m-hgrid>.m-acts{grid-column:2;flex-direction:row;justify-self:start;max-width:none}
+@media (max-width:600px){.m-hgrid{grid-template-columns:1fr}.m-hgrid>.m-acts{grid-column:1}.gauge.stat{grid-template-columns:104px minmax(0,1fr)}}
 
 /* v40: page header. The title sits in the top row beside the photo pill, with room before the highlight row */
 .brand span{display:none}
@@ -616,7 +633,7 @@ html[data-theme="dark"] .tile.keep img,html[data-theme="dark"] .lg.keep img,html
 
 <noscript><p style="position:fixed;top:120px;left:20px">The timeline needs JavaScript. <a href="../road.html">Drive the Road instead</a>.</p></noscript>
 
-<script src="../content/road-content.js?v=40"></script>
+<script src="../content/road-content.js?v=41"></script>
 <script type="module">
 import { COUNTRY } from '../road/marks.js';
 /* v39: sharp SVG flags (flag-icons, MIT) instead of small canvas drawings */
@@ -755,7 +772,7 @@ const LENSES = [
   { id: 'software', n: 'Software & connected', sw: ['digital'], ids: ['connected', 'shanghai', 'onstar'] },
   { id: 'customer', n: 'Customer & dealer', sw: ['cx', 'field'], ids: ['customer-experience', 'mexico'] },
   { id: 'global', n: 'Global & JV', icon: 'globe', ids: ['customer-experience', 'mexico', 'equinox', 'trailblazer-encore', 'shanghai', 'onstar'] },
-  { id: 'leadership', n: 'Leadership & influence', icon: 'users', ids: ['chrysler', 'johnson-controls', 'mexico', 'equinox', 'connected', 'shanghai', 'onstar'] },
+  { id: 'leadership', n: 'Leadership & influence', icon: 'users', ids: ['chrysler', 'johnson-controls', 'traverse', 'customer-experience', 'mexico', 'equinox', 'trailblazer-encore', 'connected', 'shanghai', 'onstar'] },
   { id: 'innovation', n: 'AI & innovation', icon: 'spark', roles: 1, ids: ['federal-mogul', 'traverse', 'customer-experience', 'trailblazer-encore', 'shanghai', 'onstar'] },
   { id: 'engineering', n: 'Engineering', sw: ['eng'], d: 'co-op included', ids: ['fm-coop', 'federal-mogul', 'chrysler', 'johnson-controls'] }
 ];
@@ -1225,14 +1242,18 @@ function arcHTML(on, note, aw = AW) {
   const bars = ROLES.map(s => { const y = 18, x = ax(s.from), w = Math.max(3, ax(s.to) - x - 2), st = STOP[s.id] || {};
     return `<g class="c-hit" data-open="${s.id}" data-tt="${esc(st.role || s.label)}" data-ts="${esc((PROF[s.id] || {}).company || s.co)} · ${esc(s.years)}"><rect class="r${set.has(s.id) ? ' on' : ''}" x="${x.toFixed(1)}" y="${y}" width="${w.toFixed(1)}" height="22" fill="var(--f-${s.focus})"/>${s.flag ? `<foreignObject x="${(x + w / 2 - 7).toFixed(1)}" y="1" width="14" height="14">${chick(s.flag)}</foreignObject>` : ''}</g>`; }).join('');
   const lit = ROLES.filter(s => set.has(s.id));
+  /* v41: a pointer under the lit bar (a bracket for a chapter) and a dashed line for today */
   let here = '';
-  if (lit.length) { const a = Math.min(...lit.map(s => s.from)), b = Math.max(...lit.map(s => s.to)); const cx = (ax(a) + ax(b)) / 2;
-    here = `<text class="here" x="${Math.min(aw - 40, Math.max(40, cx)).toFixed(1)}" y="55" text-anchor="middle">${esc(lit.length > 1 ? 'This chapter' : 'This role')}</text>`; }
-  const pin = (yr, id, lbl) => `<g class="c-hit" data-open="${id}" data-tt="${esc(lbl)}" data-ts="${Math.floor(yr)}"><circle cx="${ax(yr).toFixed(1)}" cy="70" r="${set.has(id) ? 6 : 4.5}" fill="var(--cap-bg)" stroke="var(--cap-fg)" stroke-width="${set.has(id) ? 2.5 : 1.5}"/></g>`;
-  const ticks = [2003, 2007, 2011, 2015, 2019, 2023, 2026].map(y => `<text class="yr" x="${ax(y).toFixed(1)}" y="116" text-anchor="middle">${y}</text>`).join('').replace(/y="116"/g, 'y="90"');
+  if (lit.length) { const a = Math.min(...lit.map(s => s.from)), b = Math.max(...lit.map(s => s.to)); const xa = ax(a), xb = ax(b) - 2, cx = (xa + xb) / 2, lx = Math.min(aw - 40, Math.max(40, cx));
+    const mark = lit.length > 1 ? `<path class="ptr-b" d="M${xa.toFixed(1)} 44V48H${xb.toFixed(1)}V44M${cx.toFixed(1)} 48V52"/>` : `<path class="ptr" d="M${cx.toFixed(1)} 43l8 10h-16z"/>`;
+    here = `${mark}<text class="here" x="${lx.toFixed(1)}" y="65" text-anchor="middle">${esc(lit.length > 1 ? 'This chapter' : 'This role')}</text>`; }
+  const d = new Date(), tY = Math.min(AX1 - .15, d.getFullYear() + (d.getMonth() + d.getDate() / 31) / 12), tx = ax(tY);
+  const today = `<g class="today"><line x1="${tx.toFixed(1)}" x2="${tx.toFixed(1)}" y1="8" y2="82"/><circle cx="${tx.toFixed(1)}" cy="82" r="3.5"/><text x="${(tx - 5).toFixed(1)}" y="14" text-anchor="end">Today</text></g>`;
+  const pin = (yr, id, lbl) => `<g class="c-hit" data-open="${id}" data-tt="${esc(lbl)}" data-ts="${Math.floor(yr)}"><circle cx="${ax(yr).toFixed(1)}" cy="82" r="${set.has(id) ? 6 : 4.5}" fill="var(--cap-bg)" stroke="var(--cap-fg)" stroke-width="${set.has(id) ? 2.5 : 1.5}"/></g>`;
+  const ticks = [2003, 2007, 2011, 2015, 2019, 2023].map(y => `<text class="yr" x="${ax(y).toFixed(1)}" y="102" text-anchor="middle">${y}</text>`).join('');
   return `<div class="card full"><div class="card-h"><b>Career arc</b><span>${esc(note || 'Flags mark international roles. Tap a bar to open it.')}</span></div>
-    <svg class="chart arcx" viewBox="0 0 ${aw} 94" role="img" aria-label="Career arc, 2003 to 2026">
-      <line class="ax" x1="6" x2="${aw - 6}" y1="70" y2="70"/>${bars}${here}
+    <svg class="chart arcx" viewBox="0 0 ${aw} 106" role="img" aria-label="Career arc, 2003 to today">
+      <line class="ax" x1="6" x2="${aw - 6}" y1="82" y2="82"/>${today}${bars}${here}
       ${pin(2007, 'kettering', 'BSME, Kettering')}${pin(2014.25, 'ross', 'MBA, Michigan Ross')}
       ${ticks}</svg></div>`;
 }
@@ -1244,8 +1265,26 @@ const CHART = {
   traverse: { t: 'Indexed change, 2016 to 2017', n: 'Before set to 100 to show each stated change', rows: [['Build combinations', 100, 90, '−10%'], ['Consideration at launch', 100, 106, '+6%']] },
   mexico: 'gauge', connected: 'team'
 };
+/* v41: a snapshot for every other role, built only from facts already on the site */
+const STAT = {
+  kettering: { big: '4 yrs', t: 'Degree and co-op', s: 'Kettering University', cap: 'of paid engineering co-op while earning the degree', rows: [['BSME', 'cum laude'], ['2007', 'graduated'], ['Minor', 'business management']] },
+  'fm-coop': { big: '4 yrs', t: 'Co-op engineering', s: 'Federal-Mogul', cap: 'of co-op terms on production engine sealing', rows: [['5.7L', 'HEMI gaskets helped finish'], ['PTFE', 'and elastomeric seals'], ['DFMEA', 'DVP&R and design reviews']] },
+  ross: { big: 'MBA', t: 'Michigan Ross', s: 'Marketing & Strategy', cap: 'earned while working full time', rows: [['2014', 'graduated'], ['1 week', 'on site in Victoria, BC'], ['3 yrs', 'GM leadership program next']] },
+  'customer-experience': { big: 'Global', t: 'Dealer culture program', s: 'Chevrolet', cap: 'dealer culture program built with the Disney Institute', rows: [['Ecuador', 'benchmark market, on site'], ['Orlando', 'Walt Disney World'], ['Detroit', 'HQ workshops, Opera House']] },
+  equinox: { big: '$200', t: 'Profit and content', s: 'Compact & mid crossovers', cap: 'per-vehicle profit improvements supported', rows: [['5%', 'less post-refresh price decay'], ['3', 'markets on one content plan'], ['2', 'vehicles, Equinox and Traverse']] },
+  'trailblazer-encore': { big: '2', t: 'Two launches', s: 'Encore GX & Trailblazer', cap: 'crossover launches kept moving', rows: [['On time', 'show cars, under budget'], ['Korea', 'where both are built'], ['ACTIV', 'FWD Trailblazer added']] },
+  shanghai: { big: '3 yrs', t: 'Second international assignment', s: 'SAIC-GM', cap: 'as Deputy Director in Shanghai', rows: [['1000s', 'in the software org stood up'], ['9-figure', 'driver-assist investment supported'], ['Multi-city', 'ADAS research']] },
+  onstar: { big: '8', t: 'Export connectivity', s: 'OnStar International', cap: 'export regions planned for China-built vehicles', rows: [['217', 'programs in Portfolio Made Visible'], ['55', 'markets'], ['39', 'users, 7 director+ and 3 VPs']] }
+};
+function statHTML(id) {
+  const c = STAT[id]; if (!c) return '';
+  const L = 2 * Math.PI * 40, fs = c.big.length > 5 ? 17 : c.big.length > 3 ? 21 : 26;
+  return `<div class="card"><div class="card-h"><b>${esc(c.t)}</b><span>${esc(c.s)}</span></div><div class="gauge stat">
+      <svg class="chart" viewBox="0 0 100 100" role="img" aria-label="${esc(c.big + ' ' + c.cap)}"><circle cx="50" cy="50" r="40" fill="none" stroke="var(--surface2)" stroke-width="9"/><circle class="gauge-arc" cx="50" cy="50" r="40" fill="none" stroke="var(--acc-ink)" stroke-width="9" stroke-linecap="round" transform="rotate(-90 50 50)" stroke-dasharray="${L.toFixed(1)}" stroke-dashoffset="${L.toFixed(1)}" data-to="0"/><text class="c-big" x="50" y="${(50 + fs * .36).toFixed(1)}" text-anchor="middle" style="font-size:${fs}px">${esc(c.big)}</text></svg>
+      <div class="g-side"><p class="g-cap">${esc(c.cap)}</p><ul class="g-stats">${c.rows.map(([b, t]) => `<li><b>${esc(b)}</b>${esc(t)}</li>`).join('')}</ul></div></div></div>`;
+}
 function chartHTML(id) {
-  const c = CHART[id]; if (!c) return '';
+  const c = CHART[id]; if (!c) return statHTML(id);
   if (c === 'save') {
     const max = Math.max(...SAVE.map(x => x[2])) * 1.05;
     return `<div class="card"><div class="card-h"><b>Cost savings across engineering</b><span>As stated on each role</span></div><div class="hbars">${SAVE.map(([rid, n, v, lbl, what], i) =>
@@ -1272,21 +1311,22 @@ function chartHTML(id) {
 const stickHTML = (tile, eyebrow, title) => `<div class="m-stick"><div class="m-sbar">${tile}<div><p class="eyebrow">${eyebrow}</p><b>${esc(title)}</b></div><button class="m-x" type="button" data-close aria-label="Close" tabindex="-1">×</button></div></div>`;
 function roleHTML(id) {
   const s = STOP[id] || {}, p = PROF[id] || {}, e = ERA[s.era];
-  const flags = (s.flags || []).map(([c, when, what, cities]) => `<li class="chip" title="${esc(what || '')}"><img src="${flagURL(c)}" alt="">${esc(COUNTRY[c] || c)} · ${esc(when)}</li>`).join('');
-  const chips = [s.place && `<li class="chip">${ico('pin')}${esc(s.place)}</li>`, s.span && `<li class="chip">${ico('cal')}${esc(s.span)}</li>`,
+  const home = (SLOT[id] || {}).flag; /* v41: an international posting shows its flag beside the city, not on a second line */
+  const flags = (s.flags || []).filter(([c]) => c !== home).map(([c, when, what, cities]) => `<li class="chip" title="${esc(what || '')}"><img src="${flagURL(c)}" alt="">${esc(COUNTRY[c] || c)} · ${esc(when)}</li>`).join('');
+  const chips = [s.place && `<li class="chip">${home ? `<img src="${flagURL(home)}" alt="${esc(COUNTRY[home] || home)}">` : ico('pin')}${esc(s.place)}</li>`, s.span && `<li class="chip">${ico('cal')}${esc(s.span)}</li>`,
     ...(TAGS[id] || [`<i></i>${esc(focusName(id))}`]).map(t => TAGS[id] ? `<li class="chip tag">${esc(t)}</li>` : `<li class="chip tag">${t}</li>`), e && `<li class="chip tag">Chapter ${e.n} · ${esc(e.short || e.label)}</li>`].filter(Boolean).join('') + flags;
   const stories = (s.callouts || []).map((c, k) => { const [t, lede] = splitCallout(c.text); const body = (p.stories && p.stories[k]) || lede;
     return `<li class="story"><span class="badge">${ico(pick(t) !== 'check' ? pick(t) : pick(body))}</span><div><b><small>${LET(k)}</small>${esc(t)}</b><p>${esc(body)}</p>${marksHTML(p, k)}</div></li>`; }).join('');
   const work = (WORK[id] || []).map(x => `<a class="lnk" href="${esc(x.href.replace(/^work\//, ''))}" title="${esc(x.text)} (synthetic data)">${esc(x.pill === 'Kit' ? 'Everyday kit' : 'Live demo: ' + x.title)}${ico('ext')}</a>`).join('');
   const m = s.more, more = m && m.blocks ? `<details class="m-more"><summary>${esc(m.title || 'More')}</summary>${m.blocks.map(b => `<h4>${esc(b.h)}</h4><p>${esc(b.p)}</p>`).join('')}${m.sources && m.sources.length ? '<div class="src">' + m.sources.map(x => `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.label)}</a>`).join('') + '</div>' : ''}</details>` : '';
   const i = ORDER.indexOf(id), pv = ORDER[i - 1], nx = ORDER[i + 1];
-  const chart = chartHTML(id), map = PLACES[id] ? mapHTML(PLACES[id], id === 'onstar' ? '8 export regions' : '', !chart) : '';
+  const chart = chartHTML(id), map = PLACES[id] ? mapHTML(PLACES[id], id === 'onstar' ? '8 export regions' : '', !chart && PLACES[id].length > 4) : '';
   const arc = arcHTML([id], innerWidth < 600 ? 'Tap a bar to open it' : '', innerWidth < 600 ? 480 : AW);
   return `${stickHTML(tileHTML(id), `${esc(p.company || s.title)}${p.group ? ' · ' + esc(p.group) : ''}`, s.role || s.title)}${X_BTN}<header class="m-top"><div class="m-hgrid">${tileHTML(id)}<div>
       <p class="eyebrow">${esc(p.company || s.title)}${p.group ? ' · ' + esc(p.group) : ''}</p>
       <h2 class="m-role" id="m-title">${esc(s.role || s.title)}</h2>
-      <ul class="chips">${chips}</ul></div></div>
-      <div class="m-acts"><a class="btn pri" href="../road.html#${esc(id)}" target="_top">${ico('car')}See it on the Road</a>${work}</div></header>
+      <ul class="chips">${chips}</ul></div>
+      <div class="m-acts"><a class="btn pri" href="../road.html#${esc(id)}" target="_top">${ico('car')}See it on the Road</a>${work}</div></div></header>
     <div class="m-body">
       ${p.summary ? `<p class="m-sum">${esc(p.summary)}</p>` : ''}
       ${p.hl && p.hl.length ? `<p class="m-h">Highlights</p><div class="kpis">${kpisHTML(p)}</div>` : ''}
@@ -1303,11 +1343,10 @@ const FLAG_PLACES = { 'flag-CA-2012': [DET, ['Victoria, BC', 48.43, -123.37]], E
 function flagHTML(pn) {
   const r = STOP[pn.role] || {};
   return `${stickHTML(`<div class="tile flag"><img src="${flagURL(pn.c)}" alt=""></div>`, 'Country project · ' + esc(pn.sub), pn.t)}${X_BTN}<header class="m-top"><div class="m-hgrid"><div class="tile flag"><img src="${flagURL(pn.c)}" alt=""></div><div>
-      <p class="eyebrow">Country project · ${esc(pn.sub)}</p><h2 class="m-role" id="m-title">${esc(pn.t)}</h2></div></div></header>
+      <p class="eyebrow">Country project · ${esc(pn.sub)}</p><h2 class="m-role" id="m-title">${esc(pn.t)}</h2></div>
+      <div class="m-acts"><a class="btn pri" href="../road.html#${esc(pn.role)}" target="_top">${ico('car')}See it on the Road</a></div></div></header>
     <div class="m-body"><p class="m-sum">${esc(pn.text)}</p>
-      <div class="viz" style="grid-template-columns:1fr;margin-top:16px">${mapHTML(FLAG_PLACES[pn.id] || FLAG_PLACES[pn.c] || [DET])}</div>
-      <p class="m-h">Part of</p><ul class="ch-list">${roleRow(pn.role)}</ul>
-      <div class="m-acts" style="margin-bottom:22px"><a class="btn" href="../road.html#${esc(pn.role)}" target="_top">${ico('car')}See it on the Road</a></div></div>`;
+      <p class="m-h">At a glance</p><div class="viz">${mapHTML(FLAG_PLACES[pn.id] || FLAG_PLACES[pn.c] || [DET])}<div class="card"><div class="card-h"><b>Part of</b><span>${esc((SLOT[pn.role] || {}).years || '')}</span></div><ul class="ch-list">${roleRow(pn.role)}</ul></div></div><div style="height:22px"></div></div>`;
 }
 function chapterHTML(c) {
   return `${stickHTML('', 'Chapter · ' + esc(c.years), c.t)}${X_BTN}<header class="m-top"><p class="eyebrow">Chapter · ${esc(c.years)}</p><h2 class="m-role" id="m-title">${esc(c.t)}</h2></header>
