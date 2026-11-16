@@ -1,9 +1,9 @@
 /* The Road: page app. Builds the 3D world, places one scene per stop, and
    drives the camera left to right (laptop and tablet) or top to bottom (phone). */
 import { THREE, TOKENS, setTheme, tok, roadZ, smooth, clamp, lerp } from './core.js';
-import { buildWorld } from './world.js?v=33';
-import { buildStage } from './stages.js?v=38';
-import { planCities, cityFootprints, buildCities } from './landmarks.js?v=38';
+import { buildWorld } from './world.js?v=41';
+import { buildStage } from './stages.js?v=41';
+import { planCities, cityFootprints, buildCities } from './landmarks.js?v=41';
 import { flagURL, COUNTRY } from './marks.js?v=28';
 
 const C = window.ROAD_CONTENT;
@@ -406,6 +406,10 @@ function start() {
   const sc = sun.shadow.camera; sc.left = -80; sc.right = 80; sc.top = 60; sc.bottom = -60; sc.near = 10; sc.far = 260;
   sun.shadow.bias = -0.0006; sun.shadow.normalBias = 0.04;
   scene.add(sun); scene.add(sun.target);
+  const sunOff = new THREE.Vector3(-40, 90, 75), sunC = new THREE.Vector3();
+  const sunR = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), sunOff.clone().normalize()).normalize();
+  const sunU = new THREE.Vector3().crossVectors(sunOff.clone().normalize(), sunR).normalize();
+  const sunTex = (sc.right - sc.left) / sun.shadow.mapSize.x, sunTexV = (sc.top - sc.bottom) / sun.shadow.mapSize.y;
 
   const camera = new THREE.PerspectiveCamera(30, 1, 1, 900);
 
@@ -1130,8 +1134,12 @@ function start() {
     look.lerp(lookAt, a);
     camera.lookAt(look);
     // move the sun's shadow box with the view
-    sun.position.set(fx - 40, 90, fz + 60);
-    sun.target.position.set(fx, 0, fz - 15);
+    // v41: snap the shadow box to whole shadow-map texels so edges stay put as the view glides
+    sunC.set(fx, 0, fz - 15);
+    const sa = sunC.dot(sunR), sb = sunC.dot(sunU);
+    sunC.addScaledVector(sunR, Math.round(sa / sunTex) * sunTex - sa).addScaledVector(sunU, Math.round(sb / sunTexV) * sunTexV - sb);
+    sun.target.position.copy(sunC);
+    sun.position.copy(sunC).add(sunOff);
   }
 
   /* ---------- loop ---------- */

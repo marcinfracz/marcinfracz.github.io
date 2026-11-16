@@ -5,7 +5,7 @@
    Flint (Kettering), Ann Arbor (Michigan Ross), Detroit (riverfront) and
    Shanghai (Lujiazui and the Bund). */
 import { THREE, mat, reg, mesh, merge, bx, cy, label, canvasTex, tok, roadZ, roadDZ, rand, smooth, clamp, lerp } from './core.js';
-import { vehicleGeo } from './world.js';
+import { vehicleGeo } from './world.js?v=41';
 
 /* ---------------- shared materials and a small geometry kit ---------------- */
 const C3 = h => { const c = new THREE.Color(h); return [c.r, c.g, c.b]; };
@@ -403,20 +403,20 @@ function vehicleArch(span = 12) {
 /* ---------------- shared instanced shapes ---------------- */
 function blockGeo(floors) {
   const parts = [[bx(1, 1, 1), 1], [bx(1.04, 0.025, 1.04, 0, 0.975, 0), 0.72]];
-  for (let i = 0; i < floors; i++) parts.push([bx(1.012, 0.42 / floors, 1.012, 0, (i + 0.32) / floors, 0), 0.46]);
+  for (let i = 0; i < floors; i++) parts.push([bx(1.026, 0.42 / floors, 1.026, 0, (i + 0.32) / floors, 0), 0.46]);
   return merge(parts);
 }
 function litGeo(floors) {
-  const parts = []; for (let i = 0; i < floors; i++) parts.push([bx(1.02, 0.42 / floors, 1.02, 0, (i + 0.32) / floors, 0), 1]);
+  const parts = []; for (let i = 0; i < floors; i++) parts.push([bx(1.046, 0.42 / floors, 1.046, 0, (i + 0.32) / floors, 0), 1]);
   return merge(parts);
 }
 function octGeo(floors) {
   const parts = [[cy(0.5, 0.5, 1, 0, 0, 0, 8), 1], [cy(0.52, 0.52, 0.025, 0, 0.975, 0, 8), 0.72]];
-  for (let i = 0; i < floors; i++) parts.push([cy(0.506, 0.506, 0.42 / floors, 0, (i + 0.32) / floors, 0, 8), 0.46]);
+  for (let i = 0; i < floors; i++) parts.push([cy(0.513, 0.513, 0.42 / floors, 0, (i + 0.32) / floors, 0, 8), 0.46]);
   return merge(parts);
 }
 function octLitGeo(floors) {
-  const parts = []; for (let i = 0; i < floors; i++) parts.push([cy(0.512, 0.512, 0.42 / floors, 0, (i + 0.32) / floors, 0, 8), 1]);
+  const parts = []; for (let i = 0; i < floors; i++) parts.push([cy(0.524, 0.524, 0.42 / floors, 0, (i + 0.32) / floors, 0, 8), 1]);
   return merge(parts);
 }
 const houseGeo = () => merge([[bx(1, 0.62, 0.84), 1], [new THREE.CylinderGeometry(0.01, 0.74, 0.42, 4, 1).rotateY(Math.PI / 4).scale(1, 1, 0.82).translate(0, 0.83, 0), 0.62]]);
@@ -440,6 +440,10 @@ const lampLitGeo = () => merge([[new THREE.SphereGeometry(0.28, 8, 6).translate(
 /* a signal pole on a corner with its arm reaching over the road (+z) */
 const signalGeo = () => merge([[cy(0.09, 0.11, 4.6, 0, 0, 0, 6), POLE], [bx(0.14, 0.14, 5.2, 0, 4.4, 2.6), POLE], [bx(0.42, 1.0, 0.34, 0, 3.55, 4.6), [0.22, 0.24, 0.28]], [bx(0.44, 0.24, 0.36, 0, 4.25, 4.6), [0.95, 0.35, 0.3]], [bx(0.44, 0.24, 0.36, 0, 3.95, 4.6), [0.98, 0.78, 0.3]], [bx(0.44, 0.24, 0.36, 0, 3.65, 4.6), [0.35, 0.8, 0.5]]]);
 const pierGeo = () => merge([[bx(1, 1, 1), 0.86]]);
+/* v41: rooftop detail: plant units, water tanks and masts */
+const acGeo = () => merge([[bx(1, 1, 1), 1], [bx(0.5, 0.08, 0.5, 0.15, 1, 0.1), 0.6]]);
+const tankGeo = () => merge([[cy(0.05, 0.05, 1, -0.35, 0, -0.35, 4), POLE], [cy(0.05, 0.05, 1, 0.35, 0, -0.35, 4), POLE], [cy(0.05, 0.05, 1, -0.35, 0, 0.35, 4), POLE], [cy(0.05, 0.05, 1, 0.35, 0, 0.35, 4), POLE], [cy(0.55, 0.55, 1.3, 0, 1, 0, 10), [0.66, 0.52, 0.42]], [new THREE.ConeGeometry(0.6, 0.45, 10).translate(0, 2.52, 0), [0.5, 0.4, 0.33]]]);
+const mastGeo = () => merge([[cy(0.06, 0.1, 1, 0, 0, 0, 5), POLE], [bx(0.5, 0.06, 0.06, 0, 0.6, 0), POLE]]);
 const cableGeo = () => merge([[cy(0.05, 0.05, 1, 0, 0, 0, 4), 0.9]]);
 const benchGeo = () => merge([[bx(1.4, 0.12, 0.45, 0, 0.4, 0), [0.62, 0.5, 0.4]], [bx(0.1, 0.4, 0.4, -0.6, 0, 0), POLE], [bx(0.1, 0.4, 0.4, 0.6, 0, 0), POLE]]);
 
@@ -583,6 +587,8 @@ const PLANS = {
       { p: [[-66, 122], [68, 124]], w: 3, k: 'st', cars: 2 },
       { p: [[-58, -46, 4.6], [-58, -30, 6], [-58, -8, 6.6], [-58, 20, 6.6], [-58, 34, 7.6], [-58, 41, 8.6], [-58, 67, 8.6], [-58, 76, 7.4], [-58, 88, 3.6], [-58, 100, 0.1]], w: 6, elev: true, bridge: 'stayed', name: "Yan'an Elevated Rd", cars: 8, bus: 1 },
       { p: [[-95, -12.2, 0.05], [-80, -13, 1.4], [-68, -17, 3.8], [-61.5, -25, 5.8], [-59.5, -33, 6]], w: 3.4, elev: true, ramp: true, cars: 1 },
+      /* v41: the high-speed rail viaduct, crossing the road and the river at the east edge */
+      { p: [[42, -46, 9.6], [42, 128, 9.6]], w: 4.2, elev: true, hsr: true, curve: false },
       { p: [[-59.5, 30, 7.2], [-61.5, 22, 6.2], [-68, 15, 3.8], [-80, 12.8, 1.4], [-95, 12.2, 0.05]], w: 3.4, elev: true, ramp: true, cars: 1 }
     ],
     parks: [{ c: [2, 100], r: [8, 7], name: 'Lujiazui Central Green' }, { c: [40, 28], r: [5, 4] }],
@@ -783,12 +789,20 @@ export function buildCities(scene, cities, { height, lite, stops, stageBoxes = [
   const built = [];
   const yAt = (x, z) => Math.max(0, height(x, z)) + 0.02;
   const SURF = mat('land', { vertexColors: true, side: THREE.DoubleSide });
+  SURF.polygonOffset = true; SURF.polygonOffsetFactor = -1; SURF.polygonOffsetUnits = -2; // v41: streets never fight the ground
 
   cities.forEach(c => {
     const g = new THREE.Group(); g.name = 'city-' + c.id;
     const near = new THREE.Group(); g.add(near); // details that hide in the wide view
     const anim = { flags: [], people: [], cars: [], movers: [], labels: [] };
     const S = c.stop.x, P = c.plan;
+    const roofs = [], tanks = [], masts = [], RR = rand(4100 + ((c.stop.x * 7) | 0));
+    const roofKit = (x, y, z, w, d, h, ry, us) => {
+      const cs = Math.cos(ry), sn = Math.sin(ry), put = (list, ox, oz, q) => list.push(Object.assign({ x: x + ox * cs + oz * sn, y, z: -ox * sn + oz * cs + z, ry }, q));
+      if (h > 4 && RR() < 0.75) { const n = 1 + ((RR() * (w > 6 ? 3 : 2)) | 0); for (let i = 0; i < n; i++) put(roofs, (RR() - 0.5) * w * 0.6, (RR() - 0.5) * d * 0.6, { sx: 0.9 + RR() * 0.8, sy: 0.45 + RR() * 0.35, sz: 0.7 + RR() * 0.6, c: RR() < 0.5 ? '#C9CED4' : '#AEB5BD' }); }
+      if (us && h > 5 && h < 17 && RR() < 0.3) put(tanks, (RR() - 0.5) * w * 0.4, (RR() - 0.5) * d * 0.4, { s: 0.9 + RR() * 0.4 });
+      if (h > 14 && RR() < 0.55) put(masts, (RR() - 0.5) * w * 0.3, (RR() - 0.5) * d * 0.3, { sx: 1, sy: 2.5 + RR() * 4.5, sz: 1 });
+    };
     const blocks = { low: [], mid: [], tall: [] }, octs = { mid: [], tall: [] }, houses = [], gables = [], trees = [], tents = [], lamps = [], signals = [], piers = [], cables = [], benches = [], lots = [];
 
     /* ---------- the occupancy grid, in the road's frame ---------- */
@@ -995,11 +1009,12 @@ export function buildCities(scene, cities, { height, lite, stops, stageBoxes = [
       if (st.elev) {
         // an elevated road: deck, girders, parapets, piers, and its bridge if it has one
         const ys = st.pts.map(q => Math.max(yL(q[0], q[1]) + 0.12, q[2] || 0));
-        const deckCol = SH.asphalt, sideCol = SH.girder, rail = SH.rail;
+        const deckCol = st.hsr ? SH.girder : SH.asphalt, sideCol = SH.girder, rail = SH.rail;
         for (let i = 0; i < n - 1; i++) {
           const a = at(i, -hw), b = at(i, hw), d = at(i + 1, hw), e = at(i + 1, -hw), y0 = ys[i], y1 = ys[i + 1];
           quad(wp(a[0], a[1], y0), wp(b[0], b[1], y0), wp(d[0], d[1], y1), wp(e[0], e[1], y1), deckCol);
-          if (i % 3 === 0 && !st.ramp) { const m0 = at(i, 0), m1 = at(i + 1, 0); const l0 = [m0[0] - T[i][1] * 0.07, m0[1] + T[i][0] * 0.07], r0 = [m0[0] + T[i][1] * 0.07, m0[1] - T[i][0] * 0.07], l1 = [m1[0] - T[i][1] * 0.07, m1[1] + T[i][0] * 0.07], r1 = [m1[0] + T[i][1] * 0.07, m1[1] - T[i][0] * 0.07]; quad(wp(l0[0], l0[1], y0 + 0.02), wp(r0[0], r0[1], y0 + 0.02), wp(r1[0], r1[1], y1 + 0.02), wp(l1[0], l1[1], y1 + 0.02), SH.dash); }
+          if (st.hsr) [-0.75, 0.75].forEach(o => { const r0 = at(i, o - 0.08), r1 = at(i, o + 0.08), r2 = at(i + 1, o + 0.08), r3 = at(i + 1, o - 0.08); quad(wp(r0[0], r0[1], y0 + 0.06), wp(r1[0], r1[1], y0 + 0.06), wp(r2[0], r2[1], y1 + 0.06), wp(r3[0], r3[1], y1 + 0.06), [0.42, 0.45, 0.5]); });
+          if (i % 3 === 0 && !st.ramp && !st.hsr) { const m0 = at(i, 0), m1 = at(i + 1, 0); const l0 = [m0[0] - T[i][1] * 0.07, m0[1] + T[i][0] * 0.07], r0 = [m0[0] + T[i][1] * 0.07, m0[1] - T[i][0] * 0.07], l1 = [m1[0] - T[i][1] * 0.07, m1[1] + T[i][0] * 0.07], r1 = [m1[0] + T[i][1] * 0.07, m1[1] - T[i][0] * 0.07]; quad(wp(l0[0], l0[1], y0 + 0.02), wp(r0[0], r0[1], y0 + 0.02), wp(r1[0], r1[1], y1 + 0.02), wp(l1[0], l1[1], y1 + 0.02), SH.dash); }
           const lift = Math.min(y0, y1) - Math.max(yL(a[0], a[1]), 0);
           if (lift > 0.35) [[a, e], [b, d]].forEach(([p0, p1]) => {
             quad(wp(p0[0], p0[1], y0), wp(p1[0], p1[1], y1), wp(p1[0], p1[1], y1 - 0.75), wp(p0[0], p0[1], y0 - 0.75), sideCol);
@@ -1133,15 +1148,21 @@ export function buildCities(scene, cities, { height, lite, stops, stageBoxes = [
         if (R() < 0.6) { const tu = u + Math.sin(ra + Math.PI / 2) * (d / 2 + 1.4) * (R() < 0.5 ? 1 : -1), tdx = dx + Math.cos(ra + Math.PI / 2) * (d / 2 + 1.4); if (get(tdx, tu) === FREE) { const [tx, tz] = W(tdx, tu); trees.push({ x: tx, z: tz, s: 0.6 + R() * 0.4, c: '#6F8E62' }); } }
         return;
       }
+      // v41: the skyline behind the road stands a little taller
+      if (u > 22) h *= 1 + 0.16 * clamp((u - 22) / 30, 0, 1);
+      const us = c.id !== 'shanghai';
       const tallish = h > 13 && (c.id === 'detroit' || c.id === 'shanghai');
-      if (tallish && R() < 0.22 && Math.abs(w - d) < 3) { (h > 14 ? octs.tall : octs.mid).push({ x, y, z, sx: Math.min(w, d), sy: h, sz: Math.min(w, d), ry, c: cl }); return; }
+      if (tallish && R() < 0.22 && Math.abs(w - d) < 3) { (h > 14 ? octs.tall : octs.mid).push({ x, y, z, sx: Math.min(w, d), sy: h, sz: Math.min(w, d), ry, c: cl }); if (h > 14 && RR() < 0.6) masts.push({ x, y: y + h, z, sx: 1, sy: 3 + RR() * 5, sz: 1, ry }); return; }
       if (tallish && R() < 0.45) {
         const h1 = h * (0.45 + R() * 0.2);
         blocks[h1 > 14 ? 'tall' : h1 > 6.5 ? 'mid' : 'low'].push({ x, y, z, sx: w, sy: h1, sz: d, ry, c: cl });
         const h2 = h - h1; blocks[h2 > 14 ? 'tall' : h2 > 6.5 ? 'mid' : 'low'].push({ x, y: y + h1, z, sx: w * 0.68, sy: h2, sz: d * 0.68, ry, c: cl, k: 1.04 });
+        roofKit(x, y + h1, z, w, d, 3, ry, false);
+        roofKit(x, y + h, z, w * 0.68, d * 0.68, h, ry, us);
         return;
       }
       blocks[h > 14 ? 'tall' : h > 6.5 ? 'mid' : 'low'].push({ x, y, z, sx: w, sy: h, sz: d, ry, c: cl });
+      roofKit(x, y + h, z, w, d, h, ry, us);
     }
     function sizeFor(zone, dx, u) {
       const tl = P.tall(dx, u);
@@ -1247,6 +1268,7 @@ export function buildCities(scene, cities, { height, lite, stops, stageBoxes = [
       const im = instanced(octGeo(FL[k]), l, LAND); if (im) g.add(im);
       const lit = instanced(octLitGeo(FL[k]), l.map(q => Object.assign({}, q, { c: '#FFFFFF', k: 1 })), LIT, false); if (lit) { lit.renderOrder = 1; g.add(lit); }
     });
+    [[acGeo(), roofs], [tankGeo(), tanks], [mastGeo(), masts]].forEach(([geo, l]) => { const im = instanced(geo, l, LAND, !lite); if (im) g.add(im); });
     [[houseGeo(), houses, g], [gableGeo(), gables, g], [treeGeo(), trees, near], [tentGeo(), tents, near], [pierGeo(), piers, g], [benchGeo(), benches, near], [cableGeo(), cables, g]].forEach(([geo, l, parent]) => {
       l.forEach(q => { if (q.y === undefined) q.y = yAt(q.x, q.z); });
       const im = instanced(geo, l, LAND, l !== cables); if (im) parent.add(im);

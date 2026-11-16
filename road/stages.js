@@ -2,9 +2,9 @@
    { group, anchors: {name: Object3D}, update(t, k, dt) } where k is 1 when the
    camera has landed on that stop and 0 when it is far away. */
 import { THREE, reg, mat, ownMat, glowMat, mesh, at, box, cyl, sph, grp, label, canvasTex, tok, smooth, clamp, lerp, roadZ } from './core.js';
-import { vehicleGeo } from './world.js';
+import { vehicleGeo } from './world.js?v=41';
 import { drawFlag, drawMark, onLogo } from './marks.js?v=28';
-import { ketteringAB, bulldog, bulldogPoster, rossBuilding, burOak, blockMSign, wavingFlag, wave, signPanel, MAIZE, BLUE } from './landmarks.js?v=38';
+import { ketteringAB, bulldog, bulldogPoster, rossBuilding, burOak, blockMSign, wavingFlag, wave, signPanel, MAIZE, BLUE } from './landmarks.js?v=41';
 
 const pin = (parent, x, y, z) => { const o = new THREE.Object3D(); o.position.set(x, y, z); parent.add(o); return o; };
 const vmesh = (type, s = 1, key = 'obj') => { const m = mesh(vehicleGeo(type), mat(key, { vertexColors: true })); m.scale.setScalar(s); return m; };
@@ -92,8 +92,9 @@ B.start = () => {
   /* round 27: a start line with life in it: a banner, a light tree, a stand of people and a crew at the garage */
   const ban = signPanel('START', 7, 1.7, '#2B3A4A', '#F2F4F7'); ban.position.set(0, 11.35, span + 0.1); g.add(ban);
   g.add(box(7.2, 1.9, 0.12, 'objDark', 0, 10.4, span - 0.02));
-  const tree = grp(cyl(0.16, 0.2, 5.4, 'objDark', 0, 0, 0, 8), box(0.9, 3.4, 0.5, 'objDark', 0, 3.2, 0));
-  const lamps = ['#E5484D', '#F2B632', '#F2B632', '#2FA36B'].map((c, i) => { const m = new THREE.MeshLambertMaterial({ color: '#55606C', emissive: '#000000' }); const l = sph(0.3, m, 0, 6.15 - i * 0.78, 0.3, 12); tree.add(l); return { l, c }; });
+  /* v41: a proper three-lamp signal, red over yellow over green, one lit at a time */
+  const tree = grp(cyl(0.16, 0.2, 5.4, 'objDark', 0, 0, 0, 8), box(1.1, 3.3, 0.6, 'objDark', 0, 3.3, 0));
+  const lamps = ['#E5484D', '#F2B632', '#2FA36B'].map((c, i) => { const m = new THREE.MeshLambertMaterial({ color: '#55606C', emissive: '#000000' }); const y = 5.95 - i * 1.0; const l = sph(0.34, m, 0, y, 0.3, 14); tree.add(l); tree.add(box(0.9, 0.08, 0.42, 'objDark', 0, y + 0.38, 0.5)); return { l, c }; });
   at(tree, -2.6, 0, 9.4); g.add(tree);
   const stand = grp(box(11, 0.6, 1.6, 'objShade', 0, 0, 0), box(11, 1.2, 1.6, 'objShade', 0, 0, -1.6), box(11, 1.8, 1.6, 'objShade', 0, 0, -3.2), box(11.2, 0.15, 5, 'objDark', 0, 0.02, -1.6));
   at(stand, -10, 0, -4); g.add(stand);
@@ -103,11 +104,11 @@ B.start = () => {
   const crew = []; [[6.5, -1.4, 'accent'], [8.2, -1.8, 'objDark'], [13.6, -1.2, 'cobalt']].forEach(([x, z, k], i) => { const p = person(k, 1); at(p, x, 0, z); g.add(p); crew.push({ p, x, ph: i }); });
   const cart = grp(box(1.6, 0.9, 1, 'accent', 0, 0.3, 0), box(1.6, 0.1, 1, 'objDark', 0, 1.2, 0)); at(cart, 11, 0, -1.6); g.add(cart);
   const vanS = vmesh('van', 0.9); at(vanS, 17, 0, -1, 0.2); g.add(vanS);
-  const lit = new THREE.Color();
+  const lit = new THREE.Color(); let lampOn = -1;
   return { group: g, anchors: {}, update(t) {
     flags.forEach(f => waveFlag(f, t));
-    const step = Math.floor((t * 0.9) % 6);
-    lamps.forEach(({ l, c }, i) => { const on = i < 3 ? step === i : step >= 3; l.material.color.set(on ? c : '#55606C'); l.material.emissive.copy(lit.set(c)).multiplyScalar(on ? 0.75 : 0); });
+    const ph = t % 8.7, cur = ph < 4 ? 2 : ph < 5.2 ? 1 : 0;
+    if (cur !== lampOn) { lampOn = cur; lamps.forEach(({ l, c }, i) => { const on = i === cur; l.material.color.set(on ? c : '#55606C'); l.material.emissive.copy(lit.set(c)).multiplyScalar(on ? 0.75 : 0); }); }
     crowd.forEach(c => { c.p.position.y = c.y + Math.max(0, Math.sin(t * 3.2 + c.ph)) * 0.32; });
     crew.forEach(c => { c.p.position.x = c.x + Math.sin(t * 0.7 + c.ph) * 0.8; });
   } };

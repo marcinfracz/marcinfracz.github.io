@@ -1,6 +1,6 @@
 /* The Road: terrain, road network, region-aware traffic, NPCs and the
    perception layer (radar, LiDAR, vision boxes, V2X). */
-import { cityFlat, cityRiver, cityKeepOut, cityWater } from './landmarks.js?v=38';
+import { cityFlat, cityRiver, cityKeepOut, cityWater } from './landmarks.js?v=41';
 import { THREE, mat, ownMat, glowMat, reg, mesh, at, box, cyl, sph, grp, merge, bx, cy, label,
   smooth, clamp, lerp, rand, roadZ, roadDZ, tok } from './core.js';
 
@@ -169,10 +169,13 @@ export function buildWorld(scene, opts) {
     const m = new THREE.Mesh(g, material); m.receiveShadow = true;
     return m;
   }
-  scene.add(ribbon(xMin - 40, xMax + 40, -HALF, HALF, 0.03, mat('road')));
+  /* v41: layered road surfaces get a depth bias each, so they never fight at a distance */
+  const layer = (m, n) => { m.polygonOffset = true; m.polygonOffsetFactor = -n; m.polygonOffsetUnits = -n * 2; return m; };
+  scene.add(ribbon(xMin - 40, xMax + 40, -HALF, HALF, 0.03, layer(mat('road'), 1)));
   scene.add(ribbon(xMin - 40, xMax + 40, HALF, HALF + 2.4, 0.08, mat('curb')));
   scene.add(ribbon(xMin - 40, xMax + 40, -HALF - 2.4, -HALF, 0.08, mat('curb')));
-  [-7.4, 7.4, -0.22, 0.22].forEach(o => scene.add(ribbon(xMin - 40, xMax + 40, o - 0.1, o + 0.1, 0.06, mat('line'))));
+  const lineM = layer(mat('line'), 2);
+  [-7.4, 7.4, -0.22, 0.22].forEach(o => scene.add(ribbon(xMin - 40, xMax + 40, o - 0.1, o + 0.1, 0.06, lineM)));
   // dashed lane lines
   {
     const dg = new THREE.BoxGeometry(2.6, 0.04, 0.18);
@@ -196,14 +199,17 @@ export function buildWorld(scene, opts) {
   const CYCLE = 11, GREEN = 7;
   const sigGreen = (s, t) => ((t + s.off) % CYCLE) < GREEN;
 
-  const lightRed = new THREE.MeshBasicMaterial({ color: '#E5484D' });
-  const lightGreen = new THREE.MeshBasicMaterial({ color: '#3FB27F' });
+  /* v41: three-lamp heads, red over yellow over green, with a yellow phase */
+  const YELLOW = 1.6;
+  const sigPhase = (s, t) => { const p = (t + s.off) % CYCLE; return p < GREEN ? 2 : p < GREEN + YELLOW ? 1 : 0; };
+  const lampOn = ['#E5484D', '#F2B632', '#3FB27F'].map(c => new THREE.MeshBasicMaterial({ color: c }));
+  const lampOff = new THREE.MeshBasicMaterial({ color: '#3A434D' });
   signals.forEach(s => {
     const z = roadZ(s.x);
-    const pole = grp(cyl(0.12, 0.12, 6, 'objDark'), box(0.12, 0.12, 6.5, 'objDark', 0, 5.9, 3.2), box(0.5, 1.2, 0.5, 'objDark', 0, 5.0, 6));
+    const pole = grp(cyl(0.12, 0.12, 6, 'objDark'), box(0.12, 0.12, 6.5, 'objDark', 0, 5.9, 3.2), box(0.6, 1.75, 0.5, 'objDark', 0, 4.6, 6));
     at(pole, s.x + 1.2, 0, z - HALF - 1.2);
-    const lamp = sph(0.28, lightGreen, 0, 5.6, 6.27, 10); lamp.castShadow = false;
-    pole.add(lamp); s.lamp = lamp;
+    s.lamps = [5.98, 5.45, 4.92].map(y => { const l = sph(0.2, lampOff, 0, y, 6.27, 10); l.castShadow = false; pole.add(l); return l; });
+    s.ph = -1;
     scene.add(pole);
     s.rsu = new THREE.Vector3(s.x + 1.2, 6.2, z - HALF - 1.2);
     if (s.cw) {
@@ -373,14 +379,20 @@ export function buildWorld(scene, opts) {
   }
 
   /* ---------- traffic ---------- */
-  const TYPES = ['sedan', 'suv', 'pickup', 'compact', 'taxi', 'robotaxi', 'bus', 'semi', 'van'];
-  const LEN = { sedan: 4.6, suv: 4.9, pickup: 5.8, compact: 3.8, taxi: 3.8, robotaxi: 4.6, bus: 10, semi: 12.5, van: 5.2 };
+  const TYPES = ['sedan', 'suv', 'pickup', 'compact', 'taxi', 'robotaxi', 'bus', 'semi', 'van', 'police', 'ambulance', 'fire'];
+  const LEN = { sedan: 4.6, suv: 4.9, pickup: 5.8, compact: 3.8, taxi: 3.8, robotaxi: 4.6, bus: 10, semi: 12.5, van: 5.2, police: 4.8, ambulance: 6, fire: 8.6 };
+  /* v41: police cars, ambulances and fire trucks join every region's cast */
   const CAST = {
-    us: [['pickup', 30], ['suv', 30], ['sedan', 18], ['semi', 9], ['bus', 5], ['compact', 8]],
-    mexico: [['compact', 38], ['taxi', 22], ['sedan', 14], ['pickup', 10], ['van', 10], ['bus', 6]],
-    asia: [['robotaxi', 26], ['sedan', 30], ['compact', 20], ['van', 10], ['bus', 8], ['taxi', 6]],
-    port: [['semi', 26], ['van', 16], ['suv', 20], ['compact', 18], ['sedan', 20]],
+    us: [['pickup', 30], ['suv', 30], ['sedan', 18], ['semi', 9], ['bus', 5], ['compact', 8], ['police', 3], ['ambulance', 1.6], ['fire', 1.3]],
+    mexico: [['compact', 38], ['taxi', 22], ['sedan', 14], ['pickup', 10], ['van', 10], ['bus', 6], ['police', 3], ['ambulance', 1.5], ['fire', 1]],
+    asia: [['robotaxi', 26], ['sedan', 30], ['compact', 20], ['van', 10], ['bus', 8], ['taxi', 6], ['police', 2.5], ['ambulance', 1.5], ['fire', 1]],
+    port: [['semi', 26], ['van', 16], ['suv', 20], ['compact', 18], ['sedan', 20], ['fire', 2], ['police', 2]],
     now: [['sedan', 50], ['robotaxi', 50]]
+  };
+  const EMERG = {
+    police: [[-0.25, 2.12, 0.42], [-0.25, 2.12, -0.42]],
+    ambulance: [[0.95, 2.72, 0.7], [0.95, 2.72, -0.7]],
+    fire: [[3.55, 2.62, 0.75], [3.55, 2.62, -0.75]]
   };
   const DENS = { us: 0.5, mexico: 0.75, asia: 0.95, port: 0.55, now: 0.18 };
   const PAL = {
@@ -410,6 +422,11 @@ export function buildWorld(scene, opts) {
     vmeshes[t] = im; scene.add(im);
   });
   // headlights at dusk: tiny glow quads instanced
+  // v41: flashing beacons on emergency vehicles, two per vehicle, swapping
+  const beacons = new THREE.InstancedMesh(new THREE.BoxGeometry(0.42, 0.2, 0.5), new THREE.MeshBasicMaterial({ color: '#ffffff' }), 60);
+  beacons.frustumCulled = false; beacons.setColorAt(0, new THREE.Color('#ffffff')); beacons.count = 0; scene.add(beacons);
+  const BEAM = { police: ['#FF3B3B', '#3D7BFF'], ambulance: ['#FF3B3B', '#FFFFFF'], fire: ['#FF3B3B', '#FFB020'] };
+  const beamC = {}; for (const k in BEAM) beamC[k] = BEAM[k].map(c => new THREE.Color(c));
   const headG = new THREE.PlaneGeometry(1.6, 0.5);
   const headM = glowMat('sun', 0.0);
   const heads = new THREE.InstancedMesh(headG, headM, N); heads.frustumCulled = false; scene.add(heads);
@@ -429,15 +446,103 @@ export function buildWorld(scene, opts) {
     scene.add(pedMesh);
   }
 
+  /* ---------- v41: riders all along the drive ----------
+     motorcycles and mopeds ride the far road edge with the traffic; e-scooters,
+     kick scooters and e-unicycles use the paths on both curbs. */
+  const RR = rand(41);
+  const RIDE = ['motorcycle', 'moped', 'escooter', 'kick', 'unicycle'];
+  const RCAST = {
+    us: { road: [['motorcycle', 6], ['moped', 2]], path: [['escooter', 5], ['kick', 3], ['unicycle', 2]] },
+    mexico: { road: [['moped', 6], ['motorcycle', 5]], path: [['escooter', 3], ['kick', 3], ['unicycle', 1]] },
+    asia: { road: [['moped', 8], ['motorcycle', 2]], path: [['escooter', 6], ['unicycle', 3], ['kick', 2]] },
+    port: { road: [['motorcycle', 3], ['moped', 2]], path: [['escooter', 2], ['kick', 1]] },
+    now: { road: [['motorcycle', 1]], path: [['escooter', 2], ['unicycle', 2]] }
+  };
+  const RDENS = { us: 0.55, mexico: 0.8, asia: 0.9, port: 0.35, now: 0.4 };
+  const pickRide = (seed, list) => { let tot = 0; list.forEach(e => tot += e[1]); let r = seed * tot; for (const [k, wg] of list) if ((r -= wg) <= 0) return k; return list[0][0]; };
+  const NR = lite ? 26 : 56, NP = lite ? 30 : 64;
+  const riders = [];
+  for (let i = 0; i < NR; i++) riders.push({ path: false, x: xMin + RR() * L, dir: -1, z: -7.05, v: 0, vmax: 6 + RR() * 5, s1: RR(), s2: RR(), tint: 0.85 + RR() * 0.3, ph: RR() * 6 });
+  for (let i = 0; i < NP; i++) { const near = i % 2 === 0; riders.push({ path: true, x: xMin + RR() * L, dir: RR() < 0.5 ? 1 : -1, z: (near ? 1 : -1) * (HALF + 0.75 + RR() * 0.9), v: 0, vmax: 2.4 + RR() * 2.2, s1: RR(), s2: RR(), tint: 0.85 + RR() * 0.3, ph: RR() * 6 }); }
+  const rideMesh = {};
+  RIDE.forEach(k => { const im = new THREE.InstancedMesh(riderGeo(k), mat('obj', { vertexColors: true }), NR + NP); im.castShadow = !lite; im.frustumCulled = false; im.count = 0; rideMesh[k] = im; scene.add(im); });
+  const stopXs = stops.map(s => s.x);
+
+  /* ---------- v41: a high-speed train on the viaduct at Shanghai's east edge (built with the city) ---------- */
+  let hsr = null;
+  if (ax) {
+    const HX = ax.x + 42, DY = 9.62, U0 = -46, U1 = 128;
+    const tz = u => roadZ(HX) - u, o = new THREE.Object3D();
+    // the train: a lead car, six middle cars and a tail car, white with a red line
+    const WIN = [0.24, 0.29, 0.37], LINE = [0.86, 0.22, 0.24], BOG = 0.25;
+    const carBody = len => [[bx(len, 2.5, 2.6, 0, 0.55, 0), 1.05], [bx(len - 0.4, 0.55, 2.62, 0, 1.75, 0), WIN], [bx(len + 0.02, 0.16, 2.64, 0, 1.2, 0), LINE], [bx(len - 0.6, 0.22, 2.0, 0, 3.05, 0), 0.86], [bx(2.2, 0.5, 2.2, len / 2 - 1.8, 0.05, 0), BOG], [bx(2.2, 0.5, 2.2, -len / 2 + 1.8, 0.05, 0), BOG]];
+    const nose = (() => { const g = new THREE.BoxGeometry(4.2, 2.5, 2.6, 4, 1, 1); const pa = g.attributes.position; for (let i = 0; i < pa.count; i++) { const x = pa.getX(i) + 2.1, y = pa.getY(i), f = x / 4.2; if (y > 0) pa.setY(i, y - 2.2 * f * f); pa.setZ(i, pa.getZ(i) * (1 - 0.35 * f * f)); } g.translate(0, 1.8, 0); g.translate(3.4 + 2.1 - 2.1, 0, 0); g.computeVertexNormals(); return g; })();
+    const endGeo = merge([...carBody(7.2).map(([g2, c]) => [g2.translate(-0.6, 0, 0), c]), [nose, 1.05], [bx(0.7, 0.4, 1.9, 2.5, 2.5, 0), WIN]]);
+    const midGeo = merge(carBody(10));
+    const trM = new THREE.MeshLambertMaterial({ color: '#F1F3F6', vertexColors: true });
+    const ends = new THREE.InstancedMesh(endGeo, trM, 2), mids = new THREE.InstancedMesh(midGeo, trM, 6);
+    ends.castShadow = mids.castShadow = true; ends.frustumCulled = mids.frustumCulled = false;
+    scene.add(ends, mids);
+    hsr = { ends, mids, HX, DY, U0, U1, tz, o };
+  }
+  function updateTrain(t) {
+    if (!hsr) return;
+    const { ends, mids, HX, DY, U0, U1, tz, o } = hsr;
+    const LEN = 8 * 10.3, span = U1 - U0 + LEN, V = 30, run = span / V, CYC = run + 6;
+    const k = Math.floor(t / CYC), tt = t % CYC, f = tt / run;
+    const dir = k % 2 ? -1 : 1; // +1 runs away from the camera
+    const head = dir > 0 ? U0 - LEN / 2 + f * span : U1 + LEN / 2 - f * span;
+    let mi = 0;
+    for (let i = 0; i < 8; i++) {
+      const cu = head - dir * (i * 10.3 + 5);
+      const inside = f <= 1 && cu > U0 + 4 && cu < U1 - 4;
+      const yaw = (dir > 0 ? Math.PI / 2 : -Math.PI / 2) + (i === 7 ? Math.PI : 0);
+      o.position.set(HX, DY, tz(cu)); o.rotation.set(0, yaw, 0); o.scale.setScalar(inside ? 1 : 0); o.updateMatrix();
+      if (i === 0) ends.setMatrixAt(0, o.matrix); else if (i === 7) ends.setMatrixAt(1, o.matrix); else mids.setMatrixAt(mi++, o.matrix);
+    }
+    o.scale.setScalar(1);
+    ends.instanceMatrix.needsUpdate = mids.instanceMatrix.needsUpdate = true;
+  }
+
+  /* ---------- v41: an air-ambulance helicopter circling ahead of the drive ---------- */
+  const heli = (() => {
+    const g = new THREE.Group();
+    const body = mesh(new THREE.SphereGeometry(1.25, 14, 10), mat('obj')); body.scale.set(1.9, 1, 1); body.position.y = 0; g.add(body);
+    const glass = mesh(new THREE.SphereGeometry(1.0, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), mat('objDark')); glass.rotation.z = -Math.PI / 2; glass.scale.set(1, 1.2, 0.95); glass.position.set(1.5, 0.15, 0); g.add(glass);
+    g.add(box(2.6, 0.32, 2.56, 'accent', -0.2, -0.35, 0));
+    g.add(at(mesh(new THREE.CylinderGeometry(0.22, 0.38, 4.6, 8).rotateZ(Math.PI / 2), mat('obj')), -4.2, 0.35, 0));
+    g.add(box(1.0, 1.6, 0.14, 'accent', -6.4, 0.2, 0));
+    [-0.85, 0.85].forEach(z => { g.add(box(3.4, 0.1, 0.12, 'objDark', 0, -1.55, z)); g.add(box(0.1, 0.5, 0.1, 'objDark', 0.6, -1.5, z)); g.add(box(0.1, 0.5, 0.1, 'objDark', -0.8, -1.5, z)); });
+    g.add(cyl(0.15, 0.15, 0.6, 'objDark', 0, 1.1, 0, 8));
+    const rotor = grp(box(10, 0.06, 0.38, 'objDark', 0, 0, 0), box(0.38, 0.06, 10, 'objDark', 0, 0, 0)); rotor.position.y = 1.72; g.add(rotor);
+    const tail = grp(box(0.06, 1.8, 0.24, 'objDark', 0, -0.9, 0), box(0.06, 0.24, 1.8, 'objDark', 0, -0.12, 0)); tail.position.set(-6.4, 0.9, 0.2); g.add(tail);
+    g.traverse(m => { if (m.isMesh) m.castShadow = true; });
+    g.scale.setScalar(1.05);
+    scene.add(g);
+    return { g, rotor, tail, px: null, pz: null };
+  })();
+  function updateHeli(t, heroX) {
+    const a = t * 0.11;
+    const x = heroX + 34 + Math.sin(a) * 30, z = roadZ(heroX + 34) - 38 + Math.cos(a * 1.3) * 14, y = 27 + Math.sin(t * 0.5) * 1.2;
+    const { g, rotor, tail } = heli;
+    if (heli.px !== null) { const dx = x - heli.px, dz = z - heli.pz; if (dx * dx + dz * dz > 1e-6) { const want = Math.atan2(-dz, dx); let d = want - g.rotation.y; d = Math.atan2(Math.sin(d), Math.cos(d)); g.rotation.y += d * 0.06; } }
+    heli.px = x; heli.pz = z;
+    g.position.set(x, y, z); g.rotation.z = -0.08;
+    rotor.rotation.y = t * 21; tail.rotation.z = t * 30;
+  }
+
   /* ---------- perception layer ---------- */
   const sens = new THREE.Group(); scene.add(sens);
-  const radarM = glowMat('radar', 0.22);
+  const radarM = glowMat('radar', 0.22, { polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -8 });
   const fanGeo = (r, a) => { const g = new THREE.CircleGeometry(r, 32, -a / 2, a); g.rotateX(-Math.PI / 2); return g; };
   const radarFront = new THREE.Mesh(fanGeo(26, 0.42), radarM); radarFront.position.y = 0.25;
-  const radarWide = new THREE.Mesh(fanGeo(11, 1.6), glowMat('radar', 0.12)); radarWide.position.y = 0.22;
-  const radarRear = new THREE.Mesh(fanGeo(9, 1.1), glowMat('radar', 0.12)); radarRear.rotation.y = Math.PI; radarRear.position.y = 0.22;
+  const fanSoft = glowMat('radar', 0.12, { polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -6 });
+  const radarWide = new THREE.Mesh(fanGeo(11, 1.6), fanSoft); radarWide.position.y = 0.22;
+  const radarRear = new THREE.Mesh(fanGeo(9, 1.1), fanSoft); radarRear.rotation.y = Math.PI; radarRear.position.y = 0.22;
+  radarWide.renderOrder = 3; radarRear.renderOrder = 3; radarFront.renderOrder = 4;
+  let lockS = 0; const accC = new THREE.Color();
   const radar = grp(radarFront, radarWide, radarRear);
-  const lidarRing = new THREE.Mesh(new THREE.RingGeometry(0.92, 1, 64).rotateX(-Math.PI / 2), glowMat('lidar', 0.5));
+  const lidarRing = new THREE.Mesh(new THREE.RingGeometry(0.92, 1, 64).rotateX(-Math.PI / 2), glowMat('lidar', 0.5, { polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -8 }));
   lidarRing.position.y = 0.3;
   const lidar = grp(lidarRing);
   const hero = buildHero();
@@ -482,7 +587,7 @@ export function buildWorld(scene, opts) {
     scene.add(bxl, tg2); vis.push({ box: bxl, tag: tg2 });
   }
   // radar fans on nearby robotaxis (Shanghai)
-  const miniFan = new THREE.InstancedMesh(fanGeo(9, 0.5), glowMat('radar', 0.16), 10); miniFan.frustumCulled = false; scene.add(miniFan);
+  const miniFan = new THREE.InstancedMesh(fanGeo(9, 0.5), glowMat('radar', 0.16, { polygonOffset: true, polygonOffsetFactor: -3, polygonOffsetUnits: -6 }), 10); miniFan.frustumCulled = false; scene.add(miniFan);
 
   // V2X pulses and packets
   const v2x = [];
@@ -541,7 +646,7 @@ export function buildWorld(scene, opts) {
     }
     /* write instances */
     const counts = {}; TYPES.forEach(tp => counts[tp] = 0);
-    let hc = 0;
+    let hc = 0, bc = 0;
     const dusk = tok('glow') !== '#000000';
     cars.forEach(c => {
       if (!c.show) return;
@@ -556,6 +661,17 @@ export function buildWorld(scene, opts) {
       let tint = p;
       if (c.type === 'bus' && regionAt(c.x) === 'us') tint = [1.06, 0.86, 0.5];
       if (c.type === 'taxi') tint = regionAt(c.x) === 'mexico' ? [1.04, 0.84, 0.9] : [0.75, 0.9, 1.0];
+      if (EMERG[c.type]) {
+        tint = [1, 1, 1];
+        const cs = Math.cos(yaw), sn = Math.sin(yaw), on = Math.floor(t * 5 + c.s2 * 7) % 2;
+        EMERG[c.type].forEach(([lx, ly, lz], j) => {
+          if (bc >= 60) return;
+          tmpO.position.set(c.x + (lx * cs + lz * sn) * sc, ly * sc, z + (-lx * sn + lz * cs) * sc); tmpO.rotation.set(0, yaw, 0); tmpO.scale.setScalar(sc); tmpO.updateMatrix();
+          beacons.setMatrixAt(bc, tmpO.matrix);
+          beacons.setColorAt(bc++, tmpC.copy(beamC[c.type][j]).multiplyScalar(j === on ? 1 : 0.28));
+        });
+        tmpO.scale.setScalar(1);
+      }
       im.setColorAt(i, tmpC.setRGB(tint[0], tint[1], tint[2]));
       if (dusk && hc < N) {
         tmpO.position.set(c.x + Math.cos(yaw) * (LEN[c.type] / 2 + 0.05), 0.75, z - Math.sin(yaw) * (LEN[c.type] / 2 + 0.05));
@@ -564,6 +680,7 @@ export function buildWorld(scene, opts) {
     });
     TYPES.forEach(tp => { const im = vmeshes[tp]; im.count = counts[tp]; im.instanceMatrix.needsUpdate = true; if (im.instanceColor) im.instanceColor.needsUpdate = true; });
     heads.count = hc; heads.instanceMatrix.needsUpdate = true; headM.opacity = dusk ? 0.85 : 0;
+    beacons.count = bc; beacons.instanceMatrix.needsUpdate = true; if (beacons.instanceColor) beacons.instanceColor.needsUpdate = true;
 
     /* elevated */
     if (elevated.mesh) {
@@ -606,7 +723,34 @@ export function buildWorld(scene, opts) {
       });
       pedMesh.instanceMatrix.needsUpdate = true; pedMesh.instanceColor.needsUpdate = true;
     }
-    signals.forEach(s => { s.lamp.material = sigGreen(s, t) ? lightGreen : lightRed; });
+    signals.forEach(s => { const ph = sigPhase(s, t); if (ph !== s.ph) { s.ph = ph; s.lamps.forEach((l, i) => { l.material = i === ph ? lampOn[i] : lampOff; }); } });
+
+    updateTrain(t); updateHeli(t, heroX);
+
+    /* v41 riders */
+    const rc = {}; RIDE.forEach(k => rc[k] = 0);
+    for (const r of riders) {
+      const rg = regionAt(r.x), cast = RCAST[rg] || RCAST.us;
+      r.type = pickRide(r.s1, r.path ? cast.path : cast.road);
+      if (!still) {
+        let vd = r.vmax;
+        if (!r.path) for (const s of signals) { const ahead = r.dir * (s.x - r.x) - (r.dir > 0 ? 3 : -1); if (ahead > 0 && ahead < 14 && sigPhase(s, t) !== 2) vd = Math.min(vd, r.vmax * clamp((ahead - 0.5) / 10, 0, 1)); }
+        for (const tx of topes) { const a = Math.abs(tx - r.x); if (a < 5) vd = Math.min(vd, r.vmax * 0.5); }
+        r.v += (vd - r.v) * Math.min(1, dt * 2);
+        r.x = wrap(r.x + r.dir * r.v * dt);
+      }
+      if (r.s2 > (RDENS[rg] || 0.5)) continue;
+      let k = clamp(nearBoundary(r.x) / 4, 0, 1);
+      if (r.path) { let dmin = 1e9; for (const sx of stopXs) dmin = Math.min(dmin, Math.abs(sx - r.x)); k = Math.min(k, clamp((dmin - 16) / 4, 0, 1)); }
+      if (k <= 0.02) continue;
+      const zz = roadZ(r.x) + r.z + (r.path ? Math.sin(t * 0.7 + r.ph) * 0.2 : 0);
+      const yaw = -Math.atan(roadDZ(r.x)) + (r.dir < 0 ? Math.PI : 0);
+      const lean = r.type === 'unicycle' ? Math.sin(t * 2.4 + r.ph) * 0.05 : 0;
+      tmpO.position.set(r.x, r.path ? 0.08 : 0.03, zz); tmpO.rotation.set(lean, yaw, 0); tmpO.scale.setScalar(k * 1.2); tmpO.updateMatrix();
+      const im = rideMesh[r.type], i = rc[r.type]++;
+      im.setMatrixAt(i, tmpO.matrix); im.setColorAt(i, tmpC.setScalar(r.tint));
+    }
+    RIDE.forEach(k => { const im = rideMesh[k]; im.count = rc[k]; im.instanceMatrix.needsUpdate = true; if (im.instanceColor) im.instanceColor.needsUpdate = true; });
 
     /* hero */
     const hz = roadZ(heroX) + LANES.B, hyaw = -Math.atan(roadDZ(heroX));
@@ -619,8 +763,9 @@ export function buildWorld(scene, opts) {
     let lead = null, best = 30;
     cars.forEach(c => { if (!c.show || c.lane !== 'A') return; const d = c.x - heroX; if (d > 2 && d < best) { best = d; lead = c; } });
     radar.visible = on('radar');
-    const lockK = lead ? clamp((30 - best) / 12, 0, 1) : 0;
-    radarM.color.set(tok('radar')).lerp(new THREE.Color(tok('accent')), lockK);
+    const lockT = lead ? clamp((30 - best) / 12, 0, 1) : 0;
+    lockS += (lockT - lockS) * Math.min(1, dt * 3);
+    radarM.color.set(tok('radar')).lerp(accC.set(tok('accent')), lockS);
     radarM.opacity = 0.13 + 0.04 * (0.5 + 0.5 * Math.sin(t * 1.1));
     /* lidar */
     lidar.visible = cloud.visible = on('lidar');
@@ -634,7 +779,7 @@ export function buildWorld(scene, opts) {
     const maxBoxes = { us: 3, mexico: 4, asia: 14, port: 4, now: 2 }[rg] || 3;
     const cands = [];
     if (visOn) {
-      cars.forEach(c => { if (!c.show) return; const d = Math.abs(c.x - heroX); if (d < 40) cands.push({ d, x: c.x, z: roadZ(c.x) + c.z, l: LEN[c.type], h: c.type === 'bus' || c.type === 'semi' ? 3.4 : 2.1, w: 2.3, yaw: -Math.atan(roadDZ(c.x)) }); });
+      cars.forEach(c => { if (!c.show) return; const d = Math.abs(c.x - heroX); if (d < 40) cands.push({ d, x: c.x, z: roadZ(c.x) + c.z, l: LEN[c.type], h: c.type === 'bus' || c.type === 'semi' || c.type === 'fire' || c.type === 'ambulance' ? 3.2 : 2.1, w: 2.3, yaw: -Math.atan(roadDZ(c.x)) }); });
       if (asiaW > 0.5) {
         peds.forEach(p => { const x = p.sig.x + p.dx; if (Math.abs(x - heroX) < 34) cands.push({ d: Math.abs(x - heroX) + 3, x, z: null, ped: p, l: 0.9, h: 1.9, w: 0.9, yaw: 0 }); });
       }
@@ -687,7 +832,7 @@ export function buildWorld(scene, opts) {
 }
 
 /* ---------- vehicles ---------- */
-const GLASS = [0.52, 0.6, 0.7], TIRE = 0.22;
+const GLASS = [0.52, 0.6, 0.7], TIRE = 0.22, WHITE = 1.12, NAVY = [0.22, 0.27, 0.42], RED = [1.3, 0.3, 0.3], STEEL = [0.82, 0.84, 0.88];
 export function vehicleGeo(t) {
   const wheels = (l, w) => [[bx(0.9, 0.7, 0.35, l / 2 - 1.0, 0, w / 2), TIRE], [bx(0.9, 0.7, 0.35, -l / 2 + 1.0, 0, w / 2), TIRE], [bx(0.9, 0.7, 0.35, l / 2 - 1.0, 0, -w / 2), TIRE], [bx(0.9, 0.7, 0.35, -l / 2 + 1.0, 0, -w / 2), TIRE]];
   switch (t) {
@@ -699,7 +844,25 @@ export function vehicleGeo(t) {
     case 'bus': return merge([[bx(10, 2.4, 2.5, 0, 0.4, 0), 1], [bx(8.6, 0.8, 2.52, -0.3, 1.8, 0), GLASS], [bx(10, 0.15, 2.5, 0, 2.8, 0), 0.9], ...wheels(10, 2.5)]);
     case 'semi': return merge([[bx(2.6, 2.4, 2.4, 5.0, 0.45, 0), 1.0], [bx(0.4, 1.0, 2.2, 6.35, 1.6, 0), GLASS], [bx(9.4, 2.8, 2.55, -1.3, 0.75, 0), 0.92], [bx(9.4, 0.6, 0.6, -1.3, 0.2, 0), TIRE], ...wheels(12.5, 2.4)]);
     case 'van': return merge([[bx(5.2, 2.0, 2.1, 0, 0.35, 0), 1], [bx(1.0, 0.8, 1.95, 2.1, 1.35, 0), GLASS], ...wheels(5.2, 2.1)]);
+    case 'police': return merge([[bx(4.8, 0.85, 1.95, 0, 0.32, 0), WHITE], [bx(4.82, 0.42, 1.99, 0, 0.36, 0), NAVY], [bx(2.5, 0.72, 1.8, -0.25, 1.17, 0), GLASS], [bx(2.4, 0.08, 1.85, -0.25, 1.89, 0), WHITE], [bx(0.5, 0.12, 1.5, -0.25, 1.97, 0), 0.3], [bx(0.2, 0.5, 2.0, 2.35, 0.32, 0), 0.3], ...wheels(4.8, 1.95)]);
+    case 'ambulance': return merge([[bx(3.9, 2.3, 2.2, -0.95, 0.35, 0), WHITE], [bx(3.92, 0.32, 2.24, -0.95, 1.2, 0), RED], [bx(2.0, 1.3, 2.05, 1.95, 0.35, 0), WHITE], [bx(0.9, 0.6, 1.9, 2.15, 1.65, 0), GLASS], [bx(0.5, 0.5, 0.06, -1.6, 1.85, 1.11), RED], [bx(0.5, 0.5, 0.06, -1.6, 1.85, -1.11), RED], ...wheels(6, 2.2)]);
+    case 'fire': return merge([[bx(8.6, 2.0, 2.4, 0, 0.45, 0), RED], [bx(8.62, 0.18, 2.44, 0, 1.05, 0), WHITE], [bx(1.9, 0.75, 2.3, 3.3, 1.7, 0), GLASS], [bx(1.9, 0.12, 2.36, 3.3, 2.45, 0), RED], [bx(5.6, 0.18, 0.9, -1.2, 2.55, 0), STEEL], [bx(5.6, 0.32, 0.08, -1.2, 2.55, 0.45), STEEL], [bx(5.6, 0.32, 0.08, -1.2, 2.55, -0.45), STEEL], [bx(1.4, 0.6, 2.42, -3.5, 0.9, 0), 0.6], ...wheels(8.6, 2.4), [bx(0.9, 0.7, 0.35, 1.0, 0, 1.2), TIRE], [bx(0.9, 0.7, 0.35, 1.0, 0, -1.2), TIRE]]);
     default: return merge([[bx(4.6, 0.85, 1.95, 0, 0.32, 0), 1], [bx(2.5, 0.72, 1.8, -0.25, 1.17, 0), GLASS], ...wheels(4.6, 1.95)]);
+  }
+}
+
+/* v41: low-poly two-wheelers and personal movers, each with its rider, facing +x */
+function riderGeo(t) {
+  const wheel = (x, r, wd) => [new THREE.CylinderGeometry(r, r, wd, 10).rotateX(Math.PI / 2).translate(x, r, 0), TIRE];
+  const JACKET = [0.42, 0.47, 0.56], SKIN = [0.95, 0.82, 0.7], HELM = 1.12, PANTS = 0.38;
+  const seated = (x, y) => [[bx(0.55, 0.22, 0.42, x - 0.05, y, 0), PANTS], [cy(0.2, 0.24, 0.62, x - 0.1, y + 0.2, 0, 8), JACKET], [bx(0.5, 0.12, 0.12, x + 0.18, y + 0.62, 0.14), JACKET], [bx(0.5, 0.12, 0.12, x + 0.18, y + 0.62, -0.14), JACKET], [new THREE.SphereGeometry(0.21, 10, 8).translate(x - 0.08, y + 1.02, 0), HELM]];
+  const standing = (x, y) => [[cy(0.09, 0.1, 0.78, x, y, 0.1, 6), PANTS], [cy(0.09, 0.1, 0.78, x, y, -0.1, 6), PANTS], [cy(0.17, 0.2, 0.62, x, y + 0.76, 0, 8), JACKET], [bx(0.42, 0.1, 0.1, x + 0.2, y + 1.15, 0.14), JACKET], [bx(0.42, 0.1, 0.1, x + 0.2, y + 1.15, -0.14), JACKET], [new THREE.SphereGeometry(0.17, 10, 8).translate(x, y + 1.6, 0), SKIN]];
+  switch (t) {
+    case 'motorcycle': return merge([wheel(0.75, 0.34, 0.16), wheel(-0.72, 0.34, 0.2), [bx(1.25, 0.32, 0.32, 0, 0.42, 0), 1], [bx(0.6, 0.26, 0.36, 0.2, 0.74, 0), 1], [bx(0.62, 0.12, 0.3, -0.38, 0.74, 0), 0.3], [bx(0.08, 0.08, 0.7, 0.62, 1.12, 0), 0.3], [cy(0.04, 0.04, 0.55, 0.68, 0.58, 0, 6), 0.4], ...seated(-0.25, 0.86)]);
+    case 'moped': return merge([wheel(0.62, 0.26, 0.14), wheel(-0.58, 0.26, 0.16), [bx(1.15, 0.2, 0.36, 0, 0.32, 0), 1], [bx(0.16, 0.72, 0.44, 0.55, 0.32, 0), 1], [bx(0.6, 0.3, 0.42, -0.35, 0.52, 0), 1], [bx(0.5, 0.1, 0.32, -0.32, 0.82, 0), 0.3], [bx(0.06, 0.06, 0.62, 0.6, 1.08, 0), 0.3], ...seated(-0.3, 0.92)]);
+    case 'escooter': return merge([wheel(0.48, 0.13, 0.1), wheel(-0.46, 0.13, 0.1), [bx(0.95, 0.07, 0.22, 0, 0.16, 0), 0.32], [cy(0.035, 0.035, 0.98, 0.52, 0.2, 0, 6), 0.32], [bx(0.06, 0.06, 0.5, 0.52, 1.18, 0), 0.32], ...standing(-0.05, 0.23)]);
+    case 'kick': return merge([wheel(0.4, 0.1, 0.08), wheel(-0.4, 0.1, 0.08), [bx(0.82, 0.05, 0.16, 0, 0.12, 0), 1], [cy(0.03, 0.03, 0.95, 0.44, 0.15, 0, 6), 0.8], [bx(0.05, 0.05, 0.44, 0.44, 1.1, 0), 0.3], ...standing(-0.08, 0.17)]);
+    default: return merge([wheel(0, 0.32, 0.18), [bx(0.5, 0.5, 0.3, 0, 0.18, 0), 0.3], [bx(0.2, 0.05, 0.16, 0, 0.3, 0.2), 0.3], [bx(0.2, 0.05, 0.16, 0, 0.3, -0.2), 0.3], [cy(0.09, 0.1, 0.8, 0, 0.35, 0.2, 6), PANTS], [cy(0.09, 0.1, 0.8, 0, 0.35, -0.2, 6), PANTS], [cy(0.17, 0.2, 0.62, 0, 1.13, 0, 8), JACKET], [new THREE.SphereGeometry(0.17, 10, 8).translate(0, 1.97, 0), SKIN]]);
   }
 }
 
