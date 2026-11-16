@@ -205,18 +205,41 @@ window.SITE_CONTENT = {
           { id: "geometric-abstract", name: "Geometric Abstract", type: "image", src: "assets/wallpapers/geometric-abstract.jpg" },
           { id: "clay-model", name: "Product Creation", type: "image", src: "assets/wallpapers/clay-model.jpg" }
         ]
-      },
-      {
-        id: "solid-minimal",
-        name: "Solid Colors",
-        items: [
-          { id: "soft-sage", name: "Soft Sage", type: "color", value: "#E0E5DF" },
-          { id: "deep-slate", name: "Deep Slate", type: "color", value: "#1E2124" },
-          { id: "warm-stone", name: "Warm Stone", type: "color", value: "#D6D1CA" },
-          { id: "matte-onyx", name: "Matte Onyx", type: "color", value: "#0F0F11" },
-          { id: "ross-blue", name: "Ross Blue", type: "color", value: "#00274C" }
-        ]
       }
+    ],
+    /* v42: wall colours, used behind a framed image or on their own. "auto" follows light/dark mode. */
+    colors: [
+      { group: "Neutrals", items: [
+        { id: "auto", name: "Auto (matches light or dark)", value: "" },
+        { id: "cloud", name: "Cloud", value: "#E4E8ED" },
+        { id: "warm-stone", name: "Warm Stone", value: "#D6D1CA" },
+        { id: "sand", name: "Sand", value: "#E9E1D2" },
+        { id: "graphite", name: "Graphite", value: "#3A3F45" },
+        { id: "deep-slate", name: "Deep Slate", value: "#1E2124" },
+        { id: "matte-onyx", name: "Matte Onyx", value: "#0F0F11" }
+      ] },
+      { group: "Blues", items: [
+        { id: "ice-blue", name: "Ice Blue", value: "#DFE8F2" },
+        { id: "powder-blue", name: "Powder Blue", value: "#C5D7EB" },
+        { id: "steel-blue", name: "Steel Blue", value: "#7E9AB8" },
+        { id: "harbor-blue", name: "Harbor Blue", value: "#355C85" },
+        { id: "ross-blue", name: "Ross Blue", value: "#00274C" },
+        { id: "midnight", name: "Midnight", value: "#0D1A2B" }
+      ] },
+      { group: "Greens and warm", items: [
+        { id: "soft-sage", name: "Soft Sage", value: "#E0E5DF" },
+        { id: "mist-teal", name: "Mist Teal", value: "#D2E3E0" },
+        { id: "forest", name: "Forest", value: "#22362C" },
+        { id: "clay", name: "Clay", value: "#B9876B" },
+        { id: "burgundy", name: "Burgundy", value: "#4A1F27" }
+      ] },
+      { group: "Gradients", items: [
+        { id: "g-morning", name: "Morning Haze", value: "linear-gradient(160deg, #EEF2F7 0%, #CCDAEA 100%)" },
+        { id: "g-harbor", name: "Harbor Dusk", value: "linear-gradient(160deg, #2B4C70 0%, #0C1828 100%)" },
+        { id: "g-ross", name: "Ross Night", value: "linear-gradient(160deg, #164878 0%, #00274C 100%)" },
+        { id: "g-steel", name: "Brushed Steel", value: "linear-gradient(160deg, #F1F2F3 0%, #C9CED4 100%)" },
+        { id: "g-sunrise", name: "Shanghai Sunrise", value: "linear-gradient(170deg, #DCE6F0 0%, #E9DCCB 100%)" }
+      ] }
     ]
   },
   notes: {
