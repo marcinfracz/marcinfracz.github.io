@@ -433,10 +433,10 @@ window.ROAD_CONTENT.profile = {
   "traverse": {
     company: "General Motors", group: "Chevrolet Product Marketing", logo: "generalmotors", storyMarks: [["chevrolet"]], art: "equinox",
     summary: "Shaped content and pricing strategy for the Chevrolet Traverse in the first rotation of GM's leadership development program.",
-    hl: ["Cut 2016 Traverse build combinations by **10%**", "Lifted consideration **6%** at launch with a 'starting at' price trim (2017)", "Created the Traverse Graphite Edition"],
+    hl: ["Built a build complexity tool that cut 2016 Traverse build combinations by **10%**", "Lifted consideration **6%** at launch with a 'starting at' price trim (2017)", "Created the Traverse Graphite Edition"],
     stories: [
       "Cut 2016 Traverse build combinations by 10%, added a 'starting at' price trim that lifted consideration 6% at launch in 2017, and created the Graphite Edition.",
-      "Built the build-combination model that showed which combinations buyers skipped: the analysis behind the leaner lineup."
+      "Built a build complexity tool that showed which combinations buyers skipped: the analysis behind the leaner lineup."
     ]
   },
   "customer-experience": {
