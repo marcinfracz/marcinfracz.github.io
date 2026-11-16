@@ -547,16 +547,21 @@
 
   /* ================= preferences ================= */
   var PREF_KEY = "mf-site-prefs-v6";
+  var LAYERED_MIN = 1280; /* matches the v42 layered layout in styles.css */
   var prefs = {
-    wallpaper: "shanghai-mist", mode: "framed", dark: false, wallColor: null,
-    widgets: { clocks: { on: true, size: "M" }, weather: { on: false, size: "S" }, career: { on: true, size: "M" }, building: { on: true, size: "M" } },
+    wallpaper: "shanghai-mist", mode: "framed", dark: false, wall: "auto", frame: "white", soften: 1, blur: false,
+    widgets: { clocks: { on: true, size: "M" }, weather: { on: true, size: "S" }, career: { on: true, size: "M" }, building: { on: true, size: "M" } },
     welcome: true
   };
   try {
     var saved = JSON.parse(localStorage.getItem(PREF_KEY) || "{}");
     if (saved.wallpaper) prefs.wallpaper = saved.wallpaper;
-    if (saved.wallColor) prefs.wallColor = saved.wallColor;
     if (saved.mode) prefs.mode = saved.mode;
+    if (saved.wall) prefs.wall = saved.wall;
+    else if (saved.wallColor) prefs.legacyWallColor = saved.wallColor; /* before v42 the colour was kept as a value */
+    if (saved.frame) prefs.frame = saved.frame;
+    if (typeof saved.soften === "number") prefs.soften = saved.soften;
+    if (typeof saved.blur === "boolean") prefs.blur = saved.blur;
     if (typeof saved.dark === "boolean") prefs.dark = saved.dark;
     if (saved.widgets) {
       Object.keys(prefs.widgets).forEach(function (k) {
@@ -591,10 +596,25 @@
   /* v17: 4 categories x 5 items, defined in content.js (wallpaperSettings).
      All 15 images are AI-generated for this site (no people). Old packs
      (Wikimedia prints, cars, EUC photos, Great Wave) removed. */
-  var WP_CATEGORIES = C.wallpaperSettings.categories;
+  var WP_CATEGORIES = C.wallpaperSettings.categories.filter(function (c) { return c.items.some(function (it) { return it.type === "image"; }); });
+  var WP_COLORS = C.wallpaperSettings.colors || [];
+  /* v42: three ways to dress the wall. framed = the image hung on a wall colour,
+     full = the image edge to edge, solid = a wall colour or gradient only. */
+  var WP_MODES = [
+    { id: "framed", name: "Image on color" },
+    { id: "full", name: "Full image" },
+    { id: "solid", name: "Color only" }
+  ];
   function wpFind(id) {
     for (var i = 0; i < WP_CATEGORIES.length; i++) {
       var items = WP_CATEGORIES[i].items;
+      for (var j = 0; j < items.length; j++) if (items[j].id === id) return items[j];
+    }
+    return null;
+  }
+  function colorFind(id) {
+    for (var i = 0; i < WP_COLORS.length; i++) {
+      var items = WP_COLORS[i].items;
       for (var j = 0; j < items.length; j++) if (items[j].id === id) return items[j];
     }
     return null;
@@ -604,59 +624,102 @@
       var items = WP_CATEGORIES[i].items;
       for (var j = 0; j < items.length; j++) if (items[j].id === id) return WP_CATEGORIES[i].id;
     }
-    return "mobility-ai";
+    return WP_CATEGORIES[0].id;
   }
+  /* preferences saved before v42: a colour id in place of an image, or a colour value */
+  (function migrateWallpaper() {
+    if (!wpFind(prefs.wallpaper) && colorFind(prefs.wallpaper)) { prefs.wall = prefs.wallpaper; prefs.mode = "solid"; prefs.wallpaper = "shanghai-mist"; }
+    if (prefs.legacyWallColor) {
+      WP_COLORS.forEach(function (g) { g.items.forEach(function (c) { if (c.value && c.value.toLowerCase() === String(prefs.legacyWallColor).toLowerCase()) prefs.wall = c.id; }); });
+      delete prefs.legacyWallColor;
+    }
+    if (["framed", "full", "solid"].indexOf(prefs.mode) < 0) prefs.mode = "framed";
+    if (!colorFind(prefs.wall)) prefs.wall = "auto";
+    if (["white", "black", "none"].indexOf(prefs.frame) < 0) prefs.frame = "white";
+    if ([0, 1, 2].indexOf(prefs.soften) < 0) prefs.soften = 1;
+  })();
   var currentCategory = categoryOf(prefs.wallpaper);
   function applyWallpaper() {
     var art = wpFind(prefs.wallpaper);
     if (!art) { prefs.wallpaper = "shanghai-mist"; art = wpFind(prefs.wallpaper); } /* e.g. a removed pack id */
-    if (art.type === "color") prefs.wallColor = art.value; /* picking a colour sets the wall colour */
-    WP_CATEGORIES.forEach(function (c) { c.items.forEach(function (it) { document.body.classList.remove("wp-" + it.id); }); });
-    document.body.classList.remove("wp-solid", "wp-framed", "wp-full");
-    document.body.classList.add("wp-" + prefs.wallpaper, "wp-" + prefs.mode);
-    if (art.type === "color") document.body.classList.add("wp-solid");
+    var col = colorFind(prefs.wall) || { id: "auto", value: "" };
+    var b = document.body;
+    WP_CATEGORIES.forEach(function (c) { c.items.forEach(function (it) { b.classList.remove("wp-" + it.id); }); });
+    b.classList.remove("wp-solid", "wp-framed", "wp-full", "wp-frame-white", "wp-frame-black", "wp-frame-none", "wp-soften-0", "wp-soften-1", "wp-soften-2", "wp-blur");
+    b.classList.add("wp-" + prefs.wallpaper, "wp-" + prefs.mode, "wp-frame-" + prefs.frame, "wp-soften-" + prefs.soften);
+    if (prefs.blur && prefs.mode === "full") b.classList.add("wp-blur");
     var wallEl = document.querySelector(".wallpaper");
-    if (wallEl) wallEl.style.background = art.type === "color" ? art.value : (prefs.wallColor || ""); /* the wall colour stays when an image is picked */
+    if (wallEl) wallEl.style.background = prefs.mode === "full" ? "" : col.value; /* "" lets the theme colour show */
     var img = el("wallpaper-img");
-    if (img) img.src = art.type === "image" ? art.src : "";
+    if (img && img.getAttribute("src") !== art.src) img.src = art.src;
     var framedImg = el("framed-art-img");
-    if (framedImg && art.type === "image") { framedImg.src = art.src; framedImg.alt = art.name; }
+    if (framedImg && framedImg.getAttribute("src") !== art.src) { framedImg.src = art.src; framedImg.alt = art.name; }
     var cap = el("framed-art-caption");
-    if (cap) cap.textContent = art.type === "image" ? art.name : "";
-    currentCategory = categoryOf(prefs.wallpaper);
+    if (cap) cap.textContent = art.name;
     renderWallpaperPanel();
-    document.querySelectorAll(".wp-mode").forEach(function (b) {
-      b.classList.toggle("active", b.getAttribute("data-wp-mode") === prefs.mode);
-    });
     savePrefs();
+    if (typeof placeWeather === "function") setTimeout(placeWeather, 0);
+  }
+  function wpSeg(name, key, opts) {
+    return '<div class="wps-row"><span class="wps-label">' + name + '</span><div class="wps-seg" role="radiogroup" aria-label="' + name + '">' +
+      opts.map(function (o) {
+        var on = String(prefs[key]) === String(o[0]);
+        return '<button role="radio" aria-checked="' + on + '" class="' + (on ? "on" : "") + '" data-wp-set="' + key + '" data-wp-val="' + o[0] + '">' + o[1] + "</button>";
+      }).join("") + "</div></div>";
   }
   function renderWallpaperPanel() {
-    var packsEl = el("wp-packs");
-    if (packsEl) {
-      packsEl.innerHTML = WP_CATEGORIES.map(function (c) {
-        return '<button class="wp-pack-btn' + (c.id === currentCategory ? " on" : "") + '" data-wp-category="' + c.id + '">' + esc(c.name) + "</button>";
-      }).join("");
+    var host = el("wp-panel");
+    if (!host) return;
+    var html = '<div class="wps-modes" role="radiogroup" aria-label="Wallpaper style">' + WP_MODES.map(function (m) {
+      var on = m.id === prefs.mode;
+      return '<button role="radio" aria-checked="' + on + '" class="wps-mode' + (on ? " on" : "") + '" data-wp-mode="' + m.id + '">' +
+        '<span class="wps-mini wps-mini-' + m.id + '" aria-hidden="true"><i></i></span>' + esc(m.name) + "</button>";
+    }).join("") + "</div>";
+    if (prefs.mode !== "solid") {
+      var cat = null;
+      WP_CATEGORIES.forEach(function (c) { if (c.id === currentCategory) cat = c; });
+      if (!cat) cat = WP_CATEGORIES[0];
+      html += '<div class="wps-head"><span class="wps-title">Image</span><div class="wps-tabs">' + WP_CATEGORIES.map(function (c) {
+        return '<button class="' + (c.id === cat.id ? "on" : "") + '" data-wp-category="' + c.id + '">' + esc(c.name) + "</button>";
+      }).join("") + "</div></div>";
+      html += '<div class="wps-images">' + cat.items.map(function (w) {
+        var on = w.id === prefs.wallpaper;
+        return '<button class="wps-img' + (on ? " on" : "") + '" data-wp="' + w.id + '" aria-pressed="' + on + '" title="' + esc(w.name) + '">' +
+          '<span class="wps-thumb" style="background-image:url(\'' + esc(w.src) + '\')"></span><span class="wps-name">' + esc(w.name) + "</span></button>";
+      }).join("") + "</div>";
     }
-    var cat = null;
-    WP_CATEGORIES.forEach(function (c) { if (c.id === currentCategory) cat = c; });
-    if (!cat) cat = WP_CATEGORIES[0];
-    el("wp-options").innerHTML = cat.items.map(function (w) {
-      var sw = w.type === "color"
-        ? "background:" + w.value + ";border:1px solid #d6d3d1"
-        : "background-image:url('" + esc(w.src) + "')";
-      var active = w.type === "color" ? (w.value === prefs.wallColor) : (w.id === prefs.wallpaper);
-      return '<button class="wp-option' + (active ? " active" : "") + '" data-wp="' + w.id + '">' +
-        '<span class="wp-swatch" style="' + sw + '"></span>' + esc(w.name) +
-        '<span class="check">' + (active ? "✓" : "") + "</span></button>";
-    }).join("");
+    if (prefs.mode !== "full") {
+      html += '<div class="wps-head"><span class="wps-title">' + (prefs.mode === "solid" ? "Color" : "Wall color") + "</span></div>";
+      html += WP_COLORS.map(function (g) {
+        return '<div class="wps-group"><span class="wps-glabel">' + esc(g.group) + '</span><div class="wps-swatches">' + g.items.map(function (c) {
+          var on = c.id === prefs.wall;
+          var bg = c.id === "auto" ? "" : ' style="background:' + c.value + '"';
+          return '<button class="wps-sw' + (c.id === "auto" ? " auto" : "") + (on ? " on" : "") + '"' + bg + ' data-wp-color="' + c.id + '" aria-pressed="' + on + '" title="' + esc(c.name) + '" aria-label="' + esc(c.name) + '"></button>';
+        }).join("") + "</div></div>";
+      }).join("");
+      var cur = colorFind(prefs.wall);
+      html += '<p class="wps-current">' + esc(cur ? cur.name : "") + "</p>";
+    }
+    if (prefs.mode === "framed") html += '<div class="wps-opts">' + wpSeg("Frame", "frame", [["white", "White"], ["black", "Black"], ["none", "None"]]) + "</div>";
+    if (prefs.mode === "full") html += '<div class="wps-opts">' + wpSeg("Soften", "soften", [[0, "Off"], [1, "Light"], [2, "Strong"]]) + wpSeg("Blur", "blur", [[false, "Off"], [true, "On"]]) + "</div>";
+    host.innerHTML = html;
   }
   document.addEventListener("click", function (e) {
+    if (!e.target.closest || !e.target.closest("#window-wallpaper")) return;
     var pk = e.target.closest("[data-wp-category]");
     if (pk) { currentCategory = pk.getAttribute("data-wp-category"); renderWallpaperPanel(); return; }
     var wp = e.target.closest("[data-wp]");
     if (wp) { prefs.wallpaper = wp.getAttribute("data-wp"); applyWallpaper(); return; }
+    var cb = e.target.closest("[data-wp-color]");
+    if (cb) { prefs.wall = cb.getAttribute("data-wp-color"); applyWallpaper(); return; }
     var mode = e.target.closest("[data-wp-mode]");
-    if (mode) { prefs.mode = mode.getAttribute("data-wp-mode"); applyWallpaper(); }
+    if (mode) { prefs.mode = mode.getAttribute("data-wp-mode"); currentCategory = categoryOf(prefs.wallpaper); applyWallpaper(); return; }
+    var st = e.target.closest("[data-wp-set]");
+    if (st) {
+      var k = st.getAttribute("data-wp-set"), v = st.getAttribute("data-wp-val");
+      prefs[k] = k === "soften" ? +v : k === "blur" ? v === "true" : v;
+      applyWallpaper();
+    }
   });
 
   /* ================= theme ================= */
@@ -706,6 +769,16 @@
     var w = el("widget-weather");
     if (!w || w.style.display === "none") return;
     w.classList.remove("wx-mini", "nofit");
+    /* v42: on wide screens the layered layout puts the weather in the right column by CSS;
+       here it only shrinks, or steps out, if this screen is too short for it */
+    if (!isPhone() && !positions["widget-weather"] && window.innerWidth >= LAYERED_MIN) {
+      w.style.top = w.style.bottom = w.style.left = w.style.right = "";
+      var clash = function () { var me = w.getBoundingClientRect(), mr = { l: me.left, t: me.top, r: me.right, b: me.bottom };
+        return me.bottom > window.innerHeight - 8 || deskRects().some(function (o) { return o.id !== "widget-weather" && o.id !== "window-intro" && hits(mr, o); }); };
+      if (!clash()) return;
+      w.classList.add("wx-mini"); if (!clash()) return;
+      w.classList.add("nofit"); return;
+    }
     if (isPhone() || positions["widget-weather"] || window.innerWidth <= 1100) { if (!positions["widget-weather"]) w.style.top = w.style.bottom = w.style.left = w.style.right = ""; return; }
     var anchor = ["career", "building"].map(function (k) { var n = el("widget-" + k); return prefs.widgets[k].on && n && !n.classList.contains("nofit") ? n : null; }).filter(Boolean).pop();
     var parent = w.offsetParent || document.body, pr = parent.getBoundingClientRect(), vh = window.innerHeight;
@@ -750,6 +823,8 @@
       var rs = deskRects(), fix = null;
       for (var i = 0; i < rs.length && !fix; i++) for (var j = i + 1; j < rs.length && !fix; j++) {
         if (!hits(rs[i], rs[j])) continue;
+        /* in the layered layout the welcome window floats over the desk on purpose */
+        if (window.innerWidth >= LAYERED_MIN && (rs[i].id === "window-intro" || rs[j].id === "window-intro")) continue;
         /* move the one the visitor placed or resized; a clash in the default layout itself is left to the CSS */
         var a = rs[i], b = rs[j];
         fix = positions[b.id] ? b : positions[a.id] ? a : resized(b.id) ? b : resized(a.id) ? a : null;
@@ -1035,7 +1110,7 @@
       });
       savePositions();
     }
-    else if (a === "reset-wallpaper") { prefs.wallpaper = "shanghai-mist"; prefs.mode = "framed"; prefs.wallColor = null; applyWallpaper(); }
+    else if (a === "reset-wallpaper") { prefs.wallpaper = "shanghai-mist"; prefs.mode = "framed"; prefs.wall = "auto"; prefs.frame = "white"; prefs.soften = 1; prefs.blur = false; currentCategory = categoryOf(prefs.wallpaper); applyWallpaper(); }
     else if (a === "reset-widgets") {
       markPanelClick();
       prefs.widgets = { clocks: { on: true, size: "M" }, weather: { on: false, size: "S" }, career: { on: true, size: "M" }, building: { on: true, size: "M" } };
