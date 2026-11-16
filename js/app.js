@@ -1198,7 +1198,7 @@
   function openToolPage(href, label) {
     var u = new URL(href, window.location.href).href;
     /* v38: live demos open in their own tab, so the site stays one Back press away */
-    if (u.indexOf("brag-book.html") >= 0) { window.open(u, "_blank", "noopener"); return; }
+    /* v41: on the Desktop, live demos open as a tab in this window too (phones go to the page) */
     if (isPhone()) { window.location.href = u; return; }
     browserOpenTab(u, label || "Work & Tools");
   }
@@ -1210,7 +1210,7 @@
     if (url.split("#")[0] === ROAD_URL) return "The Road";
     if (url === RESUME_URL) return "Resume";
     if (url === REEL_URL) return "Sizzle Reel";
-    if (url.split("#")[0] === BRAG_URL) return "Work & Tools";
+    if (url.split("#")[0] === BRAG_URL) return "Live demos";
     if (url.split("#")[0] === TIMELINE_URL) return "Timeline";
     try { return new URL(url).hostname.replace(/^www\./, ""); } catch (e) { return url; }
   }
@@ -1364,6 +1364,7 @@
     var m = e.data && e.data.mfStart;
     if (!m) return;
     if (m.act === "contact") { openWindow("contact-win"); return; }
+    if (m.act === "desktop") { minimiseWindow("browser"); return; }
     var u;
     try { u = new URL(m.href, window.location.href); } catch (err) { return; }
     if (u.origin !== window.location.origin) return;
@@ -1378,7 +1379,7 @@
     var a = e.target.closest('a[href$="resume.pdf"]');
     if (a && !isPhone()) { e.preventDefault(); browserOpenTab(RESUME_URL, "Resume"); return; }
     var bb = e.target.closest('a[href*="brag-book.html"], [data-brag]');
-    if (bb) { e.preventDefault(); var nm = bb.querySelector && bb.querySelector(".app-txt b, .kit-chip span"); openToolPage(bb.href || BRAG_URL, nm ? nm.textContent.replace(/\s*Live$/, "") : "Work & Tools"); return; }
+    if (bb) { e.preventDefault(); var nm = bb.querySelector && bb.querySelector(".app-txt b, .kit-chip span"); openToolPage(bb.href || BRAG_URL, nm ? nm.textContent.replace(/\s*Live$/, "") : "Live demos"); return; }
     var tl = e.target.closest('a[href*="work/timeline.html"]');
     if (tl) { e.preventDefault(); openToolPage(tl.href, "Timeline"); return; }
     var r = e.target.closest('a[href$="reel.html"]');

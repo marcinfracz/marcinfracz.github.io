@@ -22,3 +22,27 @@
     else window.open(u.href, '_blank', 'noopener');
   });
 })();
+
+/* v41: inside the Desktop's browser window, links to other pages of this site open as new tabs
+   in that window (the Resume PDF too), Desktop shows the Desktop, Contact opens its note.
+   The Road keeps its full-screen move. Other sites still open in a real new tab.
+   On its own, outside the Desktop, every link works as before. */
+(function () {
+  var inDesk = false;
+  try { inDesk = window.parent !== window && window.parent.location.origin === location.origin && /\/(index\.html)?$/.test(window.parent.location.pathname); } catch (e) {}
+  if (!inDesk) return;
+  function send(msg) { window.parent.postMessage({ mfStart: msg }, location.origin); }
+  window.addEventListener('click', function (e) {
+    if (e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href]');
+    if (!a || a.hasAttribute('download') || a.hasAttribute('data-ext')) return;
+    var u; try { u = new URL(a.getAttribute('href'), location.href); } catch (err) { return; }
+    if (!/^https?:$/.test(u.protocol) || u.origin !== location.origin) return;
+    var path = u.pathname, here = location.pathname;
+    if (path === here && u.search === location.search) return; /* a spot on this same page */
+    if (/\/road\.html$/.test(path)) return; /* the Road keeps its own full-screen move */
+    e.preventDefault(); e.stopPropagation();
+    if (/\/(index\.html)?$/.test(path)) { send(u.hash === '#contact' ? { act: 'contact' } : { act: 'desktop' }); return; }
+    send({ href: u.href, title: '' });
+  }, true);
+})();
