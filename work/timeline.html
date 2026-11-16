@@ -507,6 +507,64 @@ html[data-theme="dark"] .bx.lens-on{box-shadow:0 0 0 2px #fff,0 14px 28px -10px 
   .m-sbar .m-x{right:12px}
 }
 @media (max-width:600px){.legend{display:none}.dock{justify-content:flex-end}}
+
+/* v40: flat logos. Brands sit on the page with no tile, border or shadow; in dark mode black marks turn white */
+.tile:not(.mono):not(.flag){background:none;box-shadow:none;border-radius:0;padding:0;place-items:center start}
+.ch-list .tile:not(.mono):not(.flag){place-items:center}
+.m-sbar .tile:not(.mono):not(.flag){padding:0}
+.lg{background:none;box-shadow:none;padding:0;border-radius:0;color:var(--ink)}
+.stories.many .lg{padding:0}
+.st-marks{gap:10px 18px}
+.pin-lg{background:none;box-shadow:none;padding:0;border-radius:0}
+html[data-theme="dark"] .tile:not(.mono):not(.flag) img,html[data-theme="dark"] .lg img,html[data-theme="dark"] .pin-lg img{filter:invert(1);opacity:.92}
+html[data-theme="dark"] .tile.clr img,html[data-theme="dark"] .lg.clr img,html[data-theme="dark"] .pin-lg.clr img{filter:brightness(0) invert(1)}
+html[data-theme="dark"] .tile.keep img,html[data-theme="dark"] .lg.keep img,html[data-theme="dark"] .pin-lg.keep img{filter:none;opacity:1}
+/* v40: facts read as one plain line; only actions look clickable */
+.chips{gap:4px 0;align-items:baseline}
+.chip{height:auto;padding:0;border:0;border-radius:0;background:none;font-size:14px;font-weight:600;color:var(--ink2)}
+.chip .ico{display:none}
+.chip:not(:last-child)::after{content:"·";margin:0 9px;color:var(--muted);font-weight:700}
+.chip.tag{font-size:13px;font-weight:500;color:var(--muted)}
+.chip img{width:14px;height:14px}
+.m-acts{align-items:center;gap:8px 22px;margin-top:16px}
+.m-acts .btn.pri{height:34px;padding:0 16px;font-size:13.5px}
+.lnk{display:inline-flex;align-items:center;gap:5px;font-size:13.5px;font-weight:700;color:var(--acc-ink);text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--acc-ink) 35%,transparent);text-underline-offset:4px;white-space:nowrap}
+.lnk:hover,.lnk:focus-visible{text-decoration-color:currentColor}
+.lnk .ico{width:13px;height:13px;flex:none}
+.places{gap:4px 14px}
+.places li{padding:0;background:none;border-radius:0}
+.places li.hot{background:none;color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+@media (max-width:600px){.chip{font-size:13px}.chip.tag{font-size:12px}.m-acts{gap:10px 18px}.lnk{white-space:normal}}
+
+/* v40: page header. The title sits in the top row beside the photo pill, with room before the highlight row */
+.brand span{display:none}
+.intro.inline{top:calc(env(safe-area-inset-top,0px) + 10px);left:max(14px,env(safe-area-inset-left,0px));right:14px}
+.intro.inline .intro-h{margin-left:var(--hx);max-width:var(--hw);min-height:42px;display:flex;flex-direction:column;justify-content:center}
+.intro.inline h1{font-size:21px;line-height:1.15}
+.intro.inline p{margin-top:1px}
+.intro.inline .lenses{margin-top:30px}
+.intro:not(.inline) .lenses{margin-top:20px}
+/* v40: footer labeled, no boxes, so the timeline and the highlight row lead */
+.legend,.zoom{background:none;border:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;padding:4px 0}
+.legend{gap:6px 10px}
+.lk{margin-left:0}
+.dk-l{font-size:9.5px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-right:6px}
+.zoom .dk-l{margin-right:4px}
+/* v40: zoomed-in role cards on the same type scale as the rest of the site */
+.z-l .bx,.z-xl .bx{padding:14px 18px 12px;gap:5px}
+.z-l .bx-k,.z-xl .bx-k{font-size:10.5px;letter-spacing:.1em}
+.z-xl .bx-t{font-size:17px;line-height:1.25;font-weight:800}
+.z-l .bx-s{font-size:15px;line-height:1.25;font-weight:800}
+.bx-tags{gap:2px 0}
+.bx-tags li{padding:0;background:none;box-shadow:none;border-radius:0;font-size:11.5px;font-weight:600;opacity:.82;line-height:1.3}
+.bx-tags li:not(:last-child)::after{content:"·";margin:0 7px;opacity:.8}
+.z-l .bx-o,.z-xl .bx-o{font-size:13.5px;line-height:1.35;margin-top:2px}
+.z-xl .bx-sum{font-size:13.5px;line-height:1.45;opacity:.88}
+.z-xl .bx-hl{font-size:13px;line-height:1.45}
+.z-xl .bx-hl li{margin-top:2px}
+.z-l .bx-y,.z-xl .bx-y{font-size:12px}
+.z-xl .bx>:not(.bx-y):not(.bx-flag){max-width:780px}
+.z-l .bx-y,.z-xl .bx-y{padding-top:4px}
 </style>
 </head>
 <body>
@@ -529,7 +587,7 @@ html[data-theme="dark"] .bx.lens-on{box-shadow:0 0 0 2px #fff,0 14px 28px -10px 
   </nav>
 </header>
 
-<div class="intro" id="intro"><h1>Career, 2003 to now</h1><p id="hint">Drag or scroll to move. Pinch or use + and − to zoom. Click any role.</p>
+<div class="intro" id="intro"><div class="intro-h"><h1>Career, 2003 to now</h1><p id="hint">Drag or scroll to move. Pinch or use + and − to zoom. Click any role.</p></div>
   <div class="lenses" id="lenses" role="group" aria-label="Highlight roles by capability"></div></div>
 
 <main class="stage" id="stage" tabindex="0" aria-label="Career timeline. Use the arrow keys to move and plus or minus to zoom.">
@@ -537,10 +595,11 @@ html[data-theme="dark"] .bx.lens-on{box-shadow:0 0 0 2px #fff,0 14px 28px -10px 
 </main>
 
 <footer class="dock" id="dock">
-  <div class="legend" aria-label="Key">
-    <span class="lk"><i style="background:var(--cap-bg)"></i>Degree</span><span class="lk"><i class="lk-img"><img src="../assets/flags/ec.svg" alt=""></i>Country project (below the line)</span><span class="lk"><i class="lk-img"><img src="../assets/flags/mx.svg" alt=""></i>International assignment (flag on its bracket)</span>
+  <div class="legend" aria-label="Legend">
+    <span class="dk-l">Legend</span>    <span class="lk"><i style="background:var(--cap-bg)"></i>Degree</span><span class="lk"><i class="lk-img"><img src="../assets/flags/ec.svg" alt=""></i>Country project (below the line)</span><span class="lk"><i class="lk-img"><img src="../assets/flags/mx.svg" alt=""></i>International assignment (flag on its bracket)</span>
   </div>
   <div class="zoom" role="group" aria-label="Zoom">
+    <span class="dk-l">Zoom</span>
     <button type="button" id="zout" aria-label="Zoom out"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg></button>
     <div class="zseg" id="zseg"></div>
     <output id="zlabel" aria-live="polite">Whole career</output>
@@ -557,7 +616,7 @@ html[data-theme="dark"] .bx.lens-on{box-shadow:0 0 0 2px #fff,0 14px 28px -10px 
 
 <noscript><p style="position:fixed;top:120px;left:20px">The timeline needs JavaScript. <a href="../road.html">Drive the Road instead</a>.</p></noscript>
 
-<script src="../content/road-content.js?v=37"></script>
+<script src="../content/road-content.js?v=40"></script>
 <script type="module">
 import { COUNTRY } from '../road/marks.js';
 /* v39: sharp SVG flags (flag-icons, MIT) instead of small canvas drawings */
@@ -609,6 +668,9 @@ const PINS = [
   { id: 'flag-KR', kind: 'flag', c: 'KR', at: 2019.6, t: 'Korea', sub: '2019', role: 'trailblazer-encore',
     text: 'Korea, where both the Buick Encore GX and the Chevrolet Trailblazer are built.' }
 ];
+const CLR = new Set(['sgm', 'patac', 'sgmw', 'ross-stack', 'ross', 'ideaconnection', 'kettering-wordmark', 'kettering-seal']);
+const KEEP = new Set(['patac', 'kettering-seal']);
+const lgCls = n => (CLR.has(n) ? ' clr' : '') + (KEEP.has(n) ? ' keep' : '');
 const PIN = Object.fromEntries(PINS.map(p => [p.id, p]));
 PIN.kettering.logo = ['kettering-wordmark', 1353 / 327, 'Kettering University'];
 PIN.ross.logo = ['ross', 574 / 80, 'Michigan Ross'];
@@ -694,7 +756,7 @@ const LENSES = [
   { id: 'customer', n: 'Customer & dealer', sw: ['cx', 'field'], ids: ['customer-experience', 'mexico'] },
   { id: 'global', n: 'Global & JV', icon: 'globe', ids: ['customer-experience', 'mexico', 'equinox', 'trailblazer-encore', 'shanghai', 'onstar'] },
   { id: 'leadership', n: 'Leadership & influence', icon: 'users', ids: ['chrysler', 'johnson-controls', 'mexico', 'equinox', 'connected', 'shanghai', 'onstar'] },
-  { id: 'innovation', n: 'AI & innovation', icon: 'spark', roles: 1, ids: ['federal-mogul', 'customer-experience', 'trailblazer-encore', 'shanghai', 'onstar'] },
+  { id: 'innovation', n: 'AI & innovation', icon: 'spark', roles: 1, ids: ['federal-mogul', 'traverse', 'customer-experience', 'trailblazer-encore', 'shanghai', 'onstar'] },
   { id: 'engineering', n: 'Engineering', sw: ['eng'], d: 'co-op included', ids: ['fm-coop', 'federal-mogul', 'chrysler', 'johnson-controls'] }
 ];
 const LENS = Object.fromEntries(LENSES.map(l => [l.id, l]));
@@ -730,7 +792,7 @@ const bxEls = ROLES.map(s => {
 const CAP = '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 4 1 9l11 5 9-4.1V16h2V9z" fill="currentColor"/><path d="M6 12.6V16c0 1.7 2.7 3 6 3s6-1.3 6-3v-3.4l-6 2.7z" fill="currentColor"/></svg>';
 const STAR = '<svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path fill="currentColor" d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 21l1.6-7L2 9.2l7.1-.6z"/></svg>';
 const pinEls = PINS.map(p => mk('a', `pin ${p.kind}`,
-  `<span class="pin-i">${p.kind === 'deg' ? CAP : p.kind === 'now' ? STAR : `<img alt="" data-flag="${p.c}">`}</span><span class="pin-t">${p.logo ? `<span class="pin-lg"><img src="../assets/road/logos/${p.logo[0]}.png" alt="${esc(p.logo[2])}" width="${Math.round(18 * p.logo[1])}" height="18"></span>` : ''}<b>${esc(p.t)}</b><i>${esc(p.sub)}</i></span>`,
+  `<span class="pin-i">${p.kind === 'deg' ? CAP : p.kind === 'now' ? STAR : `<img alt="" data-flag="${p.c}">`}</span><span class="pin-t">${p.logo ? `<span class="pin-lg${lgCls(p.logo[0])}"><img src="../assets/road/logos/${p.logo[0]}.png" alt="${esc(p.logo[2])}" width="${Math.round(18 * p.logo[1])}" height="18"></span>` : ''}<b>${esc(p.t)}</b><i>${esc(p.sub)}</i></span>`,
   { href: '#' + p.id, 'data-open': p.id, 'aria-label': `${p.t}, ${p.sub}` }));
 document.querySelectorAll('img[data-flag]').forEach(im => { im.src = flagURL(im.dataset.flag); });
 
@@ -745,7 +807,17 @@ function measureLabels() {
 
 /* ---------- view state: px per unit (U) and the unit at the left margin (u0) ---------- */
 let W = innerWidth, H = innerHeight, M = 22, U = 50, u0 = 0, levels = [], mode = '', hBox = 96, bandTop = 110, bandBot = 600;
+function placeIntro() {
+  const it = $('#intro'), br = document.querySelector('.bar .brand'), nv = document.querySelector('.bar .links');
+  if (!it || !br || !nv) return;
+  const a = br.getBoundingClientRect().right, b = nv.getBoundingClientRect().left, room = b - a - 48;
+  const on = innerWidth >= 768 && room >= 420;
+  it.classList.toggle('inline', on);
+  it.style.setProperty('--hx', on ? (a + 24 - it.getBoundingClientRect().left) + 'px' : '0px');
+  it.style.setProperty('--hw', on ? room + 'px' : 'none');
+}
 function measure() {
+  placeIntro();
   W = innerWidth; H = innerHeight; M = W < 600 ? 14 : 24;
   const span = W - 2 * M, phone = W < 600;
   const fitU = span / (TOTAL + 0.4);
@@ -777,9 +849,9 @@ function render() {
   hBox = Math.min(mode === 'xs' && 2 * U - 6 < 50 ? 44 : BOX_H[mode], hMax);
   stage.classList.toggle('xs-low', hBox < 64);
   stage.classList.toggle('roomy', hBox >= 100);
-  const up = 28 + hBox + 164, dn = 56 + 94;
+  const up = 40 + hBox + 164, dn = 56 + 94;
   const y0 = bandTop + Math.max(0, (avail - up - dn) / 2) + up;
-  const boxTop = y0 - 28 - hBox, dnTop = y0 + 56;
+  const boxTop = y0 - 40 - hBox, dnTop = y0 + 56;
 
   /* axis: lighter before GM, an arrow into now */
   const xa = sx(0), xg = sx(GM_START), xe = sx(TOTAL - 0.2);
@@ -868,12 +940,13 @@ function candidates() {
   const span = spanU();
   if (span >= TOTAL - 0.01) return [(TOTAL - span) / 2];
   const out = [];
-  for (let i = 0; i < SLOTS.length; i++) {
-    let j = i; while (j + 1 < SLOTS.length && SLOTS[j + 1].e - SLOTS[i].s <= span + 1e-6) j++;
-    const len = SLOTS[j].e - SLOTS[i].s;
-    out.push(len > span + 1e-6 ? (SLOTS[i].s + SLOTS[i].e) / 2 - span / 2 : SLOTS[i].s - (span - len) / 2);
+  for (let i = 0; i < ROLES.length; i++) {
+    let j = i; while (j + 1 < ROLES.length && ROLES[j + 1].e - ROLES[i].s <= span + 1e-6) j++;
+    const len = ROLES[j].e - ROLES[i].s;
+    out.push(len > span + 1e-6 ? (ROLES[i].s + ROLES[i].e) / 2 - span / 2 : ROLES[i].s - (span - len) / 2);
   }
-  const lo = -0.4, hi = TOTAL + 0.4 - span;
+  /* v40: never pan past the first or last role; the end arrow only shows when there is room */
+  const pad = Math.min(0.4, 18 / U), lo = -pad, hi = Math.max(lo, Math.min(TOTAL + 0.4, ROLES[ROLES.length - 1].e + pad) - span);
   return [...new Set(out.map(v => +Math.min(hi, Math.max(lo, v)).toFixed(4)))].sort((a, b) => a - b);
 }
 function nearest(target) { const c = candidates(); return c.reduce((a, b) => Math.abs(b - target) < Math.abs(a - target) ? b : a, c[0]); }
@@ -998,7 +1071,7 @@ stage.addEventListener('wheel', e => {
     u0 = fu - (e.clientX - M) / U; wFocal = e.clientX;
   } else {
     const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-    u0 = Math.max(-1.5, Math.min(TOTAL + 1.5 - spanU(), u0 + d * k / U));
+    u0 = Math.max(-0.6, Math.min(ROLES[ROLES.length - 1].e + 0.7 - spanU(), u0 + d * k / U));
   }
   render(); clearTimeout(wt); wt = setTimeout(() => { settle(wFocal); wFocal = null; }, 170);
 }, { passive: false });
@@ -1080,13 +1153,13 @@ const LET = k => String(k + 1);
 const LOGO = n => `../assets/road/logos/${n}.png`;
 function tileHTML(id) {
   const p = PROF[id] || {}, s = STOP[id] || {};
-  if (p.logo) return `<div class="tile${WIDE.has(p.logo) ? ' wide' : ''}"><img src="${LOGO(p.logo)}" alt="${esc(p.company || s.title)}"></div>`;
+  if (p.logo) return `<div class="tile${WIDE.has(p.logo) ? ' wide' : ''}${lgCls(p.logo)}"><img src="${LOGO(p.logo)}" alt="${esc(p.company || s.title)}"></div>`;
   return `<div class="tile mono" aria-hidden="true">${esc(p.mono || (p.company || s.title || '?').charAt(0))}</div>`;
 }
 function marksHTML(p, k) {
   const ms = p.storyMarks && p.storyMarks[k]; if (!ms || !ms.length) return '';
   return '<div class="st-marks">' + ms.map(m => m === 'disney' ? `<span class="lg">${DISNEY_EARS}Disney Institute</span>`
-    : `<span class="lg${XL.has(m) ? ' xl' : TALL.has(m) ? ' tall' : ''}" title="${esc(MARK[m] || m)}"><img src="${LOGO(m)}" alt="${esc(MARK[m] || m)}" loading="lazy"></span>`).join('') + '</div>';
+    : `<span class="lg${XL.has(m) ? ' xl' : TALL.has(m) ? ' tall' : ''}${lgCls(m)}" title="${esc(MARK[m] || m)}"><img src="${LOGO(m)}" alt="${esc(MARK[m] || m)}" loading="lazy"></span>`).join('') + '</div>';
 }
 const navName = k => { const st = STOP[k] || {}, p = PROF[k] || {}; return (p.company === 'General Motors' ? p.group : st.title) || k; };
 const yrs = s => (s.span || '').split(' · ')[0];
@@ -1201,10 +1274,10 @@ function roleHTML(id) {
   const s = STOP[id] || {}, p = PROF[id] || {}, e = ERA[s.era];
   const flags = (s.flags || []).map(([c, when, what, cities]) => `<li class="chip" title="${esc(what || '')}"><img src="${flagURL(c)}" alt="">${esc(COUNTRY[c] || c)} · ${esc(when)}</li>`).join('');
   const chips = [s.place && `<li class="chip">${ico('pin')}${esc(s.place)}</li>`, s.span && `<li class="chip">${ico('cal')}${esc(s.span)}</li>`,
-    ...(TAGS[id] || [`<i></i>${esc(focusName(id))}`]).map(t => TAGS[id] ? `<li class="chip">${ico('tag')}${esc(t)}</li>` : `<li class="chip">${t}</li>`), e && `<li class="chip">${ico('target')}Chapter ${e.n} · ${esc(e.short || e.label)}</li>`].filter(Boolean).join('') + flags;
+    ...(TAGS[id] || [`<i></i>${esc(focusName(id))}`]).map(t => TAGS[id] ? `<li class="chip tag">${esc(t)}</li>` : `<li class="chip tag">${t}</li>`), e && `<li class="chip tag">Chapter ${e.n} · ${esc(e.short || e.label)}</li>`].filter(Boolean).join('') + flags;
   const stories = (s.callouts || []).map((c, k) => { const [t, lede] = splitCallout(c.text); const body = (p.stories && p.stories[k]) || lede;
     return `<li class="story"><span class="badge">${ico(pick(t) !== 'check' ? pick(t) : pick(body))}</span><div><b><small>${LET(k)}</small>${esc(t)}</b><p>${esc(body)}</p>${marksHTML(p, k)}</div></li>`; }).join('');
-  const work = (WORK[id] || []).map(x => `<a class="btn" href="${esc(x.href.replace(/^work\//, ''))}" title="${esc(x.text)} (synthetic data)">${ico('ext')}${esc(x.pill === 'Kit' ? 'Everyday kit' : 'Live demo: ' + x.title)}</a>`).join('');
+  const work = (WORK[id] || []).map(x => `<a class="lnk" href="${esc(x.href.replace(/^work\//, ''))}" title="${esc(x.text)} (synthetic data)">${esc(x.pill === 'Kit' ? 'Everyday kit' : 'Live demo: ' + x.title)}${ico('ext')}</a>`).join('');
   const m = s.more, more = m && m.blocks ? `<details class="m-more"><summary>${esc(m.title || 'More')}</summary>${m.blocks.map(b => `<h4>${esc(b.h)}</h4><p>${esc(b.p)}</p>`).join('')}${m.sources && m.sources.length ? '<div class="src">' + m.sources.map(x => `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.label)}</a>`).join('') + '</div>' : ''}</details>` : '';
   const i = ORDER.indexOf(id), pv = ORDER[i - 1], nx = ORDER[i + 1];
   const chart = chartHTML(id), map = PLACES[id] ? mapHTML(PLACES[id], id === 'onstar' ? '8 export regions' : '', !chart) : '';
