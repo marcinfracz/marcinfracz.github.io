@@ -1249,3 +1249,22 @@ body.dark a:focus-visible, body.dark button:focus-visible, body.dark [role="butt
 /* v33: dark mode, the Terminal and About icons were dark gray on the dark dock */
 body.dark .dock-rail button[data-dock="terminal"] { color: #e7e5e4; }
 body.dark .dock-rail button[data-dock="about"] { color: #d6d3d1; }
+
+/* ---------- v38: site links in the menu bar; a plain "+" on the odometer ---------- */
+.mb-links { display: flex; align-items: center; gap: 2px; margin: 0 auto 0 14px; padding-left: 14px; border-left: 1px solid rgba(28, 25, 23, 0.14); }
+.mb-links a, .mb-links button { font-family: inherit; font-size: 13px; font-weight: 600; line-height: 1; color: var(--ink); background: transparent; border: 0; padding: 6px 10px; border-radius: 6px; text-decoration: none; cursor: pointer; white-space: nowrap; }
+.mb-links a:hover, .mb-links button:hover { background: rgba(28, 25, 23, 0.08); }
+body.dark .mb-links { border-left-color: rgba(255, 255, 255, 0.16); }
+body.dark .mb-links a:hover, body.dark .mb-links button:hover { background: rgba(255, 255, 255, 0.1); }
+.odo span.plus { background: none; color: var(--ink); width: auto; padding: 0 1px 0 3px; }
+@media (max-width: 700px) {
+  .menubar { height: auto; min-height: 44px; flex-wrap: wrap; padding-bottom: 4px; }
+  .mb-links { order: 3; flex: 1 0 100%; margin: 0 -8px 0 -12px; padding: 2px 8px 2px 8px; border-left: 0; overflow-x: auto; scrollbar-width: none; }
+  .mb-links::-webkit-scrollbar { display: none; }
+  .mb-links a, .mb-links button { flex: none; font-size: 13.5px; padding: 8px 10px; }
+  .mb-left, .mb-right { min-height: 44px; }
+}
+
+/* v38: a video in fullscreen fills the screen in every browser, Firefox included */
+video:fullscreen { width: 100vw !important; height: 100vh !important; max-width: none !important; max-height: none !important; aspect-ratio: auto !important; object-fit: contain !important; border-radius: 0 !important; background: #000 !important; }
+video:-moz-full-screen { width: 100vw !important; height: 100vh !important; max-width: none !important; max-height: none !important; aspect-ratio: auto !important; object-fit: contain !important; border-radius: 0 !important; background: #000 !important; }
