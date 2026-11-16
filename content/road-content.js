@@ -340,7 +340,7 @@ window.ROAD_CONTENT = {
       role: "Engineering, product, customer experience and software strategy, across the US, Mexico and China. Tap a chapter to drive back to it.",
       what: "Exploring new leadership opportunities in automotive strategy, product and AI.",
       wins: [], callouts: [],
-      reel: { src: "assets/sizzle-reel-v4.mp4", label: "Sizzle reel, 1:41" }
+      reel: { src: (window.MF_REEL || {}).src || "assets/sizzle-reel-v4.mp4", label: "Sizzle reel, " + ((window.MF_REEL || {}).length || "1:41") }
     }
   ],
 
