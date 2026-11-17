@@ -595,6 +595,24 @@ html[data-theme="dark"] .tile.keep img,html[data-theme="dark"] .lg.keep img,html
   .dock>.lenses .lens-lt{margin-right:0}
 }
 @media (min-width:768px) and (max-width:1299px){.dock>.lenses{justify-content:flex-start}.dock>.lenses .lens-lt{margin-right:4px}}
+/* v49: the Legend and Zoom row sits right under the timeline, smaller; the Highlight row is the bottom row.
+   LEGEND and ZOOM labels share one size, and so do their item texts. */
+@media (min-width:768px){
+  .dock>.legend{order:1}.dock>.zoom{order:2}.dock>.lenses{order:3}
+  .dock{row-gap:12px;align-items:center}
+  .dock .legend,.dock .zoom{align-items:center;line-height:1}
+  .dock>.legend,.dock>.zoom{padding:0}
+  .dock .dk-l{font-size:9px;letter-spacing:.2em}
+  .dock .legend{gap:4px 10px}
+  .dock .lk{font-size:11px;gap:4px}
+  .dock .lk i{width:12px;height:12px}
+  .dock .zoom{gap:0}
+  .dock .zoom>button{width:24px;height:24px}
+  .dock .zoom>button svg{width:13px;height:13px}
+  .dock .zseg button{height:22px;padding:0 8px;font-size:11px;gap:5px}
+  .dock .zseg button::before{width:5px;height:5px}
+  .dock #zlabel{font-size:11px}
+}
 /* v45: phones get a real vertical timeline: one line down the left, every role a tappable card
    with its logo, title, years and place. The zoomable desktop timeline stays for 768px and up. */
 .vt{display:none}
