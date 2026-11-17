@@ -894,8 +894,9 @@ function start() {
     ERAS.forEach(e => {
       h += `<li class="ov-era" style="--c:${e.color}"><p class="ov-eh"><b>${e.n}</b><span>${esc(e.label)}</span><em>${esc(e.years)}</em></p><ul>`;
       STOPS.forEach((s, i) => { if (s.era !== e.id) return; const r = RAILC[s.id] || { co: s.title, ro: s.role || '', yr: s.span || '' };
-        const fn = String(r.ro).split(' · ').pop();
-        h += `<li><button type="button" class="ov-stop" data-i="${i}" title="${esc(r.ro)}"><b>${esc(r.co)}<i> · ${esc(fn)}</i></b><span>${esc(r.ro)}</span><em>${esc(r.yr)}</em></button></li>`; });
+        /* v47: company and a short title that never cuts off, the date in one right-hand column, and the role's domain in the Timeline's words */
+        const t = r.t || String(r.ro).split(' · ')[0];
+        h += `<li><button type="button" class="ov-stop" data-i="${i}" title="${esc(r.co + ' · ' + r.ro)}"><b>${esc(r.co)}<i> · ${esc(t)}</i></b><em>${esc(r.yr)}</em>${r.dm ? `<span class="ov-dom f-${esc(r.f || 'eng')}"><i aria-hidden="true"></i>${esc(r.dm)}</span>` : ''}</button></li>`; });
       h += '</ul></li>';
     });
     h += `</ol><button type="button" class="ov-back">Back to the road <kbd>+</kbd></button>`;

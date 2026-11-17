@@ -885,3 +885,32 @@ html[data-theme="dusk"] .co-logo.color img[src*="patac"], html[data-theme="dusk"
 @keyframes tourPulse { 50% { outline-offset: 6px; } }
 .tb-note { margin: -4px 0 12px; font-size: 13.5px; line-height: 1.4; color: var(--ink-2, var(--ink)); }
 .tb-note[hidden] { display: none; }
+
+/* v47: career overview. Dates sit in one right-aligned column for chapters and roles; titles wrap, never cut off; each role shows its domain in the Timeline's words */
+.ov-panel { --ov-date: 72px; }
+.ov-eh { padding-right: 8px; }
+.ov-eh em { width: var(--ov-date); text-align: right; }
+.ov-stop { grid-template-columns: minmax(0, 1fr) var(--ov-date); align-items: baseline; row-gap: 2px; }
+.ov-stop b { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.3; }
+.ov-stop em { text-align: right; align-self: start; padding-top: 1px; }
+.ov-stop b i { display: inline !important; }
+.ov-stop span.ov-dom { display: inline-flex !important; grid-column: 1 / 2; grid-row: 2; align-items: center; gap: 6px; white-space: nowrap; overflow: visible; font-size: 11px; font-weight: 600; color: var(--ink-3); }
+.ov-dom i { flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--fd, #66788f); }
+.ov-dom.f-eng { --fd: #66788f; } .ov-dom.f-product { --fd: #6b7380; } .ov-dom.f-cx { --fd: #b8890f; } .ov-dom.f-field { --fd: #11804a; } .ov-dom.f-digital { --fd: #2a4aa8; } .ov-dom.f-edu { --fd: #B14F94; }
+html[data-theme="dusk"] .ov-dom.f-digital { --fd: #6f8fe8; } html[data-theme="dusk"] .ov-dom.f-product { --fd: #9aa3b0; } html[data-theme="dusk"] .ov-dom.f-eng { --fd: #8fa1b8; } html[data-theme="dusk"] .ov-dom.f-field { --fd: #2fb36b; } html[data-theme="dusk"] .ov-dom.f-cx { --fd: #e0b232; }
+@media (max-height: 1000px) { .ov-stop { padding: 3px 8px; } .ov-eras { gap: 5px; } }
+@media (max-height: 820px) { .ov-stop span.ov-dom { display: none !important; } }
+.ov-panel { width: clamp(340px, 24vw, 470px); }
+.ov-panel { width: clamp(360px, max(24vw, min(28vw, 410px)), 470px); }
+@media (max-height: 1000px) {
+  .ov-stop { padding: 2px 8px; row-gap: 0; font-size: 11.5px; }
+  .ov-stop b { font-size: 12px; }
+  .ov-stop span.ov-dom { font-size: 10.5px; }
+  .ov-eras { gap: 4px; }
+  .ov-era ul { margin-top: 1px; }
+}
+@media (max-height: 1000px) {
+  .ov-panel { top: 64px; max-height: calc(100vh - 76px); padding: 12px 14px 10px; }
+  .ov-t { font-size: 18px; } .ov-s { margin-bottom: 8px; }
+  .ov-back { margin-top: 8px; height: 30px; }
+}
