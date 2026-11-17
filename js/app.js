@@ -262,7 +262,7 @@
   var APP_WINDOWS = [
     { id: "intro", label: "Welcome" },
     { id: "about", label: "About" },
-    { id: "work", label: "Work" },
+    { id: "work", label: "Timeline" },
     { id: "projects", label: "Projects" },
     { id: "finder", label: "Finder" },
     { id: "notes-win", label: "Notes" },
@@ -288,7 +288,7 @@
     return win && !win.classList.contains("hidden-window") && !win.classList.contains("minimised") && win.style.display !== "none";
   }
   function openWindow(name) {
-    if (name === "work") { openToolPage("work/timeline.html", "Work"); return; }
+    if (name === "work") { openToolPage("work/timeline.html", "Timeline"); return; }
     /* v43: About is a page in the browser window, like Start and the Timeline */
     if (name === "about") { openToolPage("about.html", "About"); return; }
     if (name === "contact-note") {
@@ -1145,7 +1145,7 @@
     else if (a === "open-terminal") openWindow("terminal");
     else if (a === "open-browser") openWindow("browser");
     else if (a === "open-work-showcase") goPage("road.html");
-    else if (a === "open-brag") browserOpenTab(BRAG_URL, "Work & Tools");
+    else if (a === "open-brag") browserOpenTab(BRAG_URL, "Live demos");
     else if (a === "contact") openWindow("contact-win");
     else if (a === "search") openPalette();
     else if (a === "wallpaper-settings") openWindow("wallpaper");
@@ -1338,7 +1338,7 @@
     /* v38: live demos open in their own tab, so the site stays one Back press away */
     /* v41: on the Desktop, live demos open as a tab in this window too (phones go to the page) */
     if (isPhone()) { window.location.href = u; return; }
-    browserOpenTab(u, label || "Work & Tools");
+    browserOpenTab(u, label || "Live demos");
   }
   var browserTabs = []; /* {id, title, url, history, index} — one history stack per tab */
   var browserActiveId = null;
@@ -1596,8 +1596,8 @@
   /* ================= search palette ================= */
   var PALETTE_ITEMS = [
     { label: "About Marcin", hint: "Window", run: function () { openWindow("about"); } },
-    { label: "Work", hint: "Window", run: function () { openWindow("work"); } },
-    { label: "Work & Tools: four live demos", hint: "Page", run: function () { browserOpenTab(BRAG_URL, "Work & Tools"); } },
+    { label: "Timeline", hint: "Window", run: function () { openWindow("work"); } },
+    { label: "Live demos", hint: "Page", run: function () { browserOpenTab(BRAG_URL, "Live demos"); } },
     { label: "Browser", hint: "Window", run: function () { openWindow("browser"); } },
     { label: "The Road: career story", hint: "Page", run: function () { goPage("road.html"); } },
     { label: "Projects", hint: "Window", run: function () { openWindow("projects"); } },
