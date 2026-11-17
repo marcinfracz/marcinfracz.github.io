@@ -160,15 +160,13 @@ html[data-theme="dark"] .bx{box-shadow:0 0 0 1px rgba(255,255,255,.12),0 10px 24
 .pin::before{content:"";position:absolute;left:12px;top:-20px;width:2px;height:20px;background:var(--axis);opacity:.35}
 .pin-i{flex:none;width:26px;height:26px;border-radius:50%;overflow:hidden;display:grid;place-items:center;box-shadow:0 0 0 2px var(--ring),0 3px 8px rgba(0,0,0,.22);background:#dfe3e8}
 .pin-i img{width:100%;height:100%;object-fit:cover;display:block}
-.pin.deg .pin-i{background:var(--cap-bg);color:var(--cap-fg)}
+.pin.deg .pin-i{background:#fff;color:var(--cap-fg)}
 .pin.now .pin-i{background:var(--now);color:#fff}
 .pin-t{display:flex;flex-direction:column;line-height:1.15;white-space:nowrap}
 .pin-t b{font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
 .pin-t i{font-style:normal;font-size:10px;color:var(--muted)}
 .pin.nolabel .pin-t{display:none}
-.pin.deg{flex-direction:column;gap:5px}
-.pin.deg::before{left:50%;margin-left:-1px;top:-56px;height:56px}
-.pin.deg .pin-t{align-items:center;text-align:center;transform:translateX(var(--sh,0px))}
+.pin.deg::before{top:-56px;height:56px}
 .pin-lg{display:block;line-height:0;padding:4px 7px;margin-bottom:4px;border-radius:7px;background:#fff;box-shadow:0 0 0 1px var(--line),0 4px 10px -6px rgba(10,16,28,.35)}
 .pin-lg img{height:18px;width:auto;display:block}
 .pin.hide{visibility:hidden}
@@ -660,7 +658,7 @@ html[data-theme="dark"] .tile.keep img,html[data-theme="dark"] .lg.keep img,html
   .vt-intl{display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:3px 9px;border-radius:999px;background:color-mix(in srgb,var(--f-digital) 12%,transparent);color:var(--ink);font-size:11.5px;font-weight:700}
   .vt-intl img{width:16px;height:11px;border-radius:2px;object-fit:cover}
   .vt-pin .vt-dot{width:34px;height:34px;display:grid;place-items:center;background:var(--surface);overflow:hidden}
-  .vt-pin.deg .vt-dot{background:var(--cap-bg);color:var(--cap-fg)}
+  .vt-pin.deg .vt-dot{background:#fff;color:var(--cap-fg)}
   .vt-pin .vt-dot img{width:100%;height:100%;object-fit:cover}
   .vt-pin .vt-dot svg{width:17px;height:17px}
   .vt-pin .vt-p{display:flex;flex-direction:column;justify-content:center;min-height:48px;padding:4px 2px}
@@ -671,6 +669,21 @@ html[data-theme="dark"] .tile.keep img,html[data-theme="dark"] .lg.keep img,html
   .vt-now .vt-p b{font-size:16px}
   .vt-row.lens-off{opacity:.28}
   .vt-row.lens-on .vt-card{box-shadow:0 0 0 2px var(--acc),0 10px 24px -14px rgba(0,0,0,.5)}
+}
+/* v52: small windows (the Work window on the desktop, short laptop screens): no legend, one slim footer row.
+   The highlight chips shrink and the zoom keeps only minus, its level and plus, so nothing touches the degree labels. */
+@media (min-width:768px) and (max-height:760px),(min-width:768px) and (max-width:1100px){
+  .dock>.legend{display:none}
+  .dock{flex-wrap:nowrap!important;align-items:flex-end!important;row-gap:0!important;bottom:calc(env(safe-area-inset-bottom,0px) + 10px)}
+  .dock>.lenses{order:1;flex:1 1 auto!important;min-width:0;justify-content:flex-start!important;gap:5px!important}
+  .dock>.lenses .lens-lt{display:none}
+  .dock .lens{height:26px;font-size:11px;padding:0 9px 0 8px;gap:5px}
+  .dock .lens .sw i{width:8px;height:8px}
+  .dock .lens svg{width:12px;height:12px}
+  .dock>.zoom{order:2;height:26px}
+  .dock>.zoom .dk-l{display:none}
+  .dock .zseg{display:none!important}
+  .dock #zlabel{display:block;min-width:76px}
 }
 </style>
 </head>
@@ -703,7 +716,7 @@ html[data-theme="dark"] .tile.keep img,html[data-theme="dark"] .lg.keep img,html
 
 <footer class="dock" id="dock">
   <div class="legend" aria-label="Legend">
-    <span class="dk-l">Legend</span>    <span class="lk"><i style="background:var(--cap-bg)"></i>Degree</span><span class="lk"><i class="lk-img"><img src="../assets/flags/ec.svg" alt=""></i>Country project (below the line)</span><span class="lk"><i class="lk-img"><img src="../assets/flags/mx.svg" alt=""></i>International assignment (flag on its bracket)</span>
+    <span class="dk-l">Legend</span>    <span class="lk"><i class="lk-img"><img src="../assets/road/logos/kettering-seal.png" alt=""></i>Degree</span><span class="lk"><i class="lk-img"><img src="../assets/flags/ec.svg" alt=""></i>Country project (below the line)</span><span class="lk"><i class="lk-img"><img src="../assets/flags/mx.svg" alt=""></i>International assignment (flag on its bracket)</span>
   </div>
   <div class="zoom" role="group" aria-label="Zoom">
     <span class="dk-l">Zoom</span>
@@ -760,6 +773,7 @@ const TOTAL = acc, ROLES = SLOTS.filter(s => s.lane), SLOT = Object.fromEntries(
 /* year -> unit, piecewise across the slots */
 function UY(y) { for (const s of SLOTS) if (y <= s.to) return s.s + Math.max(0, (y - s.from) / (s.to - s.from)) * s.w; return TOTAL; }
 const GM_START = SLOT.traverse.s;
+const LAST_E = ROLES[ROLES.length - 1].e;
 
 const PINS = [
   { id: 'kettering', kind: 'deg', at: 2007, t: 'BSME, Kettering', sub: '2007' },
@@ -779,8 +793,8 @@ const CLR = new Set(['sgm', 'patac', 'sgmw', 'ross-stack', 'ross', 'ideaconnecti
 const KEEP = new Set(['patac', 'kettering-seal']);
 const lgCls = n => (CLR.has(n) ? ' clr' : '') + (KEEP.has(n) ? ' keep' : '');
 const PIN = Object.fromEntries(PINS.map(p => [p.id, p]));
-PIN.kettering.logo = ['kettering-wordmark', 1353 / 327, 'Kettering University'];
-PIN.ross.logo = ['ross', 574 / 80, 'Michigan Ross'];
+/* v52: degrees show the school's round logo, in the same format as the country pins */
+PIN.kettering.round = 'kettering-seal'; PIN.ross.round = 'ross-round';
 
 /* round 25: one logo chip per employer, over its span of roles: the company's emblem, then its name */
 const EMP = [
@@ -900,7 +914,7 @@ const bxEls = ROLES.map(s => {
 const CAP = '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 4 1 9l11 5 9-4.1V16h2V9z" fill="currentColor"/><path d="M6 12.6V16c0 1.7 2.7 3 6 3s6-1.3 6-3v-3.4l-6 2.7z" fill="currentColor"/></svg>';
 const STAR = '<svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"><path fill="currentColor" d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 21l1.6-7L2 9.2l7.1-.6z"/></svg>';
 const pinEls = PINS.map(p => mk('a', `pin ${p.kind}`,
-  `<span class="pin-i">${p.kind === 'deg' ? CAP : p.kind === 'now' ? STAR : `<img alt="" data-flag="${p.c}">`}</span><span class="pin-t">${p.logo ? `<span class="pin-lg${lgCls(p.logo[0])}"><img src="../assets/road/logos/${p.logo[0]}.png" alt="${esc(p.logo[2])}" width="${Math.round(18 * p.logo[1])}" height="18"></span>` : ''}<b>${esc(p.t)}</b><i>${esc(p.sub)}</i></span>`,
+  `<span class="pin-i">${p.round ? `<img alt="" src="../assets/road/logos/${p.round}.png">` : p.kind === 'deg' ? CAP : p.kind === 'now' ? STAR : `<img alt="" data-flag="${p.c}">`}</span><span class="pin-t">${p.logo ? `<span class="pin-lg${lgCls(p.logo[0])}"><img src="../assets/road/logos/${p.logo[0]}.png" alt="${esc(p.logo[2])}" width="${Math.round(18 * p.logo[1])}" height="18"></span>` : ''}<b>${esc(p.t)}</b><i>${esc(p.sub)}</i></span>`,
   { href: '#' + p.id, 'data-open': p.id, 'aria-label': `${p.t}, ${p.sub}` }));
 document.querySelectorAll('img[data-flag]').forEach(im => { im.src = flagURL(im.dataset.flag); });
 
@@ -908,7 +922,7 @@ document.querySelectorAll('img[data-flag]').forEach(im => { im.src = flagURL(im.
 const pinW = [], brW = [], lgW = [], lgC = [], lgI = [];
 let lgKey = '';
 function measureLabels() {
-  pinEls.forEach((el, i) => { el.classList.remove('nolabel'); pinW[i] = PINS[i].kind === 'deg' ? el.offsetWidth : el.querySelector('.pin-t').offsetWidth + 7; });
+  pinEls.forEach((el, i) => { el.classList.remove('nolabel'); pinW[i] = el.querySelector('.pin-t').offsetWidth + 7; });
   lgKey = '';
   brEls.forEach((el, i) => { el.classList.remove('short', 'none'); const f = el.firstChild.offsetWidth; el.classList.add('short'); const s = el.firstChild.offsetWidth; el.classList.remove('short'); brW[i] = { f, s }; });
 }
@@ -935,7 +949,8 @@ function measure() {
   W = innerWidth; H = innerHeight; M = W < 600 ? 14 : 24;
   const span = W - 2 * M, phone = W < 600;
   /* v48: whole career fills the width exactly: first card on the left edge, arrow tip on the right edge */
-  const fitU = (span - 6) / (TOTAL - 0.2);
+  /* v52: mirrored margins: first card's left edge at M, last card's right edge at W - M */
+  const fitU = (span + 6) / LAST_E;
   const per = phone ? [9, 4.6, 3.25] : [12, 6.6, 4.4, 3.3];
   const names = phone ? ['Whole career', 'Chapters', 'Two roles', 'One role'] : ['Whole career', 'Chapters', 'A few roles', 'Two roles', 'One role'];
   levels = [{ U: fitU, n: names[0] }];
@@ -969,7 +984,8 @@ function render() {
   const boxTop = y0 - 40 - hBox, dnTop = y0 + 56;
 
   /* axis: lighter before GM, an arrow into now */
-  const xa = sx(0), xg = sx(GM_START), xe = sx(TOTAL - 0.2);
+  /* v52: the line starts 3px before the first card and the arrow tip ends 3px past the last card */
+  const xa = sx(0), xg = sx(GM_START), xe = sx(LAST_E) - 9;
   T(axE, xa, y0 - 1.5); axE.style.width = Math.max(0, xg - xa - 4) + 'px';
   T(axG, xg, y0 - 1.5); axG.style.width = Math.max(0, xe - xg) + 'px';
 
@@ -1025,16 +1041,15 @@ function render() {
   PINS.forEach((p, i) => {
     const el = pinEls[i], x = sx(UY(p.at)) - 13;
     if (p.kind === 'deg') {
-      /* the cap stays on the axis; its logo and label hang under it, clear of the trip labels */
-      const w = pinW[i] || 140, c = x + 13, L = Math.max(M, Math.min(W - M - w, c - w / 2));
-      /* v38: caps sit lower than the flags, in a row of their own */
+      /* v52: degrees sit in a row of their own under the flags: round school logo, name and year beside it */
+      T(el, x, y0 + 56);
       const clash = x < lastCap + 30; el.classList.toggle('hide', clash);
-      if (clash) { T(el, x, y0 + 56); return; }
+      if (clash) return;
       lastCap = x;
-      const fits = L >= lastDeg + 10 && c > 0 && c < W && Math.abs(L - (c - w / 2)) < w / 2 - 16;
+      const nd = PINS.slice(i + 1).find(q => q.kind === 'deg'), next = nd ? sx(UY(nd.at)) - 13 : 1e9;
+      const fits = x >= 2 && x >= lastDeg + 4 && x + 26 + pinW[i] < Math.min(next - 6, W - 8);
       el.classList.toggle('nolabel', !fits);
-      if (fits) { lastDeg = L + w; T(el, c - w / 2, y0 + 56); el.style.setProperty('--sh', (L - (c - w / 2)).toFixed(1) + 'px'); }
-      else T(el, x, y0 + 56);
+      lastDeg = x + 26 + (fits ? pinW[i] : 0);
       return;
     }
     T(el, x, y0 + 20);
@@ -1054,7 +1069,7 @@ function render() {
 function candidates() {
   const span = spanU();
   /* v48: whole career (or wider): content runs from the first card (box inset 3px) to the arrow tip (9px past the line end) */
-  if (levels[0] && U <= levels[0].U * 1.0005) { const left = (W - 2 * M) - ((TOTAL - 0.2) * U + 6); return [(3 - left / 2) / U]; }
+  if (levels[0] && U <= levels[0].U * 1.0005) { const left = (W - 2 * M) - (LAST_E * U - 6); return [(3 - left / 2) / U]; }
   if (span >= TOTAL - 0.01) return [(TOTAL - span) / 2];
   const out = [];
   for (let i = 0; i < ROLES.length; i++) {
@@ -1576,7 +1591,7 @@ const VT = (() => {
       ${intl ? `<span class="vt-intl"><img src="${flagURL(intl.flag)}" alt="">${esc(intl.short)}</span>` : ''}</span></span></a>`;
   };
   const pin = p => {
-    const ico = p.kind === 'deg' ? CAP : `<img src="${flagURL(p.c)}" alt="">`;
+    const ico = p.round ? `<img src="../assets/road/logos/${p.round}.png" alt="">` : p.kind === 'deg' ? CAP : `<img src="${flagURL(p.c)}" alt="">`;
     const lg = p.logo ? `<img class="vt-lg" src="${LOGO(p.logo[0])}" alt="${esc(p.logo[2])}">` : '';
     return `<a class="vt-row vt-pin ${p.kind}" href="#${p.id}" data-open="${p.id}" data-id="${p.role || p.id}"><span class="vt-dot" aria-hidden="true">${ico}</span>
       <span class="vt-p">${lg}<b>${esc(p.t)}</b><span>${esc(p.kind === 'flag' ? 'Country project · ' + p.sub : p.sub)}</span></span></a>`;
