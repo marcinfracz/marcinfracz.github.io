@@ -158,7 +158,7 @@ html[data-theme="dark"] .sun,html:not([data-theme="dark"]) .moon{display:none}
   <nav class="pill links" aria-label="Site">
     <a href="../index.html" target="_top">Desktop</a>
     <a href="../road.html" target="_top">The Road</a>
-    <a href="../reel.html" target="_top">Sizzle reel</a>
+    <a href="../reel.html" target="_top" data-reel-name>Meet Marcin</a>
     <a href="brag-book.html" target="_blank" rel="noopener">Live demos</a>
     <a href="timeline.html" target="_top">Timeline</a>
     <a class="cur" href="how-i-made-it.html" aria-current="page">How I made it</a>
@@ -362,6 +362,8 @@ addEventListener('resize', () => { layout(); if (reduce) frame(0); });
 layout(); requestAnimationFrame(frame);
 })();
 </script>
+<script src="../js/reel-src.js?v=62"></script>
+<script src="../js/reel-player.js?v=62"></script>
 <script src="../js/top-nav.js?v=43"></script>
 <script src="../js/phone-menu.js?v=46"></script>
 </body>

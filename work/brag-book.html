@@ -552,6 +552,7 @@ html[data-theme="dark"] ::-webkit-scrollbar-thumb:hover{background:rgba(255,255,
 .s-why small,.s-built small{display:block;font:500 11px var(--font-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--tool);margin-bottom:5px}
 .s-why p{margin:0;font-size:15px;line-height:1.45}
 .s-result{display:flex;flex-direction:column;gap:5px;padding:12px 14px;border-radius:12px;background:var(--surface);border-left:4px solid var(--tool)}
+.pmv-strip{grid-column:1/-1;margin:0;padding:10px 12px 8px;border-radius:12px;background:var(--surface);color:var(--muted);--pmv-bg:var(--surface);--pmv-accent:var(--tool)}.pmv-strip svg{display:block;width:100%;max-width:300px;height:auto;margin:0 auto}.pmv-strip figcaption{display:flex;justify-content:space-between;max-width:300px;margin:4px auto 0;font-size:11.5px;font-weight:600;color:var(--muted)}.pmv-strip figcaption span:last-child{color:var(--tool)}
 .s-result b{font:800 34px/1 var(--font-display);color:var(--tool);letter-spacing:-.01em}
 .s-result span{font-size:13.5px;color:var(--muted);line-height:1.4}
 .tags{display:flex;flex-wrap:wrap;gap:6px}
@@ -813,10 +814,9 @@ html.is-dark .bar .sun,html:not(.is-dark) .bar .moon{display:none}
     <nav class="pill links" aria-label="Site">
       <a href="../index.html" target="_top">Desktop</a>
       <a href="../road.html" target="_top">The Road</a>
-      <a href="../reel.html" target="_top">Sizzle reel</a>
+      <a href="../reel.html" target="_top" data-reel-name>Meet Marcin</a>
       <a class="cur" href="#export" aria-current="page">Live demos</a>
       <a href="timeline.html" target="_top">Timeline</a>
-      <a href="how-i-made-it.html" target="_top">How I made it</a>
       <a href="../assets/resume.pdf" target="_blank" rel="noopener">Resume</a>
       <a href="../index.html#contact" target="_top">Contact</a>
       <span class="sep" aria-hidden="true"></span>
@@ -962,13 +962,14 @@ html.is-dark .bar .sun,html:not(.is-dark) .bar .moon{display:none}
   <div class="s-info">
     <div class="s-head"><span class="s-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h13"/></svg></span><div><div class="s-era">OnStar International<span class="nw"> · 2025–26</span></div><h2>Portfolio Made Visible</h2></div></div>
     <div class="s-why"><small>Why I built it</small><p>“What launches where, with which features, when?” took days of deck requests.</p></div>
-    <div class="s-result"><b>Days → seconds</b><span>built solo with AI agents. The original took a team plus seven developers.</span></div>
+    <div class="s-result"><b>Days → seconds</b><span>built solo and unprompted with AI agents: a far cheaper successor to a costly retired tool.</span></div>
+    <figure class="pmv-strip" aria-label="Before: a stack of spreadsheets and decks. After: one live dashboard."><svg viewBox="0 0 340 104" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><rect x="22" y="10" width="78" height="58" rx="3" opacity=".35"/><rect x="14" y="18" width="78" height="58" rx="3" opacity=".6"/><rect x="6" y="26" width="78" height="58" rx="3" fill="var(--pmv-bg, #fff)"/><path d="M6 38h78M6 50h78M6 62h78M6 74h78M30 26v58M50 26v58M68 26v58" opacity=".55"/></g><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity=".7"><path d="M132 52h56M178 44l10 8-10 8"/></g><g fill="none" stroke="var(--pmv-accent, currentColor)" stroke-width="1.6" stroke-linejoin="round"><rect x="222" y="12" width="112" height="76" rx="6"/><path d="M222 26h112"/><rect x="230" y="34" width="30" height="16" rx="2"/><rect x="265" y="34" width="30" height="16" rx="2"/><rect x="300" y="34" width="26" height="16" rx="2"/></g><g fill="var(--pmv-accent, currentColor)"><circle cx="229" cy="19" r="1.8"/><circle cx="235" cy="19" r="1.8"/><circle cx="241" cy="19" r="1.8"/><rect x="232" y="68" width="8" height="12" rx="1"/><rect x="244" y="62" width="8" height="18" rx="1"/><rect x="256" y="58" width="8" height="22" rx="1"/><rect x="268" y="64" width="8" height="16" rx="1"/><rect x="280" y="56" width="8" height="24" rx="1"/></g><path d="M296 74l9-7 8 4 13-12" fill="none" stroke="var(--pmv-accent, currentColor)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><figcaption><span>Before: spreadsheets</span><span>After: live dashboard</span></figcaption></figure>
     <div class="s-built"><small>What it does</small><div class="tags"><span>Plan explorer</span><span>Ship gate</span><span>Rules as code</span><span>Adoption analytics</span></div></div>
     <p class="s-try"><span aria-hidden="true">✦</span> Pick a market and year, then open <b>Ship log</b>.</p>
   </div>
   <div class="s-demo">
 <div class="win" id="winD">
-          <div class="win-bar"><div class="win-dots"><i></i><i></i><i></i></div><div class="win-title">Portfolio Made Visible <small>/ rebuild</small></div><span class="tag-syn">Synthetic data</span></div>
+          <div class="win-bar"><div class="win-dots"><i></i><i></i><i></i></div><div class="win-title">Portfolio Made Visible <small>/ planner</small></div><span class="tag-syn">Synthetic data</span></div>
           <div class="app">
             <div class="side" role="tablist" aria-label="App sections" id="pmvSide">
               <div class="logo">PMV</div>
@@ -1424,6 +1425,8 @@ try{document.body.style.setProperty('--cur',getComputedStyle(SL[cur]).getPropert
 })();
 </script>
 
+<script src="../js/reel-src.js?v=62"></script>
+<script src="../js/reel-player.js?v=62"></script>
 <script src="../js/top-nav.js?v=43"></script>
 <script src="../js/phone-menu.js?v=46"></script>
 </body></html>

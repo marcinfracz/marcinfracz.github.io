@@ -69,6 +69,12 @@ html[data-theme="dark"] .sun,html:not([data-theme="dark"]) .moon{display:none}
 .stage.grabbing{cursor:grabbing}
 #layer{position:absolute;inset:0}
 #layer>*{position:absolute;left:0;top:0;will-change:transform}
+#layer.rev{transform:scaleX(-1)}
+#layer.rev .pin>*{transform:scaleX(-1)}
+#layer.rev .tk::after{left:auto;right:-4px}
+.order-btn{pointer-events:auto;display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 10px;border-radius:999px;border:1px solid var(--glass-line);background:var(--glass);color:var(--ink);font:700 12px var(--font);cursor:pointer;white-space:nowrap}
+.order-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.order-btn:hover{border-color:var(--ink)}
 .ax{height:3px;border-radius:2px;background:var(--axis)}
 .ax.e{background:var(--axis-e)}
 .ax.gm::after{content:"";position:absolute;right:-9px;top:-5px;border-left:11px solid var(--axis);border-top:6.5px solid transparent;border-bottom:6.5px solid transparent}
@@ -379,6 +385,7 @@ html[data-theme="dark"] .map .land{stroke:color-mix(in srgb,var(--ink) 11%,trans
 .ix-b em{font-style:normal;font-size:11.5px;font-weight:700;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
 .gauge{display:grid;grid-template-columns:minmax(0,170px) minmax(0,1fr);gap:16px;align-items:center}
 .g-cap{margin:0 0 8px;font-size:13px;font-weight:700}
+.g-note{margin:0 0 8px;font-size:12px;line-height:1.35;color:var(--ink2)}
 .g-stats{display:grid;gap:6px;margin:0;padding:0;list-style:none}
 .g-stats li{display:flex;align-items:baseline;gap:8px;font-size:12.5px;color:var(--ink2)}
 .g-stats b{min-width:48px;font-size:16px;font-weight:800;color:var(--ink)}
@@ -698,10 +705,9 @@ html[data-theme="dark"] .tile.keep img,html[data-theme="dark"] .lg.keep img,html
   <nav class="pill links" aria-label="Site">
     <a href="../index.html" target="_top">Desktop</a>
     <a href="../road.html" target="_top">The Road</a>
-    <a href="../reel.html" target="_top">Sizzle reel</a>
+    <a href="../reel.html" target="_top" data-reel-name>Meet Marcin</a>
     <a href="brag-book.html" target="_blank" rel="noopener">Live demos</a>
     <a class="cur" href="timeline.html" aria-current="page">Timeline</a>
-    <a href="how-i-made-it.html" target="_top">How I made it</a>
     <a href="../assets/resume.pdf" target="_blank" rel="noopener">Resume</a>
     <a href="../index.html#contact" target="_top">Contact</a>
     <span class="sep" aria-hidden="true"></span>
@@ -741,7 +747,7 @@ html[data-theme="dark"] .tile.keep img,html[data-theme="dark"] .lg.keep img,html
 
 <noscript><p style="position:fixed;top:120px;left:20px">The timeline needs JavaScript. <a href="../road.html">Drive the Road instead</a>.</p></noscript>
 
-<script src="../content/road-content.js?v=47"></script>
+<script src="../content/road-content.js?v=63"></script>
 <script type="module">
 import { COUNTRY } from '../road/marks.js';
 /* v39: sharp SVG flags (flag-icons, MIT) instead of small canvas drawings */
@@ -763,14 +769,14 @@ const SLOTS = [
   { id: 'federal-mogul', lane: 'up', focus: 'eng', from: 2007.7, to: 2010.4, w: 2, co: 'Federal-Mogul', kicker: 'Southfield, MI', label: 'Product Engineer, Powertrain Sealing', short: 'Product Engineer', tag: 'Product Engineer', years: '2007–2010' },
   { id: 'chrysler', lane: 'up', focus: 'eng', from: 2010.4, to: 2011.4, w: 2, co: 'Chrysler Group', kicker: 'Auburn Hills, MI', label: 'Design Release Engineer, Powertrain Sealing', short: 'Design Release Engineer', tag: 'Design Release Engineer', years: '2010–2011' },
   { id: 'johnson-controls', lane: 'up', focus: 'eng', from: 2011.4, to: 2014.4, w: 2, co: 'Johnson Controls', kicker: 'Plymouth, MI', label: 'Senior Product Engineer, Automotive Seating', short: 'Senior Product Engineer', tag: 'Senior Product Engineer', years: '2011–2014' },
-  { id: 'traverse', lane: 'up', focus: 'product', from: 2014.4, to: 2015.4, w: 2, co: 'General Motors', kicker: 'Warren, MI', label: 'Assistant Product Marketing Manager, Chevrolet Traverse', short: 'Asst. Product Marketing Manager', tag: 'Asst. Product Mktg Manager', years: '2014–2015' },
-  { id: 'customer-experience', lane: 'up', focus: 'cx', from: 2015.4, to: 2016.4, w: 2, co: 'General Motors', kicker: 'Detroit, MI', label: 'Global Brand Strategy Assistant Manager, Customer Experience', short: 'Global Brand Strategy Asst. Manager', tag: 'Brand Strategy Asst. Manager', years: '2015–2016' },
-  { id: 'mexico', lane: 'up', focus: 'field', from: 2016.4, to: 2017, w: 2, co: 'GM de Mexico', kicker: 'Mexico City, MX', label: 'Supervisor, Business Development Center Rollout', short: 'BDC Rollout Supervisor', tag: 'BDC Rollout Supervisor', years: '2016', flag: 'MX' },
+  { id: 'traverse', lane: 'up', focus: 'product', from: 2014.4, to: 2015.4, w: 2, co: 'General Motors', kicker: 'Warren, MI', label: 'Product Marketing, Chevrolet Traverse', short: 'Product Marketing, Traverse', tag: 'Product Marketing', years: '2014–2015' },
+  { id: 'customer-experience', lane: 'up', focus: 'cx', from: 2015.4, to: 2016.4, w: 2, co: 'General Motors', kicker: 'Detroit, MI', label: 'Global Brand Strategy, Customer Experience', short: 'Global Brand Strategy', tag: 'Global Brand Strategy', years: '2015–2016' },
+  { id: 'mexico', lane: 'up', focus: 'field', from: 2016.4, to: 2017, w: 2, co: 'GM de Mexico', kicker: 'Mexico City, MX', label: 'Supervisor, Business Development Center Implementation', short: 'BDC Implementation Supervisor', tag: 'BDC Supervisor', years: '2016', flag: 'MX' },
   { id: 'equinox', lane: 'up', focus: 'product', from: 2017, to: 2019, w: 2, co: 'General Motors', kicker: 'Detroit, MI', label: 'Global Product Manager, Compact & Mid Crossovers', short: 'Global Product Manager', tag: 'Global Product Manager', years: '2017–2018' },
   { id: 'trailblazer-encore', lane: 'up', focus: 'product', from: 2019, to: 2020.6, w: 2, co: 'General Motors', kicker: 'Detroit, MI', label: 'Product Manager, Encore GX & Trailblazer', short: 'Product Manager', tag: 'Product Manager', years: '2019–2020' },
-  { id: 'connected', lane: 'up', focus: 'digital', from: 2020.6, to: 2022.6, w: 2, co: 'General Motors', kicker: 'Warren, MI', label: 'Business Strategy Manager, Connected & OTA', short: 'Business Strategy Manager', tag: 'Business Strategy Manager', years: '2020–2022' },
+  { id: 'connected', lane: 'up', focus: 'digital', from: 2020.6, to: 2022.6, w: 2, co: 'General Motors', kicker: 'Warren, MI', label: 'Business Strategy, Connected & OTA', short: 'Business Strategy', tag: 'Business Strategy', years: '2020–2022' },
   { id: 'shanghai', lane: 'up', focus: 'digital', from: 2022.6, to: 2025.4, w: 3, co: 'SAIC-GM', kicker: 'Shanghai, CN', label: 'Deputy Director, Software Strategy', short: 'Deputy Director, Software Strategy', tag: 'Deputy Director', years: '2022–2025', flag: 'CN' },
-  { id: 'onstar', lane: 'up', focus: 'digital', from: 2025.4, to: 2026.4, w: 2, co: 'OnStar', kicker: 'Warren, MI', label: 'Manager, OnStar Product Marketing', short: 'Product Marketing Manager', tag: 'Product Marketing Manager', years: '2025–2026' },
+  { id: 'onstar', lane: 'up', focus: 'digital', from: 2025.4, to: 2026.4, w: 2, co: 'OnStar', kicker: 'Warren, MI', label: 'Global Planning & Joint Ventures, OnStar Product Marketing', short: 'OnStar Product Marketing', tag: 'OnStar Product Marketing', years: '2025–2026' },
   { id: '_end', from: 2026.4, to: 2027, w: 1.3 }
 ];
 let acc = 0; SLOTS.forEach(s => { s.s = acc; acc += s.w; s.e = acc; });
@@ -821,11 +827,11 @@ const CHAPTERS = [
   { id: 'ch-gm', tier: 1, a: 'traverse', b: 'onstar', t: 'Business · General Motors, SAIC-GM and OnStar', short: 'General Motors', years: '2014–2026', acc: 'var(--f-digital)', cls: 'gm',
     text: 'Twelve years at General Motors: the leadership development program, global product management for crossovers, connected services strategy, Deputy Director of Software Strategy at SAIC-GM, GM\'s joint venture in Shanghai, and OnStar International.',
     ids: ['traverse', 'customer-experience', 'mexico', 'equinox', 'trailblazer-encore', 'connected', 'shanghai', 'onstar'] },
-  { id: 'ch-program', tier: 2, a: 'traverse', b: 'mexico', t: 'Leadership development program', short: 'Leadership program', years: '2014–2017', acc: 'var(--f-cx)', cls: 'gmp',
-    text: "GM's leadership development program: three rotations, from Chevrolet product marketing and global customer experience in Detroit to an international assignment in Mexico.",
+  { id: 'ch-program', tier: 2, a: 'traverse', b: 'mexico', t: 'Leadership development program', short: 'Leadership program', years: '2014–2016', acc: 'var(--f-cx)', cls: 'gmp',
+    text: "GM's Marketing TRACK leadership program (2014–2016): three rotations, in global product marketing, global customer experience and an international field assignment in Mexico.",
     ids: ['traverse', 'customer-experience', 'mexico'] },
   { id: 'ch-mexico', tier: 3, a: 'mexico', b: 'mexico', t: 'International assignment #1 · Mexico', short: 'Intl #1 · Mexico · 6 months', years: '2016 · 6 months', flag: 'MX', acc: 'var(--f-digital)', cls: 'intl',
-    text: "An international assignment to GM de Mexico in Mexico City as Supervisor of the Business Development Center rollout, the last rotation of the leadership program.",
+    text: "An international assignment to GM de Mexico in Mexico City as Supervisor of the Business Development Center implementation, the last rotation of the leadership program.",
     ids: ['mexico'] },
   { id: 'ch-abroad', tier: 3, a: 'shanghai', b: 'shanghai', t: 'International assignment #2 · Shanghai', short: 'Intl #2 · Shanghai · 3 years', years: '2022–2025 · 3 years', flag: 'CN', acc: 'var(--f-digital)', cls: 'intl',
     text: "An international assignment to SAIC-GM, GM's joint venture in Shanghai, as Deputy Director of Software Strategy.",
@@ -890,7 +896,7 @@ const LENS = Object.fromEntries(LENSES.map(l => [l.id, l]));
 /* ---------- build the elements once ---------- */
 const layer = $('#layer'), stage = $('#stage');
 const mk = (tag, cls, html, attrs) => { const n = document.createElement(tag); if (cls) n.className = cls; if (html != null) n.innerHTML = html; if (attrs) for (const k in attrs) n.setAttribute(k, attrs[k]); layer.appendChild(n); return n; };
-const axE = mk('div', 'ax e'), axG = mk('div', 'ax gm');
+const axE = mk('div', 'ax e'), axG = mk('div', 'ax gm'); axE._nf = axG._nf = true;
 const MAJOR = [2003, 2007, 2010, 2011, 2014, 2015, 2016, 2017, 2019, 2020, 2022, 2025, 2026];
 const ticks = [];
 for (let y = 2003; y <= 2026; y++) ticks.push({ y, major: MAJOR.includes(y), el: mk('span', 'tk' + (y < 2014.4 ? ' e' : ''), String(y)) });
@@ -921,6 +927,7 @@ const STAR = '<svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true"
 const pinEls = PINS.map(p => mk('a', `pin ${p.kind}`,
   `<span class="pin-i">${p.round ? `<img alt="" src="../assets/road/logos/${p.round}.png">` : p.kind === 'deg' ? CAP : p.kind === 'now' ? STAR : `<img alt="" data-flag="${p.c}">`}</span><span class="pin-t">${p.logo ? `<span class="pin-lg${lgCls(p.logo[0])}"><img src="../assets/road/logos/${p.logo[0]}.png" alt="${esc(p.logo[2])}" width="${Math.round(18 * p.logo[1])}" height="18"></span>` : ''}<b>${esc(p.t)}</b><i>${esc(p.sub)}</i></span>`,
   { href: '#' + p.id, 'data-open': p.id, 'aria-label': `${p.t}, ${p.sub}` }));
+pinEls.forEach(e => { e._nf = true; });
 document.querySelectorAll('img[data-flag]').forEach(im => { im.src = flagURL(im.dataset.flag); });
 
 /* label widths, read once (and again when the font arrives) so a frame never forces layout */
@@ -944,7 +951,19 @@ function placeIntro() {
   it.style.setProperty('--hw', on ? room + 'px' : 'none');
 }
 /* v48: the highlight row lives in the footer on laptops and tablets, under the title on phones */
+/* v63: the order switch sits in the footer on laptops and tablets, under the title on phones */
+const orderBtn = document.createElement('button'); orderBtn.type = 'button'; orderBtn.className = 'order-btn'; orderBtn.id = 'order';
+function paintOrder() {
+  orderBtn.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4v16M3 16l4 4 4-4M17 20V4M13 8l4-4 4 4"/></svg>${REV ? 'Newest first' : 'Oldest first'}`;
+  orderBtn.setAttribute('aria-label', REV ? 'Showing newest first. Switch to oldest first' : 'Showing oldest first. Switch to newest first');
+  $('#layer').classList.toggle('rev', REV);
+}
+function placeOrder() {
+  const want = innerWidth >= 768 ? $('#dock') : $('#intro');
+  if (want && orderBtn.parentNode !== want) want.appendChild(orderBtn);
+}
 function placeLenses() {
+  placeOrder();
   const ln = $('#lenses'), want = innerWidth >= 768 ? $('#dock') : $('#intro');
   if (ln && want && ln.parentNode !== want) want.insertBefore(ln, want === $('#dock') ? want.firstChild : null);
 }
@@ -972,7 +991,11 @@ function modeFor(u, hMax) {
   return MODES[Math.min(a, b)];
 }
 const BOX_H = { xs: 72, s: 108, m: 110, l: 176, xl: 236 };
-const T = (el, x, y) => { el.style.transform = `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0)`; };
+/* v63: newest first. The layer is mirrored as a whole; each piece is flipped back so its text reads normally.
+   The axis keeps the mirror (its arrow points left, into now) and pins flip their parts instead. */
+let REV = (() => { try { const q = new URLSearchParams(location.search).get('order'); if (q) return q !== 'oldest'; return localStorage.getItem('mf-tl-order') !== 'oldest'; } catch (e) { return true; } })();
+const T = (el, x, y) => { el.style.transform = `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0)${REV && !el._nf ? ' scaleX(-1)' : ''}`; };
+const ex = x => REV ? W - x : x;
 
 function render() {
   /* vertical: centre the band between the intro and the dock */
@@ -1182,8 +1205,8 @@ const clampU = (u, lo, hi) => Math.max(levels[0].U * lo, Math.min(levels[levels.
 stage.addEventListener('pointerdown', e => {
   if (e.pointerType === 'mouse' && e.button !== 0) return;
   stopAnim(); markDim(false); suppressClick = false;
-  pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
-  if (pts.size === 1) { g = { kind: 'pan', x: e.clientX, u0 }; moved = 0; samples = [{ t: e.timeStamp, x: e.clientX }]; }
+  pts.set(e.pointerId, { x: ex(e.clientX), y: e.clientY });
+  if (pts.size === 1) { g = { kind: 'pan', x: ex(e.clientX), u0 }; moved = 0; samples = [{ t: e.timeStamp, x: ex(e.clientX) }]; }
   else if (pts.size === 2) {
     const [a, b] = [...pts.values()], mid = (a.x + b.x) / 2;
     g = { kind: 'pinch', d: Math.hypot(a.x - b.x, a.y - b.y) || 1, U, fu: u0 + (mid - M) / U, mid };
@@ -1192,11 +1215,11 @@ stage.addEventListener('pointerdown', e => {
 });
 addEventListener('pointermove', e => {
   if (!pts.has(e.pointerId) || !g) return;
-  pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  pts.set(e.pointerId, { x: ex(e.clientX), y: e.clientY });
   if (g.kind === 'pan') {
-    const dx = e.clientX - g.x; moved = Math.max(moved, Math.abs(dx));
+    const dx = ex(e.clientX) - g.x; moved = Math.max(moved, Math.abs(dx));
     if (moved > 5) { stage.classList.add('grabbing'); u0 = g.u0 - dx / U; render(); }
-    samples.push({ t: e.timeStamp, x: e.clientX }); if (samples.length > 8) samples.shift();
+    samples.push({ t: e.timeStamp, x: ex(e.clientX) }); if (samples.length > 8) samples.shift();
   } else if (pts.size >= 2) {
     const [a, b] = [...pts.values()], mid = (a.x + b.x) / 2, d = Math.hypot(a.x - b.x, a.y - b.y) || 1;
     U = clampU(g.U * d / g.d, 0.75, 1.35); u0 = g.fu - (mid - M) / U; g.mid = mid; render();
@@ -1224,18 +1247,18 @@ stage.addEventListener('wheel', e => {
   e.preventDefault(); stopAnim(); markDim(false);
   const k = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? H : 1;
   if (e.ctrlKey || e.metaKey) {
-    const fu = u0 + (e.clientX - M) / U;
+    const fu = u0 + (ex(e.clientX) - M) / U;
     U = clampU(U * Math.exp(-e.deltaY * k * 0.012), 0.8, 1.25);
-    u0 = fu - (e.clientX - M) / U; wFocal = e.clientX;
+    u0 = fu - (ex(e.clientX) - M) / U; wFocal = ex(e.clientX);
   } else {
-    const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+    const d = (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY) * (REV ? -1 : 1);
     u0 = Math.max(-0.6, Math.min(ROLES[ROLES.length - 1].e + 0.7 - spanU(), u0 + d * k / U));
   }
   render(); clearTimeout(wt); wt = setTimeout(() => { settle(wFocal); wFocal = null; }, 170);
 }, { passive: false });
 /* Safari trackpad pinch */
 let gs = null;
-stage.addEventListener('gesturestart', e => { e.preventDefault(); stopAnim(); gs = { U, fu: u0 + (e.clientX - M) / U, x: e.clientX }; });
+stage.addEventListener('gesturestart', e => { e.preventDefault(); stopAnim(); gs = { U, fu: u0 + (ex(e.clientX) - M) / U, x: ex(e.clientX) }; });
 stage.addEventListener('gesturechange', e => { if (!gs) return; e.preventDefault(); U = clampU(gs.U * e.scale, 0.8, 1.25); u0 = gs.fu - (gs.x - M) / U; render(); });
 stage.addEventListener('gestureend', e => { if (!gs) return; e.preventDefault(); const x = gs.x; gs = null; settle(x); });
 $('#zin').addEventListener('click', () => zoomStep(1));
@@ -1249,12 +1272,12 @@ addEventListener('keydown', e => {
     return;
   }
   if (e.altKey || e.ctrlKey || e.metaKey) return;
-  if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); stepGroup(1); }
-  else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); stepGroup(-1); }
+  if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); stepGroup(REV ? -1 : 1); }
+  else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); stepGroup(REV ? 1 : -1); }
   else if (e.key === '+' || e.key === '=') zoomStep(1);
   else if (e.key === '-' || e.key === '_') zoomStep(-1);
-  else if (e.key === 'Home') { stopAnim(); animateTo(U, candidates()[0], 420, settled); }
-  else if (e.key === 'End') { stopAnim(); const c = candidates(); animateTo(U, c[c.length - 1], 420, settled); }
+  else if (e.key === (REV ? 'End' : 'Home')) { stopAnim(); animateTo(U, candidates()[0], 420, settled); }
+  else if (e.key === (REV ? 'Home' : 'End')) { stopAnim(); const c = candidates(); animateTo(U, c[c.length - 1], 420, settled); }
 });
 
 /* ---------- the pop-up box that takes over the page: one template for every role ---------- */
@@ -1417,14 +1440,14 @@ const STAT = {
   equinox: { big: '$200', t: 'Profit and content', s: 'Compact & mid crossovers', cap: 'per-vehicle profit improvements supported', rows: [['5%', 'less post-refresh price decay'], ['3', 'markets on one content plan'], ['2', 'vehicles, Equinox and Traverse']] },
   'trailblazer-encore': { big: '2', t: 'Two launches', s: 'Encore GX & Trailblazer', cap: 'crossover launches kept moving', rows: [['On time', 'show cars, under budget'], ['Korea', 'where both are built'], ['ACTIV', 'FWD Trailblazer added']] },
   shanghai: { big: '3 yrs', t: 'Second international assignment', s: 'SAIC-GM', cap: 'as Deputy Director in Shanghai', rows: [['1000s', 'in the software org stood up'], ['9-figure', 'driver-assist investment supported'], ['Multi-city', 'ADAS research']] },
-  onstar: { big: '8', t: 'Export connectivity', s: 'OnStar International', cap: 'export regions planned for China-built vehicles', rows: [['217', 'programs in Portfolio Made Visible'], ['55', 'markets'], ['39', 'users, 7 director+ and 3 VPs']] }
+  onstar: { big: '8', t: 'Export connectivity', s: 'OnStar International', cap: 'export regions planned for China-built vehicles', note: 'Portfolio Made Visible, built unprompted as a far cheaper successor to a retired tool', rows: [['200+', 'programs across 50+ markets'], ['11', 'AI-built apps'], ['40+', 'monthly users, adoption spread word of mouth to directors and VPs']] }
 };
 function statHTML(id) {
   const c = STAT[id]; if (!c) return '';
   const L = 2 * Math.PI * 40, fs = c.big.length > 5 ? 17 : c.big.length > 3 ? 21 : 26;
   return `<div class="card"><div class="card-h"><b>${esc(c.t)}</b><span>${esc(c.s)}</span></div><div class="gauge stat">
       <svg class="chart" viewBox="0 0 100 100" role="img" aria-label="${esc(c.big + ' ' + c.cap)}"><circle cx="50" cy="50" r="40" fill="none" stroke="var(--surface2)" stroke-width="9"/><circle class="gauge-arc" cx="50" cy="50" r="40" fill="none" stroke="var(--acc-ink)" stroke-width="9" stroke-linecap="round" transform="rotate(-90 50 50)" stroke-dasharray="${L.toFixed(1)}" stroke-dashoffset="${L.toFixed(1)}" data-to="0"/><text class="c-big" x="50" y="${(50 + fs * .36).toFixed(1)}" text-anchor="middle" style="font-size:${fs}px">${esc(c.big)}</text></svg>
-      <div class="g-side"><p class="g-cap">${esc(c.cap)}</p><ul class="g-stats">${c.rows.map(([b, t]) => `<li><b>${esc(b)}</b>${esc(t)}</li>`).join('')}</ul></div></div></div>`;
+      <div class="g-side"><p class="g-cap">${esc(c.cap)}</p>${c.note ? `<p class="g-note">${esc(c.note)}</p>` : ''}<ul class="g-stats">${c.rows.map(([b, t]) => `<li><b>${esc(b)}</b>${esc(t)}</li>`).join('')}</ul></div></div></div>`;
 }
 function chartHTML(id) {
   const c = CHART[id]; if (!c) return statHTML(id);
@@ -1602,15 +1625,33 @@ const VT = (() => {
       <span class="vt-p">${lg}<b>${esc(p.t)}</b><span>${esc(p.kind === 'flag' ? 'Country project · ' + p.sub : p.sub)}</span></span></a>`;
   };
   const ch = (id, sub) => { const c = CH[id]; return `<a class="vt-ch${sub ? ' sub' : ''}" href="#${id}" data-open="${id}" style="--acc:${c.acc}">${esc(sub ? c.t : c.short)} <span>${esc(c.years)}</span></a>`; };
-  let html = '<div class="vt-list">' + ch('ch-eng');
-  let gm = false, prog = false;
-  for (const it of items) {
-    if (!gm && it.y >= 2014.4) { gm = true; html += ch('ch-gm'); }
-    if (gm && !prog && it.k === 'role' && it.r.id === 'traverse') { prog = true; html += ch('ch-program', 1); }
-    html += it.k === 'role' ? card(it.r) : pin(it.p);
-  }
-  html += `<div class="vt-row vt-pin vt-now" aria-label="Today"><span class="vt-dot" aria-hidden="true"></span><span class="vt-p"><b>Today</b><span>Exploring new leadership opportunities</span></span></div></div>`;
-  box.innerHTML = html;
+  const today = `<div class="vt-row vt-pin vt-now" aria-label="Today"><span class="vt-dot" aria-hidden="true"></span><span class="vt-p"><b>Today</b><span>Exploring new leadership opportunities</span></span></div>`;
+  box.build = () => {
+    let html = '<div class="vt-list">';
+    if (!REV) {
+      html += ch('ch-eng');
+      let gm = false, prog = false;
+      for (const it of items) {
+        if (!gm && it.y >= 2014.4) { gm = true; html += ch('ch-gm'); }
+        if (gm && !prog && it.k === 'role' && it.r.id === 'traverse') { prog = true; html += ch('ch-program', 1); }
+        html += it.k === 'role' ? card(it.r) : pin(it.p);
+      }
+      html += today;
+    } else {
+      /* newest first: today on top, then GM back to the program, then the engineering years */
+      html += today + ch('ch-gm');
+      let prog = false, eng = false;
+      const pEnd = (ROLES.find(r => r.id === 'mexico') || { to: 2017 }).to;
+      for (const it of items.slice().reverse()) {
+        if (!prog && it.y >= 2014.4 && it.y < pEnd) { prog = true; html += ch('ch-program', 1); }
+        if (!eng && it.y < 2014.4) { eng = true; html += ch('ch-eng'); }
+        html += it.k === 'role' ? card(it.r) : pin(it.p);
+      }
+    }
+    box.innerHTML = html + '</div>';
+    box.setAttribute('aria-label', REV ? 'Career timeline, newest to oldest' : 'Career timeline, oldest to newest');
+  };
+  box.build();
   $('#stage').after(box);
   return box;
 })();
@@ -1624,7 +1665,7 @@ function setLens(id, push) {
   VT.querySelectorAll('.vt-row[data-id]').forEach(r => { const inL = !!l && l.ids.includes(r.dataset.id); r.classList.toggle('lens-off', !!l && !inL); r.classList.toggle('lens-on', inL && !r.classList.contains('vt-pin')); });
   const h = $('#hint');
   const phone = matchMedia('(max-width:767px)').matches;
-  if (!l) h.textContent = phone ? 'Oldest at the top. Tap any role for the full story.' : touchy ? 'Flick to move. Pinch to zoom. Tap any role.' : HINT0;
+  if (!l) h.textContent = phone ? (REV ? 'Newest' : 'Oldest') + ' at the top. Tap any role for the full story.' : touchy ? 'Flick to move. Pinch to zoom. Tap any role.' : HINT0;
   else { const y = lensYears(l), n = l.ids.length;
     h.innerHTML = `<b>${esc(l.n)}</b> · ${l.roles ? `${n} roles` : `about ${String(y).replace('.5', '½')} years across ${n} roles`}${l.d ? ', ' + esc(l.d) : ''}. ${touchy ? 'Tap' : 'Click'} any role.`; }
   if (push !== false) { const u = new URL(location.href); if (lens) u.searchParams.set('lens', lens); else u.searchParams.delete('lens'); history.replaceState(history.state, '', u.pathname + u.search + u.hash); }
@@ -1633,7 +1674,12 @@ $('#lenses').addEventListener('click', e => { const b = e.target.closest('[data-
 { const q = new URLSearchParams(location.search).get('lens'); if (q && LENS[q]) setLens(q, false); }
 
 /* ---------- start ---------- */
-if (!lens) $('#hint').textContent = matchMedia('(max-width:767px)').matches ? 'Oldest at the top. Tap any role for the full story.' : touchy ? 'Flick to move. Pinch to zoom. Tap any role.' : $('#hint').textContent;
+if (!lens) $('#hint').textContent = matchMedia('(max-width:767px)').matches ? (REV ? 'Newest' : 'Oldest') + ' at the top. Tap any role for the full story.' : touchy ? 'Flick to move. Pinch to zoom. Tap any role.' : $('#hint').textContent;
+paintOrder();
+orderBtn.addEventListener('click', () => {
+  REV = !REV; try { localStorage.setItem('mf-tl-order', REV ? 'newest' : 'oldest'); } catch (e) {}
+  paintOrder(); VT.build(); setLens(lens, false); render();
+});
 measure(); buildZoomSeg(); measureLabels(); U = levels[0].U; u0 = candidates()[0]; render(); settled();
 let rt = 0;
 addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => {
@@ -1642,6 +1688,8 @@ if (document.fonts) document.fonts.ready.then(() => { measureLabels(); render();
 const h0 = location.hash.slice(1);
 if (known(h0)) openModal(h0);
 </script>
+<script src="../js/reel-src.js?v=62"></script>
+<script src="../js/reel-player.js?v=62"></script>
 <script src="../js/top-nav.js?v=43"></script>
 <script src="../js/phone-menu.js?v=46"></script>
 </body>
