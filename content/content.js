@@ -55,7 +55,7 @@ window.SITE_CONTENT = {
       },
       {
         company: "General Motors",
-        role: "Business Strategy Manager, Connected & OTA Services",
+        role: "Business Strategy, Connected & OTA Services",
         years: "2020-2022",
         detail: "Connected services and over-the-air updates."
       },
@@ -67,7 +67,7 @@ window.SITE_CONTENT = {
       },
       {
         company: "General Motors",
-        role: "Manager, Global Planning & Joint Ventures, OnStar Product Marketing (International)",
+        role: "Global Planning & Joint Ventures, OnStar Product Marketing (International)",
         years: "2025",
         detail: "Global planning and OnStar product marketing."
       }
@@ -97,8 +97,8 @@ window.SITE_CONTENT = {
         { from: 2015.4, to: 2016.4, focus: "cx", kicker: "Chevrolet · Global", label: "Global Customer Experience", years: "2015-2016", road: "customer-experience" },
         { from: 2017, to: 2019, focus: "product", kicker: "GM · Global", label: "Global Product Manager, compact & mid crossovers", years: "2017-2018", road: "equinox" },
         { from: 2019, to: 2020.6, focus: "product", kicker: "Buick · Chevrolet", label: "Product Manager, Encore GX & Trailblazer", years: "2019-2020", road: "trailblazer-encore" },
-        { from: 2020.6, to: 2022.6, focus: "digital", kicker: "GM · U.S.", label: "Business Strategy Manager, Connected & OTA Services", years: "2020-2022", road: "connected" },
-        { from: 2025.4, to: 2026.4, focus: "digital", kicker: "OnStar · International", label: "Manager, OnStar Product Marketing", years: "2025-2026", road: "onstar" }
+        { from: 2020.6, to: 2022.6, focus: "digital", kicker: "GM · U.S.", label: "Business Strategy, Connected & OTA Services", years: "2020-2022", road: "connected" },
+        { from: 2025.4, to: 2026.4, focus: "digital", kicker: "OnStar · International", label: "Global Planning & Joint Ventures, OnStar Product Marketing", years: "2025-2026", road: "onstar" }
       ],
       projects: [
         { at: 2012.8, flag: "CA", label: "Canada", sub: "Ross MAP project", road: "ross" },
@@ -145,7 +145,7 @@ window.SITE_CONTENT = {
       { id: "ota", name: "Subscription Lab", org: "Connected & OTA Services", years: "2020–2022", color: "#0f766e", glyph: "loop",
         blurb: "Trials, conversion and the Super Cruise monetization strategy for features sold after the sale." },
       { id: "pmv", name: "Portfolio Made Visible", org: "OnStar International", years: "2025–2026", color: "#7c3aed", glyph: "grid",
-        blurb: "A solo, AI-agent-built rebuild of a planning tool that once took a business team plus seven developers." }
+        blurb: "Built solo and unprompted with AI agents: a better, far cheaper successor to a costly retired GM planning tool." }
     ],
     kit: [
       { id: "tz", name: "Global meeting planner", glyph: "clock", live: true, blurb: "Finds the hour that works in Detroit, Shanghai and Mexico City. Live in the kit." },
@@ -253,7 +253,7 @@ window.SITE_CONTENT = {
       "Build it, ship it, learn from it."
     ],
     resumeNote: "Resume (PDF)",
-    reelNote: "Sizzle Reel (1:04)",
+    reelNote: "Meet Marcin (1:04)",
     contact: {
       email: "marcin.fracz@gmail.com",
       linkedin: "https://www.linkedin.com/in/marcinfracz/"

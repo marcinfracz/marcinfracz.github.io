@@ -8,7 +8,7 @@ window.ROAD_CONTENT = {
     { id: "school", n: 1, label: "Engineering degree & co-op", short: "Foundation", years: "2003–2007", region: "us", color: "#B14F94" },
     { id: "engineering", n: 2, label: "Automotive engineering", short: "Engineering", years: "2007–2014", region: "us", color: "#C8693A" },
     { id: "mba", n: 3, label: "MBA: engineering to business", short: "MBA", years: "2012–2014", region: "us", color: "#5E8A2E" },
-    { id: "program", n: 4, label: "GM leadership development program", short: "Leadership program", years: "2014–2017", region: "us", color: "#D9A21B" },
+    { id: "program", n: 4, label: "GM leadership development program", short: "Leadership program", years: "2014–2016", region: "us", color: "#D9A21B" },
     { id: "crossovers", n: 5, label: "Crossover product marketing", short: "Crossovers", years: "2017–2020", region: "us", color: "#2E9C8F" },
     { id: "connected", n: 6, label: "Connected services & OTA", short: "Connected & OTA", years: "2020–2022", region: "us", color: "#7357D8" },
     { id: "shanghai", n: 7, label: "Software strategy, SAIC-GM China", short: "SAIC-GM China", years: "2022–2025", region: "asia", color: "#D64545" },
@@ -20,7 +20,7 @@ window.ROAD_CONTENT = {
       id: "start", era: null, scene: "start",
       kicker: "The Road",
       title: "Marcin Fracz",
-      tag: "Automotive product & software strategy leader",
+      tag: "Product, strategy & transformation leader",
       role: "20+ years in automotive: engineering, global product strategy, connected services and driver assist, across the US, Mexico and China.",
       what: "Find the gap. Build the mechanism. Bring the decision.",
       hint: "Scroll, swipe or use the arrow keys to drive.",
@@ -146,9 +146,9 @@ window.ROAD_CONTENT = {
     {
       id: "traverse", alias: ["gm", "program"], era: "program", scene: "traverse", region: "us",
       title: "Chevrolet Product Marketing",
-      role: "Assistant Product Marketing Manager, Chevrolet Traverse",
+      role: "Product Marketing, Chevrolet Traverse",
       place: "Warren, Michigan", span: "2014–2015",
-      what: "GM's 3-year leadership development program: up or out, with rotations and an international assignment. First rotation: run the Traverse.",
+      what: "GM's 3-year leadership development program: rotations across marketing, customer experience and an international assignment. First rotation: Chevrolet Product Marketing.",
       wins: [
         { big: "−10%", text: "build combinations for the 2016 Traverse" },
         { big: "+6%", text: "consideration at launch from a 'starting at' price trim (2017)" },
@@ -163,7 +163,7 @@ window.ROAD_CONTENT = {
     {
       id: "customer-experience", alias: ["ecuador", "cx"], era: "program", scene: "cx", region: "us",
       title: "Chevrolet Global Customer Experience",
-      role: "Global Brand Strategy Assistant Manager",
+      role: "Global Brand Strategy, Customer Experience",
       place: "Detroit, Michigan", span: "2015–2016",
       what: "GM Ecuador's dealers led every GM region in service satisfaction. Found out why: customers were brought into the process and could watch their car being fixed.",
       flags: [["EC", "Mar 2015", "Quito and Guayaquil dealers", "Quito, Guayaquil"]],
@@ -183,7 +183,7 @@ window.ROAD_CONTENT = {
     {
       id: "mexico", era: "program", scene: "mexico", region: "mexico",
       title: "GM de Mexico",
-      role: "Supervisor, Business Development Center rollout",
+      role: "Supervisor, Business Development Center Implementation",
       place: "Mexico City", span: "Jun–Dec 2016 · 6 mos",
       what: "The program's international assignment: a national dealer rollout for GM de Mexico. Completed the program and was promoted.",
       flags: [["MX", "Jun–Dec 2016", "international assignment", "Mexico City, Guadalajara, Monterrey"]],
@@ -211,7 +211,7 @@ window.ROAD_CONTENT = {
       title: "Global Product Marketing",
       role: "Global Product Manager, compact and mid crossovers",
       place: "Detroit, Michigan", span: "2017–2018",
-      what: "Out of the program and promoted to product marketing manager: content and pricing for crossovers, with work trips around the world.",
+      what: "Completed the leadership program and promoted to product marketing manager: global content and pricing for crossovers across North America and Asia.",
       flags: [["CA", "2017", "manufacturing efficiency"], ["CN", "2018", "market research"]],
       wins: [
         { big: "−5%", text: "post-refresh price decay with a global content plan" },
@@ -253,15 +253,15 @@ window.ROAD_CONTENT = {
     {
       id: "connected", alias: ["ota", "super-cruise"], era: "connected", scene: "ota", region: "us",
       title: "Connected & OTA Services",
-      role: "Business Strategy Manager",
+      role: "Business Strategy",
       place: "Warren, Michigan", span: "2020–2022",
       wins: [
         { big: "Super Cruise", text: "monetization strategy across every GM brand in North America" },
-        { big: "Trial", text: "in-market trial for paid digital products, a $30M opportunity" },
+        { big: "Trial", text: "in-market trial of paid ADAS digital enhancements, a high-margin ~$30M revenue opportunity" },
         { big: "2021", text: "helped shape the connected and driver-assist services behind GM's software revenue goal" }
       ],
       callouts: [
-        { obj: "team", text: "Built the team: grew it 2 to 7 and ran a $30M paid-products trial." },
+        { obj: "team", text: "Built the team: grew it 2 to 7 and won approval for a ~$30M high-margin ADAS upgrade trial." },
         { obj: "wheel", text: "Super Cruise: built monetization across every GM brand in North America." },
         { obj: "car", text: "Over-the-air: shaped revenue after the sale." }
       ],
@@ -270,7 +270,7 @@ window.ROAD_CONTENT = {
         art: "connected",
         blocks: [
           { h: "Scope", p: "Remote services, connected cameras, driver assist, vehicle performance and personalization." },
-          { h: "The context", p: "At its Oct 2021 Investor Day, GM set a goal of $20–25B a year in software and services revenue by 2030. Helped shape the services." }
+          { h: "The context", p: "At its Oct 2021 Investor Day, GM set a goal of $20–25B a year in software and services revenue by 2030. I helped shape the ADAS & connected digital service strategy behind it." }
         ],
         sources: [
           { label: "Design Engineering, Oct 2021", url: "https://www.design-engineering.com/gm-promises-to-double-revenue-by-2030-1004037500/" }
@@ -286,7 +286,7 @@ window.ROAD_CONTENT = {
       flags: [["CN", "2022–2025", "second international assignment"]],
       wins: [
         { big: "L2++", text: "multi-city ADAS research and pitch that supported a nine-figure driver-assist investment" },
-        { big: "Insights", text: "led a strategy, data insights and software research team" },
+        { big: "Insights", text: "co-led a 49-person strategy, intelligent data, competitive insights and software research team" },
         { big: "Org", text: "helped stand up a multi-thousand-person software org" }
       ],
       callouts: [
@@ -308,7 +308,7 @@ window.ROAD_CONTENT = {
     {
       id: "onstar", alias: ["now", "ai", "pmv"], era: "onstar", scene: "onstar", region: "port",
       title: "OnStar International",
-      role: "Manager, OnStar Product Marketing, Global Planning & Joint Ventures",
+      role: "Global Planning & Joint Ventures, OnStar Product Marketing",
       place: "Warren, Michigan", span: "2025–2026",
       wins: [
         { big: "8", text: "export regions: OnStar for China-built vehicles" },
@@ -322,7 +322,7 @@ window.ROAD_CONTENT = {
         { obj: "pmv", text: "Portfolio Made Visible: built the export portfolio tool leaders used, with AI agents." }
       ],
       more: {
-        title: "The window is real. It is not infinite.",
+        title: "Export connectivity at scale",
         art: "onstar",
         blocks: [
           { h: "The job", p: "Commercialize OnStar connected services on China-built export vehicles, region by region." },
@@ -341,7 +341,7 @@ window.ROAD_CONTENT = {
       role: "Engineering, product, customer experience and software strategy, across the US, Mexico and China. Tap a chapter to drive back to it.",
       what: "Exploring new leadership opportunities in automotive strategy, product and AI.",
       wins: [], callouts: [],
-      reel: { src: (window.MF_REEL || {}).src || "assets/sizzle-reel-v4.mp4", label: "Sizzle reel, " + ((window.MF_REEL || {}).length || "1:41") }
+      reel: { src: (window.MF_REEL || {}).src || "assets/sizzle-reel-1min.mp4", label: ((window.MF_REEL || {}).name || "Meet Marcin") + ", " + ((window.MF_REEL || {}).length || "1:04") }
     }
   ],
 
@@ -379,7 +379,7 @@ window.ROAD_CONTENT.profile = {
     summary: "Earned a mechanical engineering degree, cum laude, while completing four years of paid engineering co-op at Federal-Mogul on production engine sealing.",
     hl: ["**BSME, cum laude**, 2007, minor in business management", "Delivered four years of co-op engineering on production engine parts for global automakers"],
     stories: [
-      "Graduated cum laude in 2007 from Kettering's co-op program, which pairs every academic term with a paid industry term, with four years of production engineering already behind me.",
+      "Graduated cum laude in 2007 from Kettering's co-op program, pairing every academic term with a paid industry term for four years of production engineering experience at graduation.",
       "Worked every co-op term at Federal-Mogul on engine sealing for GM, Volkswagen, Ford, Cummins and others: designed and tested PTFE and elastomeric seals, and helped finish the 5.7L HEMI cast riser and valve cover gaskets."
     ]
   },
@@ -445,8 +445,8 @@ window.ROAD_CONTENT.profile = {
     summary: "Shaped customer experience strategy for Chevrolet's worldwide dealer network: benchmarked GM's best service market in Ecuador, then built a global dealer culture program with the Disney Institute.",
     hl: ["Benchmarked **GM Ecuador**, the top service satisfaction market in GM, on site in Quito and Guayaquil", "Built a global dealer culture program with the **Disney Institute**, with work at **Walt Disney World** in Orlando", "Ran HQ workshops at the **Detroit Opera House** and managed the program budget"],
     stories: [
-      "Ran the 2015 field study in Quito and Guayaquil on why GM Ecuador's dealers led every GM region in service satisfaction. The answer: customers were brought into the process and could watch their car being fixed, so they trusted it.",
-      "Partnered with the Disney Institute to turn those lessons into one culture program for Chevrolet dealers worldwide. Much of the work happened on site at Walt Disney World in Orlando.",
+      "Ran the 2015 field study in Quito and Guayaquil on why GM Ecuador led every GM region in service satisfaction: bringing customers into the service process built transparency and trust.",
+      "Partnered with the Disney Institute, including on-site work in Orlando, to turn those lessons into one culture program for Chevrolet dealers worldwide. #EverydayHero",
       "Brought the program home to GM's Detroit headquarters with workshops at the Detroit Opera House, and managed the budget for the Disney Institute work."
     ]
   },
@@ -481,34 +481,34 @@ window.ROAD_CONTENT.profile = {
   "connected": {
     company: "General Motors", group: "Connected & OTA Services", logo: "generalmotors", storyMarks: [[], ["cadillac", "chevrolet", "buick"], ["onstar"]], art: "connected",
     summary: "Grew GM's connected services strategy team from 2 to 7 and set business strategy across five value streams: remote services, connected cameras, driver assist, vehicle performance and personalization.",
-    hl: ["Grew the strategy team from **2 to 7**", "Built the **Super Cruise** monetization strategy across every GM brand in North America", "Ran an in-market trial for paid digital products, a **$30M** opportunity"],
+    hl: ["Grew the strategy team from **2 to 7**", "Built the **Super Cruise** monetization strategy across every GM brand in North America", "Won executive approval for an in-market trial of paid ADAS digital enhancements, a high-margin **~$30M** revenue opportunity"],
     stories: [
-      "Grew the strategy team from 2 to 7 people and ran an in-market trial for paid digital products, a $30M opportunity.",
+      "Grew the strategy team from 2 to 7 and won executive approval for an in-market trial of paid ADAS digital enhancements, a high-margin ~$30M revenue opportunity.",
       "Built the monetization strategy for Super Cruise across every GM brand in North America, then for next-gen Ultra Cruise.",
-      "Helped shape the over-the-air services that let GM sell new features after the sale, part of GM's Oct 2021 goal of $20–25B a year in software and services revenue by 2030."
+      "Helped shape the over-the-air services behind post-sale feature revenue, part of GM's Oct 2021 goal of $20–25B a year in software and services revenue by 2030."
     ],
     sources: 2
   },
   "shanghai": {
     company: "SAIC-GM", group: "Software Strategy", logo: "sgm", storyMarks: [["patac"], ["momenta"], [], ["cadillac", "buick"]], art: "shanghai",
-    summary: "Deputy Director at GM's joint venture in China. Helped stand up a multi-thousand-person software org, led a strategy, data insights and software research team, and set a market-first product strategy for driver assist and the cockpit.",
-    hl: ["Helped stand up a **multi-thousand-person** software org", "Ran multi-city ADAS research and a pitch that supported a **nine-figure** driver-assist investment", "Led a strategy, data insights and software research team"],
+    summary: "Deputy Director at GM's joint venture in China. Helped stand up a multi-thousand-person software org, co-led a 49-person strategy, data insights and software research team, and set a market-first product strategy for driver assist and the cockpit.",
+    hl: ["Helped stand up a **multi-thousand-person** software org", "Ran multi-city ADAS research and a pitch that supported a **nine-figure** driver-assist investment", "Co-led a **49-person** strategy, data insights and software research team"],
     stories: [
-      "Helped stand up SAIC-GM's software organization, a multi-thousand-person org, while leading a strategy, data insights and software research team.",
+      "Pivotal to the formation of SAIC-GM's ~2,500-person software and digital business team, from benchmarking and negotiations to dual-path approval by the GM, SAIC and SAIC-GM boards and realistic alignment across both parent organizations. Co-led a 49-person strategy, data insights and software research team.",
       "Ran consumer research across Chinese cities on what drivers will pay for in driver assist. The research and pitch supported a nine-figure driver-assist investment.",
       "Shaped an AI 'Model Integrator' strategy for voice and vision in the intelligent cockpit.",
-      "Reframed luxury for young Chinese buyers around value over the vehicle's life: connected hardware as an investment, not a cost."
+      "Shaped GM China and SAIC-GM studies showing technology had become the new luxury for Chinese buyers, then realigned workstreams and messaging to launch intelligent cockpit and driving features faster and close the gap with the market."
     ]
   },
   "onstar": {
     company: "General Motors", group: "OnStar International", logo: "generalmotors", storyMarks: [["onstar"], ["chevrolet", "cadillac", "sgm", "sgmw"]], art: "onstar",
     summary: "Owned OnStar connected services for China-built GM export vehicles across 8 regions, aligning OnStar, GM's regional teams and the Chinese joint venture partners on connectivity and launch timing. Built Portfolio Made Visible with AI agents so leaders could see the whole export portfolio in seconds.",
-    hl: ["Planned OnStar for China-built vehicles in **8** export regions", "Aligned OnStar, GM regions and Chinese JV partners on connectivity and launch timing", "Kept driver assist in scope with a global L2, L2+ and L2++ strategy workshop, **Aug 2026**", "Built **Portfolio Made Visible** with AI agents: **217** programs, **55** markets, **39** users including **7** director+ and **3** VPs"],
+    hl: ["Planned OnStar intelligent driving and software services for China-built vehicles in **8** export regions; secured transfer prices on **3** launch vehicles", "Aligned OnStar's intelligent driving and software services strategy and roadmap, including launch timing and cadence for connectivity and vehicle hardware enablers, across GM regions, two Chinese JVs and SAIC (Maxus)", "Kept driver assist in scope with a global L2, L2+ and L2++ strategy workshop, **Aug 2026**", "Unprompted, built **Portfolio Made Visible** solo with AI agents, a better, far cheaper successor to a retired GM tool; **200+** programs, **50+** markets; **11** AI-built apps grew by word of mouth to **40+** monthly users, up to VP level"],
     stories: [
       "Planned connected services for vehicles bound for Mexico, South America, Middle East & Africa, Asia Pacific, Korea, Israel, Australia & NZ and Central Asia, each region with its own connectivity and launch timing.",
       "Built connected-services plans across the export portfolio: the Chevrolet Aveo, Spark EUV and Captiva and the Cadillac XT5.",
       "Kept driver assist in scope with a global strategy workshop on L2, L2+ and L2++ in Aug 2026. At GM Forward in Oct 2026, GM made OnStar an AI assistant and said hands-free highway driving will expand: the same space this work covered.",
-      "Rebuilt a retired portfolio tool with AI agents doing the build: 1,780 rows covering 217 programs across 55 markets, so leaders could see any market-year view of the export portfolio, and its gaps, in seconds. It reached 39 users across 11 apps, including 7 director+ and 3 VPs, and was previewed at GM AI Day."
+      "Unprompted, built a portfolio planning tool solo with AI agents, then learned GM had shut down a costly predecessor years earlier. The new one does more at a fraction of the cost, turning 200+ programs across 50+ markets into any market-year view, and its gaps, in seconds. The 11 apps built this way grew by word of mouth to 40+ monthly users: analysts shared charts and links upward, pulling in directors and VPs."
     ],
     sources: 2
   }
@@ -558,18 +558,18 @@ window.ROAD_CONTENT.roles = {
    Same three lines for every stop: company, role and its function, years. */
 window.ROAD_CONTENT.rail = {
   "start":               { co: "The Road",              ro: "20+ years in automotive",                                 yr: "2003–2026" },
-  "kettering":           { co: "Kettering University",  ro: "BS & Federal-Mogul co-op · Mechanical Engineering",         yr: "2003–2007", t: "BSME and co-op",                      dm: "Education",                  f: "edu" },
+  "kettering":           { co: "Kettering University",  ro: "Mechanical Engineering",                                  yr: "2003–2007", lines: ["Kettering University", "Mechanical Engineering", "BSME, cum laude, 2007", "• Engineering Co-op w/ Federal-Mogul Corp."], t: "BSME and co-op",                      dm: "Education",                  f: "edu" },
   "federal-mogul":       { co: "Federal-Mogul",         ro: "Product Engineer · Powertrain Sealing",                     yr: "2007–2010", t: "Product Engineer",                     dm: "Product engineering",        f: "eng" },
   "chrysler":            { co: "Chrysler Group",        ro: "Design Release Engineer · Powertrain Sealing",              yr: "2010–2011", t: "Design Release Engineer",              dm: "Design release",             f: "eng" },
   "johnson-controls":    { co: "Johnson Controls",      ro: "Senior Product Engineer · Automotive Seating",              yr: "2011–2014", t: "Senior Product Engineer",              dm: "Program leadership",         f: "eng" },
-  "ross":                { co: "Michigan Ross",         ro: "MBA · Marketing & Strategy · MAP in Canada",                yr: "2012–2014", t: "MBA, Marketing & Strategy",            dm: "Education",                  f: "edu" },
-  "traverse":            { co: "GM",                    ro: "Asst. Product Marketing Manager · Chevrolet Marketing",    yr: "2014–2015", t: "Asst. Product Marketing Manager",      dm: "Vehicle product marketing",  f: "product" },
-  "customer-experience": { co: "GM",                    ro: "Global Brand Strategy Asst. Manager · Customer Experience", yr: "2015–2016", t: "Asst. Manager, Global Brand Strategy",  dm: "Customer experience",        f: "cx" },
-  "mexico":              { co: "GM Mexico",             ro: "Supervisor · Dealer Sales Operations",                      yr: "2016",      t: "Supervisor, Dealer Sales Operations",  dm: "Dealer sales operations",    f: "field" },
+  "ross":                { co: "University of Michigan", ro: "Ross School of Business",                                 yr: "2012–2014", lines: ["University of Michigan", "Ross School of Business", "MBA, May 2014"], t: "MBA, Marketing & Strategy",            dm: "Education",                  f: "edu" },
+  "traverse":            { co: "GM",                    ro: "Product Marketing · Chevrolet Traverse",                   yr: "2014–2015", t: "Product Marketing, Chevrolet",      dm: "Vehicle product marketing",  f: "product" },
+  "customer-experience": { co: "GM",                    ro: "Global Brand Strategy · Customer Experience",               yr: "2015–2016", t: "Global Brand Strategy",  dm: "Customer experience",        f: "cx" },
+  "mexico":              { co: "GM Mexico",             ro: "Supervisor · BDC Implementation",                           yr: "2016",      t: "Supervisor, BDC Implementation",  dm: "Dealer sales operations",    f: "field" },
   "equinox":             { co: "GM",                    ro: "Global Product Manager · Crossover Product Strategy",       yr: "2017–2018", t: "Global Product Manager",               dm: "Global product management",  f: "product" },
   "trailblazer-encore":  { co: "GM",                    ro: "Product Manager · Buick & Chevrolet Crossovers",           yr: "2019–2020", t: "Product Manager, Buick & Chevrolet",   dm: "Vehicle product management", f: "product" },
-  "connected":           { co: "GM",                    ro: "Business Strategy Manager · Connected Services",            yr: "2020–2022", t: "Business Strategy Manager",            dm: "Connected services",         f: "digital" },
+  "connected":           { co: "GM",                    ro: "Business Strategy · Connected Services",                    yr: "2020–2022", t: "Business Strategy, Connected",            dm: "Connected services",         f: "digital" },
   "shanghai":            { co: "SAIC-GM",               ro: "Deputy Director · Software Strategy",                       yr: "2022–2025", t: "Deputy Director, Software Strategy",   dm: "Software strategy",          f: "digital" },
-  "onstar":              { co: "GM",                    ro: "Manager · OnStar International Product Marketing",          yr: "2025–2026", t: "Manager, OnStar Product Marketing",    dm: "Software product marketing", f: "digital" },
+  "onstar":              { co: "GM",                    ro: "Global Planning & JVs · OnStar Product Marketing",          yr: "2025–2026", t: "OnStar Product Marketing",    dm: "Software product marketing", f: "digital" },
   "finale":              { co: "Finish",                ro: "Eight chapters, one road",                                  yr: "2003–2026" }
 };
