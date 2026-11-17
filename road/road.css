@@ -94,7 +94,7 @@ button { font: inherit; color: inherit; }
   padding: 14px 16px 12px; border-radius: 16px; background: var(--glass); box-shadow: var(--shadow); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   scrollbar-width: none; transition: opacity .35s ease, transform .35s ease; }
 .card::-webkit-scrollbar { display: none; }
-.card.out { opacity: 0; transform: translateY(6px); }
+.card.out { opacity: 0; transform: translateY(6px); pointer-events: none; }
 .kicker { font-size: 10.5px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-ink); margin: 0 0 4px; }
 @supports (color: color-mix(in srgb, red 50%, black)) {
   .kicker { color: color-mix(in srgb, var(--era, var(--accent)) 72%, var(--ink)); }
@@ -936,3 +936,8 @@ html[data-theme="dusk"] .ov-stop span.ov-dom { color: color-mix(in srgb, var(--f
 @media (max-height: 820px) { .ov-stop span.ov-dom { display: table !important; } }
 @media (max-height: 1000px) { .ov-panel { top: 64px; max-height: calc(100vh - 76px); padding: calc(12px * var(--ovs)) 14px calc(10px * var(--ovs)); } }
 .ov-back { margin-top: calc(10px * var(--ovs)); height: calc(32px * var(--ovs)); font-size: calc(12.5px * var(--ovs)); }
+/* v51: fade the card's foot while there is more to scroll */
+.card.more { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 44px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 44px), transparent); }
+
+/* v51: keep the page itself from scrolling sideways in any browser */
+html { overflow: hidden; }

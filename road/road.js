@@ -594,6 +594,7 @@ function start() {
   let idle = null;
   let pos = STOPS[0].x, target = STOPS[0].x, prevPos = pos, vel = 0, base = 0;
   let focus = -1; // selected callout
+  let rush = null; // v51: the current eased flight between stops
   let zOut = 0, zOutT = 0; // 0 = on the road, 1 = the whole career from above
   const ZMAX = 0.3; // wide enough to see the neighbours, never past the edge of the world
   /* v33: two states only, on the road or the overview. A pinch, Ctrl+wheel or key that moves past a
@@ -606,6 +607,12 @@ function start() {
     if (typeof syncOverview === 'function') syncOverview();
   }
   const card = $('#card'), panel = $('#panel'), panelBody = $('#panel-body');
+  /* v51: a soft fade at the card's foot while more of it sits below the fold */
+  const cardCue = () => card.classList.toggle('more', card.scrollTop + card.clientHeight < card.scrollHeight - 4);
+  card.addEventListener('scroll', cardCue, { passive: true });
+  card.addEventListener('load', cardCue, true);
+  addEventListener('resize', cardCue);
+  new MutationObserver(() => requestAnimationFrame(cardCue)).observe(card, { childList: true, subtree: true });
   const markersEl = $('#markers'), leaders = $('#leaders');
   const prevBtn = $('#prev'), nextBtn = $('#next');
 
@@ -616,14 +623,27 @@ function start() {
 
   function nearest(x) { let b = 0, d = 1e9; STOPS.forEach(s => { const e = Math.abs(s.x - x); if (e < d) { d = e; b = s.i; } }); return b; }
 
+  /* v51: every jump (Next, Prev, rail, keys, one wheel step) is one short eased flight of 1 to 2 s,
+     however far. The old card fades out as the car leaves, and the card, rail, buttons and address
+     all change together on arrival, so they never disagree. */
+  let flyOut = false;
+  const flightMs = d => clamp(900 + d * 1.1, 900, 2000);
   function go(i, instant) {
     i = clamp(i, 0, STOPS.length - 1);
     closeStory();
     base = i; target = STOPS[i].x;
     clearTimeout(idle);
-    if (instant) { pos = prevPos = target; vel = 0; cur = i; setFocus(-1); renderCard(); }
-    try { history.replaceState(null, '', '#' + STOPS[i].id); localStorage.setItem('road.lastStop', STOPS[i].id); } catch (e) {}
+    if (instant) { rush = null; pos = prevPos = target; vel = 0; cur = i; setFocus(-1); renderCard(); return; }
+    if (isPhone()) return;
+    if (Math.abs(pos - target) > 1) {
+      rush = reduced ? null : { from: pos, to: target, t0: performance.now(), dur: flightMs(Math.abs(pos - target)) };
+      if (reduced) { pos = prevPos = target; vel = 0; }
+      vel = 0;
+      if (i !== cur && !card.classList.contains('out')) { card.classList.add('out'); flyOut = true; }
+      setFocus(-1);
+    }
   }
+  function markStop(i) { try { history.replaceState(null, '', '#' + STOPS[i].id); localStorage.setItem('road.lastStop', STOPS[i].id); } catch (e) {} }
 
   /* ---------- card, rail, panel ---------- */
   function renderCard() {
@@ -631,6 +651,7 @@ function start() {
     const was = shown;
     shown = cur;
     const s = STOPS[cur];
+    flyOut = false; markStop(cur);
     const barFace = document.querySelector('.bar-title .mono');
     if (was === 0 && cur !== 0 && !renderCard.flown) flyPhoto(card.querySelector('.hero-photo img'), barFace);
     renderCard.flown = false;
@@ -966,7 +987,6 @@ function start() {
       if (i === base && Math.abs(d) > 10) i = base + Math.sign(d);
       i = clamp(i, 0, STOPS.length - 1);
       base = i; target = STOPS[i].x;
-      try { history.replaceState(null, '', '#' + STOPS[i].id); localStorage.setItem('road.lastStop', STOPS[i].id); } catch (e) {}
     }, ms);
   }
   function nudge(dx) {
@@ -997,8 +1017,16 @@ function start() {
     }
     let d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
     if (e.deltaMode === 1) d *= 32; else if (e.deltaMode === 2) d *= innerWidth;
-    nudge(clamp(d, -120, 120) * (0.14 + 0.5 * zOut));
+    /* v51: on the road one wheel gesture moves one stop at most; a new step needs a short pause */
+    const now = performance.now();
+    if (now - wheelAt > 220 && !rush) { wheelLock = false; wheelAcc = 0; }
+    wheelAt = now;
+    if (zOutT > 0) { nudge(clamp(d, -120, 120) * (0.14 + 0.5 * zOut)); return; }
+    if (wheelLock) return;
+    wheelAcc += d;
+    if (Math.abs(wheelAcc) >= 30) { wheelLock = true; go(base + Math.sign(wheelAcc)); }
   }, { passive: false });
+  let wheelAt = 0, wheelAcc = 0, wheelLock = false;
 
   let g0 = 0;
   addEventListener('gesturestart', e => { if (isPhone()) return; e.preventDefault(); g0 = zOutT; });
@@ -1052,7 +1080,7 @@ function start() {
     if (isPhone()) { go(0); return; }
     const from = pos; go(0);
     if (Math.abs(from - target) < 1 || reduced) { go(0, true); return; }
-    rush = { from, to: target, t0: performance.now(), dur: 550 };
+    rush.dur = 550;
     cur = 0; setFocus(-1); renderCard();
   }
   // keep the last few words of a line together, so no line ends up holding one to three words
@@ -1199,7 +1227,7 @@ function start() {
 
   /* ---------- loop ---------- */
   const clock = new THREE.Clock();
-  let t = 0, first = true, visible = true, rush = null;
+  let t = 0, first = true, visible = true;
   document.addEventListener('visibilitychange', () => { visible = !document.hidden; if (visible) clock.getDelta(); });
   function frame() {
     requestAnimationFrame(frame);
@@ -1232,6 +1260,7 @@ function start() {
       // the card follows the car, switching only once the car is close to a stop
       const n = nearest(pos);
       if (!rush && n !== cur && Math.abs(pos - STOPS[n].x) < 26 && (Math.abs(vel) < 45 || n === nearest(target))) { cur = n; setFocus(-1); renderCard(); }
+      else if (!rush && flyOut && n === cur && Math.abs(pos - STOPS[cur].x) < 26) { flyOut = false; card.classList.remove('out'); }
     }
     const v = rush ? 0 : (pos - prevPos) / Math.max(dt, 1e-3); prevPos = pos;
     if (isPhone()) zOutT = 0;

@@ -271,7 +271,7 @@ function place() {
     const r = e.getBoundingClientRect(), p = 6;
     let top = r.top - p, bot = r.bottom + p;
     if (isPhone() && !e.closest('.bar, #pm-sheet')) { top = Math.max(top, barBottom() + 4); bot = Math.min(bot, ui.getBoundingClientRect().top - 8); }
-    if (r.width && r.height && bot - top > 20) {
+    if (r.width && r.height && bot - top > 20 && !e.classList.contains('out')) { /* v51: no ring around a card that is hidden mid-flight */
       ring.style.cssText = `left:${r.left - p}px;top:${top}px;width:${r.width + p * 2}px;height:${bot - top}px`;
       ring.classList.add('on');
     } else ring.classList.remove('on');
@@ -367,7 +367,14 @@ function syncMenu() {
   const v = $('#music-vol'); if (v) v.value = Math.round(Music.vol * 100);
   const c = $('#ctl-btn'); if (c) c.classList.toggle('music-on', Music.track >= 0);
 }
-document.querySelectorAll('#music-seg button').forEach(b => b.addEventListener('click', () => { Music.set(+b.dataset.t); syncMenu(); }));
+document.querySelectorAll('#music-seg button').forEach(b => b.addEventListener('click', () => { Music.set(+b.dataset.t); try { sessionStorage.setItem('mf-road-music', String(Music.track)); } catch (e) {} syncMenu(); }));
+/* v51: a track picked earlier in this visit comes back with the visitor's first tap or key (browsers never let sound start on its own) */
+(() => {
+  let t = -1; try { t = parseInt(sessionStorage.getItem('mf-road-music') || '-1', 10); } catch (e) {}
+  if (!(t >= 0 && t < AUDIO.tracks.length)) return;
+  const go = () => { removeEventListener('pointerdown', go, true); removeEventListener('keydown', go, true); if (Music.track < 0) { Music.set(t); syncMenu(); } };
+  addEventListener('pointerdown', go, true); addEventListener('keydown', go, true);
+})();
 document.querySelectorAll('#voice-seg button').forEach(b => b.addEventListener('click', () => { Voice.set(b.dataset.v === '1'); syncMenu(); syncVoice(); }));
 const vol = $('#music-vol'); if (vol) vol.addEventListener('input', () => Music.setVol(vol.value / 100));
 syncMenu();
