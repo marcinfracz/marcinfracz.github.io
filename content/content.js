@@ -261,9 +261,9 @@ window.SITE_CONTENT = {
   },
   finder: [
     { id: "now", name: "Now.txt", icon: "📄", category: "start", target: null, preview: "<b>Now.txt</b> — Exploring new leadership opportunities in automotive strategy, product and AI. Building with AI, shipping small tools, and learning in public." },
-    { id: "live-demos", name: "Live Demos", icon: "📁", category: "start", nav: "tools", preview: "<b>Live Demos</b> — Four systems I built, each rebuilt on synthetic data so you can use it. Double-click to open the folder." },
+    { id: "live-demos", name: "Tools I Built", icon: "📁", category: "start", nav: "tools", preview: "<b>Tools I Built</b> — Four systems I built, each rebuilt on synthetic data so you can use it. Double-click to open the folder." },
     { id: "kit-folder", name: "Everyday Kit", icon: "📁", category: "start", nav: "kit", preview: "<b>Everyday Kit</b> — The small single-file tools behind a global team that never shared a time zone. Double-click to open the folder." },
-    { id: "projects", name: "Projects", icon: "📁", category: "start", target: "projects", preview: "<b>Projects</b> — The live demos, the everyday kit and personal builds. Double-click to open." },
+    { id: "projects", name: "Projects", icon: "📁", category: "start", target: "projects", preview: "<b>Projects</b> — The tools I built, the everyday kit and personal builds. Double-click to open." },
     { id: "work-index", name: "Work Index", icon: "📁", category: "work", target: "work", preview: "<b>Work Index</b> — Twenty-three years across engineering, product and software strategy, from powertrain to Shanghai. Double-click to open the timeline." },
     { id: "timeline-app", name: "Timeline Explorer", app: "timeline", category: "work", href: "work/timeline.html", preview: "<b>Career timeline explorer</b> — Every role since 2003 on one zoomable line, with the international assignments. Double-click to open." },
     { id: "colophon", name: "Colophon", icon: "📝", category: "start", target: null, preview: "<b>Colophon</b> — This site is a fake desktop: plain HTML, CSS and vanilla JavaScript, hosted on GitHub Pages. No framework, no build step. Desktop concept inspired by Zain Haseeb. Built with AI." },
