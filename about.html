@@ -74,6 +74,26 @@ ul.edu li b{display:block;color:var(--ink);font-size:14.5px}
 
 /* v45 phone: 44px tap targets; inline links grow their tap area without moving the text */
 @media (max-width:767px){.wrap a:not([class]){display:inline-block;padding:10px 0;margin:-10px 0}.foot a{display:inline-block;padding:14px 0;margin:-14px 0}}
+
+/* v60: hook line, quiet reel link, signature results, result-first value cards */
+.role-line{margin:6px 0 0;font-size:13.5px;font-weight:600;color:var(--muted);letter-spacing:.005em}
+.who p.body{line-height:1.55}
+.reel-lnk{display:inline-flex;align-items:center;gap:5px;margin:0 0 0 4px;white-space:nowrap;font-size:inherit;font-weight:700;color:var(--gold);text-decoration:none}
+.reel-lnk:hover,.reel-lnk:focus-visible{text-decoration:underline;text-underline-offset:3px;outline:none}
+.reel-lnk span{transition:transform .15s ease}.reel-lnk:hover span{transform:translateX(3px)}
+.proof{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,1.6vw,24px);margin:0;padding:0;list-style:none}
+.proof li{border-left:3px solid var(--c);padding:1px 0 1px 13px}
+.proof b{display:block;font-size:15px;line-height:1.25;font-weight:800;letter-spacing:-.005em}
+.proof span{display:block;margin-top:4px;font-size:13px;line-height:1.42;color:var(--ink2)}
+.area p.res{margin:0 0 4px;font-size:14px;line-height:1.35;font-weight:700;color:var(--ink)}
+.area h2{font-size:11.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--c);margin:0 0 5px}
+html[data-theme="dark"] .area h2{filter:brightness(1.35)}
+.lead,.proof b,.area p.res{text-wrap:balance}
+@media (min-width:1101px){.grid{grid-template-rows:auto 1fr;row-gap:0}.who{grid-column:1;grid-row:1}.right{grid-column:2;grid-row:1 / span 2}.grid>.two{grid-column:1;grid-row:2;align-self:start}}
+.grid>.two{margin-top:clamp(4px,1vh,10px)}
+@media (max-width:1100px){.grid>.two{margin-top:calc(6px - clamp(32px,4vw,72px))}}
+@media (min-width:1101px) and (max-height:820px){.wrap{padding-top:18px;padding-bottom:12px}.sec{margin-top:12px;margin-bottom:8px}.foot{margin-top:10px;padding-top:10px}.who p.body{margin-top:8px}}
+@media (max-width:640px){.proof{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -85,11 +105,12 @@ ul.edu li b{display:block;color:var(--ink);font-size:14.5px}
         <div>
           <p class="kicker">About</p>
           <h1>Marcin Fracz</h1>
-          <p class="lead">Automotive product and software strategy leader. 20+ years shaping vehicle portfolios, pricing, and digital customer experiences across the US, Mexico, and China.</p>
+          <p class="lead">From powertrain gaskets to L2++ and AI&#8209;built planning systems.</p>
+          <p class="role-line">Automotive product, strategy and transformation leader · US, Mexico and China</p>
         </div>
       </div>
-      <p class="body">With a foundation in mechanical engineering and a Michigan Ross MBA, I bridge technical feasibility, brand positioning, and commercial profitability. Over two decades across the US, Mexico, and China, I've managed crossover products, shaped global customer experience programs, and served as Deputy Director of Software Strategy at GM's Shanghai joint venture before owning OnStar connected services across 8 export regions.</p>
-      <p class="body">I thrive at the intersection of product, design, finance, and engineering, making clear trade-offs to bring vehicles and digital ecosystems to market that customers genuinely want. Today, I also build practical AI workflows and tools to accelerate strategy and decision-making; a few are live demos here.</p>
+      <p class="body">A decade of powertrain and interiors engineering, then 11+ years at GM across the US, Mexico and China. As Deputy Director of Software Strategy at GM's Shanghai joint venture, I helped premium brands respond as Chinese customers redefined luxury around experience, technology and autonomy. Most recently I led OnStar offering strategy for China&#8209;built exports across 8 regions, and I build practical AI tools for faster decisions.</p>
+      <p class="body">I make clear trade&#8209;offs where product, finance and engineering meet. A few of the tools I built are live demos here. <a class="reel-lnk" href="reel.html" data-tab="Sizzle Reel">Watch the 1-minute reel <span aria-hidden="true">→</span></a></p>
       <ul class="links">
         <li><a href="assets/resume.pdf" data-tab="Resume">Resume</a></li>
         <li><a href="road.html" data-tab="The Road">The Road</a></li>
@@ -100,7 +121,7 @@ ul.edu li b{display:block;color:var(--ink);font-size:14.5px}
       </ul>
     </section>
 
-    <section>
+    <section class="right">
       <div class="stats">
         <div class="stat"><b>20+</b><span>years in automotive</span></div>
         <div class="stat"><b>11+</b><span>years at GM and its China joint venture</span></div>
@@ -108,15 +129,23 @@ ul.edu li b{display:block;color:var(--ink);font-size:14.5px}
         <div class="stat"><b>8</b><span>export regions for OnStar International</span></div>
       </div>
 
+      <p class="sec">Signature results</p>
+      <ul class="proof">
+        <li style="--c:#7357D8"><b>Nine&#8209;figure L2++ approval</b><span>My multi&#8209;city China ADAS customer research and board pre-read supported approval of nine&#8209;figure L2++ funding.</span></li>
+        <li style="--c:#2E9C8F"><b>Planning tool rebuilt with AI</b><span>Rebuilt Portfolio Made Visible solo with AI coding agents, at a fraction of the original cost.</span></li>
+        <li style="--c:#C8693A"><b>On&#8209;time launch through COVID</b><span>Launched Encore GX and Trailblazer on time and under budget through harness disruption, with a complexity tool I built.</span></li>
+      </ul>
+
       <p class="sec">Where I add value</p>
       <div class="areas">
-        <div class="area" style="--c:#2E9C8F"><h2>Product</h2><p>Contenting and pricing strategy for Traverse and global crossovers, balancing margin, volume and customer desirability through global supply constraints.</p></div>
-        <div class="area" style="--c:#D9A21B"><h2>Customer experience</h2><p>Global retail and client experience strategy for Chevrolet, translating customer insights into scalable brand standards across international markets.</p></div>
-        <div class="area" style="--c:#C8693A"><h2>Field, sales &amp; operations</h2><p>Commercial execution and dealer network alignment: led a national BDC rollout across GM Mexico with 350+ dealer visits.</p></div>
-        <div class="area" style="--c:#7357D8"><h2>Software &amp; digital</h2><p>Connected and OTA services strategy, software strategy at SAIC-GM, and OnStar across 8 export regions.</p></div>
+        <div class="area" style="--c:#2E9C8F"><h2>Product</h2><p class="res">5% less post&#8209;refresh price decay; helped add $200 per vehicle in profit</p><p>Mid-cycle content and pricing strategy for global crossovers, including Equinox and Traverse, aligned across US, Canada and Korea leadership.</p></div>
+        <div class="area" style="--c:#D9A21B"><h2>Customer experience</h2><p class="res">China's shift in luxury turned into Cadillac product recommendations</p><p>Modern&#8209;luxury insight for current and next&#8209;generation Cadillac programs, after global Chevrolet customer experience work that included the Disney engagement and its budget.</p></div>
+        <div class="area" style="--c:#C8693A"><h2>Field, sales &amp; operations</h2><p class="res">A national dealer program to 70% completion in six months</p><p>Led the business development center rollout across GM de México's dealer network, with 350+ dealer visits, tracking and digital tools.</p></div>
+        <div class="area" style="--c:#7357D8"><h2>Software &amp; digital</h2><p class="res">Board approval for SAIC-GM's OTA products and software monetization</p><p>Super Cruise subscription strategy, connected and OTA roadmaps, and OnStar offering strategy across 8 export regions.</p></div>
       </div>
 
-      <div class="two">
+    </section>
+    <div class="two">
         <div>
           <p class="sec">How I work</p>
           <ul class="how">
@@ -129,11 +158,10 @@ ul.edu li b{display:block;color:var(--ink);font-size:14.5px}
           <p class="sec">Education</p>
           <ul class="edu">
             <li><img class="mark" src="assets/road/logos/ross-stack.png" alt="" aria-hidden="true"><span><b>MBA, Marketing &amp; Strategy, Michigan Ross (2014)</b></span></li>
-            <li><img class="mark" src="assets/road/logos/kettering.png" alt="" aria-hidden="true"><span><b>BSME, Kettering University (2007)</b>Cum laude; four years of engineering co-op at Federal-Mogul</span></li>
+            <li><img class="mark" src="assets/road/logos/kettering.png" alt="" aria-hidden="true"><span><b>BSME, Kettering University (2007)</b>Cum laude; engineering co&#8209;op at Federal&#8209;Mogul</span></li>
           </ul>
         </div>
       </div>
-    </section>
   </div>
   <p class="foot" id="foot">Prefer the whole picture? <a href="index.html" target="_top">Open the Desktop</a>.</p>
 </main>
