@@ -1562,8 +1562,9 @@
     if (bb) { e.preventDefault(); var nm = bb.querySelector && bb.querySelector(".app-txt b, .kit-chip span"); openToolPage(bb.href || BRAG_URL, nm ? nm.textContent.replace(/\s*Live$/, "") : "Live demos"); return; }
     var tl = e.target.closest('a[href*="work/timeline.html"]');
     if (tl) { e.preventDefault(); openToolPage(tl.href, "Timeline"); return; }
-    var r = e.target.closest('a[href$="reel.html"]');
+    var r = e.target.closest('a[href$="reel.html"], [data-reel]');
     if (r && !isPhone()) { e.preventDefault(); browserOpenTab(REEL_URL, "Sizzle Reel"); return; }
+    if (r && r.hasAttribute("data-reel")) { window.location.href = REEL_URL; return; } /* v57: the dock's reel button on a phone */
     var x = e.target.closest("[data-browser-tab-close]");
     if (x) { e.stopPropagation(); if (Date.now() - tabXAt > 600) browserCloseTab(parseInt(x.getAttribute("data-browser-tab-close"), 10)); return; }
     var tb = e.target.closest("[data-browser-tab]");
