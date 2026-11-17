@@ -1,1 +1,346 @@
-TEST-WRITE-PERMISSION
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#e8e2d5">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<script>try{if(window.matchMedia("(max-width: 700px)").matches){document.documentElement.classList.add("is-phone");}}catch(e){}</script>
+<title>Marcin Fracz</title>
+<meta name="description" content="Automotive product & software strategy leader · GM · SAIC-GM Shanghai">
+<meta property="og:title" content="Marcin Fracz — Automotive product & software strategy leader">
+<meta property="og:description" content="Automotive product & software strategy leader · GM · SAIC-GM Shanghai">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://marcinfracz.ai/">
+<meta property="og:image" content="https://marcinfracz.ai/assets/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css?v=51">
+</head>
+<body>
+<div class="wallpaper" aria-hidden="true"><img id="wallpaper-img" src="assets/wallpapers/shanghai-mist.jpg" alt=""></div>
+
+<header class="menubar">
+  <div class="mb-left">
+    <span class="mb-name">Marcin Fracz</span>
+    <div class="menu">
+      <button class="mb-item menu-btn" data-menu="file">File</button>
+      <div class="menu-dropdown" id="menu-file">
+        <button data-action="open-finder">Open Finder</button>
+        <button data-action="open-about">About Marcin</button>
+        <button data-action="open-work">Open Work</button>
+        <button data-action="open-brag">Open Live demos</button>
+        <button data-action="open-projects">Open Projects</button>
+        <button data-action="open-notes-win">Open Notes</button>
+        <button data-action="open-terminal">Open Terminal</button>
+        <button data-action="open-browser">Open Browser</button>
+        <button data-action="contact">Contact Marcin</button>
+        <div class="menu-sep"></div>
+        <button data-action="search">Search… <span class="kbd">⌘K</span></button>
+      </div>
+    </div>
+    <div class="menu">
+      <button class="mb-item menu-btn" data-menu="view">View</button>
+      <div class="menu-dropdown" id="menu-view">
+        <button data-action="wallpaper-settings">Wallpaper Settings…</button>
+        <button data-action="widget-settings">Widget Settings…</button>
+        <div class="menu-sep"></div>
+        <button data-action="toggle-welcome"><span class="check" id="check-welcome">✓</span> Show Welcome</button>
+        <button data-action="reset-positions">Reset All Positions</button>
+        <button data-action="show-desktop">Show Desktop</button>
+        <div class="menu-sep"></div>
+        <button data-action="light"><span class="check" id="check-light">✓</span> Light Appearance</button>
+        <button data-action="dark"><span class="check" id="check-dark"></span> Dark Appearance</button>
+      </div>
+    </div>
+    <div class="menu">
+      <button class="mb-item menu-btn" data-menu="window">Window</button>
+      <div class="menu-dropdown" id="menu-window">
+        <div id="window-list"></div>
+        <div class="menu-sep"></div>
+        <button data-action="close-front" id="close-front-btn">Close Front Window</button>
+        <button data-action="close-all" id="close-all-btn">Close All Windows</button>
+      </div>
+    </div>
+  </div>
+  <nav class="mb-links" aria-label="Site">
+    <a href="road.html">The Road</a>
+    <a href="work/brag-book.html" target="_blank" rel="noopener">Live demos</a>
+    <a href="work/timeline.html">Timeline</a>
+    <a href="assets/resume.pdf" target="_blank" rel="noopener">Resume</a>
+    <button type="button" data-action="contact">Contact</button>
+  </nav>
+  <div class="mb-right">
+    <span class="mb-clock" id="topbar-clock"></span>
+    <button class="mb-icon-btn" id="mb-wallpaper-btn" title="Wallpaper Settings" aria-label="Wallpaper Settings">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+    </button>
+    <button class="mb-item mb-text-btn" id="mb-widgets-btn">Widgets</button>
+    <button class="mb-icon-btn" id="mb-theme-btn" title="Toggle dark mode" aria-label="Toggle dark mode">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+  </div>
+</header>
+
+<nav class="dock-rail" id="dock-rail" aria-label="Apps">
+  <button data-href="road.html" data-dock="road" title="The Road" aria-label="The Road: career story">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20 9 4M20 20 15 4M12 6v2M12 11v2M12 16v2"/></svg>
+  </button>
+  <button data-open="finder" data-dock="finder" title="Finder" aria-label="Finder">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/></svg>
+  </button>
+  <button data-open="work" data-dock="work" title="Timeline" aria-label="Timeline">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+  </button>
+  <button data-brag="1" data-dock="brag" title="Live demos" aria-label="Live demos">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+  </button>
+  <button data-open="projects" data-dock="projects" title="Projects" aria-label="Projects">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+  </button>
+  <button data-open="notes-win" data-dock="notes-win" title="Notes" aria-label="Notes">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5z"/><path d="M15 3v6h6M9 13h6M9 17h4"/></svg>
+  </button>
+  <button data-open="terminal" data-dock="terminal" title="Terminal" aria-label="Terminal">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m7 9 3 3-3 3M12 15h5"/></svg>
+  </button>
+  <button data-open="about" data-dock="about" title="About" aria-label="About">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
+  </button>
+  <button data-open="contact-win" data-dock="contact-win" title="Contact" aria-label="Contact">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+  </button>
+  <span class="rail-sep"></span>
+  <button data-open="browser" data-dock="browser" title="Browser" aria-label="Browser">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="currentColor" stroke="none"/></svg>
+  </button>
+  <button data-href="https://www.linkedin.com/in/marcinfracz/" data-newtab="1" title="LinkedIn" aria-label="LinkedIn">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
+  </button>
+</nav>
+
+<main class="desktop" id="desktop">
+
+  <!-- Framed artwork: the centrepiece, like a print on the wall -->
+  <figure class="framed-art" id="framed-art">
+    <div class="art-frame">
+      <img id="framed-art-img" src="assets/wallpapers/shanghai-mist.jpg" alt="Shanghai Lujiazui skyline in mist at dawn">
+      <figcaption class="art-chip" id="framed-art-caption">Shanghai · Lujiazui</figcaption>
+    </div>
+  </figure>
+
+  <!-- Intro card -->
+  <section class="window glass intro" id="window-intro" data-window="intro" data-draggable="1">
+    <div class="window-bar" data-drag><span class="dot red" data-act="close"></span><span class="window-title">Welcome</span><button class="bar-btn" data-action="reset-welcome" title="Reset position" aria-label="Reset position">↻</button></div>
+    <div class="window-body intro-body">
+      <div class="avatar-wrap"><img class="avatar" id="intro-photo" src="assets/headshots/pro-blue-gray-avatar.jpg" alt="Marcin Fracz"><button class="photo-pick-btn" id="photo-pick-btn" type="button" hidden>Choose photo</button></div>
+      <h1 id="intro-name"></h1>
+      <p class="intro-title" id="intro-title"></p>
+      <p class="headline" id="intro-headline"></p>
+      <div class="intro-actions">
+        <a class="ia ia-primary" href="road.html">The Road <span aria-hidden="true">→</span></a>
+        <a class="ia" href="assets/resume.pdf" target="_blank" rel="noopener">Resume</a>
+        <button class="ia" type="button" data-open="contact-win">Contact</button>
+      </div>
+      <p class="intro-road-cap">My career as one drive, from engine gaskets to AI.</p>
+      <div class="intro-links" id="intro-buttons"></div>
+    </div>
+  </section>
+
+  <!-- World clock -->
+  <section class="widget glass clocks" id="widget-clocks" data-widget="clocks" data-draggable="1">
+    <div class="widget-bar" data-drag><span class="widget-title" id="clocks-title"></span><span class="widget-sub" id="clocks-sub"></span><span class="widget-actions"><button class="bar-btn" data-widget-size="clocks" title="Change size" aria-label="Change size">↻</button><button class="bar-btn" data-widget-hide="clocks" title="Hide widget" aria-label="Hide widget">×</button></span></div>
+    <div class="clock-grid" id="clocks"></div>
+  </section>
+
+
+  <!-- Weather (off by default) -->
+  <section class="widget glass weather" id="widget-weather" data-widget="weather" data-draggable="1">
+    <div class="widget-bar" data-drag><span class="widget-title">Weather</span><span class="widget-sub">Detroit</span><span class="widget-actions"><button class="bar-btn" data-widget-hide="weather" title="Hide widget" aria-label="Hide widget">×</button></span></div>
+    <div class="weather-body" id="weather-body">Loading…</div>
+  </section>
+
+
+  <!-- Career odometer -->
+  <section class="widget glass career" id="widget-career" data-widget="career" data-draggable="1">
+    <div class="widget-bar" data-drag><span class="widget-title">Career odometer</span><span class="widget-sub">20+ years</span><span class="widget-actions"><button class="bar-btn" data-widget-hide="career" title="Hide widget" aria-label="Hide widget">×</button></span></div>
+    <div class="career-body">
+      <div class="odo" aria-label="20 plus years"><span>2</span><span>0</span><span class="plus">+</span><em>years</em></div>
+      <p class="career-cos">Federal-Mogul · Chrysler Group · Johnson Controls · GM · SAIC-GM</p>
+      <p class="career-where">Worked in the US, Mexico and China</p>
+      <p class="career-adas"><i class="fan" aria-hidden="true"></i>From connected services and over-the-air updates at GM to L2++ ADAS strategy in China.</p>
+      <div class="career-part" id="career-part"><b>Pentastar 3.6L head gaskets</b><span>Left and right bank, designed and tested. The engine passed 10 million built by 2019.</span></div>
+      <a class="career-road" href="road.html">Drive the road →</a>
+    </div>
+  </section>
+
+  <!-- Now building -->
+  <section class="widget glass building" id="widget-building" data-widget="building" data-draggable="1">
+    <div class="widget-bar" data-drag><span class="widget-title">Now building</span><span class="widget-sub">Marcin Hub</span><span class="widget-actions"><button class="bar-btn" data-widget-hide="building" title="Hide widget" aria-label="Hide widget">×</button></span></div>
+    <div class="building-body">
+      <div class="build-stats"><div><b>1,780</b><span>rows</span></div><div><b>217</b><span>programs</span></div><div><b>55</b><span>markets</span></div><div><b>1,800+</b><span>commits</span></div></div>
+      <ol class="build-loop" id="build-loop"><li>Brief</li><li>Plan</li><li>Approve</li><li>Build</li><li>Score</li><li>Fix</li><li>Checkpoint</li></ol>
+    </div>
+  </section>
+
+  <!-- Sticky notes: each one drags on its own -->
+  <div class="note yellow" id="note-motto" data-note="motto" data-draggable="1">
+    <p class="note-tag">Field notes</p>
+    <p class="handwritten" id="note-motto-text">Find the gap. Build the mechanism. Bring the decision.</p>
+  </div>
+  <div class="note pink" id="note-resume" data-note="resume" data-draggable="1">
+    <p class="note-tag">Resume</p>
+    <p class="handwritten" id="note-resume-text"><a href="assets/resume.pdf">Resume (PDF)</a></p>
+  </div>
+  <div class="note blue" id="note-contact" data-note="contact" data-draggable="1">
+    <p class="note-tag">Contact</p>
+    <p><a id="note-email" href=""></a></p>
+    <p><a id="note-linkedin" href="" target="_blank" rel="noopener"></a></p>
+  </div>
+
+</main>
+
+<!-- Photo picker: preview only, hidden on the public site unless the address has ?pick -->
+<section class="window glass overlay-window hidden-window photo-picker" id="window-photos" data-window="photos" data-draggable="1">
+  <div class="window-bar" data-drag><span class="dot red" data-act="close"></span><span class="window-title">Choose the site photo</span></div>
+  <div class="window-body">
+    <div class="pp-layout">
+      <div class="pp-grid" id="pp-grid"></div>
+      <figure class="pp-preview"><img id="pp-big" alt=""><figcaption id="pp-cap"></figcaption></figure>
+    </div>
+    <p class="hint" id="pp-note">Your pick shows in this browser only. Tell Claude which one to make permanent.</p>
+  </div>
+</section>
+
+<!-- Overlay windows: open on demand -->
+<section class="window glass overlay-window hidden-window" id="window-about" data-window="about" data-draggable="1">
+  <div class="window-bar" data-drag><span class="dot red" data-act="close"></span><span class="dot yellow" data-act="min"></span><span class="dot green" data-act="max"></span><span class="window-title">About</span></div>
+  <div class="window-body" id="about-body"></div>
+</section>
+
+<section class="window glass overlay-window hidden-window" id="window-projects" data-window="projects" data-draggable="1">
+  <div class="window-bar" data-drag><span class="dot red" data-act="close"></span><span class="dot yellow" data-act="min"></span><span class="dot green" data-act="max"></span><span class="window-title">Projects</span></div>
+  <div class="window-body" id="projects-body"></div>
+</section>
+
+<section class="window glass overlay-window hidden-window" id="window-work" data-window="work" data-draggable="1">
+  <div class="window-bar" data-drag><span class="dot red" data-act="close"></span><span class="dot yellow" data-act="min"></span><span class="dot green" data-act="max"></span><span class="window-title">Work</span></div>
+  <div class="window-body">
+    <p class="hint" id="work-note"></p>
+    <div class="timeline-controls">
+      <button id="zoom-out" aria-label="Zoom out">−</button>
+      <button id="zoom-in" aria-label="Zoom in">+</button>
+    </div>
+    <div class="timeline-viewport">
+      <div class="timeline" id="timeline"></div>
+    </div>
+    <div class="showcase-row"><a class="showcase-link" href="work/timeline.html">Open the full timeline explorer ↗</a><a class="showcase-link" href="work/brag-book.html">See the work and tools: four live demos ↗</a><a class="showcase-link" href="road.html">Drive the Road ↗</a></div>
+  </div>
+</section>
+
+
+<section class="window glass overlay-window hidden-window" id="window-finder" data-window="finder" data-draggable="1">
+  <div class="window-bar" data-drag><span class="dot red" data-act="close"></span><span class="dot yellow" data-act="min"></span><span class="dot green" data-act="max"></span><span class="window-title">Finder</span></div>
+  <div class="window-body finder-body">
+    <aside class="finder-side">
+      <p class="finder-side-title">Favorites</p>
+      <button data-finder-nav="start">Start Here</button>
+      <button data-finder-nav="tools">Live Demos</button>
+      <button data-finder-nav="kit">Everyday Kit</button>
+      <button data-finder-nav="work">Work</button>
+    </aside>
+    <div class="finder-main">
+      <div class="finder-toolbar">
+        <input id="finder-search" type="search" placeholder="Search" aria-label="Search">
+      </div>
+      <div class="finder-grid" id="finder-grid"></div>
+    </div>
+  </div>
+</section>
+
+<section class="window glass overlay-window hidden-window" id="window-notes-win" data-window="notes-win" data-draggable="1">
+  <div class="window-bar" data-drag><span class="dot red" data-act="close"></span><span class="dot yellow" data-act="min"></span><span class="dot green" data-act="max"></span><span class="window-title">Notes</span></div>
+  <div class="window-body" id="notes-body"></div>
+</section>
+
+<section class="window glass overlay-window hidden-window" id="window-terminal" data-window="terminal" data-draggable="1">
+  <div class="window-bar" data-drag><span class="dot red" data-act="close"></span><span class="dot yellow" data-act="min"></span><span class="dot green" data-act="max"></span><span class="window-title">Terminal</span></div>
+  <div class="window-body terminal-body">
+    <div class="term-out" id="term-out"></div>
+    <div class="term-in"><span class="term-prompt">marcin@hub ~ % </span><input id="term-input" type="text" spellcheck="false" autocomplete="off"></div>
+  </div>
+</section>
+
+<section class="window glass overlay-window hidden-window" id="window-contact-win" data-window="contact-win" data-draggable="1">
+  <div class="window-bar" data-drag><span class="dot red" data-act="close"></span><span class="dot yellow" data-act="min"></span><span class="dot green" data-act="max"></span><span class="window-title">Contact</span></div>
+  <div class="window-body">
+    <form id="contact-form" class="contact-form">
+      <label>Name<input type="text" name="name" required></label>
+      <label>Email<input type="email" name="email" required></label>
+      <label>Message<textarea name="message" rows="5" required></textarea></label>
+      <button type="submit" class="pill-btn primary">Send</button>
+    </form>
+    <p class="hint" id="contact-status"></p>
+  </div>
+</section>
+
+<section class="window glass overlay-window hidden-window" id="window-browser" data-window="browser" data-draggable="1">
+  <div class="window-bar" data-drag><span class="dot red" data-act="close"></span><span class="dot yellow" data-act="min"></span><span class="dot green" data-act="max"></span><span class="window-title">Browser</span>
+    <button id="browser-back" title="Back" aria-label="Back">‹</button>
+    <button id="browser-forward" title="Forward" aria-label="Forward">›</button>
+    <button id="browser-reload" title="Reload" aria-label="Reload">↻</button>
+    <div class="browser-tabs" id="browser-tabs"></div>
+    <input id="browser-url" type="text" value="" spellcheck="false" autocomplete="off" aria-label="Address" hidden>
+    <button id="browser-open-tab" title="Open in a new tab" aria-label="Open in a new tab">↗</button>
+  </div>
+  <div class="browser-body">
+    <iframe id="browser-frame" title="Browser" src="about:blank" allow="fullscreen; autoplay" allowfullscreen></iframe>
+    <div class="browser-blocked hidden-window" id="browser-blocked">
+      <p><b>This page didn't load here.</b></p>
+      <p class="muted">It may block embedding, or be unreachable. You can still open it in a real tab.</p>
+      <button class="pill-btn" id="browser-blocked-open">Open in new tab ↗</button>
+    </div>
+  </div>
+</section>
+
+<section class="window glass overlay-window hidden-window" id="window-wallpaper" data-window="wallpaper" data-draggable="1">
+  <div class="window-bar" data-drag><span class="dot red" data-act="close"></span><span class="dot yellow" data-act="min"></span><span class="dot green" data-act="max"></span><span class="window-title">Wallpaper Settings</span></div>
+  <div class="window-body">
+    <div class="wp-panel" id="wp-panel"></div>
+    <div class="wp-footer">
+      <button class="pill-btn" data-action="reset-wallpaper">Reset</button>
+      <button class="pill-btn primary" data-close-win="wallpaper">Done</button>
+    </div>
+  </div>
+</section>
+
+<aside class="widget-panel hidden-window" id="widget-panel">
+  <div class="wp-head">
+    <div>
+      <h3>Desktop Widgets</h3>
+      <span class="wp-count" id="widget-panel-count"></span>
+    </div>
+    <div class="wp-head-actions">
+      <button class="pill-btn wp-reset" data-action="reset-widgets">Reset</button>
+      <button class="bar-btn" data-action="close-widget-panel" title="Close" aria-label="Close">×</button>
+    </div>
+  </div>
+  <div id="widget-panel-list"></div>
+</aside>
+
+<div class="palette hidden-window" id="palette">
+  <input id="palette-input" type="text" placeholder="Search apps and projects…" autocomplete="off">
+  <ul id="palette-list"></ul>
+</div>
+
+<script src="content/content.js?v=42"></script>
+<script src="js/app.js?v=54"></script>
+<script src="js/phone-menu.js?v=46"></script>
+<!-- Cloudflare Web Analytics --><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "18aafd4fcbc5429e9148c50c5ca2d470"}'></script><!-- End Cloudflare Web Analytics -->
+</body>
+</html>
