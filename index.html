@@ -20,7 +20,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=51">
+<link rel="stylesheet" href="css/styles.css?v=63">
 </head>
 <body>
 <div class="wallpaper" aria-hidden="true"><img id="wallpaper-img" src="assets/wallpapers/shanghai-mist.jpg" alt=""></div>
@@ -70,10 +70,9 @@
   </div>
   <nav class="mb-links" aria-label="Site">
     <a href="road.html">The Road</a>
-    <a href="reel.html">Sizzle reel</a>
+    <a href="reel.html" data-reel-name>Meet Marcin</a>
     <a href="work/brag-book.html" target="_blank" rel="noopener">Live demos</a>
     <a href="work/timeline.html">Timeline</a>
-    <a href="work/how-i-made-it.html">How I made it</a>
     <a href="assets/resume.pdf" target="_blank" rel="noopener">Resume</a>
     <button type="button" data-action="contact">Contact</button>
   </nav>
@@ -102,7 +101,7 @@
   <button data-brag="1" data-dock="brag" title="Live demos" aria-label="Live demos">
     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
   </button>
-  <button data-reel="1" data-dock="reel" title="Sizzle reel" aria-label="Sizzle reel">
+  <button data-reel="1" data-dock="reel" title="Meet Marcin" aria-label="Meet Marcin" data-reel-name="title">
     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M10 9.2v5.6l4.6-2.8z" fill="currentColor"/></svg>
   </button>
   <button data-open="projects" data-dock="projects" title="Projects" aria-label="Projects">
@@ -143,6 +142,7 @@
   <section class="window glass intro" id="window-intro" data-window="intro" data-draggable="1">
     <div class="window-bar" data-drag><span class="dot red" data-act="close"></span><span class="window-title">Welcome</span><button class="bar-btn" data-action="reset-welcome" title="Reset position" aria-label="Reset position">↻</button></div>
     <div class="window-body intro-body">
+      <div class="intro-reel" id="intro-reel"></div>
       <div class="avatar-wrap"><img class="avatar" id="intro-photo" src="assets/headshots/pro-blue-gray-avatar.jpg" alt="Marcin Fracz"><button class="photo-pick-btn" id="photo-pick-btn" type="button" hidden>Choose photo</button></div>
       <h1 id="intro-name"></h1>
       <p class="intro-title" id="intro-title"></p>
@@ -188,7 +188,7 @@
   <section class="widget glass building" id="widget-building" data-widget="building" data-draggable="1">
     <div class="widget-bar" data-drag><span class="widget-title">Now building</span><span class="widget-sub">Marcin Hub</span><span class="widget-actions"><button class="bar-btn" data-widget-hide="building" title="Hide widget" aria-label="Hide widget">×</button></span></div>
     <div class="building-body">
-      <div class="build-stats"><div><b>1,780</b><span>rows</span></div><div><b>217</b><span>programs</span></div><div><b>55</b><span>markets</span></div><div><b>1,800+</b><span>commits</span></div></div>
+      <div class="build-stats"><div><b>200+</b><span>programs</span></div><div><b>50+</b><span>markets</span></div><div><b>11</b><span>apps</span></div><div><b>1,800+</b><span>commits</span></div></div>
       <ol class="build-loop" id="build-loop"><li>Brief</li><li>Plan</li><li>Approve</li><li>Build</li><li>Score</li><li>Fix</li><li>Checkpoint</li></ol>
     </div>
   </section>
@@ -353,8 +353,11 @@
   <ul id="palette-list"></ul>
 </div>
 
-<script src="content/content.js?v=58"></script>
-<script src="js/app.js?v=61"></script>
+<script src="content/content.js?v=62"></script>
+<script src="js/reel-src.js?v=62"></script>
+<script src="js/reel-player.js?v=62"></script>
+<script>/* v63: Meet Marcin is the first thing on the home page; it plays, with sound, only when clicked */ (function(){var h=document.getElementById("intro-reel");if(window.MFReel&&h&&MFReel.mount(h)){h.closest(".intro").classList.add("has-reel")}else if(h){h.remove()}})();</script>
+<script src="js/app.js?v=62"></script>
 <script src="js/phone-menu.js?v=46"></script>
 <!-- Cloudflare Web Analytics --><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "18aafd4fcbc5429e9148c50c5ca2d470"}'></script><!-- End Cloudflare Web Analytics -->
 </body>

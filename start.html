@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Marcin Fracz · Start</title>
-<meta name="description" content="Marcin Fracz: automotive product and software strategy leader. The sizzle reel, the Road, the career timeline, live demos and the resume, all in one place.">
+<meta name="description" content="Marcin Fracz: automotive product and software strategy leader. A one-minute video, the Road, the career timeline, live demos and the resume, all in one place.">
 <link rel="icon" href="assets/favicon.png">
 <meta name="theme-color" content="#E9EDF2">
 <script>
@@ -15,8 +15,8 @@
     document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
   })();
 </script>
-<script src="js/reel-src.js?v=58"></script>
-<script src="js/reel-player.js?v=61"></script>
+<script src="js/reel-src.js?v=62"></script>
+<script src="js/reel-player.js?v=62"></script>
 <style>
 :root{
   --bg1:#f1f3f6;--bg2:#e3e8ee;--ink:#1b1f24;--ink2:#46505d;--muted:#6b7684;--line:rgba(27,31,36,.12);
@@ -57,13 +57,13 @@ h1{margin:0;white-space:nowrap;font-size:clamp(30px,min(3.2vw,6vh),58px);line-he
 .player{position:relative;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:#05080f;box-shadow:0 30px 60px -34px rgba(5,10,20,.75),0 0 0 1px var(--shot-line)}
 .player img,.player video{width:100%;height:100%;object-fit:cover}
 .player video{display:block;background:#000}
-.play{all:unset;position:absolute;inset:0;cursor:pointer;display:flex;align-items:flex-end;justify-content:flex-start;gap:14px;padding:20px 22px}
-.play::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 55%,rgba(0,0,0,.6))}
+.play{all:unset;position:absolute;inset:0;cursor:pointer;display:flex;align-items:flex-start;justify-content:flex-start;gap:14px;padding:20px 22px} /* v62: top left, clear of the name on the freeze frame */
+.play::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.45),rgba(0,0,0,0) 40%)}
 .play .btn{position:relative;z-index:1;flex:none;width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.94);display:grid;place-items:center;box-shadow:0 14px 34px -10px rgba(0,0,0,.6);transition:transform .18s ease}
 .play .btn svg{width:24px;height:24px;margin-left:4px;fill:#0b1020}
 .play:hover .btn,.play:focus-visible .btn{transform:scale(1.07)}
 .play:focus-visible .btn{outline:3px solid #fff;outline-offset:4px}
-.play .lbl{position:relative;z-index:1;align-self:flex-end;height:64px;display:flex;align-items:center;color:#fff;font-size:16px;font-weight:800;letter-spacing:.01em;text-shadow:0 1px 8px rgba(0,0,0,.5)}
+.play .lbl{position:relative;z-index:1;align-self:flex-start;height:64px;display:flex;align-items:center;color:#fff;font-size:16px;font-weight:800;letter-spacing:.01em;text-shadow:0 1px 8px rgba(0,0,0,.5)}
 .play .lbl span{font-weight:500;opacity:.8;margin-left:8px}
 .reel figcaption{display:flex;justify-content:space-between;gap:12px;margin-top:12px;font-size:13px;color:var(--muted)}
 .reel figcaption a{font-weight:700;color:var(--ink2);text-decoration:none}
@@ -118,13 +118,13 @@ h1{margin:0;white-space:nowrap;font-size:clamp(30px,min(3.2vw,6vh),58px);line-he
 
     <figure class="reel">
       <div class="player" id="player">
-        <img id="reel-poster" src="assets/sizzle-poster-1min.jpg" alt="">
-        <button class="play" type="button" id="reel-play" aria-label="Play the sizzle reel">
+        <img id="reel-poster" src="assets/reel-poster.jpg" alt="">
+        <button class="play" type="button" id="reel-play" data-reel="1" aria-label="Play the video">
           <span class="btn" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z"/></svg></span>
-          <span class="lbl">Sizzle reel<span id="reel-len">1:04</span></span>
+          <span class="lbl"><b data-reel-name style="font-weight:inherit">Meet Marcin</b><span id="reel-len">1:04</span></span>
         </button>
       </div>
-      <figcaption><span>The career in about a minute.</span><a href="reel.html" data-tab="Sizzle Reel">Open the reel page</a></figcaption>
+      <figcaption><span>The career in about a minute.</span></figcaption>
     </figure>
   </section>
 
@@ -152,19 +152,12 @@ h1{margin:0;white-space:nowrap;font-size:clamp(30px,min(3.2vw,6vh),58px);line-he
 <script>
   /* the reel: one source, set in js/reel-src.js */
   (function () {
-    var R = window.MF_REEL || { src: "assets/sizzle-reel-1min.mp4", poster: "assets/sizzle-poster-1min.jpg", length: "1:04" };
+    var R = window.MF_REEL || { src: "assets/sizzle-reel-1min.mp4", poster: "assets/reel-poster.jpg", length: "1:04" };
     var player = document.getElementById("player"), btn = document.getElementById("reel-play");
     document.getElementById("reel-poster").src = R.poster;
     document.getElementById("reel-len").textContent = R.length || "";
-    btn.addEventListener("click", function () {
-      if (window.MFReel) { window.MFReel.mount(player, { autoplay: true }); return; } /* v57: the tall cut on phones while upright */
-      var v = document.createElement("video");
-      v.controls = true; v.playsInline = true; v.autoplay = true; v.poster = R.poster; v.src = R.src;
-      v.setAttribute("aria-label", "Sizzle reel");
-      player.innerHTML = ""; player.appendChild(v);
-      var p = v.play(); if (p && p.catch) p.catch(function () {});
-      v.focus();
-    });
+    /* v62: the play button opens the video in a popup (js/reel-player.js) */
+    btn.setAttribute("aria-label", "Play " + (R.name || "the video") + (R.length ? ", " + R.length : ""));
   })();
   /* Inside the Desktop's browser window, site links open as new tabs there.
      On its own, each link simply opens its page. */

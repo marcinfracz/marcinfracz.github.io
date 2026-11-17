@@ -3,52 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sizzle Reel — Marcin Fracz</title>
-<meta name="description" content="Marcin Fracz — automotive strategy and product leader. A one-minute sizzle reel: hardware and data grounding, global product leadership, strategic execution, amplified by AI.">
+<title>Meet Marcin · Marcin Fracz</title>
+<meta name="description" content="Marcin Fracz, automotive strategy and product leader, in one minute: hardware and data grounding, global product leadership, strategic execution, amplified by AI.">
 <style>
-  :root { --paper: #F4F1EA; --ink: #1E2124; --amber: #E8A33D; --muted: #6b6f73; }
-  * { box-sizing: border-box; }
-  body { margin: 0; background: var(--paper); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-  .wrap { max-width: 960px; margin: 0 auto; padding: 40px 20px 64px; }
-  .kicker { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
-  h1 { font-size: clamp(28px, 5vw, 44px); line-height: 1.05; margin: 0 0 10px; letter-spacing: -0.02em; }
-  h1 .accent { color: var(--amber); }
-  p.lede { font-size: 17px; line-height: 1.55; margin: 0 0 24px; max-width: 640px; }
-  .player { border-radius: 12px; overflow: hidden; background: #0f0f11; box-shadow: 0 12px 40px rgba(30,33,36,.18); }
-  .player video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; background: #0f0f11; }
-  .meta { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 16px; font-size: 14px; color: var(--muted); }
-  .meta b { color: var(--ink); font-weight: 600; }
-  .back { display: inline-block; margin-top: 28px; font-size: 15px; color: var(--ink); text-decoration: none; border-bottom: 2px solid var(--amber); padding-bottom: 2px; }
-  .back:hover { color: var(--amber); }
-  /* v38: fill the screen in fullscreen, Firefox included */
-  video:fullscreen { width: 100vw !important; height: 100vh !important; max-width: none !important; max-height: none !important; aspect-ratio: auto !important; object-fit: contain !important; border-radius: 0 !important; background: #000 !important; }
-  video:-moz-full-screen { width: 100vw !important; height: 100vh !important; max-width: none !important; max-height: none !important; aspect-ratio: auto !important; object-fit: contain !important; border-radius: 0 !important; background: #000 !important; }
-  
-/* v45 phone: 44px tap targets; inline links grow their tap area without moving the text */
-@media (max-width:767px){a{display:inline-block;padding:11px 0;margin:-11px 0}a.back{display:inline-flex;align-items:center;min-height:44px;margin:0}}
+  html, body { margin: 0; height: 100%; background: #06080c; }
 </style>
+<script src="js/reel-src.js?v=62"></script>
+<script src="js/reel-player.js?v=62"></script>
 </head>
 <body>
-<main class="wrap">
-  <p class="kicker">Marcin Fracz</p>
-  <h1>Sizzle Reel<span class="accent">.</span></h1>
-  <p class="lede">Hardware and data grounding. Global product leadership. Strategic execution. All amplified by AI. One minute.</p>
-  <div class="player" id="player">
-  </div>
-  <div class="meta">
-    <span>Length <b id="reel-len">1:04</b></span>
-    <span>Format <b>1080p</b></span>
-    <span>Voice <b>AI narration</b></span>
-  </div>
-  <a class="back" href="./">Back to the desktop</a>
-</main>
-<script src="js/reel-src.js?v=58"></script>
-<script src="js/reel-player.js?v=61"></script>
 <script>
-  /* the reel's files are set in one place, js/reel-src.js; js/reel-player.js picks the cut for the screen */
-  (function () { var R = window.MF_REEL || {};
-    if (window.MFReel) window.MFReel.mount(document.getElementById("player"), { id: "reel", preload: "metadata" });
-    if (R.length) document.getElementById("reel-len").textContent = R.length; })();
+  /* v62: the video opens on its own, with nothing around it; closing it goes to the Desktop */
+  (function () {
+    var R = window.MF_REEL || {};
+    if (R.name) document.title = R.name + " · Marcin Fracz";
+    if (window.MFReel) window.MFReel.open({ here: true, noFs: true, onClose: function () { location.href = "./"; } });
+  })();
 </script>
 <!-- Cloudflare Web Analytics --><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "18aafd4fcbc5429e9148c50c5ca2d470"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
