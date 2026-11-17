@@ -1392,3 +1392,15 @@ body.dark .wps-img.on .wps-thumb, body.dark .wps-tabs button.on { outline-color:
 #window-projects .window-body { max-height: min(calc(100vh - 150px), 880px); }
 #window-projects .window-body.more { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 56px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 56px), transparent); }
 @media (max-width: 700px) { #window-projects .window-body { max-height: none; } }
+
+/* v63: Meet Marcin play tile at the top of the Welcome card; the poster carries his face, so the round photo steps aside */
+.intro-reel { border-radius: 14px; overflow: hidden; margin: 0 0 16px; box-shadow: 0 6px 20px rgba(15, 23, 42, .18); }
+.intro.has-reel .avatar-wrap { display: none; }
+/* v63: on phones the Shanghai photo, World Clock and Weather go to the end of the stack */
+@media (max-width: 767px) {
+  .framed-art, #widget-clocks, #widget-weather { order: 10; }
+}
+.intro-reel .mft { aspect-ratio: 2.2 / 1; background-position: center 45%; }
+/* compact form: the poster already shows the name, so the heading stays for screen readers only */
+#window-intro.compact.has-reel .intro-reel { max-width: 250px; margin: 0 auto 10px; }
+#window-intro.compact.has-reel h1 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: 0; }
