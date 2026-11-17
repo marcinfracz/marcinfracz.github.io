@@ -1,4 +1,4 @@
-/* v57: the sizzle reel player, used on the Start page, the reel page and the Road's finish.
+/* v57 (v61: inline box always wide on phones): the sizzle reel player, used on the Start page, the reel page and the Road's finish.
    On a computer: the wide cut with the browser's own controls.
    On a phone or tablet: the tall cut while the screen is upright and the wide cut when it is
    turned, swapped in place. Both cuts load together and stay in step; the wide one always
@@ -27,7 +27,7 @@
       '.mfr-big svg{width:26px;height:26px;margin-left:4px;fill:#0b1020}' +
       '.mfr[data-state=playing] .mfr-big{opacity:0;pointer-events:none}' +
       '.mfr-bar{position:absolute;left:0;right:0;bottom:0;z-index:3;display:flex;align-items:center;gap:6px;padding:22px 8px max(6px,env(safe-area-inset-bottom,0px));background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.62));color:#fff;font:600 13px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;transition:opacity .25s ease}' +
-      '.mfr.mfr-idle .mfr-bar{opacity:0;pointer-events:none}' +
+      '.mfr.mfr-idle .mfr-bar,.mfr.mfr-fresh .mfr-bar{opacity:0;pointer-events:none}' +
       '.mfr-bar button{all:unset;flex:none;width:44px;height:44px;display:grid;place-items:center;cursor:pointer;border-radius:50%}' +
       '.mfr-bar button:focus-visible,.mfr-big:focus-visible{outline:2px solid #fff;outline-offset:2px}' +
       '.mfr-bar svg{width:22px;height:22px;fill:currentColor}' +
@@ -61,7 +61,7 @@
     addCss();
     host.classList.add('mfr-host');
     var root = document.createElement('div');
-    root.className = 'mfr'; root.setAttribute('data-state', 'paused');
+    root.className = 'mfr mfr-fresh'; root.setAttribute('data-state', 'paused'); /* v61: no control bar over the poster until the first play */
     if (o.id) root.id = o.id + '-player';
     root.innerHTML =
       '<video class="mfr-v mfr-l" playsinline webkit-playsinline preload="metadata"></video>' +
@@ -88,7 +88,9 @@
       cur = root.querySelector('.mfr-cur'), dur = root.querySelector('.mfr-dur'), mute = root.querySelector('.mfr-mute'), fsb = root.querySelector('.mfr-fs');
     var want = false, seeking = false, idleT = 0, nativeFs = false;
 
-    function orient() { root.setAttribute('data-o', upright() ? 'p' : 'l'); }
+    /* v61: at rest and inline the box is always the wide cut; the tall cut shows only in full screen while upright */
+    function inFs() { var f = document.fullscreenElement || document.webkitFullscreenElement; return !!f && (f === root || f.contains(root)); }
+    function orient() { root.setAttribute('data-o', upright() && inFs() ? 'p' : 'l'); }
     orient();
     function hard() { /* put the picture exactly where the sound is */
       if (Math.abs(P.currentTime - L.currentTime) > 0.06) { try { P.currentTime = L.currentTime; } catch (e) {} }
@@ -108,6 +110,7 @@
       if (want) idleT = setTimeout(function () { if (want && !seeking) root.classList.add('mfr-idle'); }, 2600);
     }
     function play() {
+      root.classList.remove('mfr-fresh');
       want = true; hard();
       var a = L.play();
       quiet(P.play());
@@ -143,12 +146,19 @@
     });
     seek.addEventListener('change', function () { seeking = false; hard(); wake(); });
 
-    big.addEventListener('click', function (e) { e.stopPropagation(); play(); });
-    pp.addEventListener('click', function (e) { e.stopPropagation(); toggle(); });
+    function goFull() { /* v61: a tap on play while upright opens the tall cut in full screen */
+      if (!upright() || inFs()) return;
+      try {
+        if (root.requestFullscreen) quiet(root.requestFullscreen({ navigationUI: 'hide' }));
+        else if (root.webkitRequestFullscreen) root.webkitRequestFullscreen();
+      } catch (e) {}
+    }
+    big.addEventListener('click', function (e) { e.stopPropagation(); goFull(); play(); });
+    pp.addEventListener('click', function (e) { e.stopPropagation(); if (!want) goFull(); toggle(); });
     mute.addEventListener('click', function (e) { e.stopPropagation(); L.muted = !L.muted; show(); wake(); });
     root.addEventListener('click', function (e) {
       if (e.target.closest('.mfr-bar')) return;
-      if (!want) { play(); return; }
+      if (!want) { goFull(); play(); return; }
       if (root.classList.contains('mfr-idle')) wake(); else toggle();
     });
 
@@ -184,6 +194,8 @@
       try { window.matchMedia('(orientation: portrait)').addListener(turned); } catch (e2) {}
     }
     window.addEventListener('resize', turned);
+    document.addEventListener('fullscreenchange', turned);
+    document.addEventListener('webkitfullscreenchange', turned);
     window.addEventListener('orientationchange', function () { setTimeout(turned, 60); });
 
     show();
