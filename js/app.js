@@ -1250,7 +1250,7 @@
     var pinned = [
       { tag: "Motto", text: C.notes.motto },
       { tag: "Resume", text: C.notes.resumeNote, href: "assets/resume.pdf" },
-      { tag: "Sizzle Reel", text: C.notes.reelNote, href: "reel.html" },
+      { tag: "Video", text: ((window.MF_REEL || {}).name || "Meet Marcin") + " (" + ((window.MF_REEL || {}).length || "1:04") + ")", href: "reel.html" },
       { tag: "Contact", text: "Email · LinkedIn" }
     ];
     el("notes-body").innerHTML =
@@ -1349,7 +1349,7 @@
     if (url === BROWSER_HOME) return "Start";
     if (url.split("#")[0] === ROAD_URL) return "The Road";
     if (url === RESUME_URL) return "Resume";
-    if (url === REEL_URL) return "Sizzle Reel";
+    if (url === REEL_URL) return (window.MF_REEL || {}).name || "Meet Marcin";
     if (url.split("#")[0] === BRAG_URL) return "Live demos";
     if (url.split("#")[0] === TIMELINE_URL) return "Timeline";
     if (url.split("#")[0] === new URL("work/how-i-made-it.html", window.location.href).href) return "How I made it";
@@ -1566,8 +1566,7 @@
     var hm = e.target.closest('a[href*="how-i-made-it.html"]');
     if (hm) { e.preventDefault(); openToolPage(hm.href, "How I made it"); return; }
     var r = e.target.closest('a[href$="reel.html"], [data-reel]');
-    if (r && !isPhone()) { e.preventDefault(); browserOpenTab(REEL_URL, "Sizzle Reel"); return; }
-    if (r && r.hasAttribute("data-reel")) { window.location.href = REEL_URL; return; } /* v57: the dock's reel button on a phone */
+    if (r) { e.preventDefault(); if (window.MFReel) window.MFReel.open(); else window.location.href = REEL_URL; return; } /* v62: the video opens in a popup over the Desktop */
     var x = e.target.closest("[data-browser-tab-close]");
     if (x) { e.stopPropagation(); if (Date.now() - tabXAt > 600) browserCloseTab(parseInt(x.getAttribute("data-browser-tab-close"), 10)); return; }
     var tb = e.target.closest("[data-browser-tab]");
