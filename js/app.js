@@ -177,7 +177,8 @@
     li.textContent = C.notes.contact.linkedin;
     li.removeAttribute("href");
   }
-  el("contact-email-link").href = "mailto:" + C.notes.contact.email;
+  var contactEmailLink = el("contact-email-link"); /* v57: a missing link must not stop the rest of the page */
+  if (contactEmailLink) contactEmailLink.href = "mailto:" + C.notes.contact.email;
 
   /* ================= clocks ================= */
   function dialSvg(i) {
@@ -254,7 +255,8 @@
   /* ================= z-order / bring to front ================= */
   var zDesk = 20, zOver = 70;
   function bringToFront(node) {
-    if (node.classList.contains("overlay-window")) node.style.zIndex = ++zOver;
+    /* v57: on a phone an open sheet sits above the menu bar, so its close button can always be tapped */
+    if (node.classList.contains("overlay-window")) node.style.zIndex = (isPhone() ? 10000 : 0) + (++zOver);
     else node.style.zIndex = ++zDesk;
   }
 
