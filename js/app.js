@@ -740,6 +740,18 @@
     el("check-light").textContent = prefs.dark ? "" : "✓";
     el("check-dark").textContent = prefs.dark ? "✓" : "";
     savePrefs();
+    syncFrameTheme();
+  }
+  /* v52: the page open in the desktop Browser follows the desktop's light or dark mode */
+  function syncFrameTheme() {
+    var f = el("browser-frame");
+    try {
+      var w = f && f.contentWindow;
+      if (!w || !w.document || !w.document.documentElement) return;
+      if (w.__road && w.__road.setTheme) { w.__road.setTheme(prefs.dark ? "dusk" : "day"); return; }
+      var r = w.document.documentElement, cur = r.getAttribute("data-theme");
+      if (cur === "light" || cur === "dark" || cur === null && w.location.href.indexOf(window.location.origin + "/") === 0) r.setAttribute("data-theme", prefs.dark ? "dark" : "light");
+    } catch (e) {}
   }
   on("mb-theme-btn", "click", function () { prefs.dark = !prefs.dark; applyTheme(); });
 
