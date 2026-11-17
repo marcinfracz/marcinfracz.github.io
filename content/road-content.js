@@ -5,13 +5,14 @@ window.ROAD_CONTENT = {
   tagline: "Find the gap. Build the mechanism. Bring the decision.",
 
   eras: [
-    { id: "school", n: 1, label: "Engineering foundation", short: "Foundation", years: "2003–2007", region: "us", color: "#B14F94" },
-    { id: "engineering", n: 2, label: "Engineering & an evening MBA", short: "Engineering", years: "2007–2014", region: "us", color: "#C8693A" },
-    { id: "program", n: 3, label: "GM leadership development program", short: "Leadership program", years: "2014–2017", region: "us", color: "#D9A21B" },
-    { id: "crossovers", n: 4, label: "Crossover product marketing", short: "Crossovers", years: "2017–2020", region: "us", color: "#2E9C8F" },
-    { id: "connected", n: 5, label: "Connected & OTA", years: "2020–2022", region: "us", color: "#7357D8" },
-    { id: "shanghai", n: 6, label: "Shanghai", years: "2022–2025", region: "asia", color: "#D64545" },
-    { id: "onstar", n: 7, label: "OnStar International", short: "OnStar Intl.", years: "2025–2026", region: "port", color: "#1F8FD1" }
+    { id: "school", n: 1, label: "Engineering degree & co-op", short: "Foundation", years: "2003–2007", region: "us", color: "#B14F94" },
+    { id: "engineering", n: 2, label: "Automotive engineering", short: "Engineering", years: "2007–2014", region: "us", color: "#C8693A" },
+    { id: "mba", n: 3, label: "MBA: engineering to business", short: "MBA", years: "2012–2014", region: "us", color: "#5E8A2E" },
+    { id: "program", n: 4, label: "GM leadership development program", short: "Leadership program", years: "2014–2017", region: "us", color: "#D9A21B" },
+    { id: "crossovers", n: 5, label: "Crossover product marketing", short: "Crossovers", years: "2017–2020", region: "us", color: "#2E9C8F" },
+    { id: "connected", n: 6, label: "Connected services & OTA", short: "Connected & OTA", years: "2020–2022", region: "us", color: "#7357D8" },
+    { id: "shanghai", n: 7, label: "Software strategy, SAIC-GM China", short: "SAIC-GM China", years: "2022–2025", region: "asia", color: "#D64545" },
+    { id: "onstar", n: 8, label: "OnStar International", short: "OnStar Intl.", years: "2025–2026", region: "port", color: "#1F8FD1" }
   ],
 
   stops: [
@@ -125,7 +126,7 @@ window.ROAD_CONTENT = {
     },
 
     {
-      id: "ross", alias: ["mba", "michigan-ross", "michigan", "umich"], era: "engineering", scene: "ross", region: "us", milestone: "The MBA",
+      id: "ross", alias: ["michigan-ross", "michigan", "umich"], era: "mba", scene: "ross", region: "us", milestone: "The MBA",
       title: "Michigan Ross MBA",
       role: "MBA, Marketing & Strategy",
       place: "Ann Arbor, Michigan", span: "Graduated 2014",
@@ -336,7 +337,7 @@ window.ROAD_CONTENT = {
     {
       id: "finale", alias: ["reel"], era: null, scene: "finale",
       kicker: "Finish",
-      title: "Seven chapters, one road.",
+      title: "Eight chapters, one road.",
       role: "Engineering, product, customer experience and software strategy, across the US, Mexico and China. Tap a chapter to drive back to it.",
       what: "Exploring new leadership opportunities in automotive strategy, product and AI.",
       wins: [], callouts: [],
@@ -557,18 +558,18 @@ window.ROAD_CONTENT.roles = {
    Same three lines for every stop: company, role and its function, years. */
 window.ROAD_CONTENT.rail = {
   "start":               { co: "The Road",              ro: "20+ years in automotive",                                 yr: "2003–2026" },
-  "kettering":           { co: "Kettering University",  ro: "BS & Federal-Mogul co-op · Mechanical Engineering",         yr: "2003–2007" },
-  "federal-mogul":       { co: "Federal-Mogul",         ro: "Product Engineer · Powertrain Sealing",                     yr: "2007–2010" },
-  "chrysler":            { co: "Chrysler Group",        ro: "Design Release Engineer · Powertrain Sealing",              yr: "2010–2011" },
-  "johnson-controls":    { co: "Johnson Controls",      ro: "Senior Product Engineer · Automotive Seating",              yr: "2011–2014" },
-  "ross":                { co: "Michigan Ross",         ro: "MBA · Marketing & Strategy · MAP in Canada",                yr: "2012–2014" },
-  "traverse":            { co: "General Motors",        ro: "Asst. Product Marketing Manager · Chevrolet Marketing",    yr: "2014–2015" },
-  "customer-experience": { co: "General Motors",        ro: "Global Brand Strategy Asst. Manager · Customer Experience", yr: "2015–2016" },
-  "mexico":              { co: "GM de Mexico",          ro: "Supervisor · Dealer Sales Operations",                      yr: "2016" },
-  "equinox":             { co: "General Motors",        ro: "Global Product Manager · Crossover Product Strategy",       yr: "2017–2018" },
-  "trailblazer-encore":  { co: "General Motors",        ro: "Product Manager · Buick & Chevrolet Crossovers",           yr: "2019–2020" },
-  "connected":           { co: "General Motors",        ro: "Business Strategy Manager · Connected Services",            yr: "2020–2022" },
-  "shanghai":            { co: "SAIC-GM",               ro: "Deputy Director · Software Strategy",                       yr: "2022–2025" },
-  "onstar":              { co: "General Motors",        ro: "Manager · OnStar International Product Marketing",          yr: "2025–2026" },
-  "finale":              { co: "Finish",                ro: "Seven chapters, one road",                                  yr: "2003–2026" }
+  "kettering":           { co: "Kettering University",  ro: "BS & Federal-Mogul co-op · Mechanical Engineering",         yr: "2003–2007", t: "BSME and co-op",                      dm: "Education",                  f: "edu" },
+  "federal-mogul":       { co: "Federal-Mogul",         ro: "Product Engineer · Powertrain Sealing",                     yr: "2007–2010", t: "Product Engineer",                     dm: "Product engineering",        f: "eng" },
+  "chrysler":            { co: "Chrysler Group",        ro: "Design Release Engineer · Powertrain Sealing",              yr: "2010–2011", t: "Design Release Engineer",              dm: "Design release",             f: "eng" },
+  "johnson-controls":    { co: "Johnson Controls",      ro: "Senior Product Engineer · Automotive Seating",              yr: "2011–2014", t: "Senior Product Engineer",              dm: "Program leadership",         f: "eng" },
+  "ross":                { co: "Michigan Ross",         ro: "MBA · Marketing & Strategy · MAP in Canada",                yr: "2012–2014", t: "MBA, Marketing & Strategy",            dm: "Education",                  f: "edu" },
+  "traverse":            { co: "GM",                    ro: "Asst. Product Marketing Manager · Chevrolet Marketing",    yr: "2014–2015", t: "Asst. Product Marketing Manager",      dm: "Vehicle product marketing",  f: "product" },
+  "customer-experience": { co: "GM",                    ro: "Global Brand Strategy Asst. Manager · Customer Experience", yr: "2015–2016", t: "Asst. Manager, Global Brand Strategy",  dm: "Customer experience",        f: "cx" },
+  "mexico":              { co: "GM Mexico",             ro: "Supervisor · Dealer Sales Operations",                      yr: "2016",      t: "Supervisor, Dealer Sales Operations",  dm: "Dealer sales operations",    f: "field" },
+  "equinox":             { co: "GM",                    ro: "Global Product Manager · Crossover Product Strategy",       yr: "2017–2018", t: "Global Product Manager",               dm: "Global product management",  f: "product" },
+  "trailblazer-encore":  { co: "GM",                    ro: "Product Manager · Buick & Chevrolet Crossovers",           yr: "2019–2020", t: "Product Manager, Buick & Chevrolet",   dm: "Vehicle product management", f: "product" },
+  "connected":           { co: "GM",                    ro: "Business Strategy Manager · Connected Services",            yr: "2020–2022", t: "Business Strategy Manager",            dm: "Connected services",         f: "digital" },
+  "shanghai":            { co: "SAIC-GM",               ro: "Deputy Director · Software Strategy",                       yr: "2022–2025", t: "Deputy Director, Software Strategy",   dm: "Software strategy",          f: "digital" },
+  "onstar":              { co: "GM",                    ro: "Manager · OnStar International Product Marketing",          yr: "2025–2026", t: "Manager, OnStar Product Marketing",    dm: "Software product marketing", f: "digital" },
+  "finale":              { co: "Finish",                ro: "Eight chapters, one road",                                  yr: "2003–2026" }
 };
