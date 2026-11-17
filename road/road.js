@@ -168,12 +168,13 @@ function buildFlow(withGL) {
     inner += flagsHTML(s);
     if (s.i === 0) inner += `<div class="card-actions"><button class="btn tour-btn" type="button" data-act="tour">Show me around</button></div>`;
     inner += winsHTML(s) + calloutsHTML(s);
-    if (s.reel) inner += `<div class="reel"><video src="${esc(s.reel.src)}" ${s.reel.poster ? `poster="${esc(s.reel.poster)}"` : ''} controls playsinline preload="none" aria-label="${esc(s.reel.label)}"></video></div>`;
+    if (s.reel) inner += window.MFReel ? `<div class="reel" data-mfreel="1"></div>` : `<div class="reel"><video src="${esc(s.reel.src)}" ${s.reel.poster ? `poster="${esc(s.reel.poster)}"` : ''} controls playsinline preload="none" aria-label="${esc(s.reel.label)}"></video></div>`;
     if (s.reel) inner += `<div class="card-actions"><a class="btn primary" href="index.html">${esc(UI.back)}</a><a class="btn" href="${esc(UI.resumeHref)}" target="_blank" rel="noopener">${esc(UI.resume)}</a></div>`;
     inner += moreHTML(s, true);
     parts.push(`<section id="m-${s.id}" data-i="${s.i}"><div class="fcard">${inner}</div></section>`);
   });
   flow.innerHTML = parts.join('');
+  flow.querySelectorAll('[data-mfreel]').forEach(box => { const st = STOPS.find(x => x.reel); window.MFReel.mount(box, { label: st && st.reel ? st.reel.label : 'Sizzle reel' }); });
 }
 
 /* headshot sticker: round 27, always the blue-gray headshot used on the desktop page */
@@ -718,7 +719,12 @@ function start() {
         card.scrollTop = 0;
         card.querySelectorAll('[data-era]').forEach(b => b.addEventListener('click', () => { const ix = STOPS.findIndex(x => x.era === b.dataset.era); if (ix >= 0) go(ix); }));
         const rb = card.querySelector('[data-act="reel"]');
-        if (rb) rb.addEventListener('click', () => { const box = card.querySelector('.reel'); box.innerHTML = `<video id="reel" src="${esc(s.reel.src)}" controls playsinline preload="metadata" aria-label="${esc(s.reel.label)}"></video>`; box.hidden = false; rb.remove(); const v = box.querySelector('video'); v.play().catch(() => {}); });
+        if (rb) rb.addEventListener('click', () => {
+          const box = card.querySelector('.reel'); box.hidden = false; rb.remove();
+          /* v57: the reel player shows the tall cut on an upright phone and the wide cut when it is turned */
+          if (window.MFReel) { window.MFReel.mount(box, { id: 'reel', autoplay: true, label: s.reel.label }); return; }
+          box.innerHTML = `<video id="reel" src="${esc(s.reel.src)}" controls playsinline preload="metadata" aria-label="${esc(s.reel.label)}"></video>`; const v = box.querySelector('video'); v.play().catch(() => {});
+        });
         buildMarkers(s);
         card.classList.remove('out');
         resize();
