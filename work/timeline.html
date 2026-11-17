@@ -613,6 +613,16 @@ html[data-theme="dark"] .tile.keep img,html[data-theme="dark"] .lg.keep img,html
   .dock .zseg button::before{width:5px;height:5px}
   .dock #zlabel{font-size:11px}
 }
+/* v50: role titles: two lines at most, whole words, never hyphenated; the domain reads as a small tag */
+.bx-t,.bx-s,.bx-g{hyphens:none!important;-webkit-hyphens:none!important;overflow-wrap:normal!important;word-break:normal!important;-webkit-line-clamp:2!important}
+.bx-d{display:none;align-self:flex-start;max-width:100%;box-sizing:border-box;margin-top:2px;padding:3px 5px 2px;border-radius:4px;background:rgba(255,255,255,.2);font-size:8.5px!important;font-weight:800;letter-spacing:.04em;text-transform:uppercase;line-height:1.25;opacity:1;-webkit-line-clamp:2;hyphens:none;overflow-wrap:normal}
+.bx-d::before{display:none}
+.z-s.narrow .bx{padding-left:5px!important;padding-right:4px!important}
+.z-xs .bx-g{-webkit-line-clamp:4!important}
+.z-s.narrow .bx-g,.z-s.narrow .bx-s,.z-xs .bx-g{letter-spacing:-.015em}
+.z-s .bx-d{-webkit-line-clamp:3}
+.z-s.narrow .bx-d{-webkit-line-clamp:3;font-size:8px!important;letter-spacing:.02em;padding:2px 4px 1px}
+.z-m .bx-d,.z-s.roomy .bx-d{display:-webkit-box}
 /* v45: phones get a real vertical timeline: one line down the left, every role a tappable card
    with its logo, title, years and place. The zoomable desktop timeline stays for 768px and up. */
 .vt{display:none}
@@ -869,7 +879,8 @@ const tickOrder = ticks.slice().sort((a, b) => (b.major - a.major) || (a.y - b.y
 const zoneUp = mk('span', 'zone', 'Domestic experience'), zoneDn = mk('span', 'zone', 'International experience');
 /* v33: soft hyphens let long words in narrow boxes break at a syllable instead of being clipped */
 const SHY = { Engineering: 'Engi&shy;neering', Engineer: 'Engi&shy;neer', Manager: 'Man&shy;ager', Supervisor: 'Super&shy;visor', Strategy: 'Strat&shy;egy', Marketing: 'Market&shy;ing', Director: 'Direc&shy;tor', Product: 'Prod&shy;uct', Release: 'Re&shy;lease', Business: 'Busi&shy;ness', Global: 'Glo&shy;bal', Rollout: 'Roll&shy;out' };
-const shy = t => t.replace(/[A-Za-z]+/g, w => SHY[w] || w);
+/* v50: no word breaks in role titles. Whole words only; a hyphenated word like Co-op never splits */
+const shy = t => t.replace(/-/g, '\u2011');
 const brEls = CHAPTERS.map(c => mk('a', 'br t' + c.tier + (c.cls ? ' ' + c.cls : ''), `<span class="br-l">${c.flag ? `<span class="br-fl">${chick(c.flag)}</span>` : ''}<span class="f">${esc(c.t)} <i>· ${esc(c.years)}</i></span><span class="s">${esc(c.short)}</span></span>`, { href: '#' + c.id, 'data-open': c.id, 'aria-label': `${c.t}, ${c.years}` }));
 const lgEls = EMP.map(e => mk('span', 'lg-chip span',
   `<img src="../assets/road/logos/${e.n}.png" alt="" width="${Math.round(20 * e.r)}" height="20"><b>${esc(e.t)}</b>`,
@@ -879,7 +890,7 @@ const bxEls = ROLES.map(s => {
   const hl = (p.hl || []).slice(0, 3).map(x => `<li>${md(x)}</li>`).join('');
   const tg = TAGS[s.id] || [];
   return mk('a', `bx ${s.lane} f-${s.focus}`,
-    `<span class="bx-k">${esc(s.kicker)}</span><span class="bx-t">${esc(s.label)}</span><span class="bx-s">${shy(esc(s.short))}</span><span class="bx-g">${shy(esc(s.tag))}</span>` +
+    `<span class="bx-k">${esc(s.kicker)}</span><span class="bx-t">${shy(esc(s.label))}</span><span class="bx-s">${shy(esc(s.short))}</span><span class="bx-g">${shy(esc(s.tag))}</span>` +
     (tg.length ? `<span class="bx-d">${esc(tg[0])}</span><ul class="bx-tags">${tg.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : '') +
     (OUT[s.id] ? `<span class="bx-o">${esc(OUT[s.id])}</span>` : '') +
     `<span class="bx-sum">${esc(p.summary || '')}</span><ul class="bx-hl">${hl}</ul>` +
@@ -1076,7 +1087,28 @@ function fitHL() {
     if (mode !== 'xl' || el.classList.contains('dim')) return;
     for (let k = li.length - 1; k >= 0 && ul.scrollHeight > ul.clientHeight + 1; k--) li[k].hidden = true; });
 }
-const settled = () => { markDim(true); syncZoomUI(); fitHL(); };
+/* v50: every visible role title fits on two lines of whole words: shrink the type a little where needed */
+function fitTitles() {
+  /* pass 1: per card, the size its title needs for two lines; a long title falls back to its shorter form first */
+  const need = [];
+  bxEls.forEach((el, i) => {
+    const sp = el.querySelector('.bx-s'), r = ROLES[i];
+    if (sp.dataset.alt) { sp.innerHTML = shy(esc(r.short)); delete sp.dataset.alt; }
+    el.querySelectorAll('.bx-t,.bx-s,.bx-g').forEach(x => x.style.removeProperty('font-size'));
+    const t = [...el.querySelectorAll('.bx-t,.bx-s,.bx-g')].find(x => getComputedStyle(x).display !== 'none');
+    if (!t) return;
+    const base = parseFloat(getComputedStyle(t).fontSize), lh = parseFloat(getComputedStyle(t).lineHeight) / base || 1.2;
+    const fit = () => { let fs = base; t.style.removeProperty('font-size'); const over = () => t.scrollWidth > t.clientWidth + 1 || t.scrollHeight > Math.ceil((mode === 'xs' ? 4 : 2) * fs * lh) + 2;
+      for (let k = 0; k < 14 && over() && fs > 9; k++) { fs -= 0.5; t.style.setProperty('font-size', fs + 'px', 'important'); } return fs; };
+    let fs = fit();
+    if (t === sp && fs < base - 1 && r.tag && r.tag !== r.short) { sp.innerHTML = shy(esc(r.tag)); sp.dataset.alt = 1; fs = fit(); }
+    need.push([t, base, fs]);
+  });
+  /* pass 2: one type size for every card on screen, so the row reads evenly */
+  const m = Math.min(...need.map(n => n[2]));
+  need.forEach(([t, base]) => { if (m < base) t.style.setProperty('font-size', m + 'px', 'important'); else t.style.removeProperty('font-size'); });
+}
+const settled = () => { markDim(true); syncZoomUI(); fitHL(); fitTitles(); };
 
 /* one animation at a time: tween U (in log space) and u0 */
 let anim = null;
