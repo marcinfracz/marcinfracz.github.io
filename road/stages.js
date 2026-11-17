@@ -2,9 +2,9 @@
    { group, anchors: {name: Object3D}, update(t, k, dt) } where k is 1 when the
    camera has landed on that stop and 0 when it is far away. */
 import { THREE, reg, mat, ownMat, glowMat, mesh, at, box, cyl, sph, grp, label, canvasTex, tok, smooth, clamp, lerp, roadZ } from './core.js';
-import { vehicleGeo } from './world.js?v=55';
+import { vehicleGeo } from './world.js?v=56';
 import { drawFlag, drawMark, onLogo } from './marks.js?v=28';
-import { ketteringAB, bulldog, bulldogPoster, rossBuilding, burOak, blockMSign, wavingFlag, wave, signPanel, MAIZE, BLUE } from './landmarks.js?v=55';
+import { ketteringAB, bulldog, bulldogPoster, rossBuilding, burOak, blockMSign, wavingFlag, wave, signPanel, MAIZE, BLUE } from './landmarks.js?v=56';
 
 const pin = (parent, x, y, z) => { const o = new THREE.Object3D(); o.position.set(x, y, z); parent.add(o); return o; };
 const vmesh = (type, s = 1, key = 'obj') => { const m = mesh(vehicleGeo(type), mat(key, { vertexColors: true })); m.scale.setScalar(s); return m; };

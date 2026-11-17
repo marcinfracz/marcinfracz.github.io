@@ -5,7 +5,7 @@
    Flint (Kettering), Ann Arbor (Michigan Ross), Detroit (riverfront) and
    Shanghai (Lujiazui and the Bund). */
 import { THREE, mat, reg, mesh, merge, bx, cy, label, canvasTex, tok, roadZ, roadDZ, rand, smooth, clamp, lerp } from './core.js';
-import { vehicleGeo } from './world.js?v=55';
+import { vehicleGeo } from './world.js?v=56';
 
 /* ---------------- shared materials and a small geometry kit ---------------- */
 const C3 = h => { const c = new THREE.Color(h); return [c.r, c.g, c.b]; };

@@ -1,6 +1,6 @@
 /* The Road: terrain, road network, region-aware traffic, NPCs and the
    perception layer (radar, LiDAR, vision boxes, V2X). */
-import { cityFlat, cityRiver, cityKeepOut, cityWater } from './landmarks.js?v=55';
+import { cityFlat, cityRiver, cityKeepOut, cityWater } from './landmarks.js?v=56';
 import { buildLife } from './life.js?v=50';
 import { THREE, mat, ownMat, glowMat, reg, mesh, at, box, cyl, sph, grp, merge, bx, cy, label,
   smooth, clamp, lerp, rand, roadZ, roadDZ, tok } from './core.js';
@@ -874,7 +874,7 @@ export function buildWorld(scene, opts) {
       if (!c.show) return;
       const nb = nearBoundary(c.x); let sc = clamp(nb / 4, 0, 1);
       /* v55: in the down-the-road views, keep the hero's side clear between the camera and the car */
-      if (aheadW > 0 && c.z > 0) sc *= 1 - aheadW * smooth(heroX - 50, heroX - 45, c.x) * smooth(heroX - 0.5, heroX - 4, c.x);
+      if (aheadW > 0) sc *= 1 - aheadW * smooth(heroX - 50, heroX - 45, c.x) * (c.z > 0 ? smooth(heroX - 0.5, heroX - 4, c.x) : smooth(heroX + 10, heroX - 2, c.x));
       if (sc <= 0.02) return;
       const d = laneDir(c.lane);
       const z = roadZ(c.x) + c.z;
