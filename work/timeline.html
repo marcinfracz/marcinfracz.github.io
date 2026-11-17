@@ -585,6 +585,16 @@ html[data-theme="dark"] .tile.keep img,html[data-theme="dark"] .lg.keep img,html
 .z-xl .bx>:not(.bx-y):not(.bx-flag){max-width:780px}
 .z-l .bx-y,.z-xl .bx-y{padding-top:4px}
 
+/* v48: one left edge and one right edge on laptops and tablets. The photo pill, the timeline's first card,
+   the highlight row and the legend start on the left edge; the nav pill, the arrow tip and the zoom end on the right.
+   The highlight row sits in the footer, right above the legend and zoom, spread across the full width. */
+@media (min-width:768px){
+  .bar,.dock{left:max(24px,env(safe-area-inset-left,0px));right:max(24px,env(safe-area-inset-right,0px))}
+  .dock{flex-wrap:wrap;row-gap:10px}
+  .dock>.lenses{flex:0 0 100%;margin:0;justify-content:space-between;gap:8px 6px}
+  .dock>.lenses .lens-lt{margin-right:0}
+}
+@media (min-width:768px) and (max-width:1299px){.dock>.lenses{justify-content:flex-start}.dock>.lenses .lens-lt{margin-right:4px}}
 /* v45: phones get a real vertical timeline: one line down the left, every role a tappable card
    with its logo, title, years and place. The zoomable desktop timeline stays for 768px and up. */
 .vt{display:none}
@@ -885,11 +895,18 @@ function placeIntro() {
   it.style.setProperty('--hx', on ? (a + 24 - it.getBoundingClientRect().left) + 'px' : '0px');
   it.style.setProperty('--hw', on ? room + 'px' : 'none');
 }
+/* v48: the highlight row lives in the footer on laptops and tablets, under the title on phones */
+function placeLenses() {
+  const ln = $('#lenses'), want = innerWidth >= 768 ? $('#dock') : $('#intro');
+  if (ln && want && ln.parentNode !== want) want.insertBefore(ln, want === $('#dock') ? want.firstChild : null);
+}
 function measure() {
+  placeLenses();
   placeIntro();
   W = innerWidth; H = innerHeight; M = W < 600 ? 14 : 24;
   const span = W - 2 * M, phone = W < 600;
-  const fitU = span / (TOTAL + 0.4);
+  /* v48: whole career fills the width exactly: first card on the left edge, arrow tip on the right edge */
+  const fitU = (span - 6) / (TOTAL - 0.2);
   const per = phone ? [9, 4.6, 3.25] : [12, 6.6, 4.4, 3.3];
   const names = phone ? ['Whole career', 'Chapters', 'Two roles', 'One role'] : ['Whole career', 'Chapters', 'A few roles', 'Two roles', 'One role'];
   levels = [{ U: fitU, n: names[0] }];
@@ -1007,6 +1024,8 @@ function render() {
 /* ---------- snapping: whole boxes only, centred on screen ---------- */
 function candidates() {
   const span = spanU();
+  /* v48: whole career (or wider): content runs from the first card (box inset 3px) to the arrow tip (9px past the line end) */
+  if (levels[0] && U <= levels[0].U * 1.0005) { const left = (W - 2 * M) - ((TOTAL - 0.2) * U + 6); return [(3 - left / 2) / U]; }
   if (span >= TOTAL - 0.01) return [(TOTAL - span) / 2];
   const out = [];
   for (let i = 0; i < ROLES.length; i++) {
@@ -1022,7 +1041,7 @@ function nearest(target) { const c = candidates(); return c.reduce((a, b) => Mat
 function levelIndex() { let k = 0, d = 1e9; levels.forEach((l, i) => { const dd = Math.abs(Math.log(l.U / U)); if (dd < d) { d = dd; k = i; } }); return k; }
 function markDim(on) {
   const span = spanU();
-  ROLES.forEach((s, i) => bxEls[i].classList.toggle('dim', !!on && (s.s < u0 - 0.02 || s.e > u0 + span + 0.02)));
+  ROLES.forEach((s, i) => bxEls[i].classList.toggle('dim', !!on && (s.s < u0 - 0.02 - 6 / U || s.e > u0 + span + 0.02 + 6 / U)));
 }
 function buildZoomSeg() {
   $('#zseg').innerHTML = levels.map((l, i) => `<button type="button" data-z="${i}" aria-label="Zoom: ${esc(l.n)}" title="${esc(l.n)}"><span>${esc(l.n)}</span></button>`).join('');
