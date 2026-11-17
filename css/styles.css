@@ -1382,3 +1382,13 @@ body.dark .wps-img.on .wps-thumb, body.dark .wps-tabs button.on { outline-color:
 @media (max-width: 767px) {
   .career-road, .handwritten a, #note-email, #note-linkedin { display: inline-block; padding: 13px 0; margin: -13px 0; }
 }
+
+/* v51: the welcome window's compact form, used when it drops below the world clock */
+#window-intro.compact .intro-body { padding: 18px 24px 18px; }
+#window-intro.compact .avatar { width: 84px; height: 84px; }
+#window-intro.compact h1 { font-size: 28px; margin: 8px 0 4px; }
+#window-intro.compact .headline { margin-bottom: 12px; }
+/* v51: the Projects window grows to fit its content where the screen allows, and fades at the bottom when there is more to scroll */
+#window-projects .window-body { max-height: min(calc(100vh - 150px), 880px); }
+#window-projects .window-body.more { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 56px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 56px), transparent); }
+@media (max-width: 700px) { #window-projects .window-body { max-height: none; } }
