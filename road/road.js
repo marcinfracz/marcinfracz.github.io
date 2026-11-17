@@ -1,9 +1,9 @@
 /* The Road: page app. Builds the 3D world, places one scene per stop, and
    drives the camera left to right (laptop and tablet) or top to bottom (phone). */
 import { THREE, TOKENS, setTheme, tok, roadZ, smooth, clamp, lerp } from './core.js';
-import { buildWorld } from './world.js?v=43';
-import { buildStage } from './stages.js?v=43';
-import { planCities, cityFootprints, buildCities } from './landmarks.js?v=43';
+import { buildWorld } from './world.js?v=50';
+import { buildStage } from './stages.js?v=50';
+import { planCities, cityFootprints, buildCities } from './landmarks.js?v=50';
 import { flagURL, COUNTRY } from './marks.js?v=28';
 
 const C = window.ROAD_CONTENT;
@@ -896,7 +896,8 @@ function start() {
       STOPS.forEach((s, i) => { if (s.era !== e.id) return; const r = RAILC[s.id] || { co: s.title, ro: s.role || '', yr: s.span || '' };
         /* v47: company and a short title that never cuts off, the date in one right-hand column, and the role's domain in the Timeline's words */
         const t = r.t || String(r.ro).split(' · ')[0];
-        h += `<li><button type="button" class="ov-stop" data-i="${i}" title="${esc(r.co + ' · ' + r.ro)}"><b>${esc(r.co)}<i> · ${esc(t)}</i></b><em>${esc(r.yr)}</em>${r.dm ? `<span class="ov-dom f-${esc(r.f || 'eng')}"><i aria-hidden="true"></i>${esc(r.dm)}</span>` : ''}</button></li>`; });
+        /* v50: the domain rides at the end of the title line as a small colored tag, so each stop is one or two lines */
+        h += `<li><button type="button" class="ov-stop" data-i="${i}" title="${esc(r.co + ' · ' + r.ro)}"><b>${esc(r.co)}<i> · ${esc(t)}</i>${r.dm ? ` <span class="ov-dom f-${esc(r.f || 'eng')}">${esc(r.dm)}</span>` : ''}</b><em>${esc(r.yr)}</em></button></li>`; });
       h += '</ul></li>';
     });
     h += `</ol><button type="button" class="ov-back">Back to the road <kbd>+</kbd></button>`;
@@ -906,6 +907,13 @@ function start() {
     ov.querySelector('.ov-back').addEventListener('click', () => setZoom(0));
   }
   let ovT = null;
+  /* v50: the overview always fits the window with no scroller: type and spacing step down together until it does */
+  function fitOverview() {
+    if (!ov || ov.hidden) return;
+    let k = 1; ov.style.setProperty('--ovs', k);
+    while (ov.scrollHeight > ov.clientHeight + 1 && k > 0.74) { k = +(k - 0.02).toFixed(2); ov.style.setProperty('--ovs', k); }
+  }
+  addEventListener('resize', () => { if (ov && !ov.hidden) fitOverview(); });
   function syncOverview() {
     if (!ov) return;
     const on = zOutT > 0 && !isPhone();
@@ -913,6 +921,7 @@ function start() {
     if (on) {
       ov.hidden = false;
       ov.querySelectorAll('.ov-stop').forEach(b => b.classList.toggle('on', +b.dataset.i === cur));
+      fitOverview();
       requestAnimationFrame(() => ov.classList.add('on'));
     } else { ov.classList.remove('on'); ovT = setTimeout(() => { ov.hidden = true; }, 260); }
   }

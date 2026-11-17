@@ -5,7 +5,7 @@
    Flint (Kettering), Ann Arbor (Michigan Ross), Detroit (riverfront) and
    Shanghai (Lujiazui and the Bund). */
 import { THREE, mat, reg, mesh, merge, bx, cy, label, canvasTex, tok, roadZ, roadDZ, rand, smooth, clamp, lerp } from './core.js';
-import { vehicleGeo } from './world.js?v=43';
+import { vehicleGeo } from './world.js?v=50';
 
 /* ---------------- shared materials and a small geometry kit ---------------- */
 const C3 = h => { const c = new THREE.Color(h); return [c.r, c.g, c.b]; };
@@ -681,6 +681,7 @@ export function cityFootprints() {}
 /* ---------------- building the cities ---------------- */
 const SH = { asphalt: [0.62, 0.66, 0.71], walk: [0.88, 0.88, 0.87], dash: [0.98, 0.96, 0.86], brick: [0.83, 0.72, 0.62], path: [0.88, 0.85, 0.77], green: [0.7, 0.8, 0.64], plaza: [0.9, 0.88, 0.84], lot: [0.72, 0.75, 0.78], zebra: [0.98, 0.98, 0.96], rail: [0.8, 0.83, 0.86], girder: [0.66, 0.7, 0.75] };
 const CURB = 10.4;
+const TOWN_QA = typeof location !== 'undefined' && /[?&]qa\b/.test(location.search);
 const TOWN_DEBUG = typeof location !== 'undefined' && /townDebug/.test(location.search);
 const CARS = {
   flint: ['sedan', 'pickup', 'suv', 'sedan'],
@@ -783,6 +784,216 @@ function i75Sign() {
   return g;
 }
 
+/* v50: city traffic. Every car, bus and walker moves on a closed loop of its own street: out on the right,
+   a U-turn at the end, and back on the other side, so nothing jumps back to the start. Movers keep their
+   distance on their own loop, and wherever two paths meet each looks two seconds ahead: whoever reaches the
+   meeting point first goes, the other waits. So nothing drives or walks through anything else. */
+const TPRI = { ped: 3, bus: 2, car: 1 };
+const TP4 = [0, 0, 0, 0];
+function tPathAt(p, s, lane, out) {
+  const P = p.P, cum = p.cum; let lo = 0, hi = cum.length - 1;
+  while (hi - lo > 1) { const m = (lo + hi) >> 1; if (cum[m] <= s) lo = m; else hi = m; }
+  const a = P[lo], b = P[hi], seg = cum[hi] - cum[lo] || 1, f = clamp((s - cum[lo]) / seg, 0, 1);
+  const tx = b[0] - a[0], tz = b[2] - a[2], L = Math.hypot(tx, tz) || 1;
+  out[0] = lerp(a[0], b[0], f) - tz / L * lane; out[1] = lerp(a[1], b[1], f); out[2] = lerp(a[2], b[2], f) + tx / L * lane; out[3] = Math.atan2(-tz, tx);
+  return out;
+}
+export function tRing(path, r, c, inset, inset1 = inset) {
+  let a = Math.max(0, inset), b = path.L - Math.max(0, inset1);
+  if (b - a < 1) { const m = clamp((a + b) / 2, 0.5, path.L - 0.5); a = m - 0.5; b = m + 0.5; }
+  const Ls = b - a;
+  return { path, r, c, a, b, Ls, A: Math.PI * r, Lr: 2 * Ls + 2 * Math.PI * r, list: [] };
+}
+function tRingPos(R, u, out) {
+  const { a, b, Ls, r, c, A } = R; let s, lane, turn = 0, back = false;
+  if (u < Ls) { s = a + u; lane = c + r; }
+  else if (u < Ls + A) { const th = (u - Ls) / r; s = b + r * Math.sin(th); lane = c + r * Math.cos(th); turn = th; }
+  else if (u < 2 * Ls + A) { s = b - (u - Ls - A); lane = c - r; back = true; }
+  else { const th = (u - 2 * Ls - A) / r; s = a - r * Math.sin(th); lane = c - r * Math.cos(th); turn = th; back = true; }
+  tPathAt(R.path, s, lane, out); out[3] += (back ? Math.PI : 0) + turn;
+  return out;
+}
+const tToTurn = (R, u) => u < R.Ls ? R.Ls - u : u < R.Ls + R.A ? 0 : u < 2 * R.Ls + R.A ? 2 * R.Ls + R.A - u : 0;
+export function tPose(m) {
+  tRingPos(m.R, m.u, TP4); m.x = TP4[0]; m.y = TP4[1]; m.z = TP4[2]; m.yaw = TP4[3]; m.hx = Math.cos(m.yaw); m.hz = -Math.sin(m.yaw);
+}
+// closest distance between segments p1-q1 and p2-q2 (2D); also leaves the midpoint of the closest points in TSEG
+const TSEG = [0, 0];
+function tSegDist(p1x, p1z, q1x, q1z, p2x, p2z, q2x, q2z) {
+  const d1x = q1x - p1x, d1z = q1z - p1z, d2x = q2x - p2x, d2z = q2z - p2z, rx = p1x - p2x, rz = p1z - p2z;
+  const a = d1x * d1x + d1z * d1z, e = d2x * d2x + d2z * d2z, f = d2x * rx + d2z * rz;
+  let s, t;
+  if (a < 1e-9 && e < 1e-9) { s = 0; t = 0; }
+  else if (a < 1e-9) { s = 0; t = clamp(f / e, 0, 1); }
+  else {
+    const c = d1x * rx + d1z * rz;
+    if (e < 1e-9) { t = 0; s = clamp(-c / a, 0, 1); }
+    else {
+      const b = d1x * d2x + d1z * d2z, den = a * e - b * b;
+      s = den > 1e-9 ? clamp((b * f - c * e) / den, 0, 1) : 0;
+      t = (b * s + f) / e;
+      if (t < 0) { t = 0; s = clamp(-c / a, 0, 1); } else if (t > 1) { t = 1; s = clamp((b - c) / a, 0, 1); }
+    }
+  }
+  const cx1 = p1x + d1x * s, cz1 = p1z + d1z * s, cx2 = p2x + d2x * t, cz2 = p2z + d2z * t;
+  TSEG[0] = (cx1 + cx2) / 2; TSEG[1] = (cz1 + cz2) / 2;
+  return Math.hypot(cx1 - cx2, cz1 - cz2);
+}
+// the gap between two movers' bodies as they stand (negative = overlap)
+export function tGap(i, j) {
+  const ei = Math.max(0, i.len / 2 - i.hw), ej = Math.max(0, j.len / 2 - j.hw);
+  return tSegDist(i.x - i.hx * ei, i.z - i.hz * ei, i.x + i.hx * ei, i.z + i.hz * ei, j.x - j.hx * ej, j.z - j.hz * ej, j.x + j.hx * ej, j.z + j.hz * ej) - i.hw - j.hw;
+}
+/* Where two loops cross or come close, that stretch is a shared zone. A mover takes every zone of the stretch ahead
+   in one go, only when no other loop holds any of them and there is room for it beyond the stretch, and lets go
+   once its tail is clear. Nobody ever waits while holding a zone, so the town can never lock up. */
+const tFwd = (R, from, to) => ((to - from) % R.Lr + R.Lr) % R.Lr;
+export function tZones(T) {
+  const rings = T.rings, CS = 3.5, G = new Map(), key = (a, b) => a * 7919 + b;
+  rings.forEach((R, ri) => {
+    R.ri = ri; R.win = [];
+    const n = Math.max(1, Math.ceil(R.Lr / 0.4)); R.sx = new Float32Array(n); R.sz = new Float32Array(n); R.sy = new Float32Array(n); R.shx = new Float32Array(n); R.shz = new Float32Array(n); R.du = R.Lr / n;
+    R.se = Math.max(0, R.len / 2 - R.hw);
+    for (let k = 0; k < n; k++) { tRingPos(R, k * R.du, TP4); R.sx[k] = TP4[0]; R.sz[k] = TP4[2]; R.sy[k] = TP4[1]; R.shx[k] = Math.cos(TP4[3]) * R.se; R.shz[k] = -Math.sin(TP4[3]) * R.se; const kk = key(Math.floor(TP4[0] / CS), Math.floor(TP4[2] / CS)); let c = G.get(kk); if (!c) G.set(kk, c = []); c.push(ri, k); }
+  });
+  // conflicting samples, per pair of loops
+  const pairs = new Map();
+  rings.forEach((R, ri) => {
+    for (let k = 0; k < R.sx.length; k++) {
+      const x = R.sx[k], z = R.sz[k], gx = Math.floor(x / CS), gz = Math.floor(z / CS);
+      for (let a = -2; a <= 2; a++) for (let b = -2; b <= 2; b++) {
+        const c = G.get(key(gx + a, gz + b)); if (!c) continue;
+        for (let q = 0; q < c.length; q += 2) {
+          const rj = c[q]; if (rj <= ri) continue; const R2 = rings[rj], k2 = c[q + 1];
+          if (Math.abs(R2.sy[k2] - R.sy[k]) > 1.5) continue;
+          const ux = R.shx[k], uz = R.shz[k], vx = R2.shx[k2], vz = R2.shz[k2], X = R2.sx[k2], Z = R2.sz[k2];
+          if (tSegDist(x - ux, z - uz, x + ux, z + uz, X - vx, Z - vz, X + vx, Z + vz) > R.hw + R2.hw + 0.12) continue;
+          const pk = ri * 4096 + rj; let L = pairs.get(pk); if (!L) pairs.set(pk, L = []); L.push(k, k2);
+        }
+      }
+    }
+  });
+  // runs of samples on one loop
+  const runsOf = (R, ks) => {
+    const u = [...new Set(ks)].sort((p, q) => p - q), out = []; let cur = null;
+    u.forEach(k => { if (cur && k - cur[1] <= 2) cur[1] = k; else out.push(cur = [k, k]); });
+    if (out.length > 1 && out[0][0] === 0 && out[out.length - 1][1] === R.sx.length - 1) { const f = out.shift(); out[out.length - 1][1] = f[1] + R.sx.length; }
+    return out;
+  };
+  const runIdx = (runs, k, N) => runs.findIndex(r => (k >= r[0] && k <= r[1]) || (k + N >= r[0] && k + N <= r[1]));
+  T.zones = [];
+  pairs.forEach((L, pk) => {
+    const A = rings[Math.floor(pk / 4096)], B = rings[pk % 4096];
+    const ra = runsOf(A, L.filter((_, i) => i % 2 === 0)), rb = runsOf(B, L.filter((_, i) => i % 2 === 1));
+    // runs that touch each other belong to one zone
+    const par = [...ra.map((_, i) => i), ...rb.map((_, i) => ra.length + i)], f = i => par[i] === i ? i : (par[i] = f(par[i]));
+    for (let i = 0; i < L.length; i += 2) { const a = runIdx(ra, L[i], A.sx.length), b = runIdx(rb, L[i + 1], B.sx.length); if (a >= 0 && b >= 0) par[f(a)] = f(ra.length + b); }
+    const zs = new Map();
+    par.forEach((_, i) => { const r = f(i); let z = zs.get(r); if (!z) { zs.set(r, z = { id: T.zones.length + zs.size, owner: null, n: 0, req: new Map() }); } const isA = i < ra.length, run = isA ? ra[i] : rb[i - ra.length], R = isA ? A : B; const ps = run[0] * R.du, pe = run[1] * R.du + R.du; R.win.push({ s: ps, e: pe, zones: new Set([z]), parts: [[z, pe]] }); });
+    zs.forEach(z => T.zones.push(z));
+  });
+  // merge each loop's stretches that lie too close together to stop between them
+  rings.forEach(R => {
+    const pad = R.len / 2 + 0.3, W = R.win.map(w => ({ s: w.s - pad, e: w.e + pad, zones: w.zones, parts: w.parts.map(([z, e]) => [z, e + pad]) })).sort((p, q) => p.s - q.s), out = [];
+    W.forEach(w => { const l = out[out.length - 1]; if (l && w.s - l.e < 1) { l.e = Math.max(l.e, w.e); w.zones.forEach(z => l.zones.add(z)); l.parts.push(...w.parts); } else out.push(w); });
+    if (out.length > 1) { const f = out[0], l = out[out.length - 1]; if (f.s + R.Lr - l.e < 1) { l.e = Math.max(l.e, f.e + R.Lr); f.zones.forEach(z => l.zones.add(z)); f.parts.forEach(([z, e]) => l.parts.push([z, e + R.Lr])); out.shift(); } }
+    out.forEach(w => { if (w.e - w.s > R.Lr - 1.5) R.shut = true; const len = Math.min(R.Lr - 1, w.e - w.s); w.ze = new Map(); w.parts.forEach(([z, e]) => w.ze.set(z, Math.max(w.ze.get(z) || 0, Math.min(len, e - w.s)))); delete w.parts; w.s = ((w.s % R.Lr) + R.Lr) % R.Lr; w.e = w.s + len; });
+    R.win = out;
+    // a loop that spends most of its length inside crossings would hold everyone else up
+    if (out.reduce((a, w) => a + (w.e - w.s), 0) > 0.45 * R.Lr) R.shut = true;
+  });
+}
+const tFree = z => { if (--z.n <= 0) { z.n = 0; z.owner = null; } };
+function tRelease(m, h) { m.held.splice(m.held.indexOf(h), 1); h.zs.forEach(tFree); }
+function tTry(T, m, w) {
+  const R = m.R;
+  // no room beyond the stretch behind whoever is ahead on the loop: just wait, without taking a place in line
+  const ld = m.lead;
+  if (ld && ld !== m && tFwd(R, m.u, ld.u - ld.len / 2) < tFwd(R, m.u, w.e + m.len / 2 + 0.6)) return false;
+  // one place in line for the whole stretch; the earliest in line goes first, so two loops never wait on each other
+  let mine = T.time;
+  for (const z of w.zones) if (z.req.has(R)) mine = Math.min(mine, z.req.get(R));
+  let ok = true;
+  for (const z of w.zones) {
+    if (z.owner && z.owner !== R) ok = false;
+    for (const [R2, t2] of z.req) if (R2 !== R && (t2 < mine || (t2 === mine && R2.ri < R.ri))) ok = false;
+  }
+  if (!ok) { w.zones.forEach(z => z.req.set(R, mine)); return false; }
+  w.zones.forEach(z => { z.owner = R; z.n++; z.req.delete(R); });
+  m.held.push({ w, zs: new Set(w.zones) });
+  return true;
+}
+const TCELL = 12;
+export function tStep(T, dt) {
+  const M = T.movers; if (!M.length || dt <= 0) return;
+  const n = Math.min(4, Math.ceil(dt / 0.05 - 1e-6)), h = dt / n;
+  for (let k = 0; k < n; k++) {
+    T.time = (T.time || 0) + h;
+    // keep distance on the own loop
+    T.rings.forEach(R => {
+      const L = R.list, N = L.length; if (!N) return;
+      if (N === 1) { L[0].D = 1e9; L[0].lead = null; return; }
+      L.sort((p, q) => p.u - q.u);
+      for (let i = 0; i < N; i++) { const m = L[i], ld = L[(i + 1) % N]; m.lead = ld; m.by = ld; m.D = ((ld.u - m.u + R.Lr) % R.Lr) - (m.len + ld.len) / 2 - (m.kind === 'ped' ? 0.3 : 0.7); }
+    });
+    // shared zones: let go of the ones behind, ask for the next one ahead
+    M.forEach(m => {
+      const R = m.R;
+      for (let i = m.held.length - 1; i >= 0; i--) {
+        const h = m.held[i], w = h.w, d = tFwd(R, w.s, m.u);
+        if (d > w.e - w.s && tFwd(R, w.e, m.u) < tFwd(R, m.u, w.s)) { tRelease(m, h); continue; }
+        // a crossing already cleared is handed back at once, so a slow walker does not hold up the far lanes
+        if (d <= w.e - w.s) h.zs.forEach(z => { if (d > w.ze.get(z)) { h.zs.delete(z); tFree(z); } });
+      }
+      if (!R.win.length) return;
+      const look = m.kind === 'ped' ? 0.8 : m.v * m.v / 16 + m.v * 0.3 + 1.2;
+      let best = null, bd = 1e9;
+      for (const w of R.win) { if (m.held.some(h => h.w === w)) continue; const d = tFwd(R, m.u, w.s); if (d < bd) { bd = d; best = w; } }
+      if (!best || bd > look) return;
+      if (!tTry(T, m, best)) { if (bd < m.D) { m.D = Math.max(0, bd - 0.05); m.by = best; } }
+    });
+    M.forEach(m => {
+      const ped = m.kind === 'ped', brake = ped ? 1.2 : 5;
+      let vt = m.vmax * clamp((m.D - 0.1) / brake, 0, 1);
+      if (!ped && m.R.r > 0.2) vt = Math.min(vt, 1.3 + tToTurn(m.R, m.u) * 0.45);
+      if (vt > m.v) m.v = Math.min(vt, m.v + (ped ? 1.5 : 2.5) * h); else m.v = Math.max(vt, m.v - 12 * h);
+      const st = Math.min(m.v * h, Math.max(0, m.D));
+      m.u = (m.u + st) % m.R.Lr;
+      tPose(m);
+    });
+  }
+}
+// put movers on their loops: never on a shared stretch, never on top of each other; returns the movers kept
+export function tSeat(T, cands) {
+  T.rings = [...new Set(cands.map(m => m.R))];
+  T.rings.forEach(R => { R.list = []; R.hw = 0; R.len = 0; });
+  cands.forEach(m => { m.R.hw = Math.max(m.R.hw, m.hw); m.R.len = Math.max(m.R.len, m.len); m.held = []; });
+  tZones(T);
+  const inWin = m => m.R.win.some(w => tFwd(m.R, w.s, m.u + 0.6) < w.e - w.s + 0.6);
+  // how many can wait on a loop between its crossings; one place always stays free so the loop can never jam itself
+  T.rings.forEach(R => {
+    const W = R.win, slot = R.len + 1;
+    if (!W.length) { R.cap = 1e9; return; }
+    let cap = 0;
+    W.forEach((w, i) => { const nx = W[(i + 1) % W.length], g = W.length === 1 ? R.Lr - (w.e - w.s) : tFwd(R, w.e, nx.s) - (tFwd(R, w.s, nx.s) < w.e - w.s ? R.Lr : 0); cap += Math.max(0, Math.floor(g / slot)); });
+    R.cap = Math.max(0, cap - 1);
+  });
+  const kept = [];
+  cands.forEach(m => {
+    const R = m.R; let ok = false;
+    if (R.shut) return; // a loop that never leaves a crossing gets nobody
+    if (R.list.length >= R.cap || (m.kind === 'ped' && R.list.length >= Math.max(1, Math.floor(R.Lr / 7)))) return;
+    for (let k = 0; k < 24 && !ok; k++) {
+      if (k) m.u = (m.u + R.Lr * 0.043 + 0.9) % R.Lr;
+      tPose(m); if (inWin(m)) continue;
+      ok = !R.list.some(o => { const d = tFwd(R, m.u, o.u), d2 = R.Lr - d; return Math.min(d, d2) < (m.len + o.len) / 2 + 1.2; });
+    }
+    if (!ok) return;
+    m.id = kept.length; kept.push(m); R.list.push(m);
+  });
+  T.movers = kept;
+  return kept;
+}
 export function buildCities(scene, cities, { height, lite, stops, stageBoxes = [] }) {
   mats();
   const R = rand(31);
@@ -938,7 +1149,7 @@ export function buildCities(scene, cities, { height, lite, stops, stageBoxes = [
       const tr = train.build(); g.add(tr); anim.movers.push({ loop: PM, obj: tr, s: 0.5, y: 5.5 });
       const fr = freighter(); g.add(fr); anim.movers.push({ ship: fr, x0: c.X0 - 10, x1: c.X1 + 10, dz: 33, s: 0.6, v: 0.012 });
       for (let x = c.X0 + 2; x < c.X1; x += 7) { const lmp = kit(); lmp.cyl(0.07, 0.09, 3.2, 0, 0, 0, '#3E4650', 6).sph(0.22, 0, 3.3, 0, '#F4E6C3', 8); lmp.add(new THREE.SphereGeometry(0.3, 8, 6).translate(0, 3.3, 0), [1, 0.85, 0.55], true); placeZ(lmp.build(), x, roadZ(x) + 12.6, 0, near); if ((x | 0) % 2) trees.push({ x: x + 3.5, z: roadZ(x) + 13.4, s: 0.9, c: '#6F8E62' }); }
-      for (let i = 0; i < (lite ? 20 : 40); i++) { const x = c.X0 + R() * (c.X1 - c.X0); anim.people.push({ x0: x, z: roadZ(x) + 11.6 + R() * 2.4, dx: (R() < 0.5 ? -1 : 1) * 30, sp: 0.01 + R() * 0.02, ph: R(), c: PEOPLE[(R() * PEOPLE.length) | 0], road: true }); }
+      for (let i = 0; i < (lite ? 20 : 40); i++) { const x = c.X0 + R() * (c.X1 - c.X0); anim.people.push({ river: true, x0: x, ph: R(), c: PEOPLE[(R() * PEOPLE.length) | 0] }); }
     }
     if (c.id === 'detroit' && !c.hq) {
       lm(renCen(), S + 10, 60, 22, 18, 0, 'Renaissance Center', 32);
@@ -964,7 +1175,7 @@ export function buildCities(scene, cities, { height, lite, stops, stageBoxes = [
       const fr2 = freighter(); fr2.scale.setScalar(0.7); g.add(fr2); anim.movers.push({ ship: fr2, x0: c.X0 - 10, x1: c.X1 + 10, dz: 42, s: 0.8, v: -0.018 });
       // the Riverwalk: lamps, trees and people
       for (let x = c.X0 + 2; x < c.X1; x += 7) { if (Math.abs(x - (S - 50)) < 5) continue; const lmp = kit(); lmp.cyl(0.07, 0.09, 3.2, 0, 0, 0, '#3E4650', 6).sph(0.22, 0, 3.3, 0, '#F4E6C3', 8); lmp.add(new THREE.SphereGeometry(0.3, 8, 6).translate(0, 3.3, 0), [1, 0.85, 0.55], true); placeZ(lmp.build(), x, roadZ(x) + 12.6, 0, near); if ((x | 0) % 2) trees.push({ x: x + 3.5, z: roadZ(x) + 13.4, s: 0.9, c: '#6F8E62' }); }
-      for (let i = 0; i < (lite ? 30 : 60); i++) { const x = c.X0 + R() * (c.X1 - c.X0); anim.people.push({ x0: x, z: roadZ(x) + 11.6 + R() * 2.4, dx: (R() < 0.5 ? -1 : 1) * 30, sp: 0.01 + R() * 0.02, ph: R(), c: PEOPLE[(R() * PEOPLE.length) | 0], road: true }); }
+      for (let i = 0; i < (lite ? 30 : 60); i++) { const x = c.X0 + R() * (c.X1 - c.X0); anim.people.push({ river: true, x0: x, ph: R(), c: PEOPLE[(R() * PEOPLE.length) | 0] }); }
     }
     if (c.id === 'shanghai') {
       lm(pearlTower(), S - 12, 74, 14, 14, 0, 'Oriental Pearl Tower', 48);
@@ -975,7 +1186,7 @@ export function buildCities(scene, cities, { height, lite, stops, stageBoxes = [
       // the Bund on the near bank, between the road and the camera
       const B = [[-43, 13, { pyr: 1 }, 'Peace Hotel'], [-27, 9, {}], [-17, 9, { c: '#D4C8B4' }], [-7, 9, {}], [3, 10, { c: '#D4C8B4' }], [14, 9, {}], [25, 12, { clock: 3.4 }, 'Custom House'], [38, 13, { dome: 1 }, 'HSBC Building'], [51, 10, {}], [62, 11, { c: '#D4C8B4' }]];
       B.forEach(([dx, w, opt, name]) => { const b = bund(w - 0.8, 6, opt.clock ? 6 : (opt.pyr ? 6.2 : 5.6), opt); placeZ(b, S + dx, roadZ(S + dx) + 18.5, 0, near); take(S + dx, roadZ(S + dx) + 18.5, w - 2.6, 4.6); if (name) tag(name, b, opt.clock ? 17 : 11); });
-      for (let i = 0; i < 4; i++) { const bt = kit(); bt.box(8, 1.2, 2.2, 0, -0.3, 0, i % 2 ? '#E9EDF2' : '#C2507F').box(5, 1.4, 1.8, -0.4, 0.9, 0, '#E9EDF2').bands(5, 1.8, -0.4, 0.9, 2.3, 0, 0.7, '#3E4A56'); const b = bt.build(); g.add(b); anim.movers.push({ ship: b, x0: c.X0 - 20, x1: c.X1 + 20, dz: -(48 + (i % 2) * 8), s: i / 4, v: (i % 2 ? 1 : -1) * (0.008 + i * 0.002) }); }
+      for (let i = 0; i < 4; i++) { const bt = kit(); bt.box(8, 1.2, 2.2, 0, -0.3, 0, i % 2 ? '#E9EDF2' : '#C2507F').box(5, 1.4, 1.8, -0.4, 0.9, 0, '#E9EDF2').bands(5, 1.8, -0.4, 0.9, 2.3, 0, 0.7, '#3E4A56'); const b = bt.build(); g.add(b); anim.movers.push({ ship: b, x0: c.X0 - 20, x1: c.X1 + 20, dz: -(46 + i * 4), s: i / 4, v: (i % 2 ? 1 : -1) * (0.008 + i * 0.002) }); }
     }
 
     /* ---------- surfaces: streets, sidewalks, bridges, decks, parks ---------- */
@@ -1088,6 +1299,7 @@ export function buildCities(scene, cities, { height, lite, stops, stageBoxes = [
     for (let dx = c.x0 + 4; dx < c.x1 - 2; dx += 11) [-1, 1].forEach(sd => {
       const u = sd * (CURB + 0.9), v = get(dx, u + sd * 0.8);
       if (v === BLOCK || v === STREET || v === WATER || v === 255) return;
+      for (let k = -1.5; k <= 1.5; k += 0.5) for (const j of [-0.6, 0, 0.8]) if (get(dx + k, u + sd * j) === STREET) return; // never at a street's mouth
       if (c.id === 'detroit' && sd < 0) return;
       const [x, z] = W(dx, u); lamps.push({ x, z, ry: sd > 0 ? 0 : Math.PI });
     });
@@ -1235,28 +1447,141 @@ export function buildCities(scene, cities, { height, lite, stops, stageBoxes = [
         if (!free(x, z, 3, 3)) continue;
         mark(x - S, roadZ(x) - z, 3, 3, 0, BLDG);
         tents.push({ x, z, y: yAt(x, z), ry: R() * 0.4, c: i % 2 ? MAIZE : BLUE });
-        for (let p = 0; p < 4; p++) anim.people.push({ x0: x + (R() - 0.5) * 4, z: z + (R() - 0.5) * 4, dx: 0, sp: 0, ph: R(), c: R() < 0.5 ? MAIZE : BLUE, bob: true });
-        if (R() < 0.7) anim.cars.push({ park: true, x: x + 3.4, z: z + (R() - 0.5) * 2, ry: R() * 3, t: 'suv', c: ['#E3E8EE', '#8C97A6', '#4A5563', '#00274C', '#B8C2CD'][(R() * 5) | 0] });
+        [[-0.7, -0.7], [0.7, -0.7], [-0.7, 0.7], [0.7, 0.7]].forEach(([a, b2]) => anim.people.push({ x0: x + a + (R() - 0.5) * 0.3, z: z + b2 + (R() - 0.5) * 0.3, ph: R(), c: R() < 0.5 ? MAIZE : BLUE, bob: true }));
+        const sz = z + (R() - 0.5) * 1.2;
+        if (R() < 0.7 && free(x + 3.9, sz, 4.4, 2.6)) { mark(x + 3.9 - S, roadZ(x + 3.9) - sz, 4.4, 2.6, 0, BLDG); anim.cars.push({ park: true, x: x + 3.9, z: sz, ry: (R() - 0.5) * 0.5, t: 'suv', c: ['#E3E8EE', '#8C97A6', '#4A5563', '#00274C', '#B8C2CD'][(R() * 5) | 0] }); }
       }
     }
 
     /* ---------- traffic, buses and walkers on the street network ---------- */
+    /* v50: every mover runs a closed loop (out on the right, U-turn, back) and gives way at crossings; see tStep */
     const types = CARS[c.id];
     const lite2 = lite ? 0.5 : 1;
+    const TR = { movers: [], rings: [] }, cand = [];
+    const CLEN = { sedan: 4.6, suv: 4.9, pickup: 5.8, compact: 3.8, taxi: 3.8, robotaxi: 4.6 };
+    const CWID = { sedan: 1.95, suv: 2.1, pickup: 2.2, compact: 1.75, taxi: 1.75, robotaxi: 1.95 };
+    // how far in from each end a loop must turn so its U-turn stays clear of the crossing street and the main road,
+    // with room to stop between the U-turn and the next crossing
+    // every street's centre line, to keep U-turns out of the streets they meet
+    const segs = [];
+    streets.forEach(st => (st.path || []).forEach(p => { for (let k = 1; k < p.P.length; k++) { const a = p.P[k - 1], b2 = p.P[k]; segs.push({ st, p, ax: a[0], az: a[2], bx: b2[0], bz: b2[2], y: (a[1] + b2[1]) / 2, hw: st.w / 2 + (st.walk ? st.walk * 0.54 + 0.55 : 0) }); } }));
+    const segD = (q, x, z) => { const dx = q.bx - q.ax, dz = q.bz - q.az, l2 = dx * dx + dz * dz || 1, f = clamp(((x - q.ax) * dx + (z - q.az) * dz) / l2, 0, 1); return Math.hypot(x - q.ax - dx * f, z - q.az - dz * f); };
+    const clearIn = (st, p, fromEnd, o0, o1, len, room) => {
+      tPathAt(p, fromEnd ? p.L : 0, 0, TP4); const ex = TP4[0], ez = TP4[2], ey = TP4[1];
+      const near = segs.filter(q => q.p !== p && Math.abs(q.y - ey) < 1.5 && segD(q, ex, ez) < 45);
+      if (!near.length) return 0;
+      for (let e = 0; e <= Math.min(p.L / 2, 30); e += 0.5) {
+        let bad = false;
+        for (let d = e; d <= e + len + 1e-6 && !bad; d += 0.5) {
+          const sv = fromEnd ? p.L - d : d;
+          for (let o = o0; o <= o1 + 1e-6 && !bad; o += 0.6) { tPathAt(p, sv, o, TP4); for (const q of near) if (segD(q, TP4[0], TP4[2]) < q.hw + room) { bad = true; break; } }
+        }
+        if (!bad) return e;
+      }
+      return Math.min(p.L / 2, 30);
+    };
+    const ringAt = (st, p, tg, r, cc, ext) => {
+      p.rings = p.rings || {}; if (tg in p.rings) return p.rings[tg];
+      const o0 = cc === 0 ? -Math.max(r, ext) : cc - r - 0.4, o1 = cc === 0 ? Math.max(r, ext) : cc + r + 0.4;
+      const veh = cc === 0 && ext > 1, add = veh ? ext : r + ext, len = add + (veh ? 5.5 : 1.8), room = veh ? 0.5 : 0.25;
+      let e0 = clearIn(st, p, false, o0, o1, len, room), e1 = clearIn(st, p, true, o0, o1, len, room);
+      // keep the whole loop on its own ground: cars on the street, walkers off buildings, water and the main road
+      const okG = veh ? v => v === STREET || v === DECK : v => v === WALK || v === STREET || v === PARK || v === FREE || v === DECK;
+      const b0 = veh ? -(r + 0.45) : cc - r - 0.1, b1 = veh ? r + 0.45 : cc + r + 0.1, NS = Math.floor(p.L / 0.5) + 1, good = new Uint8Array(NS);
+      for (let i = 0; i < NS; i++) {
+        let ok = 1;
+        for (let k = 0, nk = Math.ceil((b1 - b0) / 0.3); k <= nk && ok; k++) { const o = b0 + (b1 - b0) * k / nk; tPathAt(p, Math.min(p.L, i * 0.5), o, TP4); if (TP4[1] > 0.6) continue; if (!okG(get(TP4[0] - S, roadZ(TP4[0]) - TP4[2]))) ok = 0; }
+        good[i] = ok;
+      }
+      // the longest clean stretch that also leaves room for both U-turns
+      let best = null;
+      for (let i = 0; i < NS;) {
+        if (!good[i]) { i++; continue; }
+        let j = i; while (j + 1 < NS && good[j + 1]) j++;
+        const s0 = Math.max(i * 0.5 + (i ? 0.5 : 0), e0), s1 = Math.min(j * 0.5 - (j < NS - 1 ? 0.5 : 0), p.L - e1);
+        if (s1 - s0 - 2 * add > (best ? best[1] - best[0] - 2 * add : 0)) best = [s0, s1];
+        i = j + 1;
+      }
+      if (!best || best[1] - best[0] - 2 * add < (veh ? 8 : 3)) return (p.rings[tg] = null);
+      return (p.rings[tg] = tRing(p, r, cc, best[0] + add, p.L - best[1] + add));
+    };
+    const pickLong = pl => { let k = R() * pl.reduce((a, p) => a + p.L, 0); for (const p of pl) if ((k -= p.L) <= 0) return p; return pl[pl.length - 1]; };
+    const walker = (Rg, colr, vmax) => { const q = { c: colr, ph: R() }; q.m = { R: Rg, u: R() * Rg.Lr, v: 0, vmax, len: 0.44, hw: 0.22, kind: 'ped', q }; cand.push(q.m); return q; };
+    const walkers = [];
     streets.forEach(st => {
       const pl = (st.path || []).filter(p => p.L > 12); if (!pl.length) return;
-      const pick = () => pl[(R() * pl.length) | 0];
+      const r = st.w / 4, fit = w0 => Math.min(0.75, (st.w / 2 - 0.18) / w0); // each lane holds its car with room to spare
       const nC = Math.round((st.cars || 0) * lite2 + (st.cars && R() < 0.5 ? 1 : 0));
-      for (let i = 0; i < nC; i++) { const p = pick(), dir = R() < 0.5 ? 1 : -1; anim.cars.push({ path: p, s: R() * p.L, v: dir * (3.2 + R() * 2.4), lane: dir * (st.elev ? st.w * 0.22 : 0.8), t: types[(R() * types.length) | 0], c: CAR_COLORS[(R() * 6) | 0] }); }
-      for (let i = 0; i < (st.bus || 0); i++) { const p = pick(), dir = R() < 0.5 ? 1 : -1; anim.cars.push({ path: p, s: R() * p.L, v: dir * 2.6, lane: dir * (st.elev ? st.w * 0.22 : 0.85), t: 'bus', c: c.id === 'shanghai' ? '#5DA9E9' : c.id === 'annarbor' ? '#2F5D9E' : '#3F8F5A' }); }
+      const vB = st.elev && !st.ramp ? 5 : 3.6;
+      for (let i = 0; i < nC; i++) {
+        const Rg = ringAt(st, pickLong(pl), 'car', r, 0, 2.9), t = types[(R() * types.length) | 0];
+        if (!Rg) continue;
+        const sc = fit(CWID[t]), q = { t, sc, c: CAR_COLORS[(R() * 6) | 0] };
+        q.m = { R: Rg, u: R() * Rg.Lr, v: 0, vmax: vB + R() * 1.1, len: CLEN[t] * sc, hw: CWID[t] * sc / 2, kind: 'car', q }; cand.push(q.m); anim.cars.push(q);
+      }
+      for (let i = 0; i < (st.bus || 0); i++) {
+        const Rg = ringAt(st, pickLong(pl), 'car', r, 0, 2.9);
+        if (!Rg) continue;
+        const sc = fit(2.5), q = { t: 'bus', sc, sx: 0.55, c: c.id === 'shanghai' ? '#5DA9E9' : c.id === 'annarbor' ? '#2F5D9E' : '#3F8F5A' };
+        q.m = { R: Rg, u: R() * Rg.Lr, v: 0, vmax: 2.6, len: 10 * 0.55, hw: 2.5 * sc / 2, kind: 'bus', q }; cand.push(q.m); anim.cars.push(q);
+      }
       const nP = Math.round((st.peds || 0) * lite2);
       for (let i = 0; i < nP; i++) {
-        const p = pick(), dir = R() < 0.5 ? 1 : -1, sd = R() < 0.5 ? 1 : -1;
-        const off = st.walk ? sd * (st.w / 2 + st.walk * 0.55) : (R() - 0.5) * st.w * 0.8;
-        const colr = st.fans ? (R() < 0.55 ? MAIZE : BLUE) : PEOPLE[(R() * PEOPLE.length) | 0];
-        anim.people.push({ path: p, s: R() * p.L, v: dir * (0.5 + R() * 0.5), lane: off, c: colr, ph: R() });
+        const p = pickLong(pl), sd = R() < 0.5 ? 1 : -1;
+        let Rg;
+        if (st.walk) Rg = ringAt(st, p, 'walk' + sd, 0.28, sd * (st.w / 2 + st.walk * 0.54), 0.4);
+        else { const tk = st.w >= 2.4 && R() < 0.5 ? 1 : 0, rr = tk ? 0.9 : 0.3; Rg = ringAt(st, p, 'trk' + tk, rr, 0, 0.4); }
+        if (Rg) walkers.push(walker(Rg, st.fans ? (R() < 0.55 ? MAIZE : BLUE) : PEOPLE[(R() * PEOPLE.length) | 0], 0.55 + R() * 0.25));
       }
     });
+    // campus, park and plaza strollers: each on a short line of its own, kept to open ground and clear of the others
+    const wk = (x, z) => { const v = get(x - S, roadZ(x) - z); return v === FREE || v === WALK || v === PARK; };
+    const still0 = (x, z) => { const v = get(x - S, roadZ(x) - z); return v === FREE || v === PARK; };
+    const lines = [], keep = [];
+    const linePath = (x0, x1, z) => { const pts = []; for (let k = 0; k <= 6; k++) { const x = lerp(x0, x1, k / 6); pts.push([x, yAt(x, z), z]); } return mkPath(pts); };
+    anim.people.forEach(q => {
+      if (q.river || !q.sp || !q.dx) { if (q.river || !q.sp) keep.push(q); return; }
+      const half = Math.abs(q.dx) / 2; let x0 = q.x0 - half, x1 = q.x0 + half;
+      if (!wk(q.x0, q.z)) return;
+      for (let x = q.x0; x >= q.x0 - half; x -= 0.3) if (!wk(x, q.z)) { x0 = x + 0.6; break; }
+      for (let x = q.x0; x <= q.x0 + half; x += 0.3) if (!wk(x, q.z)) { x1 = x - 0.6; break; }
+      if (lines.some(o => Math.abs(o.z - q.z) < 0.75 && o.x0 < x1 + 0.6 && x0 < o.x1 + 0.6)) return;
+      if (x1 - x0 < 1.4) { if (still0(q.x0, q.z)) { lines.push({ x0: q.x0 - 0.3, x1: q.x0 + 0.3, z: q.z }); keep.push({ x0: q.x0, z: q.z, ph: q.ph, c: q.c }); } return; }
+      lines.push({ x0, x1, z: q.z });
+      const Rg = tRing(linePath(x0, x1, q.z), 0, 0, 0.3);
+      walkers.push(walker(Rg, q.c, clamp(Math.abs(q.dx) * q.sp, 0.3, 0.8)));
+    });
+    // the Riverwalk: one loop per open stretch, between the road's sidewalk and the lamps
+    const river = keep.filter(q => q.river);
+    if (river.length) {
+      const RZ = 11.85, runs = []; let cur = null;
+      for (let x = c.X0; x <= c.X1; x += 1) { if (wk(x, roadZ(x) + RZ - 0.6) && wk(x, roadZ(x) + RZ + 0.6)) { if (!cur) runs.push(cur = []); cur.push([x, yAt(x, roadZ(x) + RZ), roadZ(x) + RZ]); } else cur = null; }
+      const rr = runs.filter(r2 => r2.length > 14).map(r2 => tRing(mkPath(r2.filter((_, k) => k % 3 === 0 || k === r2.length - 1)), 0.35, 0, 0.6));
+      const tot = rr.reduce((a, r2) => a + r2.Lr, 0);
+      if (rr.length) river.forEach(q => { let k = R() * tot, Rg = rr[0]; for (const r2 of rr) if ((k -= r2.Lr) <= 0) { Rg = r2; break; } walkers.push(walker(Rg, q.c, 0.5 + R() * 0.3)); });
+    }
+    anim.people = keep.filter(q => !q.river);
+    tSeat(TR, cand);
+    // no tree where a loop runs: cars keep clear of the whole crown, walkers of the trunk
+    {
+      const CG = 2, G = new Map(), kk = (a, b) => a * 7919 + b;
+      TR.rings.forEach(Rg => {
+        if (!Rg.list.length) return; const veh = Rg.list[0].kind !== 'ped';
+        for (let k = 0; k < Rg.sx.length; k++) { if (Rg.sy[k] > 2.5) continue; const key = kk(Math.floor(Rg.sx[k] / CG), Math.floor(Rg.sz[k] / CG)); let L = G.get(key); if (!L) G.set(key, L = []); L.push(Rg.sx[k], Rg.sz[k], Rg.hw, veh ? 1 : 0); }
+      });
+      const clear = t => {
+        const gx = Math.floor(t.x / CG), gz = Math.floor(t.z / CG), s0 = t.s || 1;
+        for (let a = -2; a <= 2; a++) for (let b = -2; b <= 2; b++) {
+          const L = G.get(kk(gx + a, gz + b)); if (!L) continue;
+          for (let i = 0; i < L.length; i += 4) if (Math.hypot(L[i] - t.x, L[i + 1] - t.z) < (L[i + 3] ? 0.95 * s0 : 0.45 * s0) + L[i + 2] + 0.1) return false;
+        }
+        return true;
+      };
+      for (let i = trees.length - 1; i >= 0; i--) if (!clear(trees[i])) trees.splice(i, 1);
+    }
+    walkers.forEach(q => { if (TR.movers.includes(q.m)) anim.people.push(q); });
+    anim.cars = anim.cars.filter(q => !q.m || TR.movers.includes(q.m));
+    anim.traffic = TR;
 
     /* ---------- draw the instanced sets ---------- */
     const FL = { low: 3, mid: 7, tall: 16 };
@@ -1296,7 +1621,30 @@ export function buildCities(scene, cities, { height, lite, stops, stageBoxes = [
 
     scene.add(g);
     if (TOWN_DEBUG) console.log('[town]', c.id, 'blocks', Object.values(blocks).reduce((a, l) => a + l.length, 0), 'houses', houses.length + gables.length, 'trees', trees.length, 'cars', anim.cars.length, 'people', anim.people.length, 'tris', SP.length / 9);
-    built.push({ c, g, near, anim, vSets, pIM, x0: c.X0, x1: c.X1 });
+    /* v50: boats keep to water. Each ship's run is clipped to the stretch of river that is deep enough for its whole hull,
+       and it turns round at each end instead of sailing on over land or jumping back to the start. */
+    anim.movers.forEach(m => {
+      if (!m.ship) return;
+      const bb = new THREE.Box3().setFromObject(m.ship), hl = (bb.max.x - bb.min.x) / 2 + 1.5, hw = (bb.max.z - bb.min.z) / 2 + 0.8;
+      // sail between bridge piers, never through one: take the nearest lane that clears them all
+      const hz = (bb.max.z - bb.min.z) / 2; m.hz = hz; const xa = Math.min(m.x0, m.x1) - hl, xb = Math.max(m.x0, m.x1) + hl;
+      const pierHit = dz => piers.some(q => q.x > xa && q.x < xb && q.y < 0.5 && Math.abs(q.z - (roadZ(q.x) + dz)) < hz + Math.max(0.5, q.sz / 2) + 0.4);
+      if (pierHit(m.dz)) { let best = null; for (let o = 0.5; o <= 4 && best === null; o += 0.5) for (const sg of [1, -1]) if (best === null && !pierHit(m.dz + sg * o)) best = m.dz + sg * o; if (best === null) { m.off = true; m.ship.visible = false; return; } m.dz = best; }
+      const wet = x => { for (const dx of [-hl, -hl / 2, 0, hl / 2, hl]) for (const dw of [-hw, 0, hw]) if (height(x + dx, roadZ(x + dx) + m.dz + dw) > -1.6) return false; return true; };
+      const a = Math.min(m.x0, m.x1), b2 = Math.max(m.x0, m.x1), runs = []; let st = null;
+      for (let x = a; x <= b2; x += 1) { if (wet(x)) { if (st === null) st = x; } else if (st !== null) { runs.push([st, x - 1]); st = null; } }
+      if (st !== null) runs.push([st, b2]);
+      const x0 = lerp(m.x0, m.x1, m.s);
+      const run = runs.find(r => x0 >= r[0] && x0 <= r[1]) || runs.sort((p, q) => (q[1] - q[0]) - (p[1] - p[0]))[0];
+      if (!run || run[1] - run[0] < 12) { m.off = true; m.ship.visible = false; return; }
+      m.x0 = run[0]; m.x1 = run[1];
+      const s0 = clamp((x0 - run[0]) / (run[1] - run[0]), 0, 1), e = Math.acos(1 - 2 * s0) / Math.PI;
+      m.p = m.v > 0 ? e : 2 - e; m.sp = Math.abs(m.v);
+    });
+    // two boats never share a lane
+    const sh = anim.movers.filter(m => m.ship && !m.off);
+    sh.forEach((m, i) => { if (sh.slice(0, i).some(o => !o.off && o.x0 < m.x1 + 10 && m.x0 < o.x1 + 10 && Math.abs(o.dz - m.dz) < o.hz + m.hz + 0.8)) { m.off = true; m.ship.visible = false; } });
+    built.push({ c, g, near, anim, vSets, pIM, x0: c.X0, x1: c.X1, qg: TOWN_QA ? (x, z) => get(x - S, roadZ(x) - z) : null, qs: TOWN_QA ? { trees, lamps, signals, benches, tents, piers } : null });
   });
 
   /* the Chrysler Technology Center and the I-75 shield */
@@ -1311,15 +1659,6 @@ export function buildCities(scene, cities, { height, lite, stops, stageBoxes = [
   }
 
   const o = new THREE.Object3D();
-  function onPath(p, s, lane, out) {
-    const P = p.P, cum = p.cum; let lo = 0, hi = cum.length - 1;
-    while (hi - lo > 1) { const m = (lo + hi) >> 1; if (cum[m] <= s) lo = m; else hi = m; }
-    const a = P[lo], b = P[hi], seg = cum[hi] - cum[lo] || 1, f = clamp((s - cum[lo]) / seg, 0, 1);
-    const tx = b[0] - a[0], tz = b[2] - a[2], L = Math.hypot(tx, tz) || 1;
-    out[0] = lerp(a[0], b[0], f) - tz / L * lane; out[1] = lerp(a[1], b[1], f); out[2] = lerp(a[2], b[2], f) + tx / L * lane; out[3] = Math.atan2(-tz, tx);
-    return out;
-  }
-  const tmp4 = [0, 0, 0, 0];
   function update(t, dt, pos, zoomOut, still) {
     built.forEach(b => {
       const d = pos < b.x0 ? b.x0 - pos : pos > b.x1 ? pos - b.x1 : 0;
@@ -1331,34 +1670,36 @@ export function buildCities(scene, cities, { height, lite, stops, stageBoxes = [
       A.labels.forEach(q => { const k = clamp(1 - Math.abs(q.x - pos) / 60, 0, 1) * clamp(1 - zoomOut * 8, 0, 1) * (q.k || 1); q.l.material.opacity = k; q.l.visible = k > 0.02; });
       if (!b.near.visible) return;
       if (!still) A.flags.forEach(f => wave(f, t));
+      if (A.traffic && !still) tStep(A.traffic, Math.min(dt, 0.2));
       b.vSets.forEach(({ im, list }) => {
         list.forEach((q, i) => {
-          if (q.park) { o.position.set(q.x, yAtLocal(q.x, q.z), q.z); o.rotation.set(0, q.ry, 0); }
-          else {
-            if (!still) { q.s += q.v * dt; if (q.s > q.path.L) q.s -= q.path.L; if (q.s < 0) q.s += q.path.L; }
-            onPath(q.path, q.s, q.lane, tmp4); o.position.set(tmp4[0], tmp4[1] + 0.02, tmp4[2]); o.rotation.set(0, tmp4[3] + (q.v < 0 ? Math.PI : 0), 0);
-          }
-          o.scale.setScalar(0.85); o.updateMatrix(); im.setMatrixAt(i, o.matrix);
+          if (q.park) { o.position.set(q.x, yAtLocal(q.x, q.z), q.z); o.rotation.set(0, q.ry, 0); o.scale.setScalar(0.8); }
+          else { const m = q.m; o.position.set(m.x, m.y + 0.02, m.z); o.rotation.set(0, m.yaw, 0); if (q.sx) o.scale.set(q.sx, q.sc, q.sc); else o.scale.setScalar(q.sc); }
+          o.updateMatrix(); im.setMatrixAt(i, o.matrix);
         });
         im.instanceMatrix.needsUpdate = true;
       });
       if (b.pIM) A.people.forEach((q, i) => {
-        let x = q.x0, y, z = q.z;
-        if (q.path) {
-          if (!still) { q.s += q.v * dt; if (q.s > q.path.L) q.s -= q.path.L; if (q.s < 0) q.s += q.path.L; }
-          onPath(q.path, q.s, q.lane, tmp4); x = tmp4[0]; z = tmp4[2]; y = tmp4[1] + 0.05;
-        } else if (q.sp) { const f = (t * q.sp + q.ph) % 1; x = q.x0 + (f - 0.5) * q.dx; if (q.road) z = roadZ(x) + (q.z - roadZ(q.x0)); }
-        const bob = q.bob ? Math.abs(Math.sin(t * 3 + q.ph * 9)) * 0.25 : Math.abs(Math.sin(t * 7 + q.ph * 9)) * 0.06;
+        let x = q.x0, y, z = q.z, walking = false;
+        if (q.m) { x = q.m.x; z = q.m.z; y = q.m.y + 0.05; walking = q.m.v > 0.08; }
+        const bob = q.bob ? Math.abs(Math.sin(t * 3 + q.ph * 9)) * 0.25 : walking ? Math.abs(Math.sin(t * 7 + q.ph * 9)) * 0.06 : 0;
         o.position.set(x, (y === undefined ? yAtLocal(x, z) : y) + bob, z); o.rotation.set(0, 0, 0); o.scale.setScalar(1); o.updateMatrix(); b.pIM.setMatrixAt(i, o.matrix);
       });
       if (b.pIM) b.pIM.instanceMatrix.needsUpdate = true;
       A.movers.forEach(m => {
-        if (m.ship) { if (!still) m.s = (m.s + m.v * dt * 0.25 + 1) % 1; const x = lerp(m.x0, m.x1, m.s); m.ship.position.set(x, -1.2, roadZ(x) + m.dz); m.ship.rotation.y = m.v > 0 ? 0 : Math.PI; }
+        if (m.ship && !m.off) {
+          /* out and back along its own stretch of water, slowing into each turn */
+          if (!still) m.p = (m.p + m.sp * dt * 0.25) % 2;
+          const q = m.p, s1 = q < 1 ? q : 2 - q, x = lerp(m.x0, m.x1, 0.5 - 0.5 * Math.cos(Math.PI * s1));
+          const a = q < 0.05 ? Math.PI * (1 + smooth(1.95, 2.05, q + 2)) : Math.PI * (smooth(0.95, 1.05, q) + smooth(1.95, 2.05, q));
+          m.ship.position.set(x, -1.2, roadZ(x) + m.dz); m.ship.rotation.y = a;
+        }
         if (m.loop) { if (!still) m.s = (m.s + dt * 0.035) % 1; const P = m.loop, f = m.s * 4, e = Math.floor(f) % 4, r = f - Math.floor(f); const [ax, az] = P[e], [bx2, bz] = P[(e + 1) % 4]; m.obj.position.set(lerp(ax, bx2, r), m.y, lerp(az, bz, r)); m.obj.rotation.y = -Math.atan2(bz - az, bx2 - ax); }
         if (m.beacon) m.beacon.visible = (t % 1.6) < 0.9;
       });
     });
   }
   function yAtLocal(x, z) { return Math.max(0, height(x, z)) + 0.02; }
+  if (typeof location !== 'undefined' && /[?&]qa\b/.test(location.search)) window.__lq = { built, tStep, tGap };
   return { update, cities: built };
 }

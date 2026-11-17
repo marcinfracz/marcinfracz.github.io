@@ -2,9 +2,9 @@
    { group, anchors: {name: Object3D}, update(t, k, dt) } where k is 1 when the
    camera has landed on that stop and 0 when it is far away. */
 import { THREE, reg, mat, ownMat, glowMat, mesh, at, box, cyl, sph, grp, label, canvasTex, tok, smooth, clamp, lerp, roadZ } from './core.js';
-import { vehicleGeo } from './world.js?v=43';
+import { vehicleGeo } from './world.js?v=50';
 import { drawFlag, drawMark, onLogo } from './marks.js?v=28';
-import { ketteringAB, bulldog, bulldogPoster, rossBuilding, burOak, blockMSign, wavingFlag, wave, signPanel, MAIZE, BLUE } from './landmarks.js?v=43';
+import { ketteringAB, bulldog, bulldogPoster, rossBuilding, burOak, blockMSign, wavingFlag, wave, signPanel, MAIZE, BLUE } from './landmarks.js?v=50';
 
 const pin = (parent, x, y, z) => { const o = new THREE.Object3D(); o.position.set(x, y, z); parent.add(o); return o; };
 const vmesh = (type, s = 1, key = 'obj') => { const m = mesh(vehicleGeo(type), mat(key, { vertexColors: true })); m.scale.setScalar(s); return m; };
@@ -887,7 +887,7 @@ B.onstar = () => {
     [[-2.2, 0], [2.2, 0], [-2.2, -5], [2.2, -5]].forEach(([dx, dz]) => c.add(box(0.5, 12, 0.5, 'accent', dx, 0, dz)));
     c.add(box(5, 0.8, 0.8, 'accent', 0, 12, 0)); c.add(box(5, 0.8, 0.8, 'accent', 0, 12, -5));
     c.add(box(1.4, 0.8, 22, 'accent', 0, 12.8, -10));
-    const trolley = box(1.8, 0.8, 1.8, 'objDark', 0, 12, -10); c.add(trolley);
+    const trolley = box(1.8, 0.8, 1.8, 'objDark', 0, 11.2, -10); c.add(trolley);
     const cable = box(0.08, 6, 0.08, 'objDark', 0, 6, -10); c.add(cable);
     const cnt = box(2.4, 2.2, 5.4, i ? 'cobalt' : 'obj', 0, 4.2, -10); c.add(cnt);
     at(c, x, 0, -4); g.add(c);
@@ -897,6 +897,10 @@ B.onstar = () => {
   const ship = new THREE.Group();
   ship.add(box(26, 3, 6.4, 'objDark', 0, -1.2, 0)); ship.add(box(22, 6, 6.2, 'obj', -1, 1.8, 0)); ship.add(box(3, 2.2, 6.2, 'objShade', 9.6, 7.8, 0));
   for (let i = 0; i < 5; i++) ship.add(box(22.1, 0.12, 6.3, 'objShade', -1, 2.6 + i * 1.1, 0));
+  /* v50: the ship stays moored at the quay, in the harbour water, under the crane booms.
+     It never sails: the old route ran it over the land behind the port. */
+  const SHIP_X = -3, SHIP_Z = -15.5, SHIP_Y = -0.9, STACK = 7.8 + SHIP_Y;
+  ship.position.set(SHIP_X, SHIP_Y, SHIP_Z);
   g.add(ship);
   const beacons = []; const regions = ['Mexico', 'S. America', 'ME & Africa', 'Asia Pacific', 'Korea', 'Israel', 'Aus & NZ', 'Central Asia'];
   regions.forEach((r, i) => {
@@ -947,10 +951,26 @@ B.onstar = () => {
         b.blk.visible = go;
       });
       hand.rotation.z = -t * 0.6;
-      cranes.forEach(c => { const f = 0.5 + 0.5 * Math.sin(t * 0.5 + c.ph); const z = -2 - f * 16; c.trolley.position.z = z; c.cable.position.z = z; c.cnt.position.z = z; const h = 4.2 + Math.sin(t * 0.9 + c.ph) * 2.2; c.cnt.position.y = h; c.cable.scale.y = (12 - h - 2.2) / 6; c.cable.position.y = h + 2.2; });
-      const f = (t * 0.03) % 1;
-      ship.position.set(4 + f * 60, 0.6, -18 - f * 70); ship.rotation.y = -0.6 * smooth(0, 0.3, f);
-      ship.scale.setScalar(f > 0.9 ? (1 - f) * 10 : f < 0.04 ? f * 25 : 1);
+      /* v50: the ship rides gently at its moorings; it never moves off the quay */
+      const bob = Math.sin(t * 0.7) * 0.07;
+      ship.position.y = SHIP_Y + bob; ship.rotation.x = Math.sin(t * 0.55) * 0.006;
+      /* each crane loads one container: down onto the quay, up, across, down onto the ship's stack, and back.
+         The container clears the crane legs and the hull, and never passes through the ship. */
+      const QZ = -2.5, SZ = SHIP_Z - (-4), HI = 8.8, QY = 0.4, SY = STACK + bob - 0.02;
+      cranes.forEach(c => {
+        const s = ((t / 18) + c.ph * 0.37) % 1;
+        let z = QZ, y = HI;
+        if (s < 0.1) y = lerp(HI, QY, smooth(0, 0.1, s));
+        else if (s < 0.2) y = lerp(QY, HI, smooth(0.1, 0.2, s));
+        else if (s < 0.45) z = lerp(QZ, SZ, smooth(0.2, 0.45, s));
+        else if (s < 0.55) { z = SZ; y = lerp(HI, SY, smooth(0.45, 0.55, s)); }
+        else if (s < 0.65) { z = SZ; y = lerp(SY, HI, smooth(0.55, 0.65, s)); }
+        else if (s < 0.9) z = lerp(SZ, QZ, smooth(0.65, 0.9, s));
+        c.trolley.position.z = z; c.cable.position.z = z; c.cnt.position.z = z;
+        /* y is the container's underside; meshes are centred */
+        c.cnt.position.y = y + 1.1; const top = y + 2.2;
+        c.cable.scale.y = Math.max(0.02, (11.2 - top) / 6); c.cable.position.y = (top + 11.2) / 2;
+      });
       beacons.forEach((b, i) => b.material.opacity = 0.16 + 0.14 * (0.5 + 0.5 * Math.sin(t * 2 + i)));
     }
   };

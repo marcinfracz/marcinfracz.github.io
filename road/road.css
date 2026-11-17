@@ -914,3 +914,25 @@ html[data-theme="dusk"] .ov-dom.f-digital { --fd: #6f8fe8; } html[data-theme="du
   .ov-t { font-size: 18px; } .ov-s { margin-bottom: 8px; }
   .ov-back { margin-top: 8px; height: 30px; }
 }
+
+/* v50: career overview fits with no scroller. One row per stop: company, title and a small domain tag inline, the date on the right.
+   --ovs (set by the page) scales type and spacing together when the window is short. */
+.ov-panel { --ovs: 1; overflow: hidden; scrollbar-width: none; width: clamp(380px, 31vw, 480px); }
+.ov-panel::-webkit-scrollbar { display: none; }
+.ov-t { font-size: calc(19px * var(--ovs)); }
+.ov-s { font-size: calc(12px * var(--ovs)); margin: calc(2px * var(--ovs)) 0 calc(8px * var(--ovs)); }
+.ov-k { font-size: calc(10px * var(--ovs)); }
+.ov-eras { gap: calc(6px * var(--ovs)); }
+.ov-eh { font-size: calc(12.5px * var(--ovs)); }
+.ov-eh em { font-size: calc(11.5px * var(--ovs)); }
+.ov-era ul { margin-top: calc(2px * var(--ovs)); gap: 0; }
+.ov-stop { padding: calc(3px * var(--ovs)) 8px; row-gap: 0; align-items: start; font-size: calc(12px * var(--ovs)); }
+.ov-stop b { font-size: calc(12.5px * var(--ovs)); line-height: 1.32; hyphens: none; -webkit-hyphens: none; overflow-wrap: normal; word-break: normal; }
+.ov-stop em { font-size: calc(11px * var(--ovs)); padding-top: calc(1.5px * var(--ovs)); }
+.ov-stop b span.ov-dom, .ov-stop span.ov-dom { display: table !important; grid-column: auto; grid-row: auto; margin: calc(2px * var(--ovs)) 0 calc(1px * var(--ovs)); padding: calc(2px * var(--ovs)) 5px calc(1px * var(--ovs)); border-radius: 4px; vertical-align: 1px; white-space: nowrap; overflow: visible;
+  font-size: calc(8.5px * var(--ovs)); font-weight: 800; letter-spacing: .06em; text-transform: uppercase; line-height: 1.2;
+  color: color-mix(in srgb, var(--fd, #66788f) 78%, #1E2124); background: color-mix(in srgb, var(--fd, #66788f) 15%, transparent); }
+html[data-theme="dusk"] .ov-stop span.ov-dom { color: color-mix(in srgb, var(--fd, #8fa1b8) 70%, #fff); background: color-mix(in srgb, var(--fd, #8fa1b8) 24%, transparent); }
+@media (max-height: 820px) { .ov-stop span.ov-dom { display: table !important; } }
+@media (max-height: 1000px) { .ov-panel { top: 64px; max-height: calc(100vh - 76px); padding: calc(12px * var(--ovs)) 14px calc(10px * var(--ovs)); } }
+.ov-back { margin-top: calc(10px * var(--ovs)); height: calc(32px * var(--ovs)); font-size: calc(12.5px * var(--ovs)); }

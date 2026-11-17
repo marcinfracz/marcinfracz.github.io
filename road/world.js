@@ -1,7 +1,7 @@
 /* The Road: terrain, road network, region-aware traffic, NPCs and the
    perception layer (radar, LiDAR, vision boxes, V2X). */
-import { cityFlat, cityRiver, cityKeepOut, cityWater } from './landmarks.js?v=43';
-import { buildLife } from './life.js?v=43';
+import { cityFlat, cityRiver, cityKeepOut, cityWater } from './landmarks.js?v=50';
+import { buildLife } from './life.js?v=50';
 import { THREE, mat, ownMat, glowMat, reg, mesh, at, box, cyl, sph, grp, merge, bx, cy, label,
   smooth, clamp, lerp, rand, roadZ, roadDZ, tok } from './core.js';
 
@@ -199,7 +199,10 @@ export function buildWorld(scene, opts) {
   const mx = stops.find(s => s.region === 'mexico');
   if (mx) signals.push({ x: mx.x - 30, cw: true, off: 2 });
   const topes = mx ? [mx.x - 14, mx.x + 18] : [];
-  const CYCLE = 11, GREEN = 7;
+  /* v50: a longer red so the people on the crosswalk always finish before the cars go again */
+  const CYCLE = 15, GREEN = 7;
+  const CW0 = -5.15, CW1 = -0.1;                 // the crosswalk, along the road, from the signal's x
+  const PED_WAIT = HALF + 2.2, PED_ROW = 0.7, PED_V = 4.5;
   const sigGreen = (s, t) => ((t + s.off) % CYCLE) < GREEN;
 
   /* v41: three-lamp heads, red over yellow over green, with a yellow phase */
@@ -209,16 +212,18 @@ export function buildWorld(scene, opts) {
   const lampOff = new THREE.MeshBasicMaterial({ color: '#3A434D' });
   signals.forEach(s => {
     const z = roadZ(s.x);
-    const pole = grp(cyl(0.12, 0.12, 6, 'objDark'), box(0.12, 0.12, 6.5, 'objDark', 0, 5.9, 3.2), box(0.6, 1.75, 0.5, 'objDark', 0, 4.6, 6));
-    at(pole, s.x + 1.2, 0, z - HALF - 1.2);
-    s.lamps = [5.98, 5.45, 4.92].map(y => { const l = sph(0.2, lampOff, 0, y, 6.27, 10); l.castShadow = false; pole.add(l); return l; });
+    /* v50: the pole stands back off the sidewalk, so riders and walkers never pass through it */
+    const pole = grp(cyl(0.12, 0.12, 6, 'objDark'), box(0.12, 0.12, 8.9, 'objDark', 0, 5.9, 4.4), box(0.6, 1.75, 0.5, 'objDark', 0, 4.6, 8.4));
+    at(pole, s.x + 1.2, 0, z - HALF - 3.6);
+    s.lamps = [5.98, 5.45, 4.92].map(y => { const l = sph(0.2, lampOff, 0, y, 8.67, 10); l.castShadow = false; pole.add(l); return l; });
     s.ph = -1;
     scene.add(pole);
-    s.rsu = new THREE.Vector3(s.x + 1.2, 6.2, z - HALF - 1.2);
+    s.rsu = new THREE.Vector3(s.x + 1.2, 6.2, z - HALF - 3.6);
+    s.peds = []; s.occ = [];
     if (s.cw) {
-      const n = 9, sg = new THREE.InstancedMesh(new THREE.BoxGeometry(0.9, 0.05, 1.3), mat('line'), n);
+      const n = 9, sg = new THREE.InstancedMesh(new THREE.BoxGeometry(CW1 - CW0, 0.05, 0.9), mat('line'), n);
       const o = new THREE.Object3D();
-      for (let i = 0; i < n; i++) { o.position.set(s.x - 2.5, 0.07, z - HALF + 1 + i * 1.75); o.updateMatrix(); sg.setMatrixAt(i, o.matrix); }
+      for (let i = 0; i < n; i++) { o.position.set(s.x + (CW0 + CW1) / 2, 0.07, z - HALF + 1 + i * 1.75); o.updateMatrix(); sg.setMatrixAt(i, o.matrix); }
       scene.add(sg);
     }
   });
@@ -402,7 +407,8 @@ export function buildWorld(scene, opts) {
     const eg = vehicleGeo('sedan');
     const em = new THREE.InstancedMesh(eg, mat('obj', { vertexColors: true }), 26);
     em.castShadow = true;
-    for (let i = 0; i < 26; i++) elevated.push({ s: R(), lane: i % 2 ? 1.6 : -1.6, v: 0.05 + R() * 0.03, tint: [0.9 + R() * 0.2, 0.92 + R() * 0.15, 1] });
+    /* v50: one steady speed per carriageway and even spacing, so no car drives through another */
+    for (let i = 0; i < 26; i++) { const lane = i % 2 ? 1.6 : -1.6, j = i >> 1; elevated.push({ s: (j + 0.5 + (R() - 0.5) * 0.3) / 13, lane, v: lane > 0 ? 0.062 : 0.056, tint: [0.9 + R() * 0.2, 0.92 + R() * 0.15, 1] }); }
     scene.add(em);
     elevated.mesh = em; elevated.x0 = x0; elevated.x1 = x1; elevated.U = U; elevated.ey = ey;
   }
@@ -464,10 +470,15 @@ export function buildWorld(scene, opts) {
   }
   const N = lite ? 140 : 300;
   const cars = [];
+  /* v50: cars start spread out along each lane, never on top of each other */
+  const perLane = Math.ceil(N / 3), laneN = { A: 0, C: 0, D: 0 };
   for (let i = 0; i < N; i++) {
-    const lane = ['A', 'C', 'D'][i % 3];
-    cars.push({ x: xMin + R() * L, lane, z: LANES[lane], v: 0, vmax: 7 + R() * 5, s1: R(), s2: R(), s3: R(), type: 'sedan', show: true });
+    const lane = ['A', 'C', 'D'][i % 3], j = laneN[lane]++;
+    cars.push({ x: xMin + (j + 0.5 + (R() - 0.5) * 0.3) * L / perLane, lane, z: LANES[lane], v: 0, vmax: 7 + R() * 5, s1: R(), s2: R(), s3: R(), type: 'sedan', show: false, pend: false });
   }
+  // the longest body each car can take on in any region keeps the spacing safe through every gate
+  cars.forEach(c => { c.ml = Math.max(...Object.keys(CAST).map(rg => LEN[pickType(c.s1, rg)])); const rg = regionAt(c.x); c.type = pickType(c.s1, rg); c.show = c.s2 < (DENS[rg] || 0.5); });
+  ['A', 'C', 'D'].forEach(k => { let last = null; cars.filter(c => c.lane === k && c.show).sort((a, b) => a.x - b.x).forEach(c => { if (last && c.x - last.x < (c.ml + last.ml) / 2 + 6) c.show = false; else last = c; }); });
   const vmeshes = {};
   TYPES.forEach(t => {
     const im = new THREE.InstancedMesh(vehicleGeo(t), mat('obj', { vertexColors: true }), N);
@@ -487,16 +498,27 @@ export function buildWorld(scene, opts) {
 
   /* scooters and pedestrians (Shanghai) */
   const scooters = [], peds = [];
+  const SCOOT_Z = HALF - 0.62;
+  const pedDX = p => (p.side > 0 ? -4.8 : -2.25) + p.col * 0.6;   // walking away from the camera keeps left, toward it right
   let scootMesh = null, pedMesh = null;
   if (ax) {
     const sg = merge([[bx(1.5, 0.25, 0.35, 0, 0.35, 0), 0.5], [cy(0.18, 0.2, 0.9, 0, 0.6, 0, 6), 1], [new THREE.SphereGeometry(0.22, 8, 6).translate(0, 1.7, 0), 0.9]]);
     scootMesh = new THREE.InstancedMesh(sg, mat('obj', { vertexColors: true }), 70); scootMesh.castShadow = true; scootMesh.frustumCulled = false;
-    for (let i = 0; i < 70; i++) scooters.push({ s: R(), side: i % 2 ? 1 : -1, v: 0.012 + R() * 0.012, wob: R() * 6, tint: [[1, 1, 1], [1.05, 0.9, 0.6], [0.7, 0.8, 1]][(R() * 3) | 0] });
+    /* v50: the scooters ride the near edge of the road with the traffic, in single file, and stop for red */
+    const [sa0, sa1] = RNG.asia, sLen = sa1 - sa0 - 8;
+    for (let i = 0; i < 40; i++) scooters.push({ x: sa0 + 4 + (i + 0.5 + (R() - 0.5) * 0.3) * sLen / 40, v: 0, vmax: 3.6 + R() * 1.8, wob: R() * 6, tint: [[1, 1, 1], [1.05, 0.9, 0.6], [0.7, 0.8, 1]][(R() * 3) | 0] });
     scene.add(scootMesh);
     const pg = merge([[cy(0.25, 0.3, 1.2, 0, 0, 0, 6), 1], [new THREE.SphereGeometry(0.24, 8, 6).translate(0, 1.45, 0), 0.92]]);
     pedMesh = new THREE.InstancedMesh(pg, mat('obj', { vertexColors: true }), 60); pedMesh.castShadow = true; pedMesh.frustumCulled = false;
     const cws = signals.filter(s => s.cw && Math.abs(s.x - ax.x) < 40);
-    for (let i = 0; i < 60; i++) { const s = cws[i % cws.length]; peds.push({ sig: s, dx: -4.6 + R() * 4, side: R() < 0.5 ? -1 : 1, spd: 0.8 + R() * 0.5, ph: R(), tint: [0.7 + R() * 0.4, 0.7 + R() * 0.35, 0.75 + R() * 0.3] }); }
+    /* v50: each crosswalk has two groups of 15 that swap curbs on each red: four files, queued four deep,
+       keeping to their own half of the crossing, so nobody walks through anybody */
+    cws.forEach(s => { s.grp = { 1: { n: 0, walk: false, cyc: -1 }, '-1': { n: 0, walk: false, cyc: -1 } }; });
+    for (let i = 0; i < 60; i++) {
+      const s = cws[i % cws.length], k = (i / cws.length) | 0, g = k < 15 ? 1 : -1, slot = k % 15;
+      const p = { sig: s, g, side: g, col: slot % 4, r: (slot / 4) | 0, d: 0, walk: false, off: 0, tint: [0.7 + R() * 0.4, 0.7 + R() * 0.35, 0.75 + R() * 0.3] };
+      p.dx = p.dxT = pedDX(p); peds.push(p); s.peds.push(p);
+    }
     scene.add(pedMesh);
   }
 
@@ -516,8 +538,14 @@ export function buildWorld(scene, opts) {
   const pickRide = (seed, list) => { let tot = 0; list.forEach(e => tot += e[1]); let r = seed * tot; for (const [k, wg] of list) if ((r -= wg) <= 0) return k; return list[0][0]; };
   const NR = lite ? 26 : 56, NP = lite ? 30 : 64;
   const riders = [];
-  for (let i = 0; i < NR; i++) riders.push({ path: false, x: xMin + RR() * L, dir: -1, z: -7.05, v: 0, vmax: 6 + RR() * 5, s1: RR(), s2: RR(), tint: 0.85 + RR() * 0.3, ph: RR() * 6 });
-  for (let i = 0; i < NP; i++) { const near = i % 2 === 0; riders.push({ path: true, x: xMin + RR() * L, dir: RR() < 0.5 ? 1 : -1, z: (near ? 1 : -1) * (HALF + 0.75 + RR() * 0.9), v: 0, vmax: 2.4 + RR() * 2.2, s1: RR(), s2: RR(), tint: 0.85 + RR() * 0.3, ph: RR() * 6 }); }
+  /* v50: motorbikes ride single file in the strip beyond the far lane; on the sidewalks each direction keeps
+     its own half (in on the road side, out on the far side), so riders never pass through one another */
+  for (let i = 0; i < NR; i++) riders.push({ path: false, band: 'road', x: xMin + (i + 0.5 + (RR() - 0.5) * 0.3) * L / NR, dir: -1, z: -7.35, v: 0, vmax: 6 + RR() * 5, s1: RR(), s2: RR(), tint: 0.85 + RR() * 0.3, ph: RR() * 6 });
+  for (let i = 0; i < NP; i++) {
+    const side = i % 2 === 0 ? 1 : -1, dir = (i >> 1) % 2 ? 1 : -1, band = side + '|' + dir, j = i >> 2;
+    riders.push({ path: true, band, x: xMin + (j + 0.5 + (RR() - 0.5) * 0.3) * L / Math.ceil(NP / 4), dir, z: side * (dir === side ? HALF + 0.7 : HALF + 1.45), v: 0, vmax: 2.4 + RR() * 2.2, s1: RR(), s2: RR(), tint: 0.85 + RR() * 0.3, ph: RR() * 6 });
+  }
+  riders.forEach(r => { const rg = regionAt(r.x), cast = RCAST[rg] || RCAST.us; r.type = pickRide(r.s1, r.path ? cast.path : cast.road); r.show = r.s2 < (RDENS[rg] || 0.5); });
   const rideMesh = {};
   RIDE.forEach(k => { const im = new THREE.InstancedMesh(riderGeo(k), mat('obj', { vertexColors: true }), NR + NP); im.castShadow = !lite; im.frustumCulled = false; im.count = 0; rideMesh[k] = im; scene.add(im); });
   const stopXs = stops.map(s => s.x);
@@ -689,41 +717,149 @@ export function buildWorld(scene, opts) {
   function laneDir(l) { return l === 'A' || l === 'B' ? 1 : -1; }
   function wrap(x) { return x < xMin ? x + L : x > xMax ? x - L : x; }
 
+  /* v50: shared rules for everything that drives or rides along the road */
+  const RLEN = 1.9;
+  // how fast a mover may go so it stops before a red light or a crosswalk with people on it, at its own lateral spot
+  function stopFor(x, d, len, zOff, half, vmax, t, red, cwOnly, lead, leadLen) {
+    let cap = vmax;
+    for (const s of signals) {
+      if (cwOnly && !s.cw) continue;
+      const line = d > 0 ? s.x + CW0 - 0.8 : s.x + CW1 + 0.8;
+      const ahead = d * (line - x) - len / 2;
+      if (red && !sigGreen(s, t) && ahead > 0.3 && ahead < 18) cap = Math.min(cap, vmax * clamp((ahead - 0.3) / 10, 0, 1));
+      // keep the crosswalk clear: only cross the line if there is room for the whole vehicle beyond it
+      if (s.cw && lead && ahead > 0.3 && ahead < 18) {
+        const far = d > 0 ? s.x + CW1 : s.x + CW0, room = d * (lead.x - d * leadLen / 2 - far);
+        if (room > -30 && room + (lead.v || 0) * 1.2 < len + 1.5) cap = Math.min(cap, vmax * clamp((ahead - 0.3) / 10, 0, 1));
+      }
+      // never drive into a person: anyone in your path on the crosswalk, ahead of your front, stops you
+      if (s.cw) for (const o of s.occ) {
+        // before the stop line, someone crossing toward your lane counts too; once committed, only someone in your lane
+        if (Math.abs(o.z - zOff) >= half + (o.w && ahead > -0.2 ? 1.2 : 0.3)) continue;
+        const dist = d * (o.x - (x + d * len / 2));
+        if (dist > -0.4 && dist < 18) cap = Math.min(cap, vmax * clamp((dist - 1.2) / 8, 0, 1));
+      }
+    }
+    for (const tx of topes) { const a = Math.abs(tx - x); if (a < 7) cap = Math.min(cap, vmax * (0.3 + a / 10)); }
+    return cap;
+  }
+  // single file: each mover keeps a safe gap to the one ahead, brakes hard, and can never pass through it
+  function runBand(arr, d, lenOf, cap, dt, ring, wrapF, g0, gs) {
+    if (!arr.length) return;
+    arr.sort((a, b) => d * (a.x - b.x));
+    for (let i = 0; i < arr.length; i++) {
+      const c = arr[i]; if (c.ghost) continue;
+      let lead = null;
+      for (let j = 1; j < arr.length; j++) { const o = arr[(i + j) % arr.length]; if (o.ref !== c) { lead = o; break; } }
+      let gap = Infinity, vd = c.vmax;
+      if (lead) { gap = d * (lead.x - c.x); if (gap <= 0) gap += ring; gap -= (lenOf(lead) + lenOf(c)) / 2; vd = c.vmax * clamp((gap - g0) / gs, 0, 1); }
+      c.gap = gap;
+      vd = Math.min(vd, cap(c, lead));
+      c.v += (vd - c.v) * Math.min(1, dt * (vd < c.v ? 12 : 2.2));
+      let step = c.v * dt;
+      if (lead && step > gap - 0.6) { step = Math.max(0, gap - 0.6); c.v = Math.min(c.v, lead.v || 0); }
+      c.x = wrapF(c.x + d * step);
+    }
+  }
+  const inBandB = o => o > LANES.B - 1.8 && o < LANES.B + 1.8;
+  // what is inside a crosswalk right now, across the road: {z, half}
+  // every vehicle near a crosswalk: lateral spot, half width, body span along the road, heading and speed
+  function zoneUsers(s, heroX, heroV) {
+    const a = s.x + CW0 - 24, b = s.x + CW1 + 24, out = [];
+    const add = (x, l, z, h, d, v) => { if (x + l / 2 > a && x - l / 2 < b) out.push({ z, h, x0: x - l / 2, x1: x + l / 2, d, v: Math.abs(v) }); };
+    cars.forEach(c => { if (c.show) add(c.x, LEN[c.type], c.z, 1.15, laneDir(c.lane), c.v); });
+    riders.forEach(r => { if (r.show) add(r.x, RLEN, r.z, 0.4, r.dir, r.v); });
+    scooters.forEach(q => add(q.x, 1.6, SCOOT_Z, 0.35, 1, q.v));
+    add(heroX, 4.8, LANES.B, 1.15, heroV < 0 ? -1 : 1, heroV);
+    return out;
+  }
+  // may a person step from lateral spot now to next, at x? not into a vehicle, nor in front of one that is coming
+  function clearToStep(users, x, now, next) {
+    for (const u of users) {
+      const pad = u.h + 0.35;
+      if (Math.abs(next - u.z) >= pad || Math.abs(now - u.z) < pad) continue;
+      if (x > u.x0 - 0.5 && x < u.x1 + 0.5) { return false; }
+      const front = u.d > 0 ? u.x1 : u.x0, dist = u.d * (x - front);
+      if (dist > 0 && dist < u.v * 1.4 + (u.v > 0.5 ? 2 : 0.6)) { return false; }
+    }
+    return true;
+  }
+  function updatePeds(dt, t, heroX, heroV, still) {
+    const D = 2 * PED_WAIT + 3 * PED_ROW;
+    signals.forEach(s => {
+      if (!s.grp) return;
+      if (!still) {
+        const cyc = (t + s.off) % CYCLE, cid = Math.floor((t + s.off) / CYCLE);
+        const G1 = s.grp[1], G2 = s.grp[-1];
+        // both groups set off together on the red, once the cars have had time to clear
+        if (!G1.walk && !G2.walk && G1.cyc !== cid && cyc >= GREEN + 1.5 && cyc <= CYCLE - 6.4 && s.peds.every(p => Math.abs(p.dx - p.dxT) < 0.05)) {
+          [G1, G2].forEach(G => { G.walk = true; G.cyc = cid; G.t0 = t; }); s.peds.forEach(p => { p.walk = true; p.d = 0; });
+        }
+        const heroNear = heroX > s.x + CW0 - 16 && heroX < s.x + CW1 + 6;
+        const users = zoneUsers(s, heroX, heroV);
+        [1, -1].forEach(g => {
+          const G = s.grp[g]; if (!G.walk) return;
+          const mem = s.peds.filter(p => p.g === g), qOf = p => G.n % 2 === 0 ? p.r : 3 - p.r;
+          for (let col = 0; col < 4; col++) {
+            const file = mem.filter(p => p.col === col).sort((a, b) => qOf(a) - qOf(b));
+            file.forEach((p, k) => {
+              if (!p.walk) return;
+              const q = qOf(p);
+              let step = t - G.t0 < q * 0.25 ? 0 : PED_V * dt;
+              if (k > 0) step = Math.min(step, Math.max(0, file[k - 1].d + PED_ROW - 0.65 - p.d));
+              const now = p.side * (PED_WAIT + q * PED_ROW) - p.side * p.d, next = now - p.side * step;
+              if (heroNear && !inBandB(now) && inBandB(next)) step = 0;              // wait for the car you drive
+              if (step > 0 && !clearToStep(users, s.x + p.dx, now, next)) step = 0;   // never step into or in front of a vehicle
+              p.d = Math.min(D, p.d + step);
+              if (p.d >= D) p.walk = false;
+            });
+          }
+          if (mem.every(p => !p.walk)) { G.walk = false; G.n++; mem.forEach(p => { p.side = -p.side; p.d = 0; p.dxT = pedDX(p); }); }
+        });
+        // step sideways into the next half only once both groups have reached their curbs
+        if (!s.grp[1].walk && !s.grp[-1].walk) s.peds.forEach(p => { p.dx = Math.abs(p.dxT - p.dx) < 0.05 ? p.dxT : p.dx + clamp(p.dxT - p.dx, -1.2 * dt, 1.2 * dt); });
+      }
+      s.occ.length = 0;
+      s.peds.forEach(p => {
+        const G = s.grp[p.g], q = G.n % 2 === 0 ? p.r : 3 - p.r;
+        p.off = p.side * (PED_WAIT + q * PED_ROW) - p.side * p.d;
+        if (Math.abs(p.off) < PED_WAIT - 0.1) s.occ.push({ z: p.off, x: s.x + p.dx, w: p.walk });
+      });
+    });
+  }
+
+  if (/[?&]qa\b/.test(location.search)) window.__wq = { cars, riders, scooters, peds, LEN, RLEN, SCOOT_Z, LANES, roadZ, nearBoundary };
   let decalDusk = null;
   function update(dt, t, heroX, heroV, still) {
+    if (pedMesh) updatePeds(dt, t, heroX, heroV, still);
     const asiaW = w(RNG.asia, heroX, 20);
     /* traffic sim */
     if (!still) {
-      for (const k in byLane) byLane[k].length = 0;
+      /* v50: a car changes body, appears or disappears only at a region gate, where it is scaled down to nothing,
+         and it appears only with room around it. Hidden cars keep driving so the lanes never freeze. */
       cars.forEach(c => {
-        const rg = regionAt(c.x);
-        c.type = pickType(c.s1, rg);
-        c.show = c.s2 < (DENS[rg] || 0.5) + busy(c.x);
-        if (c.show) byLane[c.lane].push(c);
+        if (nearBoundary(c.x) < 1.5) { const rg = regionAt(c.x); c.type = pickType(c.s1, rg); const want = c.s2 < (DENS[rg] || 0.5); if (!want) c.show = false; c.pend = want && !c.show; }
+        else c.pend = false;
+        if (c.chg > 0) c.chg -= dt;
       });
+      for (const k in byLane) byLane[k].length = 0;
+      cars.forEach(c => { if (!c.show) return; byLane[c.lane].push(c); if (c.chg > 0 && c.from) byLane[c.from].push({ ghost: true, ref: c, x: c.x, v: c.v, ml: c.ml }); });
+      cars.forEach(c => {
+        if (!c.pend) return;
+        if (byLane[c.lane].every(o => Math.abs(o.x - c.x) > (o.ml + c.ml) / 2 + 10)) { c.show = true; c.pend = false; c.v = c.vmax * 0.5; byLane[c.lane].push(c); }
+      });
+      cars.forEach(c => { if (!c.show) { c.x = wrap(c.x + laneDir(c.lane) * c.vmax * dt); c.v = c.vmax; } });
       for (const k in byLane) {
-        const arr = byLane[k], d = laneDir(k);
-        arr.sort((a, b) => d * (a.x - b.x));
-        for (let i = 0; i < arr.length; i++) {
-          const c = arr[i], lead = arr[(i + 1) % arr.length];
-          let gap = d * (lead.x - c.x); if (gap <= 0) gap += L;
-          gap -= (LEN[lead.type] + LEN[c.type]) / 2;
-          let vd = c.vmax * clamp((gap - 2.5) / 14, 0, 1);
-          for (const s of signals) {
-            const ahead = d * (s.x - c.x) - (d > 0 ? 3.5 : -1.5);
-            if (ahead > 0 && ahead < 16 && !sigGreen(s, t)) vd = Math.min(vd, c.vmax * clamp((ahead - 1) / 12, 0, 1));
-          }
-          for (const tx of topes) { const a = Math.abs(tx - c.x); if (a < 7) vd = Math.min(vd, c.vmax * (0.3 + a / 10)); }
-          if (gap < 7 && k !== 'A' && c.v < c.vmax * 0.5 && R() < 0.01) {
-            const other = k === 'C' ? 'D' : 'C';
-            const free = byLane[other].every(o => Math.abs(o.x - c.x) > 9);
-            if (free) c.lane = other;
-          }
-          c.v += (vd - c.v) * Math.min(1, dt * 2.2);
-          c.x = wrap(c.x + d * c.v * dt);
-          c.z += (LANES[c.lane] - c.z) * Math.min(1, dt * 1.5);
-        }
+        const d = laneDir(k);
+        runBand(byLane[k], d, o => o.ml, (c, ld) => stopFor(c.x, d, LEN[c.type], c.z, 1.15, c.vmax, t, true, false, ld, ld ? (ld.ml || LEN[ld.type]) : 0), dt, L, wrap, 2.5, 14);
       }
+      // a slow car may change between the two far lanes, only into a clear gap, and it holds both lanes while it moves over
+      ['C', 'D'].forEach(k => byLane[k].forEach(c => {
+        if (c.ghost || c.chg > 0 || !(c.gap < 7) || c.v >= c.vmax * 0.5 || R() >= 0.01) return;
+        const other = k === 'C' ? 'D' : 'C';
+        if (byLane[other].every(o => Math.abs(o.x - c.x) > (o.ml + c.ml) / 2 + 6)) { c.from = k; c.lane = other; c.chg = 1.6; }
+      }));
+      cars.forEach(c => { c.z += (LANES[c.lane] - c.z) * Math.min(1, dt * 1.5); });
     }
     /* write instances */
     const counts = {}; TYPES.forEach(tp => counts[tp] = 0);
@@ -781,26 +917,20 @@ export function buildWorld(scene, opts) {
 
     /* scooters + pedestrians */
     if (scootMesh) {
-      const a0 = RNG.asia[0], a1 = RNG.asia[1];
+      const a0 = RNG.asia[0] + 4, a1 = RNG.asia[1] - 4, sl = a1 - a0;
+      const wrapS = x => x > a1 ? x - sl : x < a0 ? x + sl : x;
+      if (!still) runBand(scooters, 1, () => 1.6, (q, ld) => stopFor(q.x, 1, 1.6, SCOOT_Z, 0.35, q.vmax, t, true, false, ld, 1.6), dt, sl, wrapS, 0.9, 5);
       scooters.forEach((s, i) => {
-        if (!still) s.s = (s.s + s.v * dt * s.side + 1) % 1;
-        const x = a0 + 4 + s.s * (a1 - a0 - 8);
+        const x = s.x;
         const sc = clamp(Math.min(x - a0, a1 - x) / 6, 0, 1);
-        tmpO.position.set(x, 0.1, roadZ(x) + s.side * (HALF + 1.2) + Math.sin(t * 2 + s.wob) * 0.25);
-        tmpO.rotation.set(0, s.side > 0 ? 0 : Math.PI, 0); tmpO.scale.setScalar(sc); tmpO.updateMatrix();
+        tmpO.position.set(x, 0.1, roadZ(x) + SCOOT_Z + Math.sin(t * 2 + s.wob) * 0.05);
+        tmpO.rotation.set(0, -Math.atan(roadDZ(x)), 0); tmpO.scale.setScalar(sc); tmpO.updateMatrix();
         scootMesh.setMatrixAt(i, tmpO.matrix); scootMesh.setColorAt(i, tmpC.setRGB(...s.tint));
       });
       scootMesh.instanceMatrix.needsUpdate = true; scootMesh.instanceColor.needsUpdate = true;
       peds.forEach((p, i) => {
-        const s = p.sig, z0 = roadZ(s.x);
-        const cyc = (t + s.off) % CYCLE; // cars red after GREEN
-        let f;
-        if (cyc < GREEN) f = 0; else f = clamp((cyc - GREEN - p.ph * 0.6) / (3.2 / p.spd), 0, 1);
-        const flip = Math.floor((t + s.off) / CYCLE) % 2 === 1;
-        const side = flip ? -p.side : p.side;
-        const zz = z0 + side * (HALF + 1.6) * (1 - 2 * f);
-        const xx = s.x + p.dx;
-        tmpO.position.set(xx, 0.1, zz + (f === 0 ? (p.ph - 0.5) * 1.5 * side : 0)); tmpO.rotation.set(0, 0, 0); tmpO.scale.setScalar(1); tmpO.updateMatrix();
+        const s = p.sig;
+        tmpO.position.set(s.x + p.dx, 0.1, roadZ(s.x) + p.off); tmpO.rotation.set(0, 0, 0); tmpO.scale.setScalar(1); tmpO.updateMatrix();
         pedMesh.setMatrixAt(i, tmpO.matrix); pedMesh.setColorAt(i, tmpC.setRGB(...p.tint));
       });
       pedMesh.instanceMatrix.needsUpdate = true; pedMesh.instanceColor.needsUpdate = true;
@@ -812,21 +942,22 @@ export function buildWorld(scene, opts) {
 
     /* v41 riders */
     const rc = {}; RIDE.forEach(k => rc[k] = 0);
+    if (!still) {
+      const bands = {};
+      riders.forEach(r => {
+        if (nearBoundary(r.x) < 1.5 || !r.type) { const rg = regionAt(r.x), cast = RCAST[rg] || RCAST.us; r.type = pickRide(r.s1, r.path ? cast.path : cast.road); const want = r.s2 < (RDENS[rg] || 0.5); if (!want) r.show = false; r.pend = want && !r.show; }
+        else r.pend = false;
+        if (r.show) (bands[r.band] = bands[r.band] || []).push(r); else { r.x = wrap(r.x + r.dir * r.vmax * dt); r.v = r.vmax; }
+      });
+      riders.forEach(r => { if (!r.pend) return; const b = bands[r.band] = bands[r.band] || []; if (b.every(o => Math.abs(o.x - r.x) > 7)) { r.show = true; r.v = r.vmax * 0.5; b.push(r); } });
+      for (const k in bands) { const d = bands[k][0].dir; runBand(bands[k], d, () => RLEN, (r, ld) => stopFor(r.x, d, RLEN, r.z, 0.4, r.vmax, t, true, r.path, ld, RLEN), dt, L, wrap, 1.2, 6); }
+    }
     for (const r of riders) {
-      const rg = regionAt(r.x), cast = RCAST[rg] || RCAST.us;
-      r.type = pickRide(r.s1, r.path ? cast.path : cast.road);
-      if (!still) {
-        let vd = r.vmax;
-        if (!r.path) for (const s of signals) { const ahead = r.dir * (s.x - r.x) - (r.dir > 0 ? 3 : -1); if (ahead > 0 && ahead < 14 && sigPhase(s, t) !== 2) vd = Math.min(vd, r.vmax * clamp((ahead - 0.5) / 10, 0, 1)); }
-        for (const tx of topes) { const a = Math.abs(tx - r.x); if (a < 5) vd = Math.min(vd, r.vmax * 0.5); }
-        r.v += (vd - r.v) * Math.min(1, dt * 2);
-        r.x = wrap(r.x + r.dir * r.v * dt);
-      }
-      if (r.s2 > (RDENS[rg] || 0.5)) continue;
+      if (!r.show || !r.type) continue;
       let k = clamp(nearBoundary(r.x) / 4, 0, 1);
       if (r.path) { let dmin = 1e9; for (const sx of stopXs) dmin = Math.min(dmin, Math.abs(sx - r.x)); k = Math.min(k, clamp((dmin - 16) / 4, 0, 1)); }
       if (k <= 0.02) continue;
-      const zz = roadZ(r.x) + r.z + (r.path ? Math.sin(t * 0.7 + r.ph) * 0.2 : 0);
+      const zz = roadZ(r.x) + r.z + (r.path ? Math.sin(t * 0.7 + r.ph) * 0.06 : 0);
       const yaw = -Math.atan(roadDZ(r.x)) + (r.dir < 0 ? Math.PI : 0);
       const lean = r.type === 'unicycle' ? Math.sin(t * 2.4 + r.ph) * 0.05 : 0;
       tmpO.position.set(r.x, r.path ? 0.08 : 0.03, zz); tmpO.rotation.set(lean, yaw, 0); tmpO.scale.setScalar(k * 1.2); tmpO.updateMatrix();
