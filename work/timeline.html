@@ -57,6 +57,9 @@ button{font:inherit;color:inherit}
 .theme-btn{width:32px;justify-content:center;padding:0!important}
 html[data-theme="dark"] .sun,html:not([data-theme="dark"]) .moon{display:none}
 
+/* v61: tablets: the photo alone in the left pill, a tighter nav, so all links fit */
+@media (min-width:768px) and (max-width:960px){.pill.brand{font-size:0;gap:0;padding-right:4px}.links a,.links button{padding:0 7px;font-size:12.5px}}
+
 .intro{position:fixed;z-index:5;left:max(20px,env(safe-area-inset-left,0px));top:calc(env(safe-area-inset-top,0px) + 62px);right:20px;pointer-events:none}
 .intro h1{margin:0;font-size:22px;font-weight:800;letter-spacing:-.01em}
 .intro p{margin:2px 0 0;color:var(--muted);font-size:13px}
@@ -698,6 +701,7 @@ html[data-theme="dark"] .tile.keep img,html[data-theme="dark"] .lg.keep img,html
     <a href="../reel.html" target="_top">Sizzle reel</a>
     <a href="brag-book.html" target="_blank" rel="noopener">Live demos</a>
     <a class="cur" href="timeline.html" aria-current="page">Timeline</a>
+    <a href="how-i-made-it.html" target="_top">How I made it</a>
     <a href="../assets/resume.pdf" target="_blank" rel="noopener">Resume</a>
     <a href="../index.html#contact" target="_top">Contact</a>
     <span class="sep" aria-hidden="true"></span>

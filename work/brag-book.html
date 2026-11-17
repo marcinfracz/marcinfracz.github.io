@@ -781,6 +781,8 @@ a.mapp:hover .app-viz{transform:translateY(-3px);box-shadow:0 18px 40px -22px va
 html.is-dark .bar .sun,html:not(.is-dark) .bar .moon{display:none}
 .deck{padding-top:4px}
 @media (max-width:900px){.bar .brand span{display:none}.bar .links a,.bar .links button{padding:0 9px;font-size:13px}}
+/* v61: tablets: the photo alone in the left pill, a tighter nav, so all links fit */
+@media (min-width:768px) and (max-width:960px){.bar .pill.brand{font-size:0;gap:0;padding-right:4px}.bar .links a,.bar .links button{padding:0 7px;font-size:12.5px}}
 @media (max-width:767px){
   .bar .bar-in{flex-wrap:nowrap}
   .bar .pill.brand{flex:none;font-size:0;gap:0;padding-right:4px}
@@ -814,6 +816,7 @@ html.is-dark .bar .sun,html:not(.is-dark) .bar .moon{display:none}
       <a href="../reel.html" target="_top">Sizzle reel</a>
       <a class="cur" href="#export" aria-current="page">Live demos</a>
       <a href="timeline.html" target="_top">Timeline</a>
+      <a href="how-i-made-it.html" target="_top">How I made it</a>
       <a href="../assets/resume.pdf" target="_blank" rel="noopener">Resume</a>
       <a href="../index.html#contact" target="_top">Contact</a>
       <span class="sep" aria-hidden="true"></span>
