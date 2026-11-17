@@ -279,16 +279,16 @@ document.addEventListener('click', e => {
   const phone = () => matchMedia('(max-width: 767px)').matches;
   function build() {
     veil = document.createElement('div'); veil.className = 'rs-veil wk-veil fb-veil'; veil.hidden = true;
-    veil.setAttribute('role', 'dialog'); veil.setAttribute('aria-modal', 'true'); veil.setAttribute('aria-label', 'Live demos');
+    veil.setAttribute('role', 'dialog'); veil.setAttribute('aria-modal', 'true'); veil.setAttribute('aria-label', 'Tools I Built');
     veil.innerHTML = `<div class="fb-win"><div class="fb-bar">`
-      + `<button class="fb-dot r" type="button" data-fb="close" aria-label="Close live demos" title="Close"></button><span class="fb-dot y" aria-hidden="true"></span><button class="fb-dot g" type="button" data-fb="full" aria-label="Open live demos as a full page" title="Full page"></button>`
+      + `<button class="fb-dot r" type="button" data-fb="close" aria-label="Close Tools I Built" title="Close"></button><span class="fb-dot y" aria-hidden="true"></span><button class="fb-dot g" type="button" data-fb="full" aria-label="Open Tools I Built as a full page" title="Full page"></button>`
       + `<button class="fb-btn" type="button" data-fb="close" aria-label="Back to the Road" title="Back to the Road">‹</button>`
       + `<button class="fb-btn" type="button" disabled aria-hidden="true" tabindex="-1">›</button>`
       + `<button class="fb-btn" type="button" data-fb="reload" aria-label="Reload" title="Reload">↻</button>`
-      + `<span class="fb-tab"><span>Live demos</span><button class="fb-x" type="button" data-fb="close" aria-label="Close live demos" title="Close">×</button></span>`
+      + `<span class="fb-tab"><span>Tools I Built</span><button class="fb-x" type="button" data-fb="close" aria-label="Close Tools I Built" title="Close">×</button></span>`
       + `<span class="fb-sp"></span>`
       + `<a class="fb-btn fb-full" href="work/brag-book.html" target="_blank" rel="noopener" aria-label="Open as a full page" title="Open as a full page">↗</a></div>`
-      + `<iframe class="fb-frame" title="Live demos" allow="fullscreen" allowfullscreen></iframe></div>`;
+      + `<iframe class="fb-frame" title="Tools I Built" allow="fullscreen" allowfullscreen></iframe></div>`;
     document.body.appendChild(veil);
     frame = veil.querySelector('iframe'); full = veil.querySelector('.fb-full');
     veil.addEventListener('click', e => {
