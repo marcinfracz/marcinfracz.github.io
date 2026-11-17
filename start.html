@@ -15,7 +15,8 @@
     document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
   })();
 </script>
-<script src="js/reel-src.js?v=41"></script>
+<script src="js/reel-src.js?v=58"></script>
+<script src="js/reel-player.js?v=58"></script>
 <style>
 :root{
   --bg1:#f1f3f6;--bg2:#e3e8ee;--ink:#1b1f24;--ink2:#46505d;--muted:#6b7684;--line:rgba(27,31,36,.12);
@@ -102,7 +103,7 @@ h1{margin:0;white-space:nowrap;font-size:clamp(30px,min(3.2vw,6vh),58px);line-he
     <div class="who">
       <img class="me" src="assets/headshots/pro-blue-gray.jpg" alt="Marcin Fracz">
       <div class="txt">
-      <p class="kicker">Automotive product & software strategy</p>
+      <p class="kicker">Automotive product &amp; software strategy</p>
       <h1>Marcin Fracz</h1>
       <p class="pos">20+ years across engineering, vehicle and software product marketing, and global joint ventures at GM, SAIC-GM and OnStar, in the US, Mexico and China.</p>
       <ul class="links">
@@ -117,13 +118,13 @@ h1{margin:0;white-space:nowrap;font-size:clamp(30px,min(3.2vw,6vh),58px);line-he
 
     <figure class="reel">
       <div class="player" id="player">
-        <img id="reel-poster" src="assets/sizzle-poster.jpg" alt="">
+        <img id="reel-poster" src="assets/sizzle-poster-1min.jpg" alt="">
         <button class="play" type="button" id="reel-play" aria-label="Play the sizzle reel">
           <span class="btn" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z"/></svg></span>
-          <span class="lbl">Sizzle reel<span id="reel-len">1:41</span></span>
+          <span class="lbl">Sizzle reel<span id="reel-len">1:04</span></span>
         </button>
       </div>
-      <figcaption><span>The career in under two minutes.</span><a href="reel.html" data-tab="Sizzle Reel">Open the reel page</a></figcaption>
+      <figcaption><span>The career in about a minute.</span><a href="reel.html" data-tab="Sizzle Reel">Open the reel page</a></figcaption>
     </figure>
   </section>
 
@@ -151,11 +152,12 @@ h1{margin:0;white-space:nowrap;font-size:clamp(30px,min(3.2vw,6vh),58px);line-he
 <script>
   /* the reel: one source, set in js/reel-src.js */
   (function () {
-    var R = window.MF_REEL || { src: "assets/sizzle-reel-v4.mp4", poster: "assets/sizzle-poster.jpg", length: "1:41" };
+    var R = window.MF_REEL || { src: "assets/sizzle-reel-1min.mp4", poster: "assets/sizzle-poster-1min.jpg", length: "1:04" };
     var player = document.getElementById("player"), btn = document.getElementById("reel-play");
     document.getElementById("reel-poster").src = R.poster;
     document.getElementById("reel-len").textContent = R.length || "";
     btn.addEventListener("click", function () {
+      if (window.MFReel) { window.MFReel.mount(player, { autoplay: true }); return; } /* v57: the tall cut on phones while upright */
       var v = document.createElement("video");
       v.controls = true; v.playsInline = true; v.autoplay = true; v.poster = R.poster; v.src = R.src;
       v.setAttribute("aria-label", "Sizzle reel");

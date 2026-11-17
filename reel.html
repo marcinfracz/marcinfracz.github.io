@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sizzle Reel — Marcin Fracz</title>
-<meta name="description" content="Marcin Fracz — automotive strategy and product leader. A 1:41 sizzle reel: hardware and data grounding, global product leadership, strategic execution, amplified by AI.">
+<meta name="description" content="Marcin Fracz — automotive strategy and product leader. A one-minute sizzle reel: hardware and data grounding, global product leadership, strategic execution, amplified by AI.">
 <style>
   :root { --paper: #F4F1EA; --ink: #1E2124; --amber: #E8A33D; --muted: #6b6f73; }
   * { box-sizing: border-box; }
@@ -32,25 +32,22 @@
 <main class="wrap">
   <p class="kicker">Marcin Fracz</p>
   <h1>Sizzle Reel<span class="accent">.</span></h1>
-  <p class="lede">Hardware and data grounding. Global product leadership. Strategic execution. All amplified by AI. One minute, forty-one seconds.</p>
-  <div class="player">
-    <video id="reel" controls preload="metadata" poster="assets/sizzle-poster.jpg" playsinline>
-      <source src="assets/sizzle-reel-v4.mp4" type="video/mp4">
-      Your browser does not support the video tag.
-    </video>
+  <p class="lede">Hardware and data grounding. Global product leadership. Strategic execution. All amplified by AI. One minute.</p>
+  <div class="player" id="player">
   </div>
   <div class="meta">
-    <span>Length <b id="reel-len">1:41</b></span>
+    <span>Length <b id="reel-len">1:04</b></span>
     <span>Format <b>1080p</b></span>
     <span>Voice <b>AI narration</b></span>
   </div>
   <a class="back" href="./">Back to the desktop</a>
 </main>
-<script src="js/reel-src.js?v=41"></script>
+<script src="js/reel-src.js?v=58"></script>
+<script src="js/reel-player.js?v=58"></script>
 <script>
-  /* the reel's file is set in one place, js/reel-src.js */
-  (function () { var R = window.MF_REEL; if (!R) return; var v = document.getElementById("reel");
-    if (v.querySelector("source").getAttribute("src") !== R.src) { v.querySelector("source").setAttribute("src", R.src); v.poster = R.poster; v.load(); }
+  /* the reel's files are set in one place, js/reel-src.js; js/reel-player.js picks the cut for the screen */
+  (function () { var R = window.MF_REEL || {};
+    if (window.MFReel) window.MFReel.mount(document.getElementById("player"), { id: "reel", preload: "metadata" });
     if (R.length) document.getElementById("reel-len").textContent = R.length; })();
 </script>
 <!-- Cloudflare Web Analytics --><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "18aafd4fcbc5429e9148c50c5ca2d470"}'></script><!-- End Cloudflare Web Analytics -->
