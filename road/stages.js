@@ -2,9 +2,9 @@
    { group, anchors: {name: Object3D}, update(t, k, dt) } where k is 1 when the
    camera has landed on that stop and 0 when it is far away. */
 import { THREE, reg, mat, ownMat, glowMat, mesh, at, box, cyl, sph, grp, label, canvasTex, tok, smooth, clamp, lerp, roadZ } from './core.js';
-import { vehicleGeo } from './world.js?v=50';
+import { vehicleGeo } from './world.js?v=55';
 import { drawFlag, drawMark, onLogo } from './marks.js?v=28';
-import { ketteringAB, bulldog, bulldogPoster, rossBuilding, burOak, blockMSign, wavingFlag, wave, signPanel, MAIZE, BLUE } from './landmarks.js?v=50';
+import { ketteringAB, bulldog, bulldogPoster, rossBuilding, burOak, blockMSign, wavingFlag, wave, signPanel, MAIZE, BLUE } from './landmarks.js?v=55';
 
 const pin = (parent, x, y, z) => { const o = new THREE.Object3D(); o.position.set(x, y, z); parent.add(o); return o; };
 const vmesh = (type, s = 1, key = 'obj') => { const m = mesh(vehicleGeo(type), mat(key, { vertexColors: true })); m.scale.setScalar(s); return m; };
@@ -80,30 +80,37 @@ const B = {};
 B.start = () => {
   const g = new THREE.Group();
   const span = 22; // the road center is at local z = +22
+  /* v55: the opening view looks down the road from behind the start line, so the gantry,
+     flags, stands and pit lane line both sides of the road ahead */
   [-11, 11].forEach(dz => g.add(box(1.4, 9, 1.4, 'obj', 0, 0, span + dz)));
   g.add(box(1.6, 1.2, 24, 'obj', 0, 9, span));
   g.add(box(1.62, 0.3, 24.02, 'accent', 0, 9.5, span));
+  const ban = signPanel('START', 8, 1.9, '#2B3A4A', '#F2F4F7'); ban.rotation.y = -Math.PI / 2; ban.position.set(-0.14, 11.3, span); g.add(ban);
+  g.add(box(0.12, 2.1, 8.2, 'objDark', 0, 10.25, span));
   const flags = [];
-  // every country the work has taken him to
-  ['US', 'MX', 'EC', 'CA', 'CN', 'KR'].forEach((c, i) => { const f = at(flag(6 + (i % 2), 'accent', c), -15 + i * 6, 0, 3); g.add(f); flags.push(f); });
-  for (let i = 0; i < 6; i++) g.add(cyl(0.05, 0.45, 1, 'accent', -8 + i * 3.2, 0, 10.8));
-  const garage = grp(box(9, 4, 7, 'obj', 0, 0, 0), box(9.2, 0.4, 7.2, 'objShade', 0, 4, 0), box(5, 3, 0.1, 'objDark', 0, 0, 3.52));
-  at(garage, 10, 0, -6); g.add(garage);
-  /* round 27: a start line with life in it: a banner, a light tree, a stand of people and a crew at the garage */
-  const ban = signPanel('START', 7, 1.7, '#2B3A4A', '#F2F4F7'); ban.position.set(0, 11.35, span + 0.1); g.add(ban);
-  g.add(box(7.2, 1.9, 0.12, 'objDark', 0, 10.4, span - 0.02));
+  // every country the work has taken him to, flying along both sides of the road
+  [['US', 3, 35.6], ['MX', 10, 35.6], ['EC', 17, 35.6], ['CA', 24, 35.6], ['CN', 6, 7.4], ['KR', 14, 7.4]].forEach(([c, x, z], i) => { const f = at(flag(6 + (i % 2), 'accent', c), x, 0, z, -Math.PI / 2); g.add(f); flags.push(f); });
+  for (let i = 0; i < 6; i++) { g.add(cyl(0.05, 0.45, 1, 'accent', 2 + i * 3.4, 0, 10.9)); g.add(cyl(0.05, 0.45, 1, 'accent', 2 + i * 3.4, 0, 33.1)); }
   /* v41: a proper three-lamp signal, red over yellow over green, one lit at a time */
   const tree = grp(cyl(0.16, 0.2, 5.4, 'objDark', 0, 0, 0, 8), box(1.1, 3.3, 0.6, 'objDark', 0, 3.3, 0));
   const lamps = ['#E5484D', '#F2B632', '#2FA36B'].map((c, i) => { const m = new THREE.MeshLambertMaterial({ color: '#55606C', emissive: '#000000' }); const y = 5.95 - i * 1.0; const l = sph(0.34, m, 0, y, 0.3, 14); tree.add(l); tree.add(box(0.9, 0.08, 0.42, 'objDark', 0, y + 0.38, 0.5)); return { l, c }; });
-  at(tree, -2.6, 0, 9.4); g.add(tree);
-  const stand = grp(box(11, 0.6, 1.6, 'objShade', 0, 0, 0), box(11, 1.2, 1.6, 'objShade', 0, 0, -1.6), box(11, 1.8, 1.6, 'objShade', 0, 0, -3.2), box(11.2, 0.15, 5, 'objDark', 0, 0.02, -1.6));
-  at(stand, -10, 0, -4); g.add(stand);
+  at(tree, 1.6, 0, 31.6, -Math.PI / 2); g.add(tree);
+  // two stands of people, one each side, rows rising away from the road
   const crowd = [];
   const tones = ['accent', 'cobalt', 'obj', 'objDark', 'accent', 'obj', 'cobalt', 'objDark', 'obj', 'accent', 'cobalt', 'obj'];
-  tones.forEach((k, i) => { const row = i % 3, p = person(k, 0.9); at(p, -14.5 + Math.floor(i / 3) * 3 + row * 0.7, 0.6 + row * 0.6, -4 - row * 1.6); g.add(p); crowd.push({ p, y: p.position.y, ph: i * 0.7 }); });
-  const crew = []; [[6.5, -1.4, 'accent'], [8.2, -1.8, 'objDark'], [13.6, -1.2, 'cobalt']].forEach(([x, z, k], i) => { const p = person(k, 1); at(p, x, 0, z); g.add(p); crew.push({ p, x, ph: i }); });
-  const cart = grp(box(1.6, 0.9, 1, 'accent', 0, 0.3, 0), box(1.6, 0.1, 1, 'objDark', 0, 1.2, 0)); at(cart, 11, 0, -1.6); g.add(cart);
-  const vanS = vmesh('van', 0.9); at(vanS, 17, 0, -1, 0.2); g.add(vanS);
+  const stand = (x, z, ry, n) => {
+    const s = grp(box(11, 0.6, 1.6, 'objShade', 0, 0, 0), box(11, 1.2, 1.6, 'objShade', 0, 0, -1.6), box(11, 1.8, 1.6, 'objShade', 0, 0, -3.2), box(11.2, 0.15, 5, 'objDark', 0, 0.02, -1.6));
+    tones.slice(0, n).forEach((k, i) => { const row = i % 3, p = person(k, 0.9); at(p, -4.5 + Math.floor(i / 3) * 3 + row * 0.7, 0.6 + row * 0.6, -row * 1.6); s.add(p); crowd.push({ p, y: p.position.y, ph: i * 0.7 }); });
+    at(s, x, 0, z, ry); g.add(s);
+  };
+  stand(36, 39.5, Math.PI, 12);
+  stand(30, 4.4, 0, 9);
+  // the pit garage and its crew, further down on the right
+  const garage = grp(box(9, 4, 7, 'obj', 0, 0, 0), box(9.2, 0.4, 7.2, 'objShade', 0, 4, 0), box(5, 3, 0.1, 'objDark', 0, 0, 3.52));
+  at(garage, 56, 0, 43, Math.PI); g.add(garage);
+  const crew = []; [[52.5, 37.6, 'accent'], [55, 37.2, 'objDark'], [59.6, 37.8, 'cobalt']].forEach(([x, z, k], i) => { const p = person(k, 1); at(p, x, 0, z); g.add(p); crew.push({ p, x, ph: i }); });
+  const cart = grp(box(1.6, 0.9, 1, 'accent', 0, 0.3, 0), box(1.6, 0.1, 1, 'objDark', 0, 1.2, 0)); at(cart, 50, 0, 37.4); g.add(cart);
+  const vanS = vmesh('van', 0.9); at(vanS, 63, 0, 38.6, 0.15); g.add(vanS);
   const lit = new THREE.Color(); let lampOn = -1;
   return { group: g, anchors: {}, update(t) {
     flags.forEach(f => waveFlag(f, t));
@@ -577,6 +584,7 @@ B.mexico = () => {
   runs.forEach(([x0, x1]) => { const n = Math.round((x1 - x0) / 0.85); for (let i = 0; i <= n; i++) bn.push({ x: x0 + (x1 - x0) * i / n, f: i / n, run: bn.length }); });
   const bMat = ownMat('land', { side: THREE.DoubleSide }); const bIm = new THREE.InstancedMesh(flagG, bMat, bn.length); g.add(bIm);
   bn.forEach((b, i) => { b.z = i < bn.length / 2 ? runs[0][2] : runs[1][2]; bIm.setColorAt(i, new THREE.Color(TRI[i % TRI.length])); });
+  { const o = new THREE.Object3D(); bn.forEach((b, i) => { o.position.set(b.x, 4.45 - Math.sin(b.f * Math.PI) * 0.9, b.z); o.updateMatrix(); bIm.setMatrixAt(i, o.matrix); }); }  // v55: strung from the start, never stacked at the lot's corner
   runs.forEach(([x0, x1, z]) => [x0, x1].forEach(x => g.add(cyl(0.08, 0.08, 4.6, 'objDark', x, 0, z))));
   // brand pylons at the street
   const pylon = (text, bg, fg, x) => { const p = grp(box(0.5, 5.4, 0.5, 'objDark', 0, 0, 0)); { const sp = signPanel(text, 3.8, 1.2, bg, fg); sp.rotation.x = -0.35; p.add(at(sp, 0, 5.9, 0.28)); } at(p, x, 0, -3.9); g.add(p); return p; };
@@ -1042,11 +1050,22 @@ B.finale = (ctx) => {
   place(angel, 13.5, -21, 'Mexico City', 14.2);
   const pearl = grp(cyl(0.22, 0.32, 15, 'objDark', 0, 0, 0, 8), ...[[-1.2, 0], [1.2, 0], [0, 1.2]].map(([x, z]) => { const l = cyl(0.25, 0.32, 5.5, 'obj', x, 0, z, 8); l.rotation.z = -x * 0.08; return l; }), sph(1.8, new THREE.MeshLambertMaterial({ color: '#C9708A' }), 0, 5.2, 0, 18), sph(1.1, new THREE.MeshLambertMaterial({ color: '#C9708A' }), 0, 11, 0, 16), cyl(0.05, 0.12, 3.5, 'objDark', 0, 13.5, 0, 6));
   place(pearl, 20.5, -16, 'Shanghai', 12.2);
-  const sun = sph(9, new THREE.MeshBasicMaterial({ color: '#F2C77A', fog: false }), 36, 0, -95, 32); sun.castShadow = false;
+  /* v55: the end view looks down the open road: a sign gantry with what comes next, and the sun rising over the road ahead */
+  const zr = dx => roadZ(ctx.base.x + dx) - ctx.base.z;
+  { const gx = 40, zc = zr(gx), yaw = (roadZ(ctx.base.x + gx + 1) - roadZ(ctx.base.x + gx - 1)) / 2;
+    const gan = new THREE.Group();
+    [-12, 12].forEach(dz => gan.add(box(1.4, 9.4, 1.4, 'obj', 0, 0, dz)));
+    gan.add(box(1.6, 1.2, 25.4, 'obj', 0, 9.4, 0)); gan.add(box(1.62, 0.3, 25.42, 'accent', 0, 9.9, 0));
+    [['STRATEGY', -7.6], ['PRODUCT', 0], ['AI', 7.6]].forEach(([t, z]) => {
+      const p = signPanel(t, 7, 2.1, '#2F6B4F', '#FFFFFF'); p.rotation.y = -Math.PI / 2; p.position.set(-0.86, 8.2, z); gan.add(p);
+      gan.add(box(0.1, 2.3, 7.2, 'objDark', -0.78, 7.05, z));
+    });
+    at(gan, gx, 0, zc, -Math.atan(yaw)); g.add(gan); }
+  const sun = sph(15, new THREE.MeshBasicMaterial({ color: '#F2C77A', fog: false }), 380, 0, zr(380) + 34, 32); sun.castShadow = false;
   reg(sun.material, 'sun');
   g.add(sun);
   return { group: g, anchors: { plaza: pin(col, 0, 8.4, 0) }, update(t, k) {
-    sun.position.y = -6 + 30 * smooth(0, 1, k);
+    sun.position.y = -12 + 64 * smooth(0, 1, k);
     const lit = Math.min(7, Math.floor(k * 9));
     bands.forEach((b, i) => { b.material.emissiveIntensity = i < lit ? 0.18 + 0.12 * Math.max(0, Math.sin(t * 1.6 - i * 0.6)) : 0; });
   } };

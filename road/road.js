@@ -1,9 +1,9 @@
 /* The Road: page app. Builds the 3D world, places one scene per stop, and
    drives the camera left to right (laptop and tablet) or top to bottom (phone). */
 import { THREE, TOKENS, setTheme, tok, roadZ, smooth, clamp, lerp } from './core.js';
-import { buildWorld } from './world.js?v=50';
-import { buildStage } from './stages.js?v=50';
-import { planCities, cityFootprints, buildCities } from './landmarks.js?v=50';
+import { buildWorld } from './world.js?v=55';
+import { buildStage } from './stages.js?v=55';
+import { planCities, cityFootprints, buildCities } from './landmarks.js?v=55';
 import { flagURL, COUNTRY } from './marks.js?v=28';
 
 const C = window.ROAD_CONTENT;
@@ -455,7 +455,7 @@ function start() {
 
   /* world and scenes */
   const cities = planCities(STOPS); cityFootprints(cities);
-  const world = buildWorld(scene, { stops: STOPS, xMin: XMIN, xMax: XMAX, lite, eras: ERAS, cities });
+  const world = buildWorld(scene, { stops: STOPS, xMin: XMIN, xMax: XMAX + 300, lite, eras: ERAS, cities });  // v55: the road runs on past the End into the haze
   const stages = STOPS.map(s => {
     const base = new THREE.Vector3(s.x, 0, roadZ(s.x) - 22);
     const st = buildStage(scene, s.scene, base, { lookoutY: world.lookoutY, height: world.height, base });
@@ -1162,7 +1162,8 @@ function start() {
   setTimeout(resize, 400);
 
   /* ---------- camera ---------- */
-  const look = new THREE.Vector3(), camPos = new THREE.Vector3(), tmp = new THREE.Vector3();
+  const look = new THREE.Vector3(), camPos = new THREE.Vector3(), tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3(), tmp3 = new THREE.Vector3();
+  const roadViewOn = true;
   let mx = 0, my = 0;
   addEventListener('pointermove', e => { mx = e.clientX / innerWidth - 0.5; my = e.clientY / innerHeight - 0.5; });
   let zoom = 0;
@@ -1177,8 +1178,8 @@ function start() {
     // in the mini cities, tip the view up so the skyline is in the frame
     let cw = 0; STOPS.forEach(s => { if (CITY_VIEW[s.id]) cw = Math.max(cw, CITY_VIEW[s.id] * smooth(46, 8, Math.abs(fx - s.x))); });
     if (cw > 0) { off.x -= (phone ? 0 : 4) * cw; lookAt.x += (phone ? 0 : 7) * cw; lookAt.z -= (phone ? 10 : 22) * cw; lookAt.y += 3 * cw + 16 * Math.max(0, cw - 1); off.y -= 9 * cw + 8 * Math.max(0, cw - 1); off.z += 6 * cw; }
-    // lift up to the lookout at the end
-    if (isFinale > 0) {
+    // lift up to the lookout at the end (v55: only while passing; at rest the end view takes over)
+    if (isFinale > 0 && !roadViewOn) {
       const lx = STOPS[STOPS.length - 1].x + 2;
       lookAt.lerp(v3.set(lx + 6, world.lookoutY + 2, roadZ(lx) - 30), 0.3 * isFinale);
     }
@@ -1208,6 +1209,26 @@ function start() {
       lookAt.lerp(lookO, smooth(0.3, 1, ze));
       off.copy(dir).multiplyScalar(Math.exp(lerp(Math.log(dn), Math.log(D), ze)));
     }
+    /* v55: at the Start and the End the camera drops behind the car and looks down the road ahead,
+       the start gantry overhead at the beginning and the open road at the end; it eases back to
+       the side view over the first and last stretch of the drive */
+    const x0 = STOPS[0].x, x1 = STOPS[STOPS.length - 1].x, RV = phone ? 40 : 64;
+    const zw = clamp(zOut / ZMAX, 0, 1), wRaw = Math.max(smooth(RV, 0, fx - x0), smooth(RV, 0, x1 - fx)) * (1 - zw * zw * (3 - 2 * zw)) * (1 - zoom);
+    const wv = roadViewOn ? wRaw : 0;
+    if (world.setAhead) world.setAhead(wv);
+    if (wv > 0.0005) {
+      const atEnd = x1 - fx < fx - x0;
+      const back = phone ? (atEnd ? 70 : 46) : (atEnd ? 30 : 42), ht = phone ? 13 : (atEnd ? 7.2 : 6.2), ahead = phone && atEnd ? 42 : atEnd ? 90 : 80;
+      const cx = fx - back, lx2 = fx + ahead;
+      const rvPos = v3.set(cx, ht, roadZ(cx) + (phone ? 2.4 : 3.2));
+      if (!reduced && !phone) { rvPos.z += mx * 2.2; rvPos.y -= my * 1.2; }
+      const rvLook = tmp2.set(lx2, phone ? -5 : atEnd ? 3.4 : 4.2, roadZ(lx2) + (phone ? 1.5 : 0.5));
+      const ew = wv * wv * (3 - 2 * wv);
+      // blend in camera space: lerp the eye and the target, keeping the off vector for fog and far plane
+      const eye = tmp3.copy(lookAt).add(off).lerp(rvPos, ew);
+      lookAt.lerp(rvLook, ew);
+      off.copy(eye).sub(lookAt);
+    }
     const dist = off.length();
     camera.far = Math.max(900, dist * 2.2); camera.near = Math.max(1, dist * 0.004);
     scene.fog.near = 170 + Math.max(0, dist - 95) * 1.2; scene.fog.far = 420 + Math.max(0, dist - 95) * 2.4;
@@ -1218,7 +1239,7 @@ function start() {
     camera.lookAt(look);
     // move the sun's shadow box with the view
     // v41: snap the shadow box to whole shadow-map texels so edges stay put as the view glides
-    sunC.set(fx, 0, fz - 15);
+    sunC.set(fx + 45 * wv, 0, fz - 15 * (1 - wv));
     const sa = sunC.dot(sunR), sb = sunC.dot(sunU);
     sunC.addScaledVector(sunR, Math.round(sa / sunTex) * sunTex - sa).addScaledVector(sunU, Math.round(sb / sunTexV) * sunTexV - sb);
     sun.target.position.copy(sunC);

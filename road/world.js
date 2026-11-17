@@ -1,6 +1,6 @@
 /* The Road: terrain, road network, region-aware traffic, NPCs and the
    perception layer (radar, LiDAR, vision boxes, V2X). */
-import { cityFlat, cityRiver, cityKeepOut, cityWater } from './landmarks.js?v=50';
+import { cityFlat, cityRiver, cityKeepOut, cityWater } from './landmarks.js?v=55';
 import { buildLife } from './life.js?v=50';
 import { THREE, mat, ownMat, glowMat, reg, mesh, at, box, cyl, sph, grp, merge, bx, cy, label,
   smooth, clamp, lerp, rand, roadZ, roadDZ, tok } from './core.js';
@@ -507,6 +507,7 @@ export function buildWorld(scene, opts) {
     /* v50: the scooters ride the near edge of the road with the traffic, in single file, and stop for red */
     const [sa0, sa1] = RNG.asia, sLen = sa1 - sa0 - 8;
     for (let i = 0; i < 40; i++) scooters.push({ x: sa0 + 4 + (i + 0.5 + (R() - 0.5) * 0.3) * sLen / 40, v: 0, vmax: 3.6 + R() * 1.8, wob: R() * 6, tint: [[1, 1, 1], [1.05, 0.9, 0.6], [0.7, 0.8, 1]][(R() * 3) | 0] });
+    scootMesh.count = scooters.length;   /* v55: only the scooters in use render, nothing parked at the origin */
     scene.add(scootMesh);
     const pg = merge([[cy(0.25, 0.3, 1.2, 0, 0, 0, 6), 1], [new THREE.SphereGeometry(0.24, 8, 6).translate(0, 1.45, 0), 0.92]]);
     pedMesh = new THREE.InstancedMesh(pg, mat('obj', { vertexColors: true }), 60); pedMesh.castShadow = true; pedMesh.frustumCulled = false;
@@ -708,6 +709,9 @@ export function buildWorld(scene, opts) {
 
   let mode = 'all';
   function setMode(m) { mode = m; }
+  /* v55: in the down-the-road views only cars ahead of the hero get vision boxes */
+  let aheadOnly = false, aheadW = 0;
+  function setAhead(w) { aheadW = +w || 0; aheadOnly = aheadW > 0.3; }
   const on = k => mode === 'all' || mode === k;
 
   /* ---------- per-frame ---------- */
@@ -868,7 +872,10 @@ export function buildWorld(scene, opts) {
     if (dusk !== decalDusk) { decalDusk = dusk; decalMats.forEach(m => m.color.set(m.userData.yellow ? (dusk ? '#9C7F3A' : '#E8B83A') : (dusk ? '#7F8894' : '#FFFFFF'))); }
     cars.forEach(c => {
       if (!c.show) return;
-      const nb = nearBoundary(c.x); const sc = clamp(nb / 4, 0, 1); if (sc <= 0.02) return;
+      const nb = nearBoundary(c.x); let sc = clamp(nb / 4, 0, 1);
+      /* v55: in the down-the-road views, keep the hero's side clear between the camera and the car */
+      if (aheadW > 0 && c.z > 0) sc *= 1 - aheadW * smooth(heroX - 50, heroX - 45, c.x) * smooth(heroX - 0.5, heroX - 4, c.x);
+      if (sc <= 0.02) return;
       const d = laneDir(c.lane);
       const z = roadZ(c.x) + c.z;
       const yaw = -Math.atan(roadDZ(c.x)) + (d < 0 ? Math.PI : 0);
@@ -993,7 +1000,7 @@ export function buildWorld(scene, opts) {
     const maxBoxes = { us: 3, mexico: 4, asia: 14, port: 4, now: 2 }[rg] || 3;
     const cands = [];
     if (visOn) {
-      cars.forEach(c => { if (!c.show) return; const d = Math.abs(c.x - heroX); if (d < 40) cands.push({ d, x: c.x, z: roadZ(c.x) + c.z, l: LEN[c.type], h: c.type === 'bus' || c.type === 'semi' || c.type === 'fire' || c.type === 'ambulance' ? 3.2 : 2.1, w: 2.3, yaw: -Math.atan(roadDZ(c.x)) }); });
+      cars.forEach(c => { if (!c.show || (aheadOnly && c.x < heroX - 3)) return; const d = Math.abs(c.x - heroX); if (d < 40) cands.push({ d, x: c.x, z: roadZ(c.x) + c.z, l: LEN[c.type], h: c.type === 'bus' || c.type === 'semi' || c.type === 'fire' || c.type === 'ambulance' ? 3.2 : 2.1, w: 2.3, yaw: -Math.atan(roadDZ(c.x)) }); });
       if (asiaW > 0.5) {
         peds.forEach(p => { const x = p.sig.x + p.dx; if (Math.abs(x - heroX) < 34) cands.push({ d: Math.abs(x - heroX) + 3, x, z: null, ped: p, l: 0.9, h: 1.9, w: 0.9, yaw: 0 }); });
       }
@@ -1042,7 +1049,7 @@ export function buildWorld(scene, opts) {
     });
   }
 
-  return { update, setMode, setZoomTint, regionAt, height, lookoutY, hero };
+  return { update, setMode, setAhead, setZoomTint, regionAt, height, lookoutY, hero };
 }
 
 /* ---------- vehicles ---------- */
