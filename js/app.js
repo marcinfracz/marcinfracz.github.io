@@ -1147,7 +1147,7 @@
     else if (a === "open-terminal") openWindow("terminal");
     else if (a === "open-browser") openWindow("browser");
     else if (a === "open-work-showcase") goPage("road.html");
-    else if (a === "open-brag") browserOpenTab(BRAG_URL, "Live demos");
+    else if (a === "open-brag") browserOpenTab(BRAG_URL, "Tools I Built");
     else if (a === "contact") openWindow("contact-win");
     else if (a === "search") openPalette();
     else if (a === "wallpaper-settings") openWindow("wallpaper");
@@ -1340,7 +1340,7 @@
     /* v38: live demos open in their own tab, so the site stays one Back press away */
     /* v41: on the Desktop, live demos open as a tab in this window too (phones go to the page) */
     if (isPhone()) { window.location.href = u; return; }
-    browserOpenTab(u, label || "Live demos");
+    browserOpenTab(u, label || "Tools I Built");
   }
   var browserTabs = []; /* {id, title, url, history, index} — one history stack per tab */
   var browserActiveId = null;
@@ -1350,7 +1350,7 @@
     if (url.split("#")[0] === ROAD_URL) return "The Road";
     if (url === RESUME_URL) return "Resume";
     if (url === REEL_URL) return (window.MF_REEL || {}).name || "Meet Marcin";
-    if (url.split("#")[0] === BRAG_URL) return "Live demos";
+    if (url.split("#")[0] === BRAG_URL) return "Tools I Built";
     if (url.split("#")[0] === TIMELINE_URL) return "Timeline";
     if (url.split("#")[0] === new URL("work/how-i-made-it.html", window.location.href).href) return "How I made it";
     if (url.split("#")[0] === new URL("about.html", window.location.href).href) return "About";
@@ -1560,7 +1560,7 @@
     var a = e.target.closest('a[href$="resume.pdf"]');
     if (a && !isPhone()) { e.preventDefault(); browserOpenTab(RESUME_URL, "Resume"); return; }
     var bb = e.target.closest('a[href*="brag-book.html"], [data-brag]');
-    if (bb) { e.preventDefault(); var nm = bb.querySelector && bb.querySelector(".app-txt b, .kit-chip span"); openToolPage(bb.href || BRAG_URL, nm ? nm.textContent.replace(/\s*Live$/, "") : "Live demos"); return; }
+    if (bb) { e.preventDefault(); var nm = bb.querySelector && bb.querySelector(".app-txt b, .kit-chip span"); openToolPage(bb.href || BRAG_URL, nm ? nm.textContent.replace(/\s*Live$/, "") : "Tools I Built"); return; }
     var tl = e.target.closest('a[href*="work/timeline.html"]');
     if (tl) { e.preventDefault(); openToolPage(tl.href, "Timeline"); return; }
     var hm = e.target.closest('a[href*="how-i-made-it.html"]');
@@ -1602,7 +1602,7 @@
   var PALETTE_ITEMS = [
     { label: "About Marcin", hint: "Window", run: function () { openWindow("about"); } },
     { label: "Timeline", hint: "Window", run: function () { openWindow("work"); } },
-    { label: "Live demos", hint: "Page", run: function () { browserOpenTab(BRAG_URL, "Live demos"); } },
+    { label: "Tools I Built", hint: "Page", run: function () { browserOpenTab(BRAG_URL, "Tools I Built"); } },
     { label: "Browser", hint: "Window", run: function () { openWindow("browser"); } },
     { label: "The Road: career story", hint: "Page", run: function () { goPage("road.html"); } },
     { label: "Projects", hint: "Window", run: function () { openWindow("projects"); } },
