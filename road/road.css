@@ -941,3 +941,40 @@ html[data-theme="dusk"] .ov-stop span.ov-dom { color: color-mix(in srgb, var(--f
 
 /* v51: keep the page itself from scrolling sideways in any browser */
 html { overflow: hidden; }
+
+/* v59: the finish box carries his name, so the name pill steps aside there */
+@media (min-width: 768px) {
+  html.at-finale .bar-title { opacity: 0; visibility: hidden; transition: opacity .2s ease, visibility 0s linear .2s; }
+  html.at-finale .card.finale { top: 10px; max-height: calc(100vh - 30px); }
+}
+.card.finale .fin-name { margin: 0 0 3px; font-size: 19px; line-height: 1.15; font-weight: 800; letter-spacing: -.01em; color: var(--ink); }
+.card.finale .hero-txt .kicker { margin-top: 0; }
+
+/* v59: a sleeker settings panel: flat one-color icons, one word per row, a caption that names what you point at */
+.bar-links .ctl-pop, .ctl-pop { width: 292px; padding: 14px 14px 12px; gap: 9px; border-radius: 18px;
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 6%, transparent), 0 18px 44px rgba(16, 22, 30, .22); }
+.cp-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; min-height: 18px; margin-bottom: 2px; }
+.cp-head .ctl-t { margin: 0; font-size: 13px; font-weight: 800; letter-spacing: .01em; }
+.cp-cap { font-size: 11.5px; font-weight: 600; color: var(--ink-3); text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cp-row { display: grid; grid-template-columns: 52px 1fr; align-items: center; gap: 8px; }
+.cp-l { font-size: 10.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+.ctl-pop .seg.ic-seg { display: inline-flex !important; flex-wrap: nowrap; justify-self: start; gap: 2px; padding: 3px; border-radius: 12px; background: var(--surface-2); }
+.ctl-pop .seg.ic-seg button { flex: none; width: 31px; height: 30px; padding: 0; gap: 0; border-radius: 9px; justify-content: center; color: var(--ink-3); font-size: 0; transition: background .15s ease, color .15s ease; }
+.ctl-pop .seg.ic-seg button svg { width: 18px; height: 18px; flex: none; }
+.ctl-pop .seg.ic-seg button:hover { color: var(--ink); background: color-mix(in srgb, var(--ink) 7%, transparent); }
+.ctl-pop .seg.ic-seg button.on { background: var(--ink); color: var(--surface); }
+.ctl-pop .seg.ic-seg button:focus-visible, .light-tog:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+@media (max-width: 1180px) { .ctl-pop #sensor-seg button:not([data-m="all"]) { padding: 0; font-size: 0; gap: 0; } }
+/* the light switch: a sun and a moon with a knob that slides between them */
+.light-tog { position: relative; justify-self: start; width: 66px; height: 32px; padding: 0; border: 0; border-radius: 999px; cursor: pointer;
+  background: var(--surface-2); display: grid; grid-template-columns: 1fr 1fr; align-items: center; justify-items: center; color: var(--ink-3); }
+.light-tog .lt-ic { position: relative; z-index: 1; display: grid; place-items: center; transition: color .2s ease; }
+.light-tog .lt-knob { position: absolute; top: 3px; left: 3px; width: 30px; height: 26px; border-radius: 999px; background: var(--ink); transition: transform .25s cubic-bezier(.4, 0, .2, 1); }
+.light-tog[aria-checked="false"] .lt-sun, .light-tog[aria-checked="true"] .lt-moon { color: var(--surface); }
+.light-tog[aria-checked="true"] .lt-knob { transform: translateX(30px); }
+.light-tog:hover { color: var(--ink); }
+.ctl-pop .vol-row { display: flex; align-items: center; gap: 9px; padding: 0 2px 0 6px; color: var(--ink-3); }
+.ctl-pop .vol-row svg { flex: none; }
+.ctl-pop .vol-row input { flex: 1; min-width: 0; height: 18px; accent-color: var(--ink); }
+.ctl-pop .tour-menu-btn { margin-top: 3px; height: 36px; border-radius: 12px; }
+@media (prefers-reduced-motion: reduce) { .light-tog .lt-knob { transition: none; } }

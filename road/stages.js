@@ -2,6 +2,7 @@
    { group, anchors: {name: Object3D}, update(t, k, dt) } where k is 1 when the
    camera has landed on that stop and 0 when it is far away. */
 import { THREE, reg, mat, ownMat, glowMat, mesh, at, box, cyl, sph, grp, label, canvasTex, tok, smooth, clamp, lerp, roadZ } from './core.js';
+import * as CORE from './core.js';
 import { vehicleGeo } from './world.js?v=56';
 import { drawFlag, drawMark, onLogo } from './marks.js?v=28';
 import { ketteringAB, bulldog, bulldogPoster, rossBuilding, burOak, blockMSign, wavingFlag, wave, signPanel, MAIZE, BLUE } from './landmarks.js?v=56';
@@ -1064,8 +1065,20 @@ B.finale = (ctx) => {
   const sun = sph(15, new THREE.MeshBasicMaterial({ color: '#F2C77A', fog: false }), 380, 0, zr(380) + 34, 32); sun.castShadow = false;
   reg(sun.material, 'sun');
   g.add(sun);
+  /* v59: at dusk a waxing crescent moon, lit on the right, rises where the sun does */
+  const moonCv = document.createElement('canvas'); moonCv.width = moonCv.height = 256;
+  { const c = moonCv.getContext('2d'), R = 74, cx = 128, cy = 128;
+    const glow = c.createRadialGradient(cx, cy, R * .7, cx, cy, 126); glow.addColorStop(0, 'rgba(225,232,245,.28)'); glow.addColorStop(1, 'rgba(225,232,245,0)');
+    c.fillStyle = glow; c.fillRect(0, 0, 256, 256);
+    c.fillStyle = 'rgba(64,76,98,.5)'; c.beginPath(); c.arc(cx, cy, R, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#EEF1F7'; c.beginPath(); c.arc(cx, cy, R, -Math.PI / 2, Math.PI / 2); c.ellipse(cx, cy, R * .45, R, 0, Math.PI / 2, -Math.PI / 2, true); c.closePath(); c.fill(); }
+  const moonTex = new THREE.CanvasTexture(moonCv); if (THREE.SRGBColorSpace) moonTex.colorSpace = THREE.SRGBColorSpace;
+  const moon = new THREE.Sprite(new THREE.SpriteMaterial({ map: moonTex, transparent: true, fog: false, depthWrite: false }));
+  moon.scale.set(52, 52, 1); moon.position.copy(sun.position); moon.visible = false;
+  g.add(moon);
   return { group: g, anchors: { plaza: pin(col, 0, 8.4, 0) }, update(t, k) {
     sun.position.y = -12 + 64 * smooth(0, 1, k);
+    const dusk = CORE.theme !== 'day'; sun.visible = !dusk; moon.visible = dusk; moon.position.set(sun.position.x, sun.position.y + 4, sun.position.z);
     const lit = Math.min(7, Math.floor(k * 9));
     bands.forEach((b, i) => { b.material.emissiveIntensity = i < lit ? 0.18 + 0.12 * Math.max(0, Math.sin(t * 1.6 - i * 0.6)) : 0; });
   } };

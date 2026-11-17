@@ -202,9 +202,10 @@ const DESK = [
     run: async () => { R().setZoom(0); await wait(1600); } },
   { id: 'd08', t: 'The gear opens the settings: sensors, light, zoom, background music, and this tour, so you can replay it any time. Music stays off unless you pick a track.', el: '#ctl-pop',
     run: async () => { R().setCtl(true); } },
-  { id: 'd09', t: 'The sun and moon button switches between day and dusk.', el: '#theme-btn',
-    run: async () => { R().setCtl(false); theme0 = theme0 || root.getAttribute('data-theme'); click('#theme-btn'); await wait(2600); if (root.getAttribute('data-theme') !== theme0) click('#theme-btn'); } },
-  { id: 'd10', t: 'Up top, you can always reach the Desktop, live demos of tools Marcin built, the timeline, his resume, and how to get in touch.', el: '.bar-links', links: true },
+  { id: 'd09', t: 'The sun and moon button switches between day and dusk.', el: '#light-tog',
+    run: async () => { R().setCtl(true); theme0 = theme0 || root.getAttribute('data-theme'); click('#light-tog'); await wait(2600); if (root.getAttribute('data-theme') !== theme0) click('#light-tog'); } },
+  { id: 'd10', t: 'Up top, you can always reach the Desktop, live demos of tools Marcin built, the timeline, his resume, and how to get in touch.', el: '.bar-links', links: true,
+    run: async () => { R().setCtl(false); } },
   { id: 'd11', t: 'That\'s the tour. Start the drive whenever you\'re ready.', el: '#card',
     run: async () => { R().toStart(); await wait(900); } },
 ];

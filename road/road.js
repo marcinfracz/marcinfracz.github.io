@@ -2,7 +2,7 @@
    drives the camera left to right (laptop and tablet) or top to bottom (phone). */
 import { THREE, TOKENS, setTheme, tok, roadZ, smooth, clamp, lerp } from './core.js';
 import { buildWorld } from './world.js?v=56';
-import { buildStage } from './stages.js?v=56';
+import { buildStage } from './stages.js?v=59';
 import { planCities, cityFootprints, buildCities } from './landmarks.js?v=56';
 import { flagURL, COUNTRY } from './marks.js?v=28';
 
@@ -478,35 +478,48 @@ function start() {
     hemi.color.set(T.hemiSky); hemi.groundColor.set(T.hemiGround); hemi.intensity = T.hemi;
     sun.color.set(T.dirColor); sun.intensity = T.dir;
     document.querySelector('meta[name="theme-color"]').setAttribute('content', T.sky);
-    lightSeg.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.t === themeName));
+    if (lightTog) { const dk = themeName !== 'day'; lightTog.setAttribute('aria-checked', String(dk)); lightTog.dataset.cap = dk ? 'Dusk' : 'Day'; lightTog.title = dk ? 'Dusk: switch to day' : 'Day: switch to dusk'; }
   }
 
   /* ---------- HUD ---------- */
-  const sensorSeg = $('#sensor-seg'), lightSeg = $('#light-seg');
+  const sensorSeg = $('#sensor-seg'), lightTog = $('#light-tog');
   const MODES = ['all', 'vision', 'radar', 'lidar', 'v2x', 'off'];
   /* v39: an Off choice hides every sensor visual; the choice is remembered like the light setting */
   let sensSaved = 'all'; try { sensSaved = localStorage.getItem('road.sensors') || 'all'; } catch (e) {}
   if (!MODES.includes(sensSaved)) sensSaved = 'all';
   world.setMode(sensSaved);
+  /* v59: the settings panel uses flat one-color icons; the name of each shows on hover and as its tooltip */
+  const SVG = d => `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+  const SENS_IC = {
+    all: '<path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/>',
+    vision: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+    radar: '<circle cx="5" cy="19" r="1.4" fill="currentColor" stroke="none"/><path d="M5 13.5a5.5 5.5 0 0 1 5.5 5.5"/><path d="M5 8.5A10.5 10.5 0 0 1 15.5 19"/><path d="M5 3.5A15.5 15.5 0 0 1 20.5 19"/>',
+    lidar: '<g fill="currentColor" stroke="none"><circle cx="4" cy="12" r="2"/><circle cx="11" cy="6" r="1.3"/><circle cx="12.5" cy="12" r="1.3"/><circle cx="11" cy="18" r="1.3"/><circle cx="18" cy="3.5" r="1.3"/><circle cx="20" cy="9" r="1.3"/><circle cx="20" cy="15" r="1.3"/><circle cx="18" cy="20.5" r="1.3"/></g>',
+    v2x: '<circle cx="12" cy="12" r="2"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.9 4.9a10 10 0 0 0 0 14.2M19.1 4.9a10 10 0 0 1 0 14.2"/>',
+    off: '<path d="M3 3l18 18"/><path d="M10.6 5.1A10 10 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.6 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7a9.7 9.7 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>'
+  };
   MODES.forEach((m, k) => {
     const lab = UI.sensors[k] || (m === 'off' ? 'Off' : m);
-    const b = el('button', m === sensSaved ? 'on' : '', (m === 'all' || m === 'off' ? '' : '<i></i>') + esc(lab));
-    b.type = 'button'; b.dataset.m = m; b.setAttribute('aria-pressed', m === sensSaved);
-    if (m === 'vision') b.querySelector('i').style.color = 'var(--accent)';
-    if (m === 'radar') b.querySelector('i').style.color = '#22D3EE';
-    if (m === 'lidar') b.querySelector('i').style.color = 'var(--ink-3)';
-    if (m === 'v2x') b.querySelector('i').style.color = 'var(--cobalt)';
+    const cap = m === 'all' ? 'All sensors' : m === 'off' ? 'Sensors off' : lab;
+    const b = el('button', m === sensSaved ? 'on' : '', SVG(SENS_IC[m] || SENS_IC.all));
+    b.type = 'button'; b.dataset.m = m; b.dataset.cap = cap; b.title = cap; b.setAttribute('aria-label', cap); b.setAttribute('aria-pressed', m === sensSaved);
     b.addEventListener('click', () => {
       world.setMode(m); try { localStorage.setItem('road.sensors', m); } catch (e) {}
       sensorSeg.querySelectorAll('button').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); });
     });
     sensorSeg.appendChild(b);
   });
-  [['day', UI.day], ['dusk', UI.dusk]].forEach(([t, lab]) => {
-    const b = el('button', '', esc(lab)); b.type = 'button'; b.dataset.t = t;
-    b.addEventListener('click', () => { themeName = t; root.setAttribute('data-theme', t); saveDark(t === 'dusk'); applyTheme(); });
-    lightSeg.appendChild(b);
+  if (lightTog) lightTog.addEventListener('click', () => {
+    const t = themeName === 'day' ? 'dusk' : 'day';
+    themeName = t; root.setAttribute('data-theme', t); saveDark(t === 'dusk'); applyTheme();
   });
+  /* the panel's caption names whatever is under the pointer or in focus */
+  const cpCap = $('#cp-cap'), cpPop = $('#ctl-pop');
+  if (cpCap && cpPop) {
+    const show = e => { const t = e.target.closest && e.target.closest('[data-cap]'); cpCap.textContent = t ? t.dataset.cap : ''; };
+    cpPop.addEventListener('pointerover', show); cpPop.addEventListener('focusin', show); cpPop.addEventListener('click', show);
+    cpPop.addEventListener('pointerleave', () => { cpCap.textContent = ''; });
+  }
   bindThemeButton(applyTheme);
   applyTheme();
 
@@ -658,6 +671,8 @@ function start() {
     renderCard.flown = false;
     /* v39: at the start the big box stands where the name pill goes, and the pill shows only once the drive starts */
     if (cur !== 0 || was < 0) root.classList.toggle('at-start', cur === 0);
+    /* v59: the finish box carries his name, so the name pill steps aside there */
+    root.classList.toggle('at-finale', s.id === 'finale');
     if (storyK !== null) { storyK = null; card.classList.remove('story'); }
     card.classList.add('out');
     clearTimeout(renderCard.t);
@@ -707,7 +722,7 @@ function start() {
       }
       if (s.id === 'finale') {
         /* round 27: the finish: the photo again, the whole road in one list, and the ways to reach him */
-        h = `<div class="hero fin"><span class="hero-photo sm"><img src="${HEADSHOT}" alt="Marcin Fracz"></span><div class="hero-txt"><p class="kicker">${esc(s.kicker || '')}</p><h1>${esc(s.title)}</h1></div></div>`
+        h = `<div class="hero fin"><span class="hero-photo sm"><img src="${HEADSHOT}" alt="Marcin Fracz"></span><div class="hero-txt"><p class="fin-name">Marcin Fracz</p><p class="kicker">${esc(s.kicker || '')}</p><h1>${esc(s.title)}</h1></div></div>`
           + (s.role ? `<p class="role">${esc(s.role)}</p>` : '')
           + '<ol class="fin-eras">' + ERAS.map(e => `<li style="--c:${e.color}"><button type="button" data-era="${e.id}"><span class="n">${e.n}</span><b>${esc(e.name)}</b><i>${esc(e.years)}</i></button></li>`).join('') + '</ol>'
           + (s.what ? `<p class="fin-what">${esc(s.what)}</p>` : '')
