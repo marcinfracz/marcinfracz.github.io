@@ -219,7 +219,13 @@ const goTo = el => { /* fits el between the bar and the tour box when it can, el
   if (!el) return; const r = el.getBoundingClientRect(), box = document.querySelector('.tour-box');
   const room = (box && !box.hidden ? box.getBoundingClientRect().top : innerHeight) - 12;
   const at = Math.max(barBottom() + 10, room - r.height);
-  scrollTo({ top: Math.max(0, r.top + scrollY - at), behavior: reduced ? 'auto' : 'smooth' }); };
+  const sc = scroller(), base = sc === document.scrollingElement ? 0 : sc.getBoundingClientRect().top;
+  /* v64: the phone page scrolls inside body, not the window, so window.scrollTo did nothing.
+     With the snap-per-stop phone Road, land on the stop's own snap point. */
+  const sec = root.classList.contains('pd-on') && el.closest('#flow > section');
+  const top = sec ? sec.getBoundingClientRect().top - base + sc.scrollTop : r.top - base + sc.scrollTop - at;
+  sc.scrollTo({ top: Math.max(0, top), behavior: reduced ? 'auto' : 'smooth' }); };
+const scroller = () => { const b = document.body; return b.scrollHeight > b.clientHeight + 1 && /(auto|scroll)/.test(getComputedStyle(b).overflowY) ? b : document.scrollingElement; };
 const stopSec = n => document.querySelectorAll('#flow > section')[n] || null;
 const menuOpen = on => { const sh = document.getElementById('pm-sheet'), bt = document.querySelector('.pm-btn'); if (!sh || !bt) return; if (on === sh.hidden) bt.click(); };
 const PHONE = [
@@ -228,7 +234,7 @@ const PHONE = [
   { id: 'p02', t: 'Scroll down to drive. Each stop shows the company, the role, the years and the results.', el: () => phoneEl,
     run: async my => { for (let n = 1; n <= 3; n++) { const s = stopSec(n); if (!s) break; phoneEl = s.querySelector('.fcard') || s; goTo(phoneEl); await wait(2200); if (my !== token) return; } } },
   { id: 'p03', t: 'Each stop lists a few short stories: the work behind the result, with the brands and products involved.', el: () => phoneEl,
-    run: async () => { const s = stopSec(3) || stopSec(1); const d = s && (s.querySelector('.card-callouts') || s.querySelector('.fcard')); phoneEl = d; goTo(d); await wait(1000); } },
+    run: async () => { const s = stopSec(3) || stopSec(1); const d = s && (s.querySelector('.pd-foot') || s.querySelector('.card-callouts') || s.querySelector('.fcard')); phoneEl = d; goTo(d); await wait(1000); } },
   { id: 'p04', t: 'The moon button switches between day and dusk.', el: '#theme-btn',
     run: async () => { theme0 = theme0 || root.getAttribute('data-theme'); click('#theme-btn'); await wait(2400); if (root.getAttribute('data-theme') !== theme0) click('#theme-btn'); } },
   { id: 'd10', t: 'Up top, you can always reach the Desktop, live demos of tools Marcin built, the timeline, his resume, and how to get in touch.', el: '#pm-sheet', links: true, menu: true,
@@ -332,7 +338,7 @@ function begin() {
   running = true; paused = false; theme0 = root.getAttribute('data-theme'); syncPause(); syncVoice();
   root.classList.add('touring');
   if (!isPhone()) { R().setCtl(false); R().closeStory(); R().setZoom(0); if (R().cur !== 0) R().toStart(); }
-  else scrollTo({ top: 0 });
+  else scroller().scrollTo({ top: 0 });
   ui.hidden = false; cancelAnimationFrame(raf); place();
   show(0);
   setTimeout(() => $('#tb-next').focus({ preventScroll: true }), 50);

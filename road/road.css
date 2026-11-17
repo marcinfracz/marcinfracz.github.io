@@ -978,3 +978,25 @@ html { overflow: hidden; }
 .ctl-pop .vol-row input { flex: 1; min-width: 0; height: 18px; accent-color: var(--ink); }
 .ctl-pop .tour-menu-btn { margin-top: 3px; height: 36px; border-radius: 12px; }
 @media (prefers-reduced-motion: reduce) { .light-tog .lt-knob { transition: none; } }
+
+/* v63: the welcome box sits lower and further in, over the road on the left, under the header and clear of the START gantry */
+@media (min-width: 768px) {
+  .card.start { top: clamp(72px, 34vh, calc(100vh - 420px)); left: clamp(20px, 13vw, 300px); max-height: calc(100vh - 92px); }
+}
+
+/* v63: on phones the start box is a slim bar with Start the drive and Show me around */
+.swipe-hint { display: none; }
+@media (max-width: 767px) {
+  #m-start .fcard { padding: 12px 14px 10px; }
+  #m-start .fcard .role, #m-start .fcard .what { display: none; }
+  #m-start .fcard h1 { font-size: 22px; margin: 0 0 2px; }
+  #m-start .fcard .hero-tag { margin: 0; }
+  #m-start .fcard .card-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  #m-start .go-btn { height: 38px; padding: 0 16px; }
+  .swipe-hint { display: block; margin: 8px 0 0; font-size: 12px; font-weight: 600; color: var(--ink-3); text-align: center; }
+}
+/* v63: PMV before/after strip in its story */
+.pmv-strip { margin: 14px 0 0; padding: 12px 14px 10px; border-radius: 12px; background: color-mix(in srgb, var(--ink) 4%, transparent); color: var(--ink-3); --pmv-bg: var(--surface); --pmv-accent: var(--accent); }
+.pmv-strip svg { display: block; width: 100%; max-width: 360px; height: auto; margin: 0 auto; }
+.pmv-strip figcaption { display: flex; justify-content: space-between; max-width: 360px; margin: 6px auto 0; font-size: 12px; font-weight: 600; color: var(--ink-2); }
+.pmv-strip figcaption span:last-child { color: var(--accent-ink); text-align: right; }

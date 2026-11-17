@@ -81,7 +81,7 @@ export function buildLife(scene, { stops, height, regionAt, lite, xMin, xMax, ke
     const parcel = B(0.32, 0.26, 0.32, M.parcel, 0, -0.25, 0); g.add(parcel);
     const l1 = Sp(0.045, ledRed, 0.28, 0.02, 0.2), l2 = Sp(0.045, ledGreen, 0.28, 0.02, -0.2); g.add(l1, l2);
     g.userData = { props, parcel, leds: [l1, l2] };
-    g.scale.setScalar(1.6);
+    g.scale.setScalar(1.0);
     return shadows(g);
   }
   function quadruped(bodyM, s, { neck = 0.25, legs = 0.5, len = 1, tail = 0.25, ears = 0, head = 0.16, antlers = false, tailM } = {}) {
@@ -165,7 +165,8 @@ export function buildLife(scene, { stops, height, regionAt, lite, xMin, xMax, ke
 
   /* delivery drones: a hop across the view now and then, more often in the cities of Asia */
   const DR = lite ? 2 : 3, drones = [];
-  for (let i = 0; i < DR; i++) { const d = add(drone()); d.visible = false; drones.push({ g: d, ev: null, next: 3 + rnd() * 10 + i * 6 }); }
+  /* v63: less is more. One small drone crosses once, near the start, and then it is gone */
+  for (let i = 0; i < DR; i++) { const d = add(drone()); d.visible = false; drones.push({ g: d, ev: null, next: i === 0 ? 2.5 : Infinity }); }
   function droneStart(dr, t, heroX) {
     const th = (rnd() < 0.5 ? 0 : Math.PI) + (rnd() - 0.5) * 1.2, dx = Math.cos(th), du = Math.sin(th);
     const mx = heroX + (rnd() - 0.3) * 60, mu = 14 + rnd() * 50, Ld = 60 + rnd() * 20;
@@ -176,9 +177,9 @@ export function buildLife(scene, { stops, height, regionAt, lite, xMin, xMax, ke
     drones.forEach((dr, i) => {
       const g = dr.g; g.visible = false;
       if (hide) { dr.ev = null; return; }
-      if (!dr.ev) { if (t > dr.next) { if (i < Math.ceil(DR * rate)) droneStart(dr, t, heroX); else dr.next = t + 8; } return; }
+      if (!dr.ev) { if (t > dr.next) droneStart(dr, t, heroX); return; }
       const e = dr.ev, d = (t - e.t0) * e.v;
-      if (d > e.L) { dr.ev = null; dr.next = t + (12 + rnd() * 20) / rate; return; }
+      if (d > e.L) { dr.ev = null; dr.next = Infinity; return; }
       const q = d / e.L, x = e.x0 + e.dx * d, u = e.u0 + e.du * d;
       let y = e.y + Math.sin(t * 1.3 + i) * 0.25;
       if (e.drop) y = lerp(y, ground(x, u) + 3, smooth(0.38, 0.5, q) * (1 - smooth(0.5, 0.62, q)));

@@ -161,12 +161,13 @@ function buildFlow(withGL) {
     }
     const kick = s.era ? eraTag(s) : esc(s.kicker || '');
     inner += `<p class="kicker">${kick}</p>`;
-    inner += s.i === 0 ? `<h1>${esc(s.title)}</h1>` : `<h2>${esc(s.title)}</h2>`;
+    inner += s.i === 0 ? `<h1>${esc(s.title)}</h1>` + (s.tag ? `<p class="hero-tag">${esc(s.tag)}</p>` : '') : `<h2>${esc(s.title)}</h2>`;
     if (s.role) inner += `<p class="role">${esc(s.role)}</p>`;
     const meta = metaLine(s); if (meta) inner += `<p class="meta">${meta}</p>`;
     if (s.what) inner += `<p class="what">${esc(s.what)}</p>`;
     inner += flagsHTML(s);
-    if (s.i === 0) inner += `<div class="card-actions"><button class="btn tour-btn" type="button" data-act="tour">Show me around</button></div>`;
+    /* v63: on phones the start is a slim bar: start the drive, or take the tour */
+    if (s.i === 0) inner += `<div class="card-actions"><button class="btn primary go-btn" type="button" data-act="drive1">Start the drive <span aria-hidden="true">→</span></button><button class="btn tour-btn" type="button" data-act="tour">Show me around</button></div><p class="swipe-hint"><span aria-hidden="true">↑</span> Swipe up to drive</p>`;
     inner += winsHTML(s) + calloutsHTML(s);
     if (s.reel) inner += window.MFReel ? `<div class="reel" data-mfreel="1"></div>` : `<div class="reel"><video src="${esc(s.reel.src)}" ${s.reel.poster ? `poster="${esc(s.reel.poster)}"` : ''} controls playsinline preload="none" aria-label="${esc(s.reel.label)}"></video></div>`;
     if (s.reel) inner += `<div class="card-actions"><a class="btn primary" href="index.html">${esc(UI.back)}</a><a class="btn" href="${esc(UI.resumeHref)}" target="_blank" rel="noopener">${esc(UI.resume)}</a></div>`;
@@ -174,7 +175,7 @@ function buildFlow(withGL) {
     parts.push(`<section id="m-${s.id}" data-i="${s.i}"><div class="fcard">${inner}</div></section>`);
   });
   flow.innerHTML = parts.join('');
-  flow.querySelectorAll('[data-mfreel]').forEach(box => { const st = STOPS.find(x => x.reel); window.MFReel.mount(box, { label: st && st.reel ? st.reel.label : 'Sizzle reel' }); });
+  flow.querySelectorAll('[data-mfreel]').forEach(box => { const st = STOPS.find(x => x.reel); window.MFReel.mount(box, { label: st && st.reel ? st.reel.label : 'Meet Marcin' }); });
 }
 
 /* headshot sticker: round 27, always the blue-gray headshot used on the desktop page */
@@ -556,7 +557,7 @@ function start() {
   const tip = el('span', 'era-cap vr-tip'); tip.setAttribute('aria-hidden', 'true'); progress.appendChild(tip);
   function showTip(btn) {
     const d = btn && btn._tip; if (!d) return;
-    tip.innerHTML = `<b class="cp-co">${esc(d.co)}</b>${d.ro ? `<span class="cp-ro">${esc(d.ro)}</span>` : ''}${d.yr ? `<span class="cp-yr">${esc(d.yr)}</span>` : ''}`;
+    tip.innerHTML = d.lines ? d.lines.map((l, k) => k === 0 ? `<b class="cp-co">${esc(l)}</b>` : `<span class="${k === d.lines.length - 1 && !/^•/.test(l) ? 'cp-yr' : 'cp-ro'}">${esc(l)}</span>`).join('') : `<b class="cp-co">${esc(d.co)}</b>${d.ro ? `<span class="cp-ro">${esc(d.ro)}</span>` : ''}${d.yr ? `<span class="cp-yr">${esc(d.yr)}</span>` : ''}`;
     tip.style.setProperty('--c', d.c);
     tip.classList.add('show');
     const pr = progress.getBoundingClientRect();
@@ -567,7 +568,7 @@ function start() {
   const hideTip = () => tip.classList.remove('show');
   STOPS.forEach((s, i) => {
     const r = RAIL[s.id], e = s.era && ERAX[s.era];
-    ticks[i]._tip = { co: r ? r.co : s.title, ro: r ? r.ro : '', yr: r ? r.yr : (s.span || ''), c: e ? e.color : 'var(--accent)' };
+    ticks[i]._tip = { co: r ? r.co : s.title, ro: r ? r.ro : '', yr: r ? r.yr : (s.span || ''), lines: r && r.lines, c: e ? e.color : 'var(--accent)' };
   });
   divs.forEach(({ d, e }) => { d._tip = { co: e.label, ro: `Chapter ${e.n}`, yr: e.years, c: e.color }; });
   progress.querySelectorAll('.vr-grp').forEach(g => { const p = g.dataset.tip.split(' · '); g._tip = { co: p[0], ro: p.length > 2 ? p[1].replace(/^./, c => c.toUpperCase()) : '', yr: p[p.length - 1], c: 'var(--ink-3)' }; });
@@ -728,18 +729,11 @@ function start() {
           + (s.what ? `<p class="fin-what">${esc(s.what)}</p>` : '')
           + `<div class="card-actions fin-acts"><a class="btn primary" href="${esc(UI.resumeHref)}" target="_blank" rel="noopener">${esc(UI.resume)}</a><a class="btn" href="${esc(UI.contactHref)}">${esc(UI.contact)}</a>`
           + (UI.linkedin ? `<a class="btn" href="${esc(UI.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>` : '') + `<a class="btn" href="index.html">${esc(UI.home || 'Desktop')}</a></div>`
-          + (s.reel ? `<button class="link-btn fin-reel-btn" type="button" data-act="reel">Watch the ${esc((s.reel.label || '').replace(/^.*?,\s*/, '') || '')} reel <span aria-hidden="true">→</span></button><div class="reel" hidden></div>` : '');
+          + (s.reel ? `<button class="link-btn fin-reel-btn" type="button" data-reel="1">${esc((window.MF_REEL || {}).name || 'Meet Marcin')}, a ${esc((window.MF_REEL || {}).length || '1:04')} video <span aria-hidden="true">→</span></button>` : ''); /* v62: opens the video in a popup (js/reel-player.js) */
         card.innerHTML = h;
         card.classList.remove('start', 'ms', 'pro'); card.classList.add('finale');
         card.scrollTop = 0;
         card.querySelectorAll('[data-era]').forEach(b => b.addEventListener('click', () => { const ix = STOPS.findIndex(x => x.era === b.dataset.era); if (ix >= 0) go(ix); }));
-        const rb = card.querySelector('[data-act="reel"]');
-        if (rb) rb.addEventListener('click', () => {
-          const box = card.querySelector('.reel'); box.hidden = false; rb.remove();
-          /* v57: the reel player shows the tall cut on an upright phone and the wide cut when it is turned */
-          if (window.MFReel) { window.MFReel.mount(box, { id: 'reel', autoplay: true, label: s.reel.label }); return; }
-          box.innerHTML = `<video id="reel" src="${esc(s.reel.src)}" controls playsinline preload="metadata" aria-label="${esc(s.reel.label)}"></video>`; const v = box.querySelector('video'); v.play().catch(() => {});
-        });
         buildMarkers(s);
         card.classList.remove('out');
         resize();
@@ -800,6 +794,7 @@ function start() {
   }
 
   /* the story: opens in place of the card, and closes the moment you move on */
+  const PMV_STRIP = `<figure class="pmv-strip" aria-label="Before: a stack of spreadsheets and decks. After: one live dashboard."><svg viewBox="0 0 340 104" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><rect x="22" y="10" width="78" height="58" rx="3" opacity=".35"/><rect x="14" y="18" width="78" height="58" rx="3" opacity=".6"/><rect x="6" y="26" width="78" height="58" rx="3" fill="var(--pmv-bg, #fff)"/><path d="M6 38h78M6 50h78M6 62h78M6 74h78M30 26v58M50 26v58M68 26v58" opacity=".55"/></g><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity=".7"><path d="M132 52h56M178 44l10 8-10 8"/></g><g fill="none" stroke="var(--pmv-accent, currentColor)" stroke-width="1.6" stroke-linejoin="round"><rect x="222" y="12" width="112" height="76" rx="6"/><path d="M222 26h112"/><rect x="230" y="34" width="30" height="16" rx="2"/><rect x="265" y="34" width="30" height="16" rx="2"/><rect x="300" y="34" width="26" height="16" rx="2"/></g><g fill="var(--pmv-accent, currentColor)"><circle cx="229" cy="19" r="1.8"/><circle cx="235" cy="19" r="1.8"/><circle cx="241" cy="19" r="1.8"/><rect x="232" y="68" width="8" height="12" rx="1"/><rect x="244" y="62" width="8" height="18" rx="1"/><rect x="256" y="58" width="8" height="22" rx="1"/><rect x="268" y="64" width="8" height="16" rx="1"/><rect x="280" y="56" width="8" height="24" rx="1"/></g><path d="M296 74l9-7 8 4 13-12" fill="none" stroke="var(--pmv-accent, currentColor)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><figcaption><span>Before: spreadsheets</span><span>After: live dashboard</span></figcaption></figure>`;
   function storyHTML(s, k) {
     const cs = s.callouts || [], p = PROF[s.id] || {};
     k = clamp(k, 0, cs.length - 1);
@@ -814,11 +809,13 @@ function start() {
     if (dt) h += `<p class="lede">${esc(dt)}</p>`;
     h += storyMarksHTML(p, k);
     if (p.stories && p.stories[k]) h += `<p class="story-body">${md(p.stories[k])}</p>`;
+    const pmv = cs[k].obj === 'pmv';
+    if (pmv && !art) h += PMV_STRIP;
     const m = s.more;
     if (p.sources === k && m && m.sources && m.sources.length) h += `<div class="sources"><h3>${esc(UI.sources)}</h3>` + m.sources.map(x => `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.label)}</a>`).join('') + '</div>';
     if (cs.length > 1) h += `<button type="button" class="story-next" data-k="${(k + 1) % cs.length}">Next: ${LETTER((k + 1) % cs.length)} · ${esc(splitCallout(cs[(k + 1) % cs.length].text)[0])} <span aria-hidden="true">→</span></button>`;
     h += `</div>`;
-    if (art) h += `<div class="story-art"><div class="art" role="img" aria-label="Line drawing" style="-webkit-mask-image:url(assets/road/art-${p.art}.png);mask-image:url(assets/road/art-${p.art}.png)"></div></div>`;
+    if (art) h += `<div class="story-art"><div class="art" role="img" aria-label="Line drawing" style="-webkit-mask-image:url(assets/road/art-${p.art}.png);mask-image:url(assets/road/art-${p.art}.png)"></div>${pmv ? PMV_STRIP : ''}</div>`;
     h += `</div>`;
     return h;
   }
@@ -1156,6 +1153,14 @@ function start() {
     }
     return STOPS[STOPS.length - 1].x;
   }
+  /* v63: on phones, Start the drive, or a tap on the road or the START sign at the start line, drives to the first stop */
+  function driveFirst() { if (sections[1]) sections[1].scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  document.querySelectorAll('#flow [data-act="drive1"]').forEach(b => b.addEventListener('click', e => { e.preventDefault(); driveFirst(); }));
+  document.addEventListener('click', e => {
+    if (!isPhone() || !sections[1] || sections[1].getBoundingClientRect().top < innerHeight * 0.6) return;
+    if (e.target.closest('a,button,input,select,textarea,.bar,.tour-box,.fcard')) return;
+    if (e.target.id === 'world' || e.target.closest('#flow')) driveFirst();
+  });
   let wasPhone = isPhone();
   if (wasPhone && cur > 0) requestAnimationFrame(() => sections[cur] && sections[cur].scrollIntoView());
 
