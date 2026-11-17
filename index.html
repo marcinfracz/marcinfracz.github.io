@@ -9,9 +9,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <script>try{if(window.matchMedia("(max-width: 700px)").matches){document.documentElement.classList.add("is-phone");}}catch(e){}</script>
 <title>Marcin Fracz</title>
-<meta name="description" content="Automotive product & software strategy leader · GM · SAIC-GM Shanghai">
-<meta property="og:title" content="Marcin Fracz — Automotive product & software strategy leader">
-<meta property="og:description" content="Automotive product & software strategy leader · GM · SAIC-GM Shanghai">
+<meta name="description" content="Automotive product &amp; software strategy leader · GM · SAIC-GM Shanghai">
+<meta property="og:title" content="Marcin Fracz — Automotive product &amp; software strategy leader">
+<meta property="og:description" content="Automotive product &amp; software strategy leader · GM · SAIC-GM Shanghai">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://marcinfracz.ai/">
 <meta property="og:image" content="https://marcinfracz.ai/assets/og-image.jpg">
@@ -253,44 +253,54 @@
       <button data-finder-nav="tools">Live Demos</button>
       <button data-finder-nav="kit">Everyday Kit</button>
       <button data-finder-nav="work">Work</button>
+      <button data-finder-nav="projects">Personal Builds</button>
     </aside>
     <div class="finder-main">
-      <div class="finder-toolbar">
-        <input id="finder-search" type="search" placeholder="Search" aria-label="Search">
-      </div>
       <div class="finder-grid" id="finder-grid"></div>
+      <div class="finder-preview" id="finder-preview"></div>
     </div>
   </div>
 </section>
 
 <section class="window glass overlay-window hidden-window" id="window-notes-win" data-window="notes-win" data-draggable="1">
-  <div class="window-bar" data-drag><span class="dot red" data-act="close"></span><span class="dot yellow" data-act="min"></span><span class="dot green" data-act="max"></span><span class="window-title">Notes</span></div>
+  <div class="window-bar" data-drag><span class="dot red" data-act="close"></span><span class="dot yellow" data-act="min"></span><span class="dot green" data-act="max"></span><span class="window-title">Notes</span><button class="bar-btn reset-notes" data-action="reset-notes" title="Reset desktop notes">Reset desktop notes</button></div>
   <div class="window-body" id="notes-body"></div>
 </section>
 
-<section class="window glass overlay-window hidden-window" id="window-terminal" data-window="terminal" data-draggable="1">
+<section class="window glass overlay-window terminal hidden-window" id="window-terminal" data-window="terminal" data-draggable="1">
   <div class="window-bar" data-drag><span class="dot red" data-act="close"></span><span class="dot yellow" data-act="min"></span><span class="dot green" data-act="max"></span><span class="window-title">Terminal</span></div>
-  <div class="window-body terminal-body">
-    <div class="term-out" id="term-out"></div>
-    <div class="term-in"><span class="term-prompt">marcin@hub ~ % </span><input id="term-input" type="text" spellcheck="false" autocomplete="off"></div>
-  </div>
+  <div class="terminal-body" id="terminal-body"></div>
+  <div class="terminal-input-row"><span class="terminal-prompt">marcin@desktop ~ %</span><input id="terminal-input" type="text" autocomplete="off" spellcheck="false" aria-label="Terminal input"></div>
 </section>
 
 <section class="window glass overlay-window hidden-window" id="window-contact-win" data-window="contact-win" data-draggable="1">
   <div class="window-bar" data-drag><span class="dot red" data-act="close"></span><span class="dot yellow" data-act="min"></span><span class="dot green" data-act="max"></span><span class="window-title">Contact</span></div>
-  <div class="window-body">
-    <form id="contact-form" class="contact-form">
-      <label>Name<input type="text" name="name" required></label>
-      <label>Email<input type="email" name="email" required></label>
-      <label>Message<textarea name="message" rows="5" required></textarea></label>
-      <button type="submit" class="pill-btn primary">Send</button>
+  <div class="window-body" id="contact-body">
+    <h2>Work with me</h2>
+    <p class="muted">Exploring new leadership opportunities in automotive strategy, product and AI.</p>
+    <form id="contact-form">
+      <label>Name<input name="name" type="text" required></label>
+      <label>Email<input name="email" type="email" required></label>
+      <label>Topic
+        <select name="topic">
+          <option>Job opportunity</option>
+          <option>Collaboration</option>
+          <option>Advisory</option>
+          <option>Speaking</option>
+          <option>Something else</option>
+        </select>
+      </label>
+      <label>Message<textarea name="message" rows="4" required></textarea></label>
+      <button class="pill-btn" type="submit">Send</button>
     </form>
-    <p class="hint" id="contact-status"></p>
+    <p class="muted contact-alt">Prefer email? <a id="contact-email-link" href="">Email me</a> · <a href="https://www.linkedin.com/in/marcinfracz/" target="_blank" rel="noopener">LinkedIn</a></p>
   </div>
 </section>
 
-<section class="window glass overlay-window hidden-window" id="window-browser" data-window="browser" data-draggable="1">
-  <div class="window-bar" data-drag><span class="dot red" data-act="close"></span><span class="dot yellow" data-act="min"></span><span class="dot green" data-act="max"></span><span class="window-title">Browser</span>
+<!-- Browser: a Safari-style window with the showcase inside -->
+<section class="window glass overlay-window browser-window hidden-window" id="window-browser" data-window="browser" data-draggable="1">
+  <!-- one slim row: window dots, back/forward, tabs, open-in-tab. No address bar, so the page gets the room. -->
+  <div class="window-bar browser-bar" data-drag><span class="dot red" data-act="close"></span><span class="dot yellow" data-act="min"></span><span class="dot green" data-act="max"></span>
     <button id="browser-back" title="Back" aria-label="Back">‹</button>
     <button id="browser-forward" title="Forward" aria-label="Forward">›</button>
     <button id="browser-reload" title="Reload" aria-label="Reload">↻</button>
@@ -339,7 +349,7 @@
 </div>
 
 <script src="content/content.js?v=42"></script>
-<script src="js/app.js?v=54"></script>
+<script src="js/app.js?v=57"></script>
 <script src="js/phone-menu.js?v=46"></script>
 <!-- Cloudflare Web Analytics --><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "18aafd4fcbc5429e9148c50c5ca2d470"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
