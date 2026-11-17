@@ -1219,7 +1219,7 @@
     whoami: "Marcin Fracz · strategist, global software & AI.",
     now: "Exploring new leadership opportunities. Building with AI.",
     history: "2003–2014 Engineering · 2014–2016 Chevrolet product, CX and GM de Mexico · 2017–2020 GM crossovers, Encore GX and Trailblazer · 2020–2022 Connected & OTA · 2022–2025 SAIC-GM Shanghai · 2025–2026 OnStar International",
-    links: "linkedin.com/in/marcinfracz · marcinfracz.github.io/road.html",
+    links: "linkedin.com/in/marcinfracz · marcinfracz.ai/road.html",
     projects: "Export Command Center · JV Strategy Room · Subscription Lab · Portfolio Made Visible · Marcin Hub · OpenAutoLink · 3D Prints",
     contact: "Open Contact from the menu bar, or LinkedIn: linkedin.com/in/marcinfracz",
     coffee: "Brewing… ☕ (just kidding, this terminal makes no coffee.)",
