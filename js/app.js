@@ -260,6 +260,7 @@
 
   /* ================= window manager ================= */
   var APP_WINDOWS = [
+    { id: "intro", label: "Welcome" },
     { id: "about", label: "About" },
     { id: "work", label: "Work" },
     { id: "projects", label: "Projects" },
@@ -272,11 +273,19 @@
     { id: "widgets", label: "Widget Settings" },
     { id: "photos", label: "Choose photo" }
   ];
+  /* v51: fade the bottom of a scrolling window body while there is more below */
+  function moreCue(body) {
+    if (!body) return;
+    var f = function () { body.classList.toggle("more", body.scrollTop + body.clientHeight < body.scrollHeight - 4); };
+    body.addEventListener("scroll", f, { passive: true }); window.addEventListener("resize", f);
+    return f;
+  }
+  var projCue = null;
   function findWindow(name) {
     return el("window-" + name) || el("widget-" + name);
   }
   function isOpen(win) {
-    return win && !win.classList.contains("hidden-window") && !win.classList.contains("minimised");
+    return win && !win.classList.contains("hidden-window") && !win.classList.contains("minimised") && win.style.display !== "none";
   }
   function openWindow(name) {
     if (name === "work") { openToolPage("work/timeline.html", "Work"); return; }
@@ -297,6 +306,7 @@
     if (dockBtn) dockBtn.classList.remove("has-min");
     bringToFront(win);
     if (name === "terminal") setTimeout(function () { el("terminal-input").focus(); }, 50);
+    if (name === "projects") { if (!projCue) projCue = moreCue(el("projects-body")); setTimeout(projCue, 30); }
     if (name === "browser") browserInit();
   }
   function closeWindow(name) {
@@ -839,10 +849,47 @@
     }
     if (changed) { savePositions(); savePrefs(); }
   }
+  /* v51: in the layered layout the welcome window still floats over the career card, but never over
+     the world clock. It drops just below the clock, in its compact form if that is what fits; on a
+     window too short for either it stays where it was. A spot the visitor dragged it to is kept. */
+  var mottoNarrowed = false;
+  function placeIntro() {
+    var win = el("window-intro"), clk = el("widget-clocks"), motto = el("note-motto");
+    if (!win) return;
+    win.classList.remove("compact"); win.style.top = ""; win.style.left = "";
+    if (mottoNarrowed && motto) { motto.style.width = ""; mottoNarrowed = false; }
+    if (isPhone() || window.innerWidth < LAYERED_MIN || positions["window-intro"] || win.style.display === "none") return;
+    if (!clk || clk.offsetParent === null || getComputedStyle(clk).display === "none") return;
+    var box = function (n) { var r = n.getBoundingClientRect(); return { l: r.left, t: r.top, r: r.right, b: r.bottom }; };
+    var C = box(clk);
+    if (!hits(box(win), C)) return;
+    var others = function () { var I = box(win); return deskRects().filter(function (o) { return o.id !== "window-intro" && o.id !== "widget-career" && o.id !== "framed-art" && hits(I, o); }); };
+    var fits = function () { return box(win).b <= window.innerHeight - 8 && !others().length; };
+    var drop = function () { var y = Math.round(C.b + 12); win.style.top = y + "px"; var d = box(win).t - y; if (Math.abs(d) > 1) win.style.top = Math.round(y - d) + "px"; };
+    /* first choice: beside the career card and under the clock, so it covers neither */
+    var car = el("widget-career");
+    if (car && car.offsetParent !== null && !positions["widget-career"]) {
+      var K = box(car), slide = function () { var x = Math.round(K.r + 16); win.style.left = x + "px"; var d = box(win).l - x; if (Math.abs(d) > 1) win.style.left = Math.round(x - d) + "px"; };
+      var fitsBeside = function () { return fits() && !hits(box(win), K) && box(win).r <= window.innerWidth - 8; };
+      slide(); drop(); if (fitsBeside()) return;
+      win.classList.add("compact"); drop(); if (fitsBeside()) return;
+      win.classList.remove("compact"); win.style.left = "";
+    }
+    drop();
+    if (fits()) return;
+    win.classList.add("compact"); drop();
+    if (fits()) return;
+    var o = others();
+    if (motto && o.length === 1 && o[0].id === "note-motto" && box(win).b <= window.innerHeight - 8) {
+      var w = Math.floor(box(win).l - box(motto).l - 14);
+      if (w >= 170) { motto.style.width = w + "px"; mottoNarrowed = true; if (fits()) return; motto.style.width = ""; mottoNarrowed = false; }
+    }
+    win.classList.remove("compact"); win.style.top = ""; win.style.left = "";
+  }
   var untangleT = null;
-  window.addEventListener("resize", function () { placeWeather(); clearTimeout(untangleT); untangleT = setTimeout(untangle, 150); });
-  window.addEventListener("load", function () { setTimeout(untangle, 60); });
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { setTimeout(untangle, 60); });
+  window.addEventListener("resize", function () { placeWeather(); clearTimeout(untangleT); untangleT = setTimeout(function () { placeIntro(); untangle(); }, 150); });
+  window.addEventListener("load", function () { setTimeout(function () { placeIntro(); untangle(); }, 60); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { setTimeout(function () { placeIntro(); untangle(); }, 60); });
   function renderWidgetPanel() {
     var labels = {
       clocks: { name: "World Clock", sub: "Detroit, Shanghai, Mexico City" },
@@ -1023,6 +1070,7 @@
   function applyWelcome() {
     var win = el("window-intro");
     if (win) win.style.display = prefs.welcome ? "" : "none";
+    if (typeof placeIntro === "function") placeIntro();
     el("check-welcome").textContent = prefs.welcome ? "✓" : "";
     savePrefs();
   }
@@ -1096,6 +1144,7 @@
       savePositions();
       var n = el("window-intro");
       if (n) { n.style.left = ""; n.style.top = ""; n.style.transform = ""; }
+      placeIntro();
     }
     else if (a === "reset-positions") {
       positions = {};
@@ -1452,7 +1501,46 @@
   frame.addEventListener("load", function () {
     clearTimeout(browserLoadTimer);
     browserHideBlocked(); /* the page loaded; a site that blocks embedding fires load too and shows its own refusal inside the frame */
+    /* v51: a link followed inside the page joins this tab's history, so Back and Forward work */
+    var href = "";
+    try { href = frame.contentWindow.location.href; } catch (err) { return; }
+    if (!href || !browserCurrent || href.indexOf(window.location.origin + "/") !== 0) return; /* only this site's own pages; never an error or blank page */
+    var bare = function (u) { return String(u || "").split("#")[0]; };
+    if (bare(href) === bare(browserCurrent)) return;
+    if (browserIndex > 0 && bare(browserHistory[browserIndex - 1]) === bare(href)) browserIndex--;
+    else if (browserIndex < browserHistory.length - 1 && bare(browserHistory[browserIndex + 1]) === bare(href)) browserIndex++;
+    else { browserHistory = browserHistory.slice(0, browserIndex + 1); browserHistory.push(href); browserIndex = browserHistory.length - 1; }
+    browserCurrent = href; urlBar.value = href;
+    browserButtons(); browserSyncTab(); renderBrowserTabs();
   });
+  /* v51: leaving for the Road (or any page) and coming back keeps the browser window's tabs */
+  var BROWSER_KEY = "mf.browserTabs";
+  window.addEventListener("pagehide", function () {
+    try {
+      var w = el("window-browser"), open = w && !w.classList.contains("hidden-window") && !w.classList.contains("minimised");
+      if (!browserTabs.length || !open) { sessionStorage.removeItem(BROWSER_KEY); return; }
+      browserSyncTab();
+      sessionStorage.setItem(BROWSER_KEY, JSON.stringify({ tabs: browserTabs, active: browserActiveId }));
+    } catch (err) {}
+  });
+  setTimeout(function restoreBrowser() {
+    var saved = null;
+    try { saved = JSON.parse(sessionStorage.getItem(BROWSER_KEY) || "null"); sessionStorage.removeItem(BROWSER_KEY); } catch (err) { saved = null; }
+    if (!saved || !saved.tabs || !saved.tabs.length || isPhone()) return;
+    var ok = saved.tabs.filter(function (t) {
+      try { return t && typeof t.url === "string" && new URL(t.url, window.location.href).origin === window.location.origin && Array.isArray(t.history); } catch (err) { return false; }
+    }).map(function (t) {
+      var h = t.history.filter(function (u) { try { return new URL(u, window.location.href).origin === window.location.origin; } catch (err) { return false; } });
+      if (!h.length) h = [t.url];
+      return { id: +t.id || 0, title: browserTitleFor(t.url), url: t.url, history: h, index: Math.max(0, Math.min(h.length - 1, +t.index || 0)) };
+    });
+    if (!ok.length) return;
+    browserTabs = ok;
+    browserTabSeq = Math.max.apply(null, ok.map(function (t) { return t.id; }));
+    var act = ok.filter(function (t) { return t.id === saved.active; })[0] || ok[ok.length - 1];
+    browserLoadTab(act);
+    openWindow("browser");
+  }, 0);
   document.addEventListener("click", function (e) {
     var a = e.target.closest('a[href$="resume.pdf"]');
     if (a && !isPhone()) { e.preventDefault(); browserOpenTab(RESUME_URL, "Resume"); return; }
@@ -1463,10 +1551,19 @@
     var r = e.target.closest('a[href$="reel.html"]');
     if (r && !isPhone()) { e.preventDefault(); browserOpenTab(REEL_URL, "Sizzle Reel"); return; }
     var x = e.target.closest("[data-browser-tab-close]");
-    if (x) { e.stopPropagation(); browserCloseTab(parseInt(x.getAttribute("data-browser-tab-close"), 10)); return; }
+    if (x) { e.stopPropagation(); if (Date.now() - tabXAt > 600) browserCloseTab(parseInt(x.getAttribute("data-browser-tab-close"), 10)); return; }
     var tb = e.target.closest("[data-browser-tab]");
-    if (tb) browserSwitchTab(parseInt(tb.getAttribute("data-browser-tab"), 10));
+    if (tb && Date.now() - tabXAt > 600) browserSwitchTab(parseInt(tb.getAttribute("data-browser-tab"), 10));
   });
+  /* v51: close a tab on press, so one click works even while a PDF in the frame holds the focus */
+  var tabXAt = 0;
+  document.addEventListener("pointerdown", function (e) {
+    if (e.button !== 0) return;
+    var x = e.target.closest && e.target.closest("[data-browser-tab-close]");
+    if (!x) return;
+    e.preventDefault(); e.stopPropagation(); tabXAt = Date.now();
+    browserCloseTab(parseInt(x.getAttribute("data-browser-tab-close"), 10));
+  }, true);
 
   /* page links to the Road go by script, so a host frame that takes over plain links (the private
      preview does) can't stop them; if the host blocks the move, the Road opens in the browser window */
@@ -1558,7 +1655,7 @@
       var busy = !el("palette").classList.contains("hidden-window") || !el("widget-panel").classList.contains("hidden-window") || document.querySelector(".menu.open");
       closeMenus(); closePalette(); closeWidgetPanel();
       var tag = (e.target && e.target.tagName) || "";
-      if (!busy && !/INPUT|TEXTAREA|SELECT/.test(tag)) { var fw = frontWindow(); if (fw && fw !== "intro") closeWindow(fw); }
+      if (!busy && (!/INPUT|TEXTAREA|SELECT/.test(tag) || e.target.id === "terminal-input")) { var fw = frontWindow(); if (fw && fw !== "intro") closeWindow(fw); }
     }
   });
   document.addEventListener("click", function (e) {
