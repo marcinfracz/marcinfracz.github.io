@@ -17,7 +17,14 @@
   (function () {
     var R = window.MF_REEL || {};
     if (R.name) document.title = R.name + " · Marcin Fracz";
-    if (window.MFReel) window.MFReel.open({ here: true, noFs: true, onClose: function () { location.href = "./"; } });
+    /* v68: inside the Desktop's browser window, hand the video to the Desktop instead of playing it in the tab */
+    var framed = false;
+    try { framed = window.parent !== window && window.parent.location.origin === location.origin && !!window.parent.document.getElementById("browser-frame"); } catch (e) {}
+    if (framed) { window.parent.postMessage({ mfStart: { act: "reel" } }, location.origin); return; }
+    /* on its own: closing goes back to the page it came from on this site, else to the Desktop */
+    var cameFromSite = false;
+    try { cameFromSite = !!document.referrer && new URL(document.referrer).origin === location.origin && history.length > 1; } catch (e) {}
+    if (window.MFReel) window.MFReel.open({ here: true, noFs: true, onClose: function () { if (cameFromSite) history.back(); else location.href = "./"; } });
   })();
 </script>
 <!-- Cloudflare Web Analytics --><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "18aafd4fcbc5429e9148c50c5ca2d470"}'></script><!-- End Cloudflare Web Analytics -->
