@@ -13,6 +13,12 @@ window.MF_REEL = { name: "Meet Marcin", src: "assets/sizzle-reel-1min.mp4", post
     document.querySelectorAll('[data-reel-name]').forEach(function (el) {
       var t = el.getAttribute('data-reel-name');
       if (t === 'title' || t === 'aria') { el.setAttribute('aria-label', R.name); if (t === 'title') el.setAttribute('title', R.name); }
+      else if (el.children.length) {
+        /* v66: keep icons inside the link (the play triangle); change only its words */
+        var tn = null;
+        for (var n = el.lastChild; n; n = n.previousSibling) { if (n.nodeType === 3 && n.nodeValue.trim()) { tn = n; break; } }
+        if (tn) tn.nodeValue = R.name; else el.appendChild(document.createTextNode(R.name));
+      }
       else el.textContent = R.name;
     });
   }
