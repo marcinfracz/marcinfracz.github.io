@@ -1574,9 +1574,16 @@
   document.addEventListener("pointerdown", function (e) {
     if (e.button !== 0) return;
     var x = e.target.closest && e.target.closest("[data-browser-tab-close]");
-    if (!x) return;
-    e.preventDefault(); e.stopPropagation(); tabXAt = Date.now();
-    browserCloseTab(parseInt(x.getAttribute("data-browser-tab-close"), 10));
+    if (x) {
+      e.preventDefault(); e.stopPropagation(); tabXAt = Date.now();
+      browserCloseTab(parseInt(x.getAttribute("data-browser-tab-close"), 10));
+      return;
+    }
+    var tb = e.target.closest && e.target.closest("[data-browser-tab]");
+    if (tb) {
+      e.preventDefault(); e.stopPropagation();
+      browserSwitchTab(parseInt(tb.getAttribute("data-browser-tab"), 10));
+    }
   }, true);
 
   /* page links to the Road go by script, so a host frame that takes over plain links (the private
