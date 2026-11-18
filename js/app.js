@@ -1562,7 +1562,6 @@
     if (bb) { e.preventDefault(); var nm = bb.querySelector && bb.querySelector(".app-txt b, .kit-chip span"); openToolPage(bb.href || BRAG_URL, nm ? nm.textContent.replace(/\s*Live$/, "") : "Tools I Built"); return; }
     var tl = e.target.closest('a[href*="work/timeline.html"]');
     if (tl) { e.preventDefault(); openToolPage(tl.href, "Timeline"); return; }
-    if (hm) { e.preventDefault(); openToolPage(hm.href, "How I made it"); return; }
     var r = e.target.closest('a[href$="reel.html"], [data-reel]');
     if (r) { e.preventDefault(); if (window.MFReel) window.MFReel.open(); else window.location.href = REEL_URL; return; } /* v62: the video opens in a popup over the Desktop */
     var x = e.target.closest("[data-browser-tab-close]");
