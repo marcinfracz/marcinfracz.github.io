@@ -314,14 +314,14 @@ function exPMV(body,setNote){
     ctl.appendChild(seg(['MY2026','MY2027','MY2028'],yr,function(i){yr=i;drawPlan()}));
     ctl.appendChild(sw('Flag gaps',gaps,function(v){gaps=v;drawPlan()}));
     area.innerHTML='';var rows=plan(),W=VW(),ph=phone();
-    var L=ph?0:250,R=ph?104:110,rowH=ph?62:38,Hh=34+rows.length*rowH+30,qW=(W-L-R)/4;
+    var L=ph?0:250,R=ph?120:130,rowH=ph?62:38,Hh=34+rows.length*rowH+30,qW=(W-L-R)/4;
     var svg=S('svg',{class:'viz',viewBox:'0 0 '+W+' '+Hh,role:'img','aria-label':'Launch plan for '+MK[mk]},area);
     ['Q1','Q2','Q3','Q4'].forEach(function(q,i){S('text',{x:L+qW*i+8,y:20,class:'ts'},svg,q);S('line',{x1:L+qW*i,x2:L+qW*i,y1:28,y2:Hh-28,class:'grid'},svg)});
     S('text',{x:W-R+10,y:20,class:'ts'},svg,'Readiness');
     rows.forEach(function(o,i){var y=32+i*rowH,by=ph?y+26:y+8,bh=ph?28:rowH-16;
       S('text',{x:0,y:ph?y+16:y+rowH/2+4,class:'t'},svg,o.v);
       var x=L+qW*o.q+3,w=W-R-x-8;
-      if(o.g&&gaps){S('rect',{x:x,y:by,width:w,height:bh,rx:6,class:'gap-bar'},svg);S('text',{x:x+10,y:by+bh/2+4,class:'ts',style:'fill:var(--gap)'},svg,ph?'No connected plan':'No connected plan for this launch')}
+      if(o.g&&gaps){S('rect',{x:x,y:by,width:w,height:bh,rx:6,class:'gap-bar'},svg);S('text',{x:x+10,y:by+bh/2+4,class:'ts',style:'fill:var(--gap)'},svg,ph?'No plan':'No connected plan')}
       else{var b=S('rect',{x:x,y:by,width:0,height:bh,rx:6,fill:PK[o.p][1]},svg);S('text',{x:x+10,y:by+bh/2+4,class:'ts',style:'fill:'+(o.p===0?'var(--ink)':'#fff')},svg,PK[o.p][0]);grow(b,'width',w,i*60)}
       var st=o.g&&!gaps?'Ready':o.st,col=st==='Gap'?'var(--gap)':st==='At risk'?'var(--accent-ink)':'var(--ok)';
       S('circle',{cx:W-R+14,cy:by+bh/2,r:5,fill:col},svg);S('text',{x:W-R+26,y:by+bh/2+5,class:'t',style:'fill:'+col},svg,st);
