@@ -1506,6 +1506,15 @@
     if (!m) return;
     if (m.act === "contact") { openWindow("contact-win"); return; }
     if (m.act === "desktop") { minimiseWindow("browser"); return; }
+    /* v68: Meet Marcin never plays as a page inside this window. If a tab lands on it,
+       the tab goes back to where it was (or closes) and the video opens over the Desktop. */
+    if (m.act === "reel") {
+      if (String(browserCurrent).split("#")[0] !== REEL_URL) browserGo(browserCurrent, false);
+      else if (browserIndex > 0) { browserIndex--; browserGo(browserHistory[browserIndex], false); }
+      else browserCloseTab(browserActiveId);
+      if (window.MFReel) window.MFReel.open();
+      return;
+    }
     var u;
     try { u = new URL(m.href, window.location.href); } catch (err) { return; }
     if (u.origin !== window.location.origin) return;
