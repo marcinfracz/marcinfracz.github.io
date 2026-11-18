@@ -993,7 +993,16 @@ function modeFor(u, hMax) {
 const BOX_H = { xs: 72, s: 108, m: 110, l: 176, xl: 236 };
 /* v63: newest first. The layer is mirrored as a whole; each piece is flipped back so its text reads normally.
    The axis keeps the mirror (its arrow points left, into now) and pins flip their parts instead. */
-let REV = (() => { try { const q = new URLSearchParams(location.search).get('order'); if (q) return q !== 'oldest'; return localStorage.getItem('mf-tl-order') !== 'oldest'; } catch (e) { return true; } })();
+let REV = (() => {
+  try {
+    const q = new URLSearchParams(location.search).get('order');
+    if (q) return q !== 'oldest';
+    const saved = localStorage.getItem('mf-tl-order');
+    if (saved) return saved !== 'oldest';
+    // Default: newest first on phones, oldest first on desktop (the previous desktop order)
+    return window.innerWidth < 768;
+  } catch (e) { return window.innerWidth < 768; }
+})();
 const T = (el, x, y) => { el.style.transform = `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0)${REV && !el._nf ? ' scaleX(-1)' : ''}`; };
 const ex = x => REV ? W - x : x;
 
