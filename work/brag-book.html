@@ -12,7 +12,7 @@
 /* theme before first paint: shared with the Desktop, the Road and the Timeline */
 (function () {
   var dark = null;
-  try { var p = JSON.parse(localStorage.getItem('mf-site-prefs-v6') || '{}'); if (typeof p.dark === 'boolean') dark = p.dark; } catch (e) {}
+  try { var p = JSON.parse(localStorage.getItem('mf-site-prefs-v7') || '{}'); if (typeof p.dark === 'boolean') dark = p.dark; } catch (e) {}
   if (dark === null) { try { dark = matchMedia('(prefers-color-scheme: dark)').matches; } catch (e) { dark = false; } }
   document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
 })();
@@ -858,10 +858,10 @@ drawAxis();fromHash();
 var lastPhone=phone(),rt;addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(function(){drawAxis();if(phone()!==lastPhone){lastPhone=phone();var k=cur;cur=-1;go(k,false,true)}},150)});
 
 /* theme toggle, shared preference */
-$('#themeBtn').addEventListener('click',function(){var d=root.getAttribute('data-theme')!=='dark';root.setAttribute('data-theme',d?'dark':'light');try{var k='mf-site-prefs-v6',q=JSON.parse(localStorage.getItem(k)||'{}');q.dark=d;localStorage.setItem(k,JSON.stringify(q));localStorage.removeItem('bb-theme')}catch(e){}});
+$('#themeBtn').addEventListener('click',function(){var d=root.getAttribute('data-theme')!=='dark';root.setAttribute('data-theme',d?'dark':'light');try{var k='mf-site-prefs-v7',q=JSON.parse(localStorage.getItem(k)||'{}');q.dark=d;localStorage.setItem(k,JSON.stringify(q));localStorage.removeItem('bb-theme')}catch(e){}});
 })();
 </script>
 <script src="../js/top-nav.js?v=43"></script>
-<script src="../js/phone-menu.js?v=48"></script>
+<script src="../js/phone-menu.js?v=49"></script>
 </body>
 </html>
