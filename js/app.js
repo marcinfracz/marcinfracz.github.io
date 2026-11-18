@@ -560,7 +560,7 @@
   });
 
   /* ================= preferences ================= */
-  var PREF_KEY = "mf-site-prefs-v6";
+  var PREF_KEY = "mf-site-prefs-v7";
   var LAYERED_MIN = 1280; /* matches the v42 layered layout in styles.css */
   var prefs = {
     wallpaper: "shanghai-mist", mode: "framed", dark: false, wall: "auto", frame: "white", soften: 1, blur: false,
