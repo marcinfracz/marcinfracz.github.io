@@ -270,7 +270,6 @@ svg.viz{display:block;width:100%;height:auto;overflow:visible}
   <article class="case" id="case"></article>
 
   <nav class="pager" id="pager" aria-label="More case studies"></nav>
-  <p class="foot">Every interactive exhibit runs on synthetic or illustrative data. No GM confidential figures, program codes, screens or partner data appear here. <a href="how-i-made-it.html" target="_top">How I made this site</a></p>
 </main>
 
 <script>
@@ -835,7 +834,6 @@ function render(c,i){
        '<li class="win"><span class="n">4</span><span class="k">The decision</span><p>'+esc(c.win)+'</p></li>'+
      '</ol>'+
      '<div class="figs">'+c.figs.map(function(f){return '<div class="fig"><b'+(f[0].length>6?' class="lg"':'')+'>'+esc(f[0])+'</b><span>'+esc(f[1])+'</span></div>'}).join('')+'</div>'+
-     '<div class="c-acts"><a class="btn pri" href="../road.html#'+c.road+'" target="_top">'+ICON.car+'See it on the Road</a>'+(c.id==='kit'?'<a class="btn ghost" href="how-i-made-it.html" target="_top">How I made this site</a>':'')+'</div>'+
    '</div>'+
    '<div class="c-right"><section class="exhibit" aria-label="'+esc(c.ex)+'"><div class="ex-head"><h3>'+esc(c.ex)+'</h3><span class="tag">'+esc(c.tag)+'</span></div><div class="ex-body" id="exBody"></div><p class="ex-note" id="exNote"></p></section>'+
    '<div class="flow"><span class="k">How it works</span><ol>'+c.flow.map(function(f){return '<li>'+esc(f)+'</li>'}).join('')+'</ol></div></div>';
