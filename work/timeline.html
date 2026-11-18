@@ -14,7 +14,7 @@
   /* theme before first paint: shared with the desktop and the Road */
   (function () {
     var dark = null;
-    try { var p = JSON.parse(localStorage.getItem("mf-site-prefs-v6") || "{}"); if (typeof p.dark === "boolean") dark = p.dark; } catch (e) {}
+    try { var p = JSON.parse(localStorage.getItem("mf-site-prefs-v7") || "{}"); if (typeof p.dark === "boolean") dark = p.dark; } catch (e) {}
     if (dark === null) { try { dark = window.matchMedia("(prefers-color-scheme: dark)").matches; } catch (e) { dark = false; } }
     document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
   })();
@@ -1605,7 +1605,7 @@ addEventListener('popstate', () => { const h = location.hash.slice(1); if (known
 $('#theme').addEventListener('click', () => {
   const dark = document.documentElement.getAttribute('data-theme') !== 'dark';
   document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-  try { const p = JSON.parse(localStorage.getItem('mf-site-prefs-v6') || '{}'); p.dark = dark; localStorage.setItem('mf-site-prefs-v6', JSON.stringify(p)); } catch (e) {}
+  try { const p = JSON.parse(localStorage.getItem('mf-site-prefs-v7') || '{}'); p.dark = dark; localStorage.setItem('mf-site-prefs-v7', JSON.stringify(p)); } catch (e) {}
 });
 
 /* ---------- v39: capability lenses ---------- */
@@ -1701,6 +1701,6 @@ if (known(h0)) openModal(h0);
 <script src="../js/reel-src.js?v=62"></script>
 <script src="../js/reel-player.js?v=62"></script>
 <script src="../js/top-nav.js?v=43"></script>
-<script src="../js/phone-menu.js?v=48"></script>
+<script src="../js/phone-menu.js?v=49"></script>
 </body>
 </html>
