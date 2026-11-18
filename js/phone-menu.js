@@ -58,11 +58,17 @@
     c.textContent = label;
     var isReel = a.hasAttribute('data-reel-name') || /reel\.html/i.test(a.getAttribute('href') || '') || /meet marcin/i.test(label);
     if (isReel) {
-      var ico = document.createElement('span');
-      ico.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true" style="margin-right:8px;flex:none;opacity:.8"><path d="M8 5v14l11-7z"/></svg>';
-      c.insertBefore(ico.firstChild, c.firstChild);
-      c.style.display = 'flex';
-      c.style.alignItems = 'center';
+      var ico = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      ico.setAttribute('viewBox', '0 0 24 24');
+      ico.setAttribute('width', '14');
+      ico.setAttribute('height', '14');
+      ico.setAttribute('fill', 'currentColor');
+      ico.setAttribute('aria-hidden', 'true');
+      ico.style.cssText = 'margin-right:6px;flex:none;opacity:.7';
+      var p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      p.setAttribute('d', 'M8 5v14l11-7z');
+      ico.appendChild(p);
+      c.insertBefore(ico, c.firstChild);
     }
     if (a.getAttribute('aria-current') === 'page' || a.classList.contains('cur') || a.classList.contains('cur-link')) c.classList.add('pm-cur');
     if (a.tagName === 'BUTTON') c.addEventListener('click', function () { close(); a.click(); });
