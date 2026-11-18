@@ -10,7 +10,7 @@
   var C = window.ROAD_CONTENT || {};
   var ERAS = C.eras || [], STOPS = C.stops || [];
   var HL_MAX = 3;
-  var esc = function (t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var esc = function (t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) { return { '&': '&', '<': '<', '>': '>', '"': '"' }[c]; }); };
 
   function ready(fn) {
     var flow = document.getElementById('flow');
@@ -171,7 +171,10 @@
   function openList() {
     var box = document.createElement('div'); box.className = 'pd-list';
     var html = '', lastEra = null;
-    STOPS.forEach(function (s, i) {
+    // Mobile list: reverse chronological so latest role is at the top (desktop drive order unchanged)
+    var ordered = STOPS.slice().reverse();
+    ordered.forEach(function (s) {
+      var i = STOPS.indexOf(s);
       var ek = eraIndex(s);
       if (ek >= 0 && s.era !== lastEra) { var e = ERAS[ek]; html += '<p class="pd-lh" style="--c:' + esc(e.color) + '"><b>' + e.n + '</b>' + esc(e.label) + '<span>' + esc(e.years) + '</span></p>'; lastEra = s.era; }
       if (ek < 0) lastEra = null;
