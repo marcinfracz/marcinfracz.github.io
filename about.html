@@ -106,12 +106,18 @@ html[data-theme="dark"] .area h2{filter:brightness(1.35)}
 .theme-btn{width:32px;justify-content:center;padding:0!important}
 html[data-theme="dark"] .sun,html:not([data-theme="dark"]) .moon{display:none}
 @media (max-width:700px){.links a,.links button{padding:0 7px;font-size:12px}.brand span{display:none}}
+
+@media (max-width:700px){
+  .brand img{display:none}
+  .bar.scrolled .brand img{display:block}
+  .bar.scrolled .brand{gap:8px}
+}
 </style>
 </head>
 <body>
 
 <header class="bar">
-  <a class="pill brand" href="index.html" target="_top"><img src="assets/headshots/pro-blue-gray-avatar.jpg" alt="" width="30" height="30">Marcin Fracz <span>· About</span></a>
+  <a class="pill brand" id="brand" href="index.html" target="_top"><img src="assets/headshots/pro-blue-gray-avatar.jpg" alt="" width="30" height="30">Marcin Fracz <span>· About</span></a>
   <nav class="pill links" aria-label="Site">
     <a href="index.html" target="_top">Desktop</a>
     <a href="road.html" target="_top">The Road</a>
@@ -231,6 +237,22 @@ html[data-theme="dark"] .sun,html:not([data-theme="dark"]) .moon{display:none}
       } catch(e){}
     });
   })();
+</script>
+
+<script>
+(function(){
+  var bar = document.querySelector('.bar');
+  var photo = document.querySelector('.who img.me');
+  if (!bar || !photo) return;
+  function check(){
+    var r = photo.getBoundingClientRect();
+    var out = r.bottom < 60;
+    bar.classList.toggle('scrolled', out);
+  }
+  check();
+  window.addEventListener('scroll', check, {passive:true});
+  window.addEventListener('resize', check);
+})();
 </script>
 </body>
 </html>
