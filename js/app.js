@@ -1352,7 +1352,6 @@
     if (url === REEL_URL) return (window.MF_REEL || {}).name || "Meet Marcin";
     if (url.split("#")[0] === BRAG_URL) return "Tools I Built";
     if (url.split("#")[0] === TIMELINE_URL) return "Timeline";
-    if (url.split("#")[0] === new URL("work/how-i-made-it.html", window.location.href).href) return "How I made it";
     if (url.split("#")[0] === new URL("about.html", window.location.href).href) return "About";
     try { return new URL(url).hostname.replace(/^www\./, ""); } catch (e) { return url; }
   }
@@ -1563,7 +1562,6 @@
     if (bb) { e.preventDefault(); var nm = bb.querySelector && bb.querySelector(".app-txt b, .kit-chip span"); openToolPage(bb.href || BRAG_URL, nm ? nm.textContent.replace(/\s*Live$/, "") : "Tools I Built"); return; }
     var tl = e.target.closest('a[href*="work/timeline.html"]');
     if (tl) { e.preventDefault(); openToolPage(tl.href, "Timeline"); return; }
-    var hm = e.target.closest('a[href*="how-i-made-it.html"]');
     if (hm) { e.preventDefault(); openToolPage(hm.href, "How I made it"); return; }
     var r = e.target.closest('a[href$="reel.html"], [data-reel]');
     if (r) { e.preventDefault(); if (window.MFReel) window.MFReel.open(); else window.location.href = REEL_URL; return; } /* v62: the video opens in a popup over the Desktop */
