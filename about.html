@@ -10,7 +10,7 @@
 <script>
   (function () {
     var dark = false;
-    try { var p = JSON.parse(localStorage.getItem("mf-site-prefs-v6") || "{}"); if (typeof p.dark === "boolean") dark = p.dark; } catch (e) {}
+    try { var p = JSON.parse(localStorage.getItem("mf-site-prefs-v7") || "{}"); if (typeof p.dark === "boolean") dark = p.dark; } catch (e) {}
     document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
   })();
 </script>
@@ -222,7 +222,7 @@ html[data-theme="dark"] .sun,html:not([data-theme="dark"]) .moon{display:none}
 <!-- Cloudflare Web Analytics --><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "18aafd4fcbc5429e9148c50c5ca2d470"}'></script><!-- End Cloudflare Web Analytics -->
 
 <script src="js/top-nav.js?v=43"></script>
-<script src="js/phone-menu.js?v=48"></script>
+<script src="js/phone-menu.js?v=49"></script>
 <script>
   (function(){
     var btn = document.getElementById('themeBtn');
