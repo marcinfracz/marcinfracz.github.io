@@ -564,7 +564,7 @@
   var LAYERED_MIN = 1280; /* matches the v42 layered layout in styles.css */
   var prefs = {
     wallpaper: "shanghai-mist", mode: "framed", dark: false, wall: "auto", frame: "white", soften: 1, blur: false,
-    widgets: { clocks: { on: true, size: "M" }, weather: { on: true, size: "S" }, career: { on: true, size: "M" }, building: { on: true, size: "M" } },
+    widgets: { clocks: { on: false, size: "M" }, weather: { on: false, size: "S" }, career: { on: true, size: "M" }, building: { on: false, size: "M" } },
     welcome: true
   };
   try {
