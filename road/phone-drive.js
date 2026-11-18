@@ -115,12 +115,12 @@
     var nPills = pills ? pills.children.length : 0;
     if (nPills === 1) foot.appendChild(pills);
     else if (nPills > 1) {
-      var dh = document.createElement('p'); dh.className = 'sec-h'; dh.textContent = 'Live demos';
+      var dh = document.createElement('p'); dh.className = 'sec-h'; dh.textContent = 'Tools I Built';
       var dbox = document.createElement('div'); dbox.className = 'pd-demos'; dbox.appendChild(pills);
       var before = more.querySelector(':scope > .sec-h') || more.querySelector(':scope > details');
       more.insertBefore(dh, before); more.insertBefore(dbox, before);
       var db = document.createElement('button'); db.type = 'button'; db.className = 'pd-demo-btn';
-      db.innerHTML = '<svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="currentColor" d="M5 3.2v9.6L12.6 8z"/></svg>Live demos <span class="pd-n">' + nPills + '</span>';
+      db.innerHTML = '<svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><path fill="currentColor" d="M5 3.2v9.6L12.6 8z"/></svg>Tools I Built <span class="pd-n">' + nPills + '</span>';
       db.addEventListener('click', function () { openSheet(shortTitle(s) + ' · ' + roleOf(s), more); });
       foot.appendChild(db);
     }
