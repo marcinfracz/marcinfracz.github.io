@@ -106,6 +106,8 @@ html[data-theme="dark"] .area h2{filter:brightness(1.35)}
 .theme-btn{width:32px;justify-content:center;padding:0!important}
 html[data-theme="dark"] .sun,html:not([data-theme="dark"]) .moon{display:none}
 @media (max-width:700px){.links a,.links button{padding:0 7px;font-size:12px}.brand span{display:none}}
+/* v66: tablet header on one line (brand label hidden, tighter nav, no wrapping) */
+@media (min-width:701px) and (max-width:1100px){.brand{white-space:nowrap}.brand span{display:none}.links{flex-wrap:nowrap}.links a,.links button{padding:0 8px;font-size:12.5px;white-space:nowrap}}
 
 @media (max-width:700px){
   .brand img{display:none}
