@@ -1000,3 +1000,12 @@ html { overflow: hidden; }
 .pmv-strip svg { display: block; width: 100%; max-width: 360px; height: auto; margin: 0 auto; }
 .pmv-strip figcaption { display: flex; justify-content: space-between; max-width: 360px; margin: 6px auto 0; font-size: 12px; font-weight: 600; color: var(--ink-2); }
 .pmv-strip figcaption span:last-child { color: var(--accent-ink); text-align: right; }
+/* v66: Meet Marcin play icon sits snug to its label in the top bar (the link gap already spaces it) */
+.bar-links > #reel-link > svg { margin-right: 0 !important; }
+/* v66: tablets: nav labels stay on one line */
+@media (min-width: 768px) and (max-width: 1100px) {
+  .bar-links > a { white-space: nowrap; padding: 0 8px; }
+}
+@media (min-width: 768px) and (max-width: 860px) {
+  .bar-links > a { padding: 0 6px; font-size: 12px; }
+}
