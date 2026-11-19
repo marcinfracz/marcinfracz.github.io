@@ -247,6 +247,8 @@ svg.viz{display:block;width:100%;height:auto;overflow:visible}
       })(window, document, "clarity", "script", ID);
     }
     if (granted) window.clarity("consentv2", { ad_Storage: "denied", analytics_Storage: "granted" });
+    /* tagged links: ?ref=linkedin etc. go to Clarity as a tag, only once Clarity is allowed to load */
+    try { var ref = (new URLSearchParams(location.search).get("ref") || "").replace(/[^A-Za-z0-9_-]/g, "").slice(0, 40); if (ref) window.clarity("set", "ref", ref); } catch (e) {}
   }
 
   var tz = "";
