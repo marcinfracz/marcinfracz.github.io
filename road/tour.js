@@ -142,8 +142,9 @@ const Voice = (() => {
   let on = prefs.voice === true, unlocking = false;
   const el = new Audio(); el.preload = 'auto';
   const pre = new Audio(); pre.preload = 'auto';
-  const REV = { t99: '-v2' };
-  const src = id => `${AUDIO.voice}tour3-${id}${REV[id] || ''}.mp3`;
+  /* v73: Marcin's v5 narration. Stories s09a to s13d keep the v3 clips until they are re-recorded. */
+  const V5 = new Set(["s01", "s01a", "s01b", "s02", "s02a", "s02b", "s03", "s03a", "s03b", "s03c", "s04", "s04a", "s04b", "s05", "s05a", "s05b", "s05c", "s06", "s06a", "s06b", "s07", "s07a", "s07b", "s07c", "s08", "s08a", "s08b", "s08c", "s09", "s10", "s11", "s12", "s13", "t00", "t99"]);
+  const src = id => `${AUDIO.voice}${V5.has(id) ? 'tour5' : 'tour3'}-${id}.mp3`;
   window.__tourVoiceLevel = v => { el.volume = Math.min(1, v); };
   el.volume = Math.min(1, Music.vol);
   return {
@@ -167,56 +168,56 @@ const Voice = (() => {
    visitor taps it, that stop's stories play one by one, each opening on screen; then the drive goes on.
    Without voice, the same captions run on a reading timer. */
 const CAPS = {
- "t00": "Welcome to the Road: 20+ years in automotive, from engine sealing to software strategy in Shanghai. The tour drives itself. At any stop, tap Stories to hear the work behind it.",
- "s01": "Flint, Michigan, 2003. Marcin studied mechanical engineering at Kettering, a co-op university, alternating school terms with paid engineering terms at Federal-Mogul. He graduated cum laude in 2007 with four years of production experience behind him.",
- "s01a": "Kettering pairs every academic term with a paid industry term. Marcin graduated cum laude in 2007 with four years of production engineering already done.",
- "s01b": "Every co-op term was at Federal-Mogul, on engine sealing for GM, Volkswagen, Ford, Cummins and others. He designed and tested seals, and helped finish the 5.7L HEMI cast riser and valve cover gaskets.",
- "s02": "2007. Federal-Mogul hired Marcin full time, in the middle of a recession. He ran value engineering for the sealing business, then took a new head gasket for the 3.6L Pentastar V6 from mid-development into production.",
- "s02a": "An earlier Pentastar head gasket design was cracking from fatigue. Marcin designed a new multi-layer steel gasket, proved it on the thermal pulsator test, and took it to production.",
- "s02b": "As value engineering lead, he brought engineering, sales, operations, purchasing and suppliers together on projects worth $3M a year in savings. A new GM 1.4L head gasket later saved $500k, and the work produced 4 US patent disclosures.",
- "s03": "2010. Marcin moved to the automaker side at Chrysler Group, and stayed with the same engine. As design release engineer, he owned every sealing part on the Pentastar V6, an engine that went on to pass 10 million built.",
- "s03a": "He designed and tested the Pentastar head gasket at the supplier, then owned every Pentastar sealing part from inside Chrysler. The engine passed 1 million built 18 months after launch, and 10 million by 2019.",
- "s03b": "When a supplier quality spill hit the Pentastar rear main seal, Marcin stopped production at a plant rather than ship suspect parts, then re-sourced the seal.",
- "s03c": "He set one global head gasket supply strategy for Chrysler and Fiat, saving $700k a year, and built a sealing and fastening engineering team.",
- "s04": "2011, Johnson Controls. Marcin moved from components to complete seat systems for Nissan's Titan and Armada, leading a 12-member cross-functional team. The seats launched ahead of schedule, with 2.2% cost savings per seat.",
- "s04a": "He owned the front and rear seats for the 2013 to 2015 Titan and Armada end to end, with 2 direct reports, and launched ahead of schedule.",
- "s04b": "Working with Nissan, he simplified trim-level combinations and saved $240k.",
- "s05": "At the same time, Marcin earned an MBA in Marketing and Strategy at Michigan Ross in the evenings, while leading Nissan programs full time. It became his bridge from engineering into product strategy and business leadership.",
- "s05a": "He finished the Ross MBA in 2014, in the evening program, while leading seat programs at Johnson Controls.",
- "s05b": "For Ross MAP in 2012, he worked on a market entry strategy for IdeaConnection, an open innovation firm in Victoria, British Columbia, spent a week on site, and presented it to the CEO.",
- "s05c": "The degree opened the door to GM's three-year, up-or-out leadership development program.",
- "s06": "2014, General Motors. Marcin joined GM's leadership program, starting in Chevrolet product marketing on the Traverse. He trimmed the lineup, priced it to draw more shoppers in, and created the Graphite Edition.",
- "s06a": "On the 2016 Traverse, he cut build combinations by 10%. For 2017, a 'starting at' price trim lifted consideration 6% at launch.",
- "s06b": "Behind the leaner lineup was a build complexity tool he built, which showed the combinations buyers actually skipped.",
- "s07": "Next, Chevrolet Global Customer Experience. Marcin went to Ecuador to learn why its dealers led every GM region in service satisfaction, then partnered with the Disney Institute to build a dealer culture program around what he found.",
- "s07a": "In Quito and Guayaquil, the answer was simple: customers could watch their car being fixed. That transparency built trust.",
- "s07b": "Much of that work happened with the Disney Institute in Orlando, building one culture program for Chevrolet dealers around the world.",
- "s07c": "Back at headquarters, he ran workshops at the Detroit Opera House and managed the budget for the Disney Institute work.",
- "s08": "2016, Mexico City. On international assignment, Marcin led the national rollout of Business Development Centers, the dealer teams that follow up every sales lead. Six months, 350+ dealer visits, and a promotion at the end of the program.",
- "s08a": "The rollout covered Mexico City, Guadalajara and Monterrey: 350+ dealer visits and 20 training sessions in six months.",
- "s08b": "The idea was simple: every sales lead gets a follow-up. Marcin presented the results to GM Mexico's Managing Director.",
- "s08c": "To make it last beyond the visits, he built a dealer training website and video series.",
- "s09": "2017. As global product manager for GM's compact and mid crossovers, Marcin brought the US, Canada and Korea onto one content and pricing plan. It cut price decay after the refresh and supported per-vehicle profit gains.",
+ "t00": "Twenty years inside the auto industry—from tier-one component engineering to running software strategy in Shanghai. This road traces how Marcin moves between hardware, commercial strategy, and AI to get complex programs shipped. The tour drives itself; tap Stories at any stop to dig into the decisions behind the work.",
+ "s01": "Most engineers don't see a live production floor until after graduation. At Kettering, Marcin spent every other term inside Federal-Mogul, graduating cum laude with four years of real plant and testing discipline already built in.",
+ "s01a": "Balancing a full mechanical engineering load with alternating industry terms meant theory was constantly tested against real manufacturing constraints.",
+ "s01b": "Working across engine sealing programs for GM, Ford, Volkswagen, and Cummins—including gasket development on the 5.7-liter HEMI—gave him an early instinct for how suppliers and automakers actually negotiate trade-offs.",
+ "s02": "Entering the industry during the 2007 downturn, Marcin stepped straight into value engineering and core program ownership—taking Chrysler's new 3.6-liter Pentastar head gasket from an early fatigue failure into volume production.",
+ "s02a": "The original gasket design was cracking under thermal cycling. Marcin engineered a multi-layer steel replacement, proved it on thermal pulsator rigs, and cleared it for launch.",
+ "s02b": "Driving three million dollars in annual cost reductions took more than a CAD change—he had to align purchasing, operations, sales, and suppliers around the same business case, generating four patent disclosures along the way.",
+ "s03": "In 2010, Marcin moved across the table to Chrysler, taking end-to-end release ownership for every sealing system on the Pentastar V6—an architecture that went on to surpass ten million engines built.",
+ "s03a": "Carrying a critical component from supplier validation into OEM release is rare. That continuity helped push the Pentastar past its first million engines within eighteen months of launch.",
+ "s03b": "When a supplier quality spill threatened the rear main seal, Marcin made the call to halt plant shipments rather than risk field failures, then led the re-sourcing effort to protect launch volume.",
+ "s03c": "Right as Chrysler and Fiat were integrating, he unified two separate purchasing playbooks into a single global head gasket strategy—cutting seven hundred thousand dollars a year in structural cost.",
+ "s04": "At Johnson Controls, the scope expanded from powertrain components to full vehicle interiors—leading a cross-functional team to deliver complete seating systems for Nissan's Titan and Armada ahead of schedule.",
+ "s04a": "Seating is where structure, safety, electronics, and craftsmanship collide. Marcin managed the program across twelve functions and two direct reports, beating launch timing while pulling cost out of every seat.",
+ "s04b": "Working directly with Nissan's product planners, he stripped out low-take trim combinations that added plant complexity without moving the needle for buyers.",
+ "s05": "While running Nissan seating programs full time, Marcin earned his MBA at Michigan Ross at night—shifting his focus from how to engineer a system to which products a company should bet on.",
+ "s05a": "Four years of evening coursework alongside a full-time engineering leadership role built the financial and strategic toolkit he needed to step out of pure R&D.",
+ "s05b": "For his multidisciplinary action project in British Columbia, he spent a week on site with an open-innovation firm and delivered a market-entry roadmap straight to its CEO.",
+ "s05c": "That combination of deep engineering credibility and Ross strategy training opened the door to General Motors' three-year, up-or-out leadership rotation.",
+ "s06": "His first GM rotation put him on the Chevrolet Traverse, using buyer-behavior analytics to strip out unprofitable build combinations and sharpen entry-level pricing.",
+ "s06a": "Trimming ten percent of build combinations cleaned up dealer inventory and plant scheduling, while a sharper entry price point lifted launch consideration by six percent.",
+ "s06b": "To get commercial and manufacturing teams on the same page, Marcin built his own complexity-modeling tool—turning messy option data into clear margin and volume trade-offs.",
+ "s07": "When GM wanted to raise global dealer service retention, Marcin studied the highest-scoring region in the company—Ecuador—and scaled what made it work into a worldwide Chevrolet culture program.",
+ "s07a": "On the ground in Quito and Guayaquil, the differentiator wasn't software—it was transparency. Letting owners watch their vehicles being serviced eliminated skepticism and drove top-decile trust scores.",
+ "s07b": "To translate that service mindset across global dealer networks, Marcin partnered with the Disney Institute in Orlando to design a repeatable training curriculum.",
+ "s07c": "Back in Detroit, he managed the program budget and led executive workshops at the Detroit Opera House to roll the standard out across leadership.",
+ "s08": "For his international rotation in Mexico City, Marcin led the nationwide rollout of dealer Business Development Centers—turning inconsistent showroom follow-up into a disciplined sales engine and earning a promotion home.",
+ "s08a": "Over six months on the ground across Mexico City, Guadalajara, and Monterrey, he personally visited more than three hundred fifty dealerships to drive adoption.",
+ "s08b": "Most lost deals die in the first twenty-four hours. Marcin stood up dedicated follow-up teams inside dealerships and reported rollout performance directly to GM Mexico's Managing Director.",
+ "s08c": "Knowing field visits wouldn't scale forever, he built an online training portal and video library so dealers could onboard new reps long after the launch team left.",
+ "s09": "Promoted to Global Product Manager, Marcin aligned leadership across the US, Canada, and Korea around a single content and pricing architecture for GM's compact and midsize crossovers.",
  "s09a": "Aligning executives in three countries on one plan cut post-refresh price decay by 5% and supported $200 per-vehicle profit improvements on Equinox and Traverse.",
  "s09b": "For the next-generation Equinox, he led global customer content workshops, informed by market research in China in 2018.",
- "s10": "2019. Marcin was product manager for two new Korea-built crossovers, the Buick Encore GX and the Chevrolet Trailblazer. When COVID hit the supply chain, he kept both launches on track.",
+ "s10": "Tasked with launching two Korea-built crossovers—the Buick Encore GX and Chevrolet Trailblazer—just as COVID-19 fractured global supply chains, Marcin kept both programs on schedule.",
  "s10a": "During the wire-harness shortage, he built a tool that matched builds to demand and harness supply. When the hero color wasn't ready, the show cars got off-line paint, and they arrived on time and under budget.",
  "s10b": "He added the Encore GX ST Black Roof Package within six months of production start, and built the greenhouse gas model that added a front-wheel-drive Trailblazer ACTIV to the lineup.",
- "s11": "2020. Marcin moved from hardware to software revenue in Connected and Over-the-Air Services. He grew the strategy team from 2 to 7, built Super Cruise monetization across GM's North American brands, and won approval for a paid driver-assist trial.",
+ "s11": "In 2020, Marcin pivoted from vehicle hardware to recurring software revenue—building the commercial monetization strategy for Super Cruise and over-the-air upgrades across GM's North American brands.",
  "s11a": "He grew the team from 2 to 7 and won executive approval for an in-market trial of paid driver-assist upgrades, a high-margin revenue opportunity of about $30M.",
  "s11b": "He built the monetization strategy for Super Cruise across every GM brand in North America, then for the next-generation Ultra Cruise.",
  "s11c": "He also helped shape the over-the-air services behind revenue after the sale, part of GM's 2021 goal of $20 to 25B a year in software and services by 2030.",
- "s12": "2022, Shanghai. Marcin joined SAIC-GM as Deputy Director of Software Strategy. Chinese buyers now saw technology as the new luxury, and the work was helping a global automaker move at China speed.",
+ "s12": "In 2022, Marcin relocated to Shanghai as Deputy Director of Software Strategy at SAIC-GM—known as SGM—helping a legacy joint venture match the software pace of China's EV challengers.",
  "s12a": "He helped form SAIC-GM's software and digital business team of about 2,500 people, through approval by the GM, SAIC and SAIC-GM boards, and co-led a 49-person strategy, insights and research team.",
  "s12b": "He ran consumer research across Chinese cities on what drivers will pay for in driver assist. The research and pitch supported a nine-figure investment.",
  "s12c": "In the intelligent cockpit, he shaped an AI 'Model Integrator' strategy that brings voice and vision together.",
  "s12d": "GM China and SAIC-GM studies showed technology had become the new luxury for Chinese buyers. He helped realign the work and messaging to launch intelligent features faster.",
- "s13": "2025, back in Michigan with OnStar International. Marcin owned connected services for China-built GM vehicles exported to 8 regions, aligning OnStar, GM's regional teams and the joint venture partners. He also built Portfolio Made Visible, with AI agents.",
+ "s13": "Returning to Michigan in 2025, Marcin took ownership of connected-service planning for China-built GM vehicles exported across eight global regions—aligning OnStar, regional P&Ls, and JV engineering teams on launch execution.",
  "s13a": "Each export region, from Mexico and South America to the Middle East, Korea, Israel, Australia and Central Asia, had its own connectivity needs and launch timing.",
  "s13b": "The plans covered the export portfolio: the Chevrolet Aveo, Spark EUV and Captiva, and the Cadillac XT5.",
  "s13c": "In August 2026 he kept driver assist in scope with a global strategy workshop on L2, L2+ and L2++. At GM Forward that October, GM said hands-free highway driving will expand: the same space this work covered.",
  "s13d": "Unprompted and solo, he built Portfolio Made Visible with AI agents. It turns 200+ programs across 50+ markets into any market-year view in seconds, at a fraction of the cost of a retired legacy tool, and grew by word of mouth to 40+ monthly users.",
- "t99": "That's the drive: 20+ years, one road, and the next chapter still open. Press Meet Marcin to watch the video, or get in touch from the top of the page."
+ "t99": "Eight chapters across three countries—connecting mechanical execution, global P&L strategy, and hands-on AI delivery. Watch Meet Marcin to hear the story firsthand, or reach out directly at the top of the page."
 };
 const R = () => window.__road;
 const C = () => window.ROAD_CONTENT || {};
