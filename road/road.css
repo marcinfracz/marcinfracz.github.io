@@ -1009,3 +1009,47 @@ html { overflow: hidden; }
 @media (min-width: 768px) and (max-width: 860px) {
   .bar-links > a { padding: 0 6px; font-size: 12px; }
 }
+
+/* v69: the audio tour box, its Stories countdown, and the start and settings buttons */
+.tour3 .tb-top { gap: 8px; }
+.tour3 .tb-where { font-size: 12.5px; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 42%; }
+.tour3 .tb-where:empty { display: none; }
+.tour3 .tb-ic svg { display: block; }
+.tour3 .tb-ic.off { color: var(--ink-3); opacity: .7; }
+.tour3 .tb-ic:disabled { opacity: .35; cursor: default; }
+.tour3 #tb-cc.off::after { content: ""; position: absolute; width: 18px; height: 2px; background: currentColor; transform: rotate(-40deg); border-radius: 2px; }
+.tour3 #tb-cc { position: relative; }
+.tour3 .tb-sub { margin: 9px 0 0; font-size: 12px; font-weight: 800; letter-spacing: .02em; color: var(--ink-2); }
+.tour3 .tb-t { min-height: 0; margin: 8px 0 12px; }
+.tour3.nocap .tb-t { display: none; }
+.tour3.nocap .tb-acts { margin-top: 12px; }
+.tour3 .tb-acts { flex-wrap: wrap; }
+.tour3 .tb-stories { display: inline-flex; align-items: center; gap: 7px; margin-right: auto; padding: 0 13px 0 9px; }
+.tour3 .tb-stories[hidden] { display: none; }
+.tour3 .tb-cd { flex: none; transform: rotate(-90deg); }
+.tour3 .tb-cd circle { fill: none; stroke-width: 2.4; stroke: color-mix(in srgb, var(--ink) 18%, transparent); }
+.tour3 .tb-cd .cd { stroke: transparent; stroke-dasharray: 100; stroke-dashoffset: 0; stroke-linecap: round; }
+.tour3 .tb-stories.ask { background: var(--accent); color: #1E2124; box-shadow: 0 0 0 4px var(--accent-soft); animation: tbAsk 1.6s ease-in-out infinite; }
+.tour3 .tb-stories.ask .tb-cd circle { stroke: rgba(30,33,36,.22); }
+.tour3 .tb-stories.ask .tb-cd .cd { stroke: #1E2124; }
+@keyframes tbAsk { 50% { box-shadow: 0 0 0 7px var(--accent-soft); } }
+.tour3.paused .tb-stories.ask { animation: none; }
+.tour3.at-end .tb-bar i { width: 100% !important; }
+.tour-pulse { animation: tourPulseBtn 1.4s ease-in-out infinite; outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 12px; }
+@keyframes tourPulseBtn { 50% { outline-offset: 7px; } }
+.card-actions .tour-btn { gap: 7px; }
+.card-actions .tour-quiet { background: transparent; box-shadow: inset 0 0 0 1px var(--line); }
+.ctl-pop .tour-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 3px; }
+.ctl-pop .tour-pair .tour-menu-btn { margin-top: 0; padding: 0 8px; white-space: nowrap; }
+.ctl-pop .tour-pair .tour-menu-btn.alt { background: var(--surface-2); color: var(--ink); }
+@media (max-width: 767px) {
+  .tour3 .tb-where { max-width: 50%; }
+  .tour3 .tb-acts { gap: 6px; }
+  .tour3 .tb-btn { padding: 0 12px; }
+  .tour3 .tb-stories { flex: 1 1 100%; justify-content: center; margin-right: 0; order: -1; }
+  .tour3 .tb-stories[hidden] { display: none; }
+  .tour3 #tb-back, .tour3 #tb-pause, .tour3 #tb-next { flex: 1 1 0; }
+  #m-start .fcard .card-actions .tour-btn { height: 38px; padding: 0 14px; }
+}
+@media (prefers-reduced-motion: reduce) { .tour3 .tb-stories.ask, .tour-pulse { animation: none; } }
+.tour3 .tb-bar { min-width: 36px; }

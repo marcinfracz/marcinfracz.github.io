@@ -1,8 +1,7 @@
-/* v38: "Show me around": a guided tour that drives the Road for the visitor, with captions and an
-   optional voice, plus three background music tracks (off by default, never autoplay).
-   Audio hooks: when recorded files exist, list them below and they replace the built-in sound.
-     AUDIO.voice  folder of per-step narration files named tour-d01.mp3 ... tour-d11.mp3 (desktop) and tour-p01.mp3 ... tour-p06.mp3 (phone)
-     AUDIO.tracks[i].file  a looping music file for that track */
+/* v69: the audio tour. "Audio tour" and "Tour without sound" (start card and settings) run one brief
+   narrated drive through all 13 stops, with an optional Stories stop at each, and captions.
+   Narration files: assets/audio/tour3-<id>.mp3 (t00 intro, s01..s13 stops, s01a.. stories, t99 finish).
+   Background music: three tracks, off by default, never autoplay. */
 const AUDIO = {
   voice: 'assets/audio/', // narration recorded in ElevenLabs
   tracks: [
@@ -138,233 +137,387 @@ const Music = (() => {
   };
 })();
 
-/* ---------------- voice ---------------- */
+/* ---------------- voice: one audio element, unlocked by the click that starts the tour ---------------- */
 const Voice = (() => {
-  let on = prefs.voice === true, cur = null, chosen = null;
-  const synth = window.speechSynthesis;
-  function pick() {
-    if (!synth) return null;
-    const vs = synth.getVoices().filter(v => /^en(-|_|$)/i.test(v.lang));
-    const score = v => (/natural|neural|online/i.test(v.name) ? 8 : 0) + (/aria|jenny|guy|davis|google us english|samantha|ava|allison/i.test(v.name) ? 4 : 0) + (/en-us/i.test(v.lang) ? 2 : 0) + (v.localService ? 0 : 1);
-    vs.sort((a, b) => score(b) - score(a));
-    return vs[0] || null;
-  }
-  if (synth) { chosen = pick(); synth.addEventListener && synth.addEventListener('voiceschanged', () => { chosen = pick(); }); }
-  function stop() { if (cur && cur.pause) { cur.pause(); } cur = null; if (synth) synth.cancel(); Music.duck(false); }
-  function say(text, id) {
-    stop();
-    if (!on) return Promise.resolve(false);
-    return new Promise(res => {
-      const done = ok => { Music.duck(false); res(ok); };
-      if (AUDIO.voice) {
-        const a = new Audio(`${AUDIO.voice}tour-${id}.mp3`); cur = a; a.volume = Math.min(1, Music.vol);
-        a.onended = () => done(true); a.onerror = () => speak(); /* a missing file falls back to the browser voice */
-        Music.duck(true); a.play().catch(() => speak()); return;
-      }
-      speak();
-      function speak() {
-      if (!synth) return done(false);
-      const u = new SpeechSynthesisUtterance(text.replace(/Marcin/g, 'Marsin')); /* said MAR-sin */
-      if (!chosen) chosen = pick();
-      if (chosen) u.voice = chosen;
-      u.rate = 1.02; u.pitch = 1; u.volume = Math.min(1, Music.vol);
-      let fin = false; const end = ok => { if (!fin) { fin = true; done(ok); } };
-      u.onend = () => end(true); u.onerror = () => end(false);
-      setTimeout(() => end(false), 1000 + text.split(' ').length * 520); // never hang on a silent engine
-      Music.duck(true); synth.speak(u);
-      }
-    });
-  }
-  window.__tourVoiceLevel = v => { if (cur && cur.pause) cur.volume = Math.min(1, v); };
-  return { say, stop, get on() { return on; }, set(v) { on = v; prefs.voice = v; savePrefs(); if (!v) stop(); } };
+  let on = prefs.voice === true, unlocking = false;
+  const el = new Audio(); el.preload = 'auto';
+  const pre = new Audio(); pre.preload = 'auto';
+  const src = id => `${AUDIO.voice}tour3-${id}.mp3`;
+  window.__tourVoiceLevel = v => { el.volume = Math.min(1, v); };
+  el.volume = Math.min(1, Music.vol);
+  return {
+    el, src,
+    unlock(id) { /* a muted play inside the click lets later clips play on phones too */
+      unlocking = true;
+      const done = () => { if (unlocking) { unlocking = false; try { el.pause(); } catch (e) {} el.muted = false; } };
+      try { el.src = src(id); el.muted = true; const p = el.play(); if (p && p.then) p.then(done, done); else done(); } catch (e) { done(); }
+    },
+    claim() { unlocking = false; el.muted = false; },
+    preload(id) { if (!on || !id) return; try { pre.src = src(id); pre.load(); } catch (e) {} },
+    stop() { el.onended = el.onerror = null; try { el.pause(); } catch (e) {} },
+    get on() { return on; },
+    set(v) { on = !!v; prefs.voice = on; savePrefs(); },
+  };
 })();
 
-/* ---------------- the tour ---------------- */
+/* ---------------- the audio tour (v69) ----------------
+   One brief narrated drive: an intro at the start, then every stop in order. At each stop the camera
+   drives there, a short line plays, then Stories is offered for a few seconds with a countdown. If the
+   visitor taps it, that stop's stories play one by one, each opening on screen; then the drive goes on.
+   Without voice, the same captions run on a reading timer. */
+const CAPS = {
+ "t00": "Welcome to the Road: 20+ years in automotive, from engine sealing to software strategy in Shanghai. The tour drives itself. At any stop, tap Stories to hear the work behind it.",
+ "s01": "Flint, Michigan, 2003. Marcin studied mechanical engineering at Kettering, a co-op university, alternating school terms with paid engineering terms at Federal-Mogul. He graduated cum laude in 2007 with four years of production experience behind him.",
+ "s01a": "Kettering pairs every academic term with a paid industry term. Marcin graduated cum laude in 2007 with four years of production engineering already done.",
+ "s01b": "Every co-op term was at Federal-Mogul, on engine sealing for GM, Volkswagen, Ford, Cummins and others. He designed and tested seals, and helped finish the 5.7L HEMI cast riser and valve cover gaskets.",
+ "s02": "2007. Federal-Mogul hired Marcin full time, in the middle of a recession. He ran value engineering for the sealing business, then took a new head gasket for the 3.6L Pentastar V6 from mid-development into production.",
+ "s02a": "An earlier Pentastar head gasket design was cracking from fatigue. Marcin designed a new multi-layer steel gasket, proved it on the thermal pulsator test, and took it to production.",
+ "s02b": "As value engineering lead, he brought engineering, sales, operations, purchasing and suppliers together on projects worth $3M a year in savings. A new GM 1.4L head gasket later saved $500k, and the work produced 4 US patent disclosures.",
+ "s03": "2010. Marcin moved to the automaker side at Chrysler Group, and stayed with the same engine. As design release engineer, he owned every sealing part on the Pentastar V6, an engine that went on to pass 10 million built.",
+ "s03a": "He designed and tested the Pentastar head gasket at the supplier, then owned every Pentastar sealing part from inside Chrysler. The engine passed 1 million built 18 months after launch, and 10 million by 2019.",
+ "s03b": "When a supplier quality spill hit the Pentastar rear main seal, Marcin stopped production at a plant rather than ship suspect parts, then re-sourced the seal.",
+ "s03c": "He set one global head gasket supply strategy for Chrysler and Fiat, saving $700k a year, and built a sealing and fastening engineering team.",
+ "s04": "2011, Johnson Controls. Marcin moved from components to complete seat systems for Nissan's Titan and Armada, leading a 12-member cross-functional team. The seats launched ahead of schedule, with 2.2% cost savings per seat.",
+ "s04a": "He owned the front and rear seats for the 2013 to 2015 Titan and Armada end to end, with 2 direct reports, and launched ahead of schedule.",
+ "s04b": "Working with Nissan, he simplified trim-level combinations and saved $240k.",
+ "s05": "At the same time, Marcin earned an MBA in Marketing and Strategy at Michigan Ross in the evenings, while leading Nissan programs full time. It became his bridge from engineering into product strategy and business leadership.",
+ "s05a": "He finished the Ross MBA in 2014, in the evening program, while leading seat programs at Johnson Controls.",
+ "s05b": "For Ross MAP in 2012, he worked on a market entry strategy for IdeaConnection, an open innovation firm in Victoria, British Columbia, spent a week on site, and presented it to the CEO.",
+ "s05c": "The degree opened the door to GM's three-year, up-or-out leadership development program.",
+ "s06": "2014, General Motors. Marcin joined GM's leadership program, starting in Chevrolet product marketing on the Traverse. He trimmed the lineup, priced it to draw more shoppers in, and created the Graphite Edition.",
+ "s06a": "On the 2016 Traverse, he cut build combinations by 10%. For 2017, a 'starting at' price trim lifted consideration 6% at launch.",
+ "s06b": "Behind the leaner lineup was a build complexity tool he built, which showed the combinations buyers actually skipped.",
+ "s07": "Next, Chevrolet Global Customer Experience. Marcin went to Ecuador to learn why its dealers led every GM region in service satisfaction, then partnered with the Disney Institute to build a dealer culture program around what he found.",
+ "s07a": "In Quito and Guayaquil, the answer was simple: customers could watch their car being fixed. That transparency built trust.",
+ "s07b": "Much of that work happened with the Disney Institute in Orlando, building one culture program for Chevrolet dealers around the world.",
+ "s07c": "Back at headquarters, he ran workshops at the Detroit Opera House and managed the budget for the Disney Institute work.",
+ "s08": "2016, Mexico City. On international assignment, Marcin led the national rollout of Business Development Centers, the dealer teams that follow up every sales lead. Six months, 350+ dealer visits, and a promotion at the end of the program.",
+ "s08a": "The rollout covered Mexico City, Guadalajara and Monterrey: 350+ dealer visits and 20 training sessions in six months.",
+ "s08b": "The idea was simple: every sales lead gets a follow-up. Marcin presented the results to GM Mexico's Managing Director.",
+ "s08c": "To make it last beyond the visits, he built a dealer training website and video series.",
+ "s09": "2017. As global product manager for GM's compact and mid crossovers, Marcin brought the US, Canada and Korea onto one content and pricing plan. It cut price decay after the refresh and supported per-vehicle profit gains.",
+ "s09a": "Aligning executives in three countries on one plan cut post-refresh price decay by 5% and supported $200 per-vehicle profit improvements on Equinox and Traverse.",
+ "s09b": "For the next-generation Equinox, he led global customer content workshops, informed by market research in China in 2018.",
+ "s10": "2019. Marcin was product manager for two new Korea-built crossovers, the Buick Encore GX and the Chevrolet Trailblazer. When COVID hit the supply chain, he kept both launches on track.",
+ "s10a": "During the wire-harness shortage, he built a tool that matched builds to demand and harness supply. When the hero color wasn't ready, the show cars got off-line paint, and they arrived on time and under budget.",
+ "s10b": "He added the Encore GX ST Black Roof Package within six months of production start, and built the greenhouse gas model that added a front-wheel-drive Trailblazer ACTIV to the lineup.",
+ "s11": "2020. Marcin moved from hardware to software revenue in Connected and Over-the-Air Services. He grew the strategy team from 2 to 7, built Super Cruise monetization across GM's North American brands, and won approval for a paid driver-assist trial.",
+ "s11a": "He grew the team from 2 to 7 and won executive approval for an in-market trial of paid driver-assist upgrades, a high-margin revenue opportunity of about $30M.",
+ "s11b": "He built the monetization strategy for Super Cruise across every GM brand in North America, then for the next-generation Ultra Cruise.",
+ "s11c": "He also helped shape the over-the-air services behind revenue after the sale, part of GM's 2021 goal of $20 to 25B a year in software and services by 2030.",
+ "s12": "2022, Shanghai. Marcin joined SAIC-GM as Deputy Director of Software Strategy. Chinese buyers now saw technology as the new luxury, and the work was helping a global automaker move at China speed.",
+ "s12a": "He helped form SAIC-GM's software and digital business team of about 2,500 people, through approval by the GM, SAIC and SAIC-GM boards, and co-led a 49-person strategy, insights and research team.",
+ "s12b": "He ran consumer research across Chinese cities on what drivers will pay for in driver assist. The research and pitch supported a nine-figure investment.",
+ "s12c": "In the intelligent cockpit, he shaped an AI 'Model Integrator' strategy that brings voice and vision together.",
+ "s12d": "GM China and SAIC-GM studies showed technology had become the new luxury for Chinese buyers. He helped realign the work and messaging to launch intelligent features faster.",
+ "s13": "2025, back in Michigan with OnStar International. Marcin owned connected services for China-built GM vehicles exported to 8 regions, aligning OnStar, GM's regional teams and the joint venture partners. He also built Portfolio Made Visible, with AI agents.",
+ "s13a": "Each export region, from Mexico and South America to the Middle East, Korea, Israel, Australia and Central Asia, had its own connectivity needs and launch timing.",
+ "s13b": "The plans covered the export portfolio: the Chevrolet Aveo, Spark EUV and Captiva, and the Cadillac XT5.",
+ "s13c": "In August 2026 he kept driver assist in scope with a global strategy workshop on L2, L2+ and L2++. At GM Forward that October, GM said hands-free highway driving will expand: the same space this work covered.",
+ "s13d": "Unprompted and solo, he built Portfolio Made Visible with AI agents. It turns 200+ programs across 50+ markets into any market-year view in seconds, at a fraction of the cost of a retired legacy tool, and grew by word of mouth to 40+ monthly users.",
+ "t99": "That's the drive: 20+ years, one road, and the next chapter still open. Watch the sizzle reel, or get in touch from the top of the page."
+};
 const R = () => window.__road;
-const click = sel => { const e = typeof sel === 'string' ? $(sel) : sel; if (e) e.click(); };
-const hoverOn = (e, on) => { if (!e) return; try { e.dispatchEvent(new PointerEvent(on ? 'pointerenter' : 'pointerleave')); } catch (x) {} };
-const stopIx = id => { const S = (window.ROAD_CONTENT || {}).stops || []; return Math.max(0, S.findIndex(s => s.id === id)); };
+const C = () => window.ROAD_CONTENT || {};
+const STOPS = () => C().stops || [];
+const LAST = () => STOPS().length - 1;            /* the finish */
+const pad2 = n => String(n).padStart(2, '0');
+const quickId = i => (i === 0 ? 't00' : i === LAST() ? 't99' : 's' + pad2(i));
+const storyId = (i, k) => 's' + pad2(i) + 'abcdefgh'[k];
+const nStories = i => (i > 0 && i < LAST() ? ((STOPS()[i] || {}).callouts || []).length : 0);
+const storyLabel = (i, k) => { const c = ((STOPS()[i] || {}).callouts || [])[k]; if (!c) return ''; const t = c.text, j = t.indexOf(': '); return j > 0 ? t.slice(0, j) : t.replace(/\.$/, ''); };
+const placeName = i => { const s = STOPS()[i] || {}, p = (C().profile || {})[s.id]; return p && p.company ? p.company : s.title || ''; };
+const flowMode = () => isPhone() || !R();          /* phones, and the plain list without 3D, scroll the page instead */
+const readMs = t => Math.max(3500, 1200 + t.split(/\s+/).length * 270);
+const WINDOW_MS = 6000;
+const LOG = []; const L = (...a) => { LOG.push([Math.round(performance.now()), ...a]); if (LOG.length > 120) LOG.shift(); };
 
-let theme0 = null;
-const DESK = [
-  { id: 'd01', t: 'Welcome to The Road. Marcin\'s career is laid out as a drive, one stop for each chapter. I\'ll drive it for you. You can skip at any time.', el: '#card' },
-  { id: 'd02', t: 'Start the drive takes you to the first stop. Each stop shows the company, the role, the years and the results.', el: '#card',
-    run: async () => { const b = $('#card [data-act="next"]'); if (b && R().cur === 0) b.click(); else R().go(1); await wait(1500); } },
-  { id: 'd03', t: 'To keep driving, scroll, use the arrow keys, or drag the road. Here\'s the next stop.', el: '#card', note: 'You can also use the round arrow buttons in the bottom-right corner.', hl: ['#step-prev', '#step-next'],
-    run: async () => { for (let i = 0; i < 9; i++) { R().nudge(9); await wait(70); } await wait(1200); } },
-  { id: 'd04', t: 'Each stop has a few short stories. Open one to see the work behind the result. The lettered pins in the scene match the stories.', el: '#card',
-    run: async () => { R().openStory(0); await wait(2600); if (R().story !== null) R().openStory(1); } },
-  { id: 'd05', t: 'The rail on the right is the whole career. Point at it to see each stop, and click to jump. Here\'s business school at Michigan Ross.', el: '#chapters', note: 'Start and End, at the top and bottom of the rail, jump to the first and last stop.', hl: ['#start-btn', '#end-btn'],
-    run: async () => { R().closeStory(); const tk = document.querySelectorAll('#progress .vr-tick')[stopIx('ross')]; hoverOn(tk, true); await wait(1400); hoverOn(tk, false); R().go(stopIx('ross')); await wait(1200); } },
-  { id: 'd06', t: 'For the big picture, zoom out with the minus key, a pinch, or Control and scroll.', el: null,
-    run: async () => { R().setZoom(1); await wait(2400); } },
-  { id: 'd07', t: 'Press plus, or click any chapter, to fly back in.', el: null,
-    run: async () => { R().setZoom(0); await wait(1600); } },
-  { id: 'd08', t: 'The gear opens the settings: sensors, light, zoom, background music, and this tour, so you can replay it any time. Music stays off unless you pick a track.', el: '#ctl-pop',
-    run: async () => { R().setCtl(true); } },
-  { id: 'd09', t: 'The sun and moon button switches between day and dusk.', el: '#light-tog',
-    run: async () => { R().setCtl(true); theme0 = theme0 || root.getAttribute('data-theme'); click('#light-tog'); await wait(2600); if (root.getAttribute('data-theme') !== theme0) click('#light-tog'); } },
-  { id: 'd10', t: 'Up top, you can always reach the Desktop, live demos of tools Marcin built, the timeline, his resume, and how to get in touch.', el: '.bar-links', links: true,
-    run: async () => { R().setCtl(false); } },
-  { id: 'd11', t: 'That\'s the tour. Start the drive whenever you\'re ready.', el: '#card',
-    run: async () => { R().toStart(); await wait(900); } },
-];
-/* v45: the phone tour follows the vertical page. Each line scrolls to what it talks about and
-   rings it in the space between the top bar and the tour box: the welcome card, the first stops
-   one after another, a stop's stories, the day and dusk button, then the Menu with every page.
-   Same recorded lines; the menu step uses the desktop line, which never mentions swiping. */
-let phoneEl = null;
-const barBottom = () => { const b = document.querySelector('.bar'); return b ? b.getBoundingClientRect().bottom : 56; };
-const goTo = el => { /* fits el between the bar and the tour box when it can, else puts its top under the bar */
-  if (!el) return; const r = el.getBoundingClientRect(), box = document.querySelector('.tour-box');
-  const room = (box && !box.hidden ? box.getBoundingClientRect().top : innerHeight) - 12;
-  const at = Math.max(barBottom() + 10, room - r.height);
-  const sc = scroller(), base = sc === document.scrollingElement ? 0 : sc.getBoundingClientRect().top;
-  /* v64: the phone page scrolls inside body, not the window, so window.scrollTo did nothing.
-     With the snap-per-stop phone Road, land on the stop's own snap point. */
-  const sec = root.classList.contains('pd-on') && el.closest('#flow > section');
-  const top = sec ? sec.getBoundingClientRect().top - base + sc.scrollTop : r.top - base + sc.scrollTop - at;
-  sc.scrollTo({ top: Math.max(0, top), behavior: reduced ? 'auto' : 'smooth' }); };
-const scroller = () => { const b = document.body; return b.scrollHeight > b.clientHeight + 1 && /(auto|scroll)/.test(getComputedStyle(b).overflowY) ? b : document.scrollingElement; };
-const stopSec = n => document.querySelectorAll('#flow > section')[n] || null;
-const menuOpen = on => { const sh = document.getElementById('pm-sheet'), bt = document.querySelector('.pm-btn'); if (!sh || !bt) return; if (on === sh.hidden) bt.click(); };
-const PHONE = [
-  { id: 'p01', t: 'Welcome to The Road. Marcin\'s career is laid out as a drive, one stop for each chapter. I\'ll show you around. You can skip at any time.', el: () => phoneEl,
-    run: async () => { phoneEl = document.querySelector('#m-start .fcard'); goTo(phoneEl); await wait(500); } },
-  { id: 'p02', t: 'Scroll down to drive. Each stop shows the company, the role, the years and the results.', el: () => phoneEl,
-    run: async my => { for (let n = 1; n <= 3; n++) { const s = stopSec(n); if (!s) break; phoneEl = s.querySelector('.fcard') || s; goTo(phoneEl); await wait(2200); if (my !== token) return; } } },
-  { id: 'p03', t: 'Each stop lists a few short stories: the work behind the result, with the brands and products involved.', el: () => phoneEl,
-    run: async () => { const s = stopSec(3) || stopSec(1); const d = s && (s.querySelector('.pd-foot') || s.querySelector('.card-callouts') || s.querySelector('.fcard')); phoneEl = d; goTo(d); await wait(1000); } },
-  { id: 'p04', t: 'The moon button switches between day and dusk.', el: '#theme-btn',
-    run: async () => { theme0 = theme0 || root.getAttribute('data-theme'); click('#theme-btn'); await wait(2400); if (root.getAttribute('data-theme') !== theme0) click('#theme-btn'); } },
-  { id: 'd10', t: 'Up top, you can always reach the Desktop, live demos of tools Marcin built, the timeline, his resume, and how to get in touch.', el: '#pm-sheet', links: true, menu: true,
-    run: async () => { menuOpen(true); await wait(400); } },
-  { id: 'p06', t: 'That\'s the tour. Scroll down to start the drive.', el: () => phoneEl,
-    run: async () => { phoneEl = document.querySelector('#m-start .fcard'); goTo(phoneEl); await wait(700); } },
-];
+let ui = null, running = false, paused = false, token = 0, raf = 0, lastFocus = null;
+let lastCur = -1, at = 0, phase = '', storyK = -1, unit = null, only = false, capsOn = prefs.captions !== false, driving = false;
 
-let ui = null, ring = null, steps = [], at = -1, running = false, paused = false, timer = null, token = 0, raf = 0, lastFocus = null;
+/* a unit is one caption: a voice clip, or a reading timer. It can be paused, skipped or cancelled. */
+function runUnit(id, kind) {
+  return new Promise(res => {
+    const u = { id, kind, res, done: false, audio: false, left: 0, total: 0, t0: 0, timer: 0 };
+    unit = u;
+    const timed = ms => { u.audio = false; u.total = u.left = ms; startTimer(u); };
+    if (kind === 'window') timed(WINDOW_MS);
+    else if (Voice.on) {
+      const a = Voice.el; u.audio = true;
+      a.onended = () => finish(u, true);
+      a.onerror = () => { if (unit === u && !u.done) timed(readMs(CAPS[id] || '')); };
+      Voice.claim(); a.src = Voice.src(id);
+      if (!paused) a.play().catch(() => { if (unit === u && !u.done && !paused) timed(readMs(CAPS[id] || '')); });
+    } else timed(readMs(CAPS[id] || ''));
+  });
+}
+function startTimer(u) { clearTimeout(u.timer); u.t0 = performance.now(); if (!paused) u.timer = setTimeout(() => finish(u, true), u.left); }
+function finish(u, ok) { if (!u.done) L('finish', u.id || u.kind, ok); if (u.done) return; u.done = true; clearTimeout(u.timer); if (u.audio) Voice.stop(); if (unit === u) unit = null; u.res(ok); }
+function cancelUnit() { if (unit) finish(unit, false); }
+function skipUnit() { if (unit) finish(unit, true); }
+function pauseUnit() { if (!unit) return; if (unit.audio) Voice.el.pause(); else { clearTimeout(unit.timer); unit.left = Math.max(0, unit.left - (performance.now() - unit.t0)); } }
+function resumeUnit() { if (!unit) return; if (unit.audio) Voice.el.play().catch(() => {}); else startTimer(unit); }
+function unitProgress() {
+  if (!unit) return null;
+  if (unit.audio) { const a = Voice.el; return a.duration ? Math.min(1, a.currentTime / a.duration) : 0; }
+  const gone = unit.total - unit.left + (paused ? 0 : performance.now() - unit.t0);
+  return Math.min(1, Math.max(0, gone / unit.total));
+}
+const waitPlay = my => new Promise(r => { const t = () => (my !== token ? r(false) : paused ? setTimeout(t, 120) : r(true)); t(); });
 
+/* ---------- driving ---------- */
+const flowSec = i => { const s = STOPS()[i]; return s ? document.getElementById('m-' + s.id) : null; };
+async function driveTo(i, my) {
+  driving = true;
+  try {
+    if (flowMode()) {
+      const sec = flowSec(i);
+      if (sec) sec.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+      await wait(reduced ? 150 : 900);
+      return;
+    }
+    const r = R();
+    if (r.story !== null) r.closeStory();
+    if (r.zoom) r.setZoom(0);
+    if (i === 0) { if (r.cur !== 0) r.toStart(); }
+    else if (r.cur !== i) {
+      if (r.cur === 0) { const b = document.querySelector('#card [data-act="next"]'); if (b && i === 1) b.click(); else r.go(i); }
+      else r.go(i);
+    }
+    const t0 = performance.now(), card = $('#card');
+    while (performance.now() - t0 < 6500) {
+      if (my !== token) return;
+      if (r.cur === i && card && !card.classList.contains('out')) break;
+      await wait(80);
+    }
+    await wait(reduced ? 60 : 350);
+  } finally { driving = false; }
+}
+
+/* ---------- the script ---------- */
+async function runFrom(i, opts = {}) {
+  const my = ++token; L('runFrom', i, JSON.stringify(opts), phase);
+  cancelUnit(); paused = false; syncPause();
+  for (let s = i; s <= LAST(); s++) {
+    if (my !== token) return;
+    const go = await visit(s, my, s === i ? opts : {});
+    if (!go || my !== token) return;
+  }
+}
+async function visit(i, my, opts) {
+  at = i; storyK = -1; only = false; phase = 'drive'; head();
+  await driveTo(i, my);
+  if (my !== token || !(await waitPlay(my))) return false;
+  const n = nStories(i);
+  let want = opts.story != null;
+  if (!want) {
+    phase = 'quick'; head(); caption(quickId(i));
+    Voice.preload(n ? storyId(i, 0) : quickId(i + 1));
+    const ok = await runUnit(quickId(i), 'quick');
+    if (my !== token) return false;
+    if (!ok) return false;
+    if (i === LAST()) { outro(); return false; }
+    if (!n) return true;
+    phase = 'window'; head();
+    const w = await runUnit('', 'window');
+    if (my !== token) return false;
+    if (!w) return false;
+    want = phase === 'stories';
+    if (!want) return true;
+  }
+  /* the stories, one after another, or just the one the visitor picked */
+  only = !!opts.only;
+  for (let k = opts.story || 0; k < n; k++) {
+    if (my !== token) return false;
+    storyK = k; phase = 'stories'; head(); caption(storyId(i, k));
+    if (!flowMode()) { R().openStory(k); }
+    Voice.preload(k + 1 < n ? storyId(i, k + 1) : quickId(i + 1));
+    const ok = await runUnit(storyId(i, k), 'story');
+    if (my !== token) return false;
+    if (!ok) return false;
+    if (only) break;
+    if (!(await waitPlay(my))) return false;
+  }
+  storyK = -1;
+  if (!flowMode() && R().story !== null) R().closeStory();
+  if (only) { /* after a picked story, offer the rest again before driving on */
+    only = false; phase = 'window'; head(); caption(quickId(i), true);
+    const w = await runUnit('', 'window');
+    if (my !== token || !w) return false;
+    if (phase === 'stories') return visit(i, my, { story: 0 });
+  }
+  return true;
+}
+function outro() {
+  phase = 'end'; head();
+  const b = document.querySelector('#card .fin-reel-btn, #flow [data-mfreel], #flow .reel');
+  if (b) b.classList.add('tour-pulse');
+}
+
+/* ---------- the tour box ---------- */
+const ICON_CC = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10.5 10.2a2.2 2.2 0 1 0 0 3.6M17 10.2a2.2 2.2 0 1 0 0 3.6"/></svg>';
+const ICON_VOICE = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H3v6h3l5 4z"/><path class="w" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/><path class="x" d="M16 9l5 6M21 9l-5 6"/></svg>';
 function build() {
   if (ui) return;
-  ring = document.createElement('div'); ring.className = 'tour-ring'; ring.setAttribute('aria-hidden', 'true');
-  ui = document.createElement('div'); ui.className = 'tour-box'; ui.setAttribute('role', 'dialog'); ui.setAttribute('aria-label', 'Tour of The Road'); ui.hidden = true;
-  ui.innerHTML = `<div class="tb-top"><span class="tb-n" id="tb-n"></span><div class="tb-bar"><i id="tb-fill"></i></div>
-    <button type="button" class="tb-ic" id="tb-voice" aria-pressed="true" aria-label="Voice on" title="Voice"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5L6 9H3v6h3l5 4z"/><path class="w" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/><path class="x" d="M16 9l5 6M21 9l-5 6"/></svg></button>
-    <button type="button" class="tb-ic" id="tb-x" aria-label="End the tour" title="End the tour">×</button></div>
+  ui = document.createElement('div'); ui.className = 'tour-box tour3'; ui.setAttribute('role', 'region'); ui.setAttribute('aria-label', 'Audio tour of The Road'); ui.hidden = true;
+  ui.innerHTML = `<div class="tb-top"><span class="tb-n" id="tb-n"></span><span class="tb-where" id="tb-where"></span><div class="tb-bar"><i id="tb-fill"></i></div>
+    <button type="button" class="tb-ic" id="tb-cc" aria-pressed="true" aria-label="Captions" title="Captions">${ICON_CC}</button>
+    <button type="button" class="tb-ic" id="tb-voice" aria-pressed="true" aria-label="Voice" title="Voice">${ICON_VOICE}</button>
+    <button type="button" class="tb-ic" id="tb-x" aria-label="End the tour" title="End the tour (Esc)">×</button></div>
+    <p class="tb-sub" id="tb-sub" hidden></p>
     <p class="tb-t" id="tb-t" aria-live="polite"></p>
-    <p class="tb-note" id="tb-note" hidden></p>
-    <div class="tb-acts"><button type="button" class="tb-btn" id="tb-back">Back</button><button type="button" class="tb-btn" id="tb-pause" aria-pressed="false">Pause</button><button type="button" class="tb-btn primary" id="tb-next">Next</button></div>`;
-  document.body.append(ring, ui);
+    <div class="tb-acts"><button type="button" class="tb-btn" id="tb-back" title="Back (←)">Back</button><button type="button" class="tb-btn" id="tb-pause" aria-pressed="false" title="Pause (Space)">Pause</button>
+      <button type="button" class="tb-btn tb-stories" id="tb-stories" title="Stories (S)"><svg class="tb-cd" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><circle cx="10" cy="10" r="8"/><circle class="cd" cx="10" cy="10" r="8" pathLength="100"/></svg><span id="tb-stories-l">Stories</span></button>
+      <button type="button" class="tb-btn primary" id="tb-next" title="Next (→)">Next stop</button></div>`;
+  document.body.append(ui);
   $('#tb-x').addEventListener('click', () => end());
-  $('#tb-next').addEventListener('click', () => (at >= steps.length - 1 ? end() : show(at + 1)));
-  $('#tb-back').addEventListener('click', () => show(Math.max(0, at - 1)));
-  $('#tb-pause').addEventListener('click', () => { paused = !paused; syncPause(); if (paused) { clearTimeout(timer); Voice.stop(); fillTo(null); } else show(at); });
-  $('#tb-voice').addEventListener('click', () => { Voice.set(!Voice.on); syncVoice(); syncMenu(); if (Voice.on && !paused) show(at); });
+  $('#tb-next').addEventListener('click', next);
+  $('#tb-back').addEventListener('click', back);
+  $('#tb-pause').addEventListener('click', togglePause);
+  $('#tb-stories').addEventListener('click', stories);
+  $('#tb-voice').addEventListener('click', () => { Voice.set(!Voice.on); syncVoice(); syncMenu(); replay(); });
+  $('#tb-cc').addEventListener('click', () => { capsOn = !capsOn; prefs.captions = capsOn; savePrefs(); syncCaps(); });
   addEventListener('keydown', e => {
-    if (!running) return;
-    if (e.key === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); end(); }
+    if (!running || e.ctrlKey || e.metaKey || e.altKey) return;
+    const t = e.target && e.target.closest ? e.target : null;
+    if (t && t.closest('input, select, textarea, [contenteditable]')) return;
+    const own = t && ui.contains(t) && t.closest('button');
+    if (own && (e.key === ' ' || e.key === 'Enter')) { e.stopImmediatePropagation(); return; } /* the focused tour button clicks itself */
+    let hit = true;
+    if (e.key === 'Escape') end();
+    else if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown') next();
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') back();
+    else if (e.key === ' ' || e.key === 'Spacebar') togglePause();
+    else if (e.key === 's' || e.key === 'S') stories();
+    else hit = false;
+    if (hit) { e.preventDefault(); e.stopImmediatePropagation(); }
   }, true);
+  /* a story picked on screen during the tour plays just that story */
+  document.addEventListener('click', e => {
+    if (!running || at <= 0 || at >= LAST()) return;
+    const m = e.target.closest && e.target.closest('#markers .marker, .marker, #card .item, #card .story-tabs button, #card .story-next');
+    if (!m || !m.closest('#card, #markers, .markers, body')) return;
+    let k = m.dataset && m.dataset.k != null && m.dataset.k !== '' ? +m.dataset.k : NaN;
+    if (isNaN(k) && m.classList.contains('marker')) k = parseInt(m.textContent, 10) - 1;
+    if (isNaN(k) || k < 0 || k >= nStories(at)) return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    runFrom(at, { story: k, only: true });
+  }, true);
+  /* driving the road by hand pauses the tour where the visitor stopped */
+  const handDrive = e => { if (!running || paused || !flowMode() || !ui || ui.contains(e.target)) return; if (e.target.closest && e.target.closest('.bar, .ctl-pop, .pd-sheet, .pm-sheet, #reel-pop, .reel-pop')) return; pauseTour(); };
+  addEventListener('wheel', handDrive, { passive: true, capture: true });
+  addEventListener('touchmove', handDrive, { passive: true, capture: true });
+  document.addEventListener('visibilitychange', () => { if (document.hidden && running) pauseTour(); });
 }
-function syncPause() { const b = $('#tb-pause'); b.textContent = paused ? 'Play' : 'Pause'; b.setAttribute('aria-pressed', String(paused)); }
-function syncVoice() { const b = $('#tb-voice'); if (!b) return; b.setAttribute('aria-pressed', String(Voice.on)); b.setAttribute('aria-label', Voice.on ? 'Voice on' : 'Voice off'); b.classList.toggle('off', !Voice.on); }
-function fillTo(ms) { const f = $('#tb-fill'); if (!f) return; f.style.transition = 'none'; f.style.width = '0%'; if (ms) { void f.offsetWidth; f.style.transition = `width ${ms}ms linear`; f.style.width = '100%'; } }
+function caption(id, keep) { const t = $('#tb-t'); if (t && !keep) t.textContent = CAPS[id] || ''; }
+function head() {
+  if (!ui) return;
+  const last = LAST(), n = nStories(at);
+  $('#tb-n').textContent = at === 0 ? 'Intro' : at === last ? 'The finish' : `Stop ${at} of ${last - 1}`;
+  $('#tb-where').textContent = at === 0 || at === last ? '' : placeName(at);
+  const sub = $('#tb-sub');
+  if (phase === 'stories' && storyK >= 0) { sub.textContent = `Story ${storyK + 1} of ${n} · ${storyLabel(at, storyK)}`; sub.hidden = false; }
+  else sub.hidden = true;
+  const sb = $('#tb-stories'), sl = $('#tb-stories-l');
+  sb.hidden = !n || phase === 'end';
+  sb.classList.toggle('ask', phase === 'window');
+  sl.textContent = phase === 'stories' ? 'Back to the drive' : phase === 'window' ? `Hear the stories (${n})` : `Stories (${n})`;
+  const nx = $('#tb-next');
+  nx.textContent = phase === 'end' || at === last ? 'Done' : phase === 'stories' && storyK < n - 1 && !only ? 'Next story' : at === 0 ? 'Start' : at === last - 1 ? 'To the finish' : 'Next stop';
+  $('#tb-back').disabled = at === 0 && phase !== 'stories';
+  $('#tb-pause').hidden = phase === 'end';
+  ui.classList.toggle('at-end', phase === 'end');
+}
+function syncPause() { const b = $('#tb-pause'); if (!b) return; b.textContent = paused ? 'Play' : 'Pause'; b.setAttribute('aria-pressed', String(paused)); if (ui) ui.classList.toggle('paused', paused); }
+function syncVoice() { const b = $('#tb-voice'); if (!b) return; b.setAttribute('aria-pressed', String(Voice.on)); b.setAttribute('aria-label', Voice.on ? 'Voice on' : 'Voice off'); b.classList.toggle('off', !Voice.on); syncCaps(); }
+function syncCaps() { const b = $('#tb-cc'); if (!b) return; const show = capsOn || !Voice.on; b.setAttribute('aria-pressed', String(show)); b.classList.toggle('off', !show); b.disabled = !Voice.on; ui.classList.toggle('nocap', !show); }
 
-function target(st) { const e = typeof st.el === 'function' ? st.el() : st.el ? $(st.el) : null; return e && e.offsetParent !== null || (e && getComputedStyle(e).position === 'fixed') ? e : null; }
+/* ---------- controls ---------- */
+function next() {
+  L('next', at, phase, storyK);
+  if (phase === 'end' || at >= LAST()) return end();
+  if (phase === 'stories' && storyK < nStories(at) - 1 && !only) { if (paused) { paused = false; syncPause(); } return skipUnit(); }
+  if (phase === 'window' && only) { only = false; }
+  runFrom(Math.min(LAST(), at + 1));
+}
+function back() {
+  L('back', at, phase, storyK);
+  if (phase === 'stories' && storyK > 0) return runFrom(at, { story: storyK - 1 });
+  if (phase === 'stories' || phase === 'window') return runFrom(at);
+  runFrom(Math.max(0, at - 1));
+}
+function stories() {
+  L('stories', at, phase, storyK, paused);
+  const n = nStories(at); if (!n || phase === 'end') return;
+  if (phase === 'stories') return runFrom(Math.min(LAST(), at + 1));
+  if (phase === 'window' && unit && !paused) { phase = 'stories'; return skipUnit(); }
+  runFrom(at, { story: 0 });
+}
+function pauseTour() { L('pause', at, phase); if (paused || phase === 'end') return; paused = true; syncPause(); pauseUnit(); }
+function togglePause() {
+  if (phase === 'end') return;
+  if (!paused) return pauseTour();
+  paused = false; syncPause();
+  /* if the visitor drove elsewhere while paused, pick up from where they are */
+  if (!flowMode() && R().cur !== at && !driving) return runFrom(R().cur);
+  if (unit) resumeUnit(); else if (phase === 'drive') {} else runFrom(at);
+}
+function replay() { /* voice switched mid-step: say the same thing again the new way */
+  if (!running || phase === 'end' || phase === 'drive') return;
+  if (phase === 'window') return;
+  runFrom(at, phase === 'stories' ? { story: storyK, only } : {});
+}
+
 function place() {
   if (!running) return;
-  const st = steps[at], e = st && target(st);
-  if (e) {
-    const r = e.getBoundingClientRect(), p = 6;
-    let top = r.top - p, bot = r.bottom + p;
-    if (isPhone() && !e.closest('.bar, #pm-sheet')) { top = Math.max(top, barBottom() + 4); bot = Math.min(bot, ui.getBoundingClientRect().top - 8); }
-    if (r.width && r.height && bot - top > 20 && !e.classList.contains('out')) { /* v51: no ring around a card that is hidden mid-flight */
-      ring.style.cssText = `left:${r.left - p}px;top:${top}px;width:${r.width + p * 2}px;height:${bot - top}px`;
-      ring.classList.add('on');
-    } else ring.classList.remove('on');
-  } else ring.classList.remove('on');
   if (!isPhone()) {
     const c = $('#card'), rail = $('#chapters');
     const cr = c && c.offsetParent !== null ? c.getBoundingClientRect() : { right: 16 };
     const rl = rail && rail.offsetParent !== null ? rail.getBoundingClientRect().left : innerWidth;
-    const w = Math.min(440, innerWidth - 32);
+    const w = Math.min(460, innerWidth - 32);
     let left = (Math.max(cr.right, 16) + rl) / 2 - w / 2;
     left = Math.max(16, Math.min(left, innerWidth - w - 16));
     ui.style.left = left + 'px'; ui.style.width = w + 'px';
   } else { ui.style.left = ''; ui.style.width = ''; }
+  const p = unitProgress(), f = $('#tb-fill');
+  if (unit && unit.kind === 'window') {
+    const cd = ui.querySelector('.tb-cd .cd'); if (cd) cd.style.strokeDashoffset = String(100 * (p || 0));
+  } else if (f && p != null) f.style.width = (p * 100).toFixed(1) + '%';
+  /* the visitor drove the road by hand: pause where they stopped */
+  if (!flowMode()) { const rc = R().cur; if (!driving && !paused && phase !== 'end' && rc !== lastCur && rc !== at) pauseTour(); lastCur = rc; }
   raf = requestAnimationFrame(place);
 }
 
-async function show(i) {
-  const my = ++token;
-  clearTimeout(timer); Voice.stop();
-  at = i; const st = steps[i];
-  $('#tb-n').textContent = `${i + 1} of ${steps.length}`;
-  $('#tb-t').textContent = st.t;
-  $('#tb-back').disabled = i === 0;
-  $('#tb-next').textContent = i === steps.length - 1 ? 'Done' : 'Next';
-  root.querySelectorAll('.tour-hl').forEach(x => x.classList.remove('tour-hl'));
-  { const n = $('#tb-note'); if (n) { n.textContent = st.note || ''; n.hidden = !st.note; } }
-  (st.hl || []).forEach(q => { const e = $(q); if (e) e.classList.add('tour-hl'); });
-  const t0 = performance.now();
-  const spoken = paused ? Promise.resolve(false) : Voice.say(st.t, st.id);
-  const words = st.t.split(/\s+/).length;
-  const readMs = Math.max(3800, words * 300);
-  fillTo(paused ? null : readMs);
-  if (isPhone() && !st.menu) menuOpen(false);
-  try { if (st.run) await st.run(my); } catch (e) {}
-  if (my !== token) return;
-  if (st.links) {
-    const sheetOn = isPhone() && document.getElementById('pm-sheet') && !document.getElementById('pm-sheet').hidden;
-    for (const a of document.querySelectorAll(sheetOn ? '#pm-sheet a' : '.bar-links > a')) {
-      if (my !== token) return;
-      a.classList.add('tour-hl');
-      await wait(sheetOn ? 900 : 650); a.classList.remove('tour-hl');
-    }
-  }
-  if (paused || my !== token) return;
-  const ok = await spoken;
-  if (my !== token || paused) return;
-  const left = Math.max(ok ? 700 : 0, readMs - (performance.now() - t0));
-  if (ok) fillTo(left);
-  timer = setTimeout(() => { if (my === token && !paused) (at >= steps.length - 1 ? end() : show(at + 1)); }, left);
-}
-
-function begin() {
-  if (!R() || running) { if (!R()) startNoGL(); return; }
+function begin(withVoice) {
+  if (typeof withVoice === 'boolean') Voice.set(withVoice);
   build();
-  lastFocus = document.activeElement;
-  steps = isPhone() ? PHONE : DESK;
-  running = true; paused = false; theme0 = root.getAttribute('data-theme'); syncPause(); syncVoice();
+  if (Voice.on) Voice.unlock('t00');
+  if (!running) lastFocus = document.activeElement;
+  running = true; paused = false;
   root.classList.add('touring');
-  if (!isPhone()) { R().setCtl(false); R().closeStory(); R().setZoom(0); if (R().cur !== 0) R().toStart(); }
-  else scroller().scrollTo({ top: 0 });
-  ui.hidden = false; cancelAnimationFrame(raf); place();
-  show(0);
+  if (!flowMode()) { R().setCtl(false); R().closeStory(); R().setZoom(0); }
+  document.querySelectorAll('.tour-pulse').forEach(x => x.classList.remove('tour-pulse'));
+  ui.hidden = false; syncPause(); syncVoice(); syncMenu();
+  cancelAnimationFrame(raf); place();
+  runFrom(0);
   setTimeout(() => $('#tb-next').focus({ preventScroll: true }), 50);
-}
-function startNoGL() { /* the plain list version has nothing to drive; the tour starts on the phone steps */
-  if (running) return; build(); steps = PHONE; running = true; paused = false; theme0 = root.getAttribute('data-theme'); syncPause(); syncVoice();
-  root.classList.add('touring'); ui.hidden = false; place(); show(0);
 }
 function end() {
   if (!running) return;
-  token++; clearTimeout(timer); Voice.stop(); cancelAnimationFrame(raf);
-  running = false; ui.hidden = true; ring.classList.remove('on'); root.classList.remove('touring');
-  if (isPhone()) menuOpen(false);
-  root.querySelectorAll('.tour-hl').forEach(x => x.classList.remove('tour-hl'));
-  if (theme0 && root.getAttribute('data-theme') !== theme0) click('#theme-btn');
-  theme0 = null;
-  if (R() && !isPhone()) { R().setCtl(false); R().setZoom(0); }
+  token++; cancelUnit(); Voice.stop(); cancelAnimationFrame(raf);
+  running = false; paused = false; phase = ''; ui.hidden = true; root.classList.remove('touring');
+  document.querySelectorAll('.tour-pulse').forEach(x => x.classList.remove('tour-pulse'));
+  if (!flowMode() && R().story !== null) R().closeStory();
   if (lastFocus && lastFocus.focus && document.contains(lastFocus)) lastFocus.focus({ preventScroll: true });
 }
 
-/* any "Show me around" button, on the first card or in the settings menu */
+/* the tour buttons: data-voice="1" with voice, "0" without, none keeps the last choice */
 document.addEventListener('click', e => {
   const b = e.target.closest && e.target.closest('[data-act="tour"]');
   if (!b) return;
   e.preventDefault(); e.stopPropagation();
-  begin();
+  const v = b.dataset.voice;
+  begin(v === '1' ? true : v === '0' ? false : undefined);
 });
 
 /* ---------------- settings menu: music and voice ---------------- */
@@ -382,8 +535,8 @@ document.querySelectorAll('#music-seg button').forEach(b => b.addEventListener('
   const go = () => { removeEventListener('pointerdown', go, true); removeEventListener('keydown', go, true); if (Music.track < 0) { Music.set(t); syncMenu(); } };
   addEventListener('pointerdown', go, true); addEventListener('keydown', go, true);
 })();
-document.querySelectorAll('#voice-seg button').forEach(b => b.addEventListener('click', () => { Voice.set(b.dataset.v === '1'); syncMenu(); syncVoice(); }));
+document.querySelectorAll('#voice-seg button').forEach(b => b.addEventListener('click', () => { Voice.set(b.dataset.v === '1'); syncMenu(); syncVoice(); replay(); }));
 const vol = $('#music-vol'); if (vol) vol.addEventListener('input', () => Music.setVol(vol.value / 100));
 syncMenu();
 
-window.__tour = { begin, end, get running() { return running; }, get step() { return at; }, music: Music, voice: Voice };
+window.__tour = { begin, end, get running() { return running; }, get stop() { return at; }, get phase() { return phase; }, get story() { return storyK; }, get paused() { return paused; }, log: LOG, music: Music, voice: Voice };
