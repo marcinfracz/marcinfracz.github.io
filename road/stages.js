@@ -3,10 +3,10 @@
    camera has landed on that stop and 0 when it is far away. */
 import { THREE, reg, mat, ownMat, glowMat, mesh, at, box, cyl, sph, grp, label, canvasTex, tok, smooth, clamp, lerp, roadZ } from './core.js';
 import * as CORE from './core.js';
-import { vehicleGeo } from './world.js?v=56';
+import { vehicleGeo } from './world.js?v=76';
 import { drawFlag, drawMark, onLogo } from './marks.js?v=28';
-import { buildPark } from './park.js?v=75';
-import { ketteringAB, bulldog, bulldogPoster, rossBuilding, burOak, blockMSign, wavingFlag, wave, signPanel, MAIZE, BLUE } from './landmarks.js?v=56';
+import { buildPark } from './park.js?v=76';
+import { ketteringAB, bulldog, bulldogPoster, rossBuilding, burOak, blockMSign, wavingFlag, wave, signPanel, MAIZE, BLUE } from './landmarks.js?v=76';
 
 const pin = (parent, x, y, z) => { const o = new THREE.Object3D(); o.position.set(x, y, z); parent.add(o); return o; };
 const vmesh = (type, s = 1, key = 'obj') => { const m = mesh(vehicleGeo(type), mat(key, { vertexColors: true })); m.scale.setScalar(s); return m; };
@@ -452,8 +452,10 @@ B.traverse = () => {
   const lTc2 = label('Eero Saarinen, 1956 · National Historic Landmark', { size: 19, key: 'ink', bg: 'card', scale: 0.85 }); lTc2.position.set(LX - 4, 12.3, LZ - 6); tc.add(lTc2);
 
   // the Milford Proving Ground: the road course loop, the Black Lake pad and test cars
-  const mpg = new THREE.Group(); g.add(mpg);
-  const MX = 15, MZ = -62, MW = 50, MD = 20;
+  // round 76: pushed further back and turned a little, so it reads as background behind the Tech Center
+  const MX = 8, MZ = -92, MW = 50, MD = 20, MROT = 0.22;
+  const mpgPivot = new THREE.Group(); mpgPivot.position.set(MX, 0, MZ); mpgPivot.rotation.y = MROT; g.add(mpgPivot);
+  const mpg = new THREE.Group(); mpg.position.set(-MX, 0, -MZ); mpgPivot.add(mpg);
   const loop = mesh(extrude(ringShape(MW, MD, 8, MW - 3.4, MD - 3.4, 6.4), 0.08), mat('road'), false);
   loop.rotation.x = -Math.PI / 2; loop.position.set(MX, 0.05, MZ); mpg.add(loop);
   const pad = box(16, 0.06, 7.5, 'objDark', MX + 6, 0, MZ); mpg.add(pad);
@@ -461,7 +463,7 @@ B.traverse = () => {
   const path = roundedRect(MW - 1.7, MD - 1.7, 7.2).getSpacedPoints(240);
   const testCars = ['sedan', 'suv', 'pickup', 'compact'].map((ty, i) => { const c = vmesh(ty, 0.8, i % 2 ? 'objDark' : 'obj'); mpg.add(c); return c; });
   const drift = vmesh('sedan', 0.75); mpg.add(drift);
-  const lMpg = label('MILFORD PROVING GROUND · GM test track since 1924', { size: 22, key: 'ink', bg: 'card', scale: 1.05, weight: 800 }); lMpg.position.set(MX - 8, 8, MZ + 2); mpg.add(lMpg);
+  const lMpg = label('MILFORD PROVING GROUND · GM test track since 1924', { size: 22, key: 'ink', bg: 'card', scale: 1.05, weight: 800 }); lMpg.position.set(MX + 6, 6, MZ); mpg.add(lMpg);
   return {
     group: g, anchors: { car: pin(car, 0, 2.6, 0), tool: pin(mon, 0, 5.2, 0) },
     update(t, k) {

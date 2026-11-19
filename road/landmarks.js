@@ -699,7 +699,7 @@ const PEOPLE = ['#E3E8EE', '#4A5563', '#C9693C', '#2563EB', '#8C97A6', '#D9B46A'
 export const CTC = { x: 458, u: 58, r: 36, sign: 449 };
 /* round 28: flat ground behind the Warren stop for the GM Global Technical Center and,
    behind it, the Milford Proving Ground (stage x from -13 to 42, depth 28 to 96) */
-export const GMTC = { x: null, a: -13, b: 42, u0: 28, u1: 96 };
+export const GMTC = { x: null, a: -13, b: 42, u0: 28, u1: 136 };
 function gmtcFlat(x, z) {
   if (GMTC.x == null) return 0;
   const dx = x - GMTC.x, u = roadZ(x) - z;
