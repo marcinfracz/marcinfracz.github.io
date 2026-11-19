@@ -1106,3 +1106,12 @@ html { overflow: hidden; }
 .fin-dot:hover, .fin-dot:focus-visible { background: var(--c); color: #fff; outline: none; }
 .fin-foot { flex-wrap: wrap; row-gap: 8px; }
 @media (max-width: 1280px) { .fin-dots { gap: 4px; } .fin-dot { width: 20px; height: 20px; font-size: 10px; } }
+
+/* v75 phone tour: Back and Pause icons sit dead center in their circles (the hidden label no longer pushes them up) */
+@media (max-width: 767px) {
+  html.touring.pd-on .tour3 #tb-back, html.touring.pd-on .tour3 #tb-pause { position: relative; display: inline-block; height: 40px; min-height: 40px; line-height: 0; color: transparent; }
+  html.touring.pd-on .tour3 #tb-back::before, html.touring.pd-on .tour3 #tb-pause::before { position: absolute; left: 50%; top: 50%; margin: 0; color: var(--ink); }
+  html.touring.pd-on .tour3 #tb-back::before { transform: translate(-30%, -50%) rotate(45deg); }
+  html.touring.pd-on .tour3 #tb-pause::before { transform: translate(-50%, -50%); }
+  html.touring.pd-on .tour3 #tb-pause[aria-pressed="true"]::before { transform: translate(-38%, -50%); }
+}
