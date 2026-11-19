@@ -142,7 +142,8 @@ const Voice = (() => {
   let on = prefs.voice === true, unlocking = false;
   const el = new Audio(); el.preload = 'auto';
   const pre = new Audio(); pre.preload = 'auto';
-  const src = id => `${AUDIO.voice}tour3-${id}.mp3`;
+  const REV = { t99: '-v2' };
+  const src = id => `${AUDIO.voice}tour3-${id}${REV[id] || ''}.mp3`;
   window.__tourVoiceLevel = v => { el.volume = Math.min(1, v); };
   el.volume = Math.min(1, Music.vol);
   return {
@@ -215,7 +216,7 @@ const CAPS = {
  "s13b": "The plans covered the export portfolio: the Chevrolet Aveo, Spark EUV and Captiva, and the Cadillac XT5.",
  "s13c": "In August 2026 he kept driver assist in scope with a global strategy workshop on L2, L2+ and L2++. At GM Forward that October, GM said hands-free highway driving will expand: the same space this work covered.",
  "s13d": "Unprompted and solo, he built Portfolio Made Visible with AI agents. It turns 200+ programs across 50+ markets into any market-year view in seconds, at a fraction of the cost of a retired legacy tool, and grew by word of mouth to 40+ monthly users.",
- "t99": "That's the drive: 20+ years, one road, and the next chapter still open. Watch the sizzle reel, or get in touch from the top of the page."
+ "t99": "That's the drive: 20+ years, one road, and the next chapter still open. Press Meet Marcin to watch the video, or get in touch from the top of the page."
 };
 const R = () => window.__road;
 const C = () => window.ROAD_CONTENT || {};
