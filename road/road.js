@@ -722,14 +722,17 @@ function start() {
         return;
       }
       if (s.id === 'finale') {
-        /* round 27: the finish: the photo again, the whole road in one list, and the ways to reach him */
-        h = `<div class="hero fin"><span class="hero-photo sm"><img src="${HEADSHOT}" alt="Marcin Fracz"></span><div class="hero-txt"><p class="fin-name">Marcin Fracz</p><p class="kicker">${esc(s.kicker || '')}</p><h1>${esc(s.title)}</h1></div></div>`
-          + (s.role ? `<p class="role">${esc(s.role)}</p>` : '')
-          + '<ol class="fin-eras">' + ERAS.map(e => `<li style="--c:${e.color}"><button type="button" data-era="${e.id}"><span class="n">${e.n}</span><b>${esc(e.name)}</b><i>${esc(e.years)}</i></button></li>`).join('') + '</ol>'
+        /* v74: the finish as an executive closing card: name and title, open to new roles, the ways to reach him, chapters as a quiet row */
+        const DOT = ERAS.map(e => `<button type="button" class="fin-dot" data-era="${e.id}" style="--c:${e.color}" title="${esc(e.name)}, ${esc(e.years)}" aria-label="${esc(e.name)}, ${esc(e.years)}">${e.n}</button>`).join('');
+        h = `<div class="fin-head"><span class="hero-photo fin-photo"><img src="${HEADSHOT}" alt="Marcin Fracz"></span><div class="fin-id"><p class="fin-name">Marcin Fracz</p><p class="fin-title">${esc((STOPS[0] && STOPS[0].tag) || '')}</p></div></div>`
+          + `<p class="fin-status"><span class="fin-live" aria-hidden="true"></span>${esc(s.kicker || 'Open to new roles')}</p>`
+          + `<h1 class="fin-h">${esc(s.title)}</h1>`
+          + (s.role ? `<p class="fin-role">${esc(s.role)}</p>` : '')
           + (s.what ? `<p class="fin-what">${esc(s.what)}</p>` : '')
           + `<div class="card-actions fin-acts"><a class="btn primary" href="${esc(UI.resumeHref)}" target="_blank" rel="noopener">${esc(UI.resume)}</a><a class="btn" href="${esc(UI.contactHref)}">${esc(UI.contact)}</a>`
-          + (UI.linkedin ? `<a class="btn" href="${esc(UI.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>` : '') + `<a class="btn" href="index.html">${esc(UI.home || 'Desktop')}</a></div>`
-          + (s.reel ? `<button class="link-btn fin-reel-btn" type="button" data-reel="1">${esc((window.MF_REEL || {}).name || 'Meet Marcin')}, a ${esc((window.MF_REEL || {}).length || '1:04')} video <span aria-hidden="true">→</span></button>` : ''); /* v62: opens the video in a popup (js/reel-player.js) */
+          + (UI.linkedin ? `<a class="btn" href="${esc(UI.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>` : '') + `</div>`
+          + (s.reel ? `<button class="link-btn fin-reel-btn" type="button" data-reel="1"><span class="fin-play" aria-hidden="true">▶</span>${esc((window.MF_REEL || {}).name || 'Meet Marcin')}, a ${esc((window.MF_REEL || {}).length || '1:04')} video</button>` : '')
+          + `<div class="fin-foot"><span>Revisit a chapter</span><div class="fin-dots">${DOT}</div></div>`;
         card.innerHTML = h;
         card.classList.remove('start', 'ms', 'pro'); card.classList.add('finale');
         card.scrollTop = 0;

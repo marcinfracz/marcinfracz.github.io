@@ -1079,3 +1079,30 @@ html { overflow: hidden; }
   html.touring.pd-on .tour3.at-last .tb-t { display: none; }
   html.touring.pd-on .tour3.at-last .tb-acts { margin-top: 6px; }
 }
+
+/* v74: the finish as an executive closing card */
+.card.finale { width: clamp(340px, 27vw, 410px); padding: 20px 22px 16px; }
+.fin-head { display: flex; align-items: center; gap: 14px; padding-bottom: 14px; margin-bottom: 14px; border-bottom: 1px solid var(--line); }
+.hero-photo.fin-photo { width: 64px; height: 64px; }
+.fin-id { min-width: 0; }
+.card.finale .fin-name { margin: 0 0 2px; font-size: 20px; line-height: 1.15; font-weight: 800; letter-spacing: -.015em; color: var(--ink); }
+.fin-title { margin: 0; font-size: 12.5px; line-height: 1.35; font-weight: 600; color: var(--ink-2); }
+.fin-status { display: inline-flex; align-items: center; gap: 7px; margin: 0 0 10px; padding: 4px 10px 4px 8px; border-radius: 999px;
+  font-size: 11.5px; font-weight: 700; letter-spacing: .02em; color: #1F6B43; background: rgba(46,160,96,.12); }
+[data-theme="dusk"] .fin-status, [data-theme="dark"] .fin-status { color: #7ED6A2; background: rgba(46,160,96,.18); }
+.fin-live { width: 7px; height: 7px; border-radius: 50%; background: #2EA060; box-shadow: 0 0 0 3px rgba(46,160,96,.22); }
+.card.finale h1.fin-h { margin: 0 0 8px; font-size: 22px; line-height: 1.2; font-weight: 800; letter-spacing: -.02em; text-wrap: balance; }
+.fin-role { margin: 0 0 8px; font-size: 13.5px; line-height: 1.5; color: var(--ink-2); }
+.card.finale .fin-what { margin: 0 0 14px; font-size: 13.5px; line-height: 1.45; font-weight: 600; color: var(--ink); }
+.card.finale .fin-acts { gap: 8px; flex-wrap: wrap; }
+.card.finale .fin-acts .btn { height: 36px; padding: 0 16px; font-size: 13px; }
+.card.finale .fin-reel-btn { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 13px; }
+.fin-play { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 8.5px; padding-left: 2px; color: #fff; background: var(--accent); }
+.fin-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+.fin-foot > span { font-size: 11.5px; font-weight: 600; color: var(--ink-3); white-space: nowrap; }
+.fin-dots { display: flex; gap: 5px; }
+.fin-dot { width: 22px; height: 22px; padding: 0; border: 1.5px solid var(--c); border-radius: 50%; background: transparent; color: var(--c);
+  font: 800 10.5px/1 Inter, system-ui, sans-serif; cursor: pointer; display: grid; place-items: center; transition: background .15s, color .15s; }
+.fin-dot:hover, .fin-dot:focus-visible { background: var(--c); color: #fff; outline: none; }
+.fin-foot { flex-wrap: wrap; row-gap: 8px; }
+@media (max-width: 1280px) { .fin-dots { gap: 4px; } .fin-dot { width: 20px; height: 20px; font-size: 10px; } }
