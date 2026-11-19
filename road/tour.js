@@ -144,7 +144,8 @@ const Voice = (() => {
   const pre = new Audio(); pre.preload = 'auto';
   /* v73: Marcin's v5 narration. Stories s09a to s13d keep the v3 clips until they are re-recorded. */
   const V5 = new Set(["s01", "s01a", "s01b", "s02", "s02a", "s02b", "s03", "s03a", "s03b", "s03c", "s04", "s04a", "s04b", "s05", "s05a", "s05b", "s05c", "s06", "s06a", "s06b", "s07", "s07a", "s07b", "s07c", "s08", "s08a", "s08b", "s08c", "s09", "s10", "s11", "s12", "s13", "t00", "t99"]);
-  const src = id => `${AUDIO.voice}${V5.has(id) ? 'tour5' : 'tour3'}-${id}.mp3`;
+  /* v74: the finish says he is open to his next role (tour5-t99b) */
+  const src = id => id === 't99' ? `${AUDIO.voice}tour5-t99b.mp3` : `${AUDIO.voice}${V5.has(id) ? 'tour5' : 'tour3'}-${id}.mp3`;
   window.__tourVoiceLevel = v => { el.volume = Math.min(1, v); };
   el.volume = Math.min(1, Music.vol);
   return {
@@ -217,7 +218,7 @@ const CAPS = {
  "s13b": "The plans covered the export portfolio: the Chevrolet Aveo, Spark EUV and Captiva, and the Cadillac XT5.",
  "s13c": "In August 2026 he kept driver assist in scope with a global strategy workshop on L2, L2+ and L2++. At GM Forward that October, GM said hands-free highway driving will expand: the same space this work covered.",
  "s13d": "Unprompted and solo, he built Portfolio Made Visible with AI agents. It turns 200+ programs across 50+ markets into any market-year view in seconds, at a fraction of the cost of a retired legacy tool, and grew by word of mouth to 40+ monthly users.",
- "t99": "Eight chapters across three countries—connecting mechanical execution, global P&L strategy, and hands-on AI delivery. Watch Meet Marcin to hear the story firsthand, or reach out directly at the top of the page."
+ "t99": "That's the road so far. Marcin is now open to his next leadership role in automotive strategy, product and AI. Let's talk."
 };
 const R = () => window.__road;
 const C = () => window.ROAD_CONTENT || {};
