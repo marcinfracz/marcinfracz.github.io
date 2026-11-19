@@ -146,17 +146,20 @@ const Voice = (() => {
   const V5 = new Set(["s01", "s01a", "s01b", "s02", "s02a", "s02b", "s03", "s03a", "s03b", "s03c", "s04", "s04a", "s04b", "s05", "s05a", "s05b", "s05c", "s06", "s06a", "s06b", "s07", "s07a", "s07b", "s07c", "s08", "s08a", "s08b", "s08c", "s09", "s10", "s11", "s12", "s13", "t00", "t99"]);
   /* v74: the finish says he is open to his next role (tour5-t99b) */
   const src = id => id === 't99' ? `${AUDIO.voice}tour5-t99b.mp3` : `${AUDIO.voice}${V5.has(id) ? 'tour5' : 'tour3'}-${id}.mp3`;
+  /* v76: stop 6 opens with a short bridge clip ("Ross led him to General Motors.") before its own line */
+  const PRE = { s06: `${AUDIO.voice}tour5-s06pre.mp3` };
+  const seq = id => PRE[id] ? [PRE[id], src(id)] : [src(id)];
   window.__tourVoiceLevel = v => { el.volume = Math.min(1, v); };
   el.volume = Math.min(1, Music.vol);
   return {
-    el, src,
+    el, src, seq,
     unlock(id) { /* a muted play inside the click lets later clips play on phones too */
       unlocking = true;
       const done = () => { if (unlocking) { unlocking = false; try { el.pause(); } catch (e) {} el.muted = false; } };
       try { el.src = src(id); el.muted = true; const p = el.play(); if (p && p.then) p.then(done, done); else done(); } catch (e) { done(); }
     },
     claim() { unlocking = false; el.muted = false; },
-    preload(id) { if (!on || !id) return; try { pre.src = src(id); pre.load(); } catch (e) {} },
+    preload(id) { if (!on || !id) return; try { pre.src = seq(id)[0]; pre.load(); } catch (e) {} },
     stop() { el.onended = el.onerror = null; try { el.pause(); } catch (e) {} },
     get on() { return on; },
     set(v) { on = !!v; prefs.voice = on; savePrefs(); },
@@ -187,7 +190,7 @@ const CAPS = {
  "s05a": "Four years of evening coursework alongside a full-time engineering leadership role built the financial and strategic toolkit he needed to step out of pure R&D.",
  "s05b": "For his multidisciplinary action project in British Columbia, he spent a week on site with an open-innovation firm and delivered a market-entry roadmap straight to its CEO.",
  "s05c": "That combination of deep engineering credibility and Ross strategy training opened the door to General Motors' three-year, up-or-out leadership rotation.",
- "s06": "His first GM rotation put him on the Chevrolet Traverse, using buyer-behavior analytics to strip out unprofitable build combinations and sharpen entry-level pricing.",
+ "s06": "Ross led him to General Motors. His first GM rotation put him on the Chevrolet Traverse, using buyer-behavior analytics to strip out unprofitable build combinations and sharpen entry-level pricing.",
  "s06a": "Trimming ten percent of build combinations cleaned up dealer inventory and plant scheduling, while a sharper entry price point lifted launch consideration by six percent.",
  "s06b": "To get commercial and manufacturing teams on the same page, Marcin built his own complexity-modeling tool—turning messy option data into clear margin and volume trade-offs.",
  "s07": "When GM wanted to raise global dealer service retention, Marcin studied the highest-scoring region in the company—Ecuador—and scaled what made it work into a worldwide Chevrolet culture program.",
@@ -247,9 +250,10 @@ function runUnit(id, kind) {
     if (kind === 'window') timed(WINDOW_MS);
     else if (Voice.on) {
       const a = Voice.el; u.audio = true;
-      a.onended = () => finish(u, true);
+      const parts = Voice.seq(id); let k = 0;
+      a.onended = () => { if (++k < parts.length && unit === u && !u.done) { a.src = parts[k]; if (!paused) a.play().catch(() => {}); } else finish(u, true); };
       a.onerror = () => { if (unit === u && !u.done) timed(readMs(CAPS[id] || '')); };
-      Voice.claim(); a.src = Voice.src(id);
+      Voice.claim(); a.src = parts[0];
       if (!paused) a.play().catch(() => { if (unit === u && !u.done && !paused) timed(readMs(CAPS[id] || '')); });
     } else timed(readMs(CAPS[id] || ''));
   });
