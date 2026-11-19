@@ -1041,6 +1041,9 @@ html { overflow: hidden; }
 .card-actions .tour-quiet { background: transparent; box-shadow: inset 0 0 0 1px var(--line); }
 .ctl-pop .tour-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 3px; }
 .ctl-pop .tour-pair .tour-menu-btn { margin-top: 0; padding: 0 8px; white-space: nowrap; }
+/* v69: a quiet Privacy link at the foot of the settings */
+.ctl-pop .cp-privacy { display: block; width: fit-content; margin: 8px 0 0 auto; font-size: 11.5px; font-weight: 600; color: var(--ink-3); text-align: right; text-decoration: none; }
+.ctl-pop .cp-privacy:hover { color: var(--ink); text-decoration: underline; }
 .ctl-pop .tour-pair .tour-menu-btn.alt { background: var(--surface-2); color: var(--ink); }
 @media (max-width: 767px) {
   .tour3 .tb-where { max-width: 50%; }

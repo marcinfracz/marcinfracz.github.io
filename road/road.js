@@ -1,7 +1,7 @@
 /* The Road: page app. Builds the 3D world, places one scene per stop, and
    drives the camera left to right (laptop and tablet) or top to bottom (phone). */
 import { THREE, TOKENS, setTheme, tok, roadZ, smooth, clamp, lerp } from './core.js';
-import { buildWorld } from './world.js?v=56';
+import { buildWorld } from './world.js?v=69';
 import { buildStage } from './stages.js?v=59';
 import { planCities, cityFootprints, buildCities } from './landmarks.js?v=56';
 import { flagURL, COUNTRY } from './marks.js?v=28';
@@ -1274,6 +1274,7 @@ function start() {
 
   /* ---------- loop ---------- */
   const clock = new THREE.Clock();
+  const viewF = new THREE.Frustum(), viewM = new THREE.Matrix4();
   let t = 0, first = true, visible = true;
   document.addEventListener('visibilitychange', () => { visible = !document.hidden; if (visible) clock.getDelta(); });
   function frame() {
@@ -1317,6 +1318,9 @@ function start() {
     if (zOut !== zPrev) { camera.setViewOffset(W, H, -baseShift, 0, W, H); root.classList.toggle('zoomed', zOut > 0.08); }
     placeCamera(dt, first);
     camera.updateProjectionMatrix();
+    /* v69: tell the world what the camera sees, so traffic only changes where nobody is looking */
+    camera.updateMatrixWorld(); viewM.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse); viewF.setFromProjectionMatrix(viewM);
+    if (world.setView) world.setView(viewF, camera.position, scene.fog.far);
     world.update(dt, t, pos, v, reduced);
     town.update(t, dt, pos, zOut, reduced);
     world.setZoomTint(zOut, themeName);
@@ -1335,5 +1339,6 @@ function start() {
     first = false;
   }
   frame();
+  if (/[?&]qa\b/.test(location.search)) window.__qaw = { world, stages, STOPS, get pos() { return pos; }, get t() { return t; } };
   window.__road = { go, at: x => { pos = prevPos = target = x; vel = 0; }, setZoom, get zoom() { return zOut; }, get cur() { return cur; }, get pos() { return pos; }, get story() { return storyK; }, next: () => go(base + 1), nudge, openStory, closeStory: () => closeStory(), setCtl, toStart, stops: STOPS.length, setTheme: n => { themeName = n; root.setAttribute('data-theme', n); applyTheme(); }, world };
 }

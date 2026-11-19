@@ -402,13 +402,20 @@ export function buildWorld(scene, opts) {
       const g = mesh(new THREE.TorusGeometry(3.6, 0.12, 6, 20, Math.PI), glowM, false); at(g, x + 4, y - 4.35, z + 0.4); deck.add(g);
     }
     underGlow = glowM;
+    /* v69: a short covered tunnel mouth at each end of the elevated road, so its cars drive down out of sight
+       below ground and come back up from there, instead of shrinking away at the ends */
+    [[x0, 1], [x1, -1]].forEach(([xe, sd]) => {
+      const pm = grp(box(7, 3.4, 0.5, 'obj', 0, 0, 3.9), box(7, 3.4, 0.5, 'obj', 0, 0, -3.9), box(7.2, 0.5, 8.3, 'obj', 0, 3.2, 0), box(0.4, 3.2, 7.3, 'objDark', -sd * 3.3, 0, 0));
+      pm.traverse(o => { if (o.isMesh) o.castShadow = true; });
+      at(pm, xe, 0, roadZ(xe) - U, -Math.atan(roadDZ(xe))); deck.add(pm);
+    });
     scene.add(deck);
     // elevated traffic
     const eg = vehicleGeo('sedan');
     const em = new THREE.InstancedMesh(eg, mat('obj', { vertexColors: true }), 26);
     em.castShadow = true;
     /* v50: one steady speed per carriageway and even spacing, so no car drives through another */
-    for (let i = 0; i < 26; i++) { const lane = i % 2 ? 1.6 : -1.6, j = i >> 1; elevated.push({ s: (j + 0.5 + (R() - 0.5) * 0.3) / 13, lane, v: lane > 0 ? 0.062 : 0.056, tint: [0.9 + R() * 0.2, 0.92 + R() * 0.15, 1] }); }
+    for (let i = 0; i < 26; i++) { const lane = i % 2 ? 1.6 : -1.6, j = i >> 1; elevated.push({ s: (j + 0.5 + (R() - 0.5) * 0.3) / 13, lane, v: (lane > 0 ? 0.062 : 0.056) * 68 / 92, tint: [0.9 + R() * 0.2, 0.92 + R() * 0.15, 1] }); }
     scene.add(em);
     elevated.mesh = em; elevated.x0 = x0; elevated.x1 = x1; elevated.U = U; elevated.ey = ey;
   }
@@ -477,7 +484,7 @@ export function buildWorld(scene, opts) {
     cars.push({ x: xMin + (j + 0.5 + (R() - 0.5) * 0.3) * L / perLane, lane, z: LANES[lane], v: 0, vmax: 7 + R() * 5, s1: R(), s2: R(), s3: R(), type: 'sedan', show: false, pend: false });
   }
   // the longest body each car can take on in any region keeps the spacing safe through every gate
-  cars.forEach(c => { c.ml = Math.max(...Object.keys(CAST).map(rg => LEN[pickType(c.s1, rg)])); const rg = regionAt(c.x); c.type = pickType(c.s1, rg); c.show = c.s2 < (DENS[rg] || 0.5); });
+  cars.forEach(c => { c.ml = Math.max(...Object.keys(CAST).map(rg => LEN[pickType(c.s1, rg)])); const rg = regionAt(c.x); c.rg = rg; c.type = pickType(c.s1, rg); c.show = c.s2 < (DENS[rg] || 0.5); });
   ['A', 'C', 'D'].forEach(k => { let last = null; cars.filter(c => c.lane === k && c.show).sort((a, b) => a.x - b.x).forEach(c => { if (last && c.x - last.x < (c.ml + last.ml) / 2 + 6) c.show = false; else last = c; }); });
   const vmeshes = {};
   TYPES.forEach(t => {
@@ -546,7 +553,9 @@ export function buildWorld(scene, opts) {
     const side = i % 2 === 0 ? 1 : -1, dir = (i >> 1) % 2 ? 1 : -1, band = side + '|' + dir, j = i >> 2;
     riders.push({ path: true, band, x: xMin + (j + 0.5 + (RR() - 0.5) * 0.3) * L / Math.ceil(NP / 4), dir, z: side * (dir === side ? HALF + 0.7 : HALF + 1.45), v: 0, vmax: 2.4 + RR() * 2.2, s1: RR(), s2: RR(), tint: 0.85 + RR() * 0.3, ph: RR() * 6 });
   }
-  riders.forEach(r => { const rg = regionAt(r.x), cast = RCAST[rg] || RCAST.us; r.type = pickRide(r.s1, r.path ? cast.path : cast.road); r.show = r.s2 < (RDENS[rg] || 0.5); });
+  const stopXs0 = stops.map(s => s.x);
+  const nearStop = x => { let d = 1e9; for (const sx of stopXs0) d = Math.min(d, Math.abs(sx - x)); return d; };
+  riders.forEach(r => { const rg = regionAt(r.x), cast = RCAST[rg] || RCAST.us; r.rg = rg; r.type = pickRide(r.s1, r.path ? cast.path : cast.road); r.want = r.s2 < (RDENS[rg] || 0.5); r.show = r.want && !(r.path && nearStop(r.x) < 18); });
   const rideMesh = {};
   RIDE.forEach(k => { const im = new THREE.InstancedMesh(riderGeo(k), mat('obj', { vertexColors: true }), NR + NP); im.castShadow = !lite; im.frustumCulled = false; im.count = 0; rideMesh[k] = im; scene.add(im); });
   const stopXs = stops.map(s => s.x);
@@ -566,19 +575,26 @@ export function buildWorld(scene, opts) {
     const ends = new THREE.InstancedMesh(endGeo, trM, 2), mids = new THREE.InstancedMesh(midGeo, trM, 6);
     ends.castShadow = mids.castShadow = true; ends.frustumCulled = mids.frustumCulled = false;
     scene.add(ends, mids);
+    /* v69: a station hall over the far end of the viaduct; the train pulls into it instead of vanishing at the end of the track */
+    const hall = grp(box(7.6, 6.4, 21, 'obj', 0, DY - 1.1, 0), box(8.2, 0.5, 21.6, 'objShade', 0, DY + 5.3, 0), box(4.6, 4.4, 0.2, 'objDark', 0, DY - 0.4, 10.52));
+    hall.traverse(m => { if (m.isMesh) m.castShadow = true; });
+    at(hall, HX, 0, tz(U1 - 1.5)); scene.add(hall);
     hsr = { ends, mids, HX, DY, U0, U1, tz, o };
   }
   function updateTrain(t) {
     if (!hsr) return;
     const { ends, mids, HX, DY, U0, U1, tz, o } = hsr;
-    const LEN = 8 * 10.3, span = U1 - U0 + LEN, V = 30, run = span / V, CYC = run + 6;
+    /* v69: each run starts and ends with the whole train hidden (the tail clears the station hall), so no car is dropped in view */
+    const TAIL = 7 * 10.3 + 5, h0 = dir0 => dir0 > 0 ? U0 - 2 : U1 - 8, h1 = dir0 => dir0 > 0 ? U1 + TAIL + 3 : U0 - TAIL - 3;
+    const V = 30, run = (U1 - U0 + TAIL + 1) / V, CYC = run + 6;
     const k = Math.floor(t / CYC), tt = t % CYC, f = tt / run;
     const dir = k % 2 ? -1 : 1; // +1 runs away from the camera
-    const head = dir > 0 ? U0 - LEN / 2 + f * span : U1 + LEN / 2 - f * span;
+    const head = h0(dir) + (h1(dir) - h0(dir)) * Math.min(f, 1);
     let mi = 0;
     for (let i = 0; i < 8; i++) {
       const cu = head - dir * (i * 10.3 + 5);
       const inside = f <= 1 && cu > U0 + 4 && cu < U1 - 4;
+      if (QA) { const q = (hsr.q = hsr.q || [])[i] || (hsr.q[i] = {}); if (cu < U1 - 12) qaPop('train', q, inside ? 1 : 0, HX, DY, tz(cu)); else q._qv = inside; }
       const yaw = (dir > 0 ? Math.PI / 2 : -Math.PI / 2) + (i === 7 ? Math.PI : 0);
       o.position.set(HX, DY, tz(cu)); o.rotation.set(0, yaw, 0); o.scale.setScalar(inside ? 1 : 0); o.updateMatrix();
       if (i === 0) ends.setMatrixAt(0, o.matrix); else if (i === 7) ends.setMatrixAt(1, o.matrix); else mids.setMatrixAt(mi++, o.matrix);
@@ -616,14 +632,28 @@ export function buildWorld(scene, opts) {
   }
   function updateHeli(t, heroX, still) {
     const H = heli, { g, rotor, tail } = H;
+    const hdt = clamp(t - (H.lt === undefined ? t : H.lt), 0, 0.1); H.lt = t;
     if (still) { g.visible = false; return; }
     if (!H.f) {
       if (H.last === undefined) H.last = t;
       if (t - H.last < H.wait) { g.visible = false; return; }
-      H.f = heliPlan(t, heroX); H.yaw = null;
+      /* v69: it sets off only from somewhere out of sight */
+      let f0 = null;
+      for (let k = 0; k < 12 && !f0; k++) { const c = heliPlan(t, heroX), x = c.P[0][0], u = c.P[0][1]; if (!seen(x, c.y0, roadZ(x) - u, 8)) f0 = c; }
+      if (!f0) { H.last = t; H.wait = 3; g.visible = false; return; }
+      H.f = f0; H.yaw = null; H.out = null;
     }
     const f = H.f, e = t - f.t0, half = f.dur / 2;
-    if (e > f.dur + f.hover) { H.f = null; H.last = t; H.wait = 10 + Math.random() * 30; g.visible = false; return; }
+    if (e > f.dur + f.hover) {
+      /* v69: at the end of its route it keeps flying straight until it is out of sight, then lands */
+      if (g.visible && (!H.out || e < f.dur + f.hover + 40) && seen(g.position.x, g.position.y, g.position.z, 8)) {
+        if (!H.out) { const P = f.P[2], Q = f.P[1], dx = P[0] - Q[0], du = P[1] - Q[1], n = Math.hypot(dx, du) || 1, v = 2 * Math.hypot(P[0] - Q[0], P[1] - Q[1]) / f.dur || 12; H.out = { dx: dx / n * v, dz: -du / n * v }; }
+        g.position.x += H.out.dx * hdt; g.position.z += H.out.dz * hdt;
+        rotor.rotation.y = t * 21; tail.rotation.z = t * 30; H.beacon.visible = (t % 1.2) < 0.15;
+        return;
+      }
+      H.f = null; H.out = null; H.last = t; H.wait = 10 + Math.random() * 30; g.visible = false; return;
+    }
     const s = e < half ? e / f.dur : e < half + f.hover ? 0.5 : (e - f.hover) / f.dur;
     const B = (k, q) => (1 - q) * (1 - q) * f.P[0][k] + 2 * (1 - q) * q * f.P[1][k] + q * q * f.P[2][k];
     const x = B(0, s), u = B(1, s), z = roadZ(x) - u;
@@ -712,6 +742,24 @@ export function buildWorld(scene, opts) {
   /* v55: in the down-the-road views only cars ahead of the hero get vision boxes */
   let aheadOnly = false, aheadW = 0;
   function setAhead(w) { aheadW = +w || 0; aheadOnly = aheadW > 0.3; }
+  /* v69: nothing that drives appears, vanishes, shrinks or changes body while the camera can see it.
+     road.js hands over the camera's view each frame; seen() says whether a spot is on screen and not lost in the haze. */
+  let viewF = null, viewP = null, viewFar = 1e9;
+  const viewS = new THREE.Sphere();
+  function setView(f, p, far) { viewF = f; viewP = p; viewFar = far || 1e9; }
+  function seen(x, y, z, r) {
+    if (!viewF) return true;
+    viewS.center.set(x, y, z); viewS.radius = r + 1.5;
+    if (viewP && viewP.distanceTo(viewS.center) - viewS.radius > viewFar) return false;
+    return viewF.intersectsSphere(viewS);
+  }
+  const QA = /[?&]qa\b/.test(location.search) ? { pops: {}, log: [] } : null;
+  function qaPop(kind, o, sc, x, y, z) {
+    if (!QA) return;
+    const vis = sc > 0.9, was = o._qv === undefined ? vis : o._qv, ty = o.type;
+    if ((vis !== was || (vis && o._qt !== undefined && o._qt !== ty)) && seen(x, y, z, 0)) { QA.pops[kind] = (QA.pops[kind] || 0) + 1; if (QA.log.length < 60) QA.log.push([kind, Math.round(x), Math.round(z), vis, ty]); }
+    o._qv = vis; o._qt = ty;
+  }
   const on = k => mode === 'all' || mode === k;
 
   /* ---------- per-frame ---------- */
@@ -832,7 +880,7 @@ export function buildWorld(scene, opts) {
     });
   }
 
-  if (/[?&]qa\b/.test(location.search)) window.__wq = { cars, riders, scooters, peds, LEN, RLEN, SCOOT_Z, LANES, roadZ, nearBoundary };
+  if (/[?&]qa\b/.test(location.search)) window.__wq = { cars, riders, scooters, peds, LEN, RLEN, SCOOT_Z, LANES, roadZ, nearBoundary, QA, seen };
   let decalDusk = null;
   function update(dt, t, heroX, heroV, still) {
     if (pedMesh) updatePeds(dt, t, heroX, heroV, still);
@@ -841,15 +889,24 @@ export function buildWorld(scene, opts) {
     if (!still) {
       /* v50: a car changes body, appears or disappears only at a region gate, where it is scaled down to nothing,
          and it appears only with room around it. Hidden cars keep driving so the lanes never freeze. */
+      /* v69: a car takes on its new region's body, or leaves or joins the traffic, only once it is out of sight;
+         a car the camera can see keeps the body it has until it drives out of the frame */
       cars.forEach(c => {
-        if (nearBoundary(c.x) < 1.5) { const rg = regionAt(c.x); c.type = pickType(c.s1, rg); const want = c.s2 < (DENS[rg] || 0.5); if (!want) c.show = false; c.pend = want && !c.show; }
-        else c.pend = false;
+        const rg = regionAt(c.x);
+        if (rg !== c.rg) {
+          if (!c.show || !seen(c.x, 1.5, roadZ(c.x) + c.z, c.ml / 2)) {
+            c.rg = rg; c.type = pickType(c.s1, rg);
+            const want = c.s2 < (DENS[rg] || 0.5); if (!want) c.show = false; c.pend = want && !c.show;
+          }
+        }
         if (c.chg > 0) c.chg -= dt;
       });
       for (const k in byLane) byLane[k].length = 0;
       cars.forEach(c => { if (!c.show) return; byLane[c.lane].push(c); if (c.chg > 0 && c.from) byLane[c.from].push({ ghost: true, ref: c, x: c.x, v: c.v, ml: c.ml }); });
       cars.forEach(c => {
         if (!c.pend) return;
+        if (c.rg !== regionAt(c.x)) { c.pend = false; return; }
+        if (seen(c.x, 1.5, roadZ(c.x) + c.z, c.ml / 2)) return;
         if (byLane[c.lane].every(o => Math.abs(o.x - c.x) > (o.ml + c.ml) / 2 + 10)) { c.show = true; c.pend = false; c.v = c.vmax * 0.5; byLane[c.lane].push(c); }
       });
       cars.forEach(c => { if (!c.show) { c.x = wrap(c.x + laneDir(c.lane) * c.vmax * dt); c.v = c.vmax; } });
@@ -871,21 +928,21 @@ export function buildWorld(scene, opts) {
     const dusk = tok('glow') !== '#000000';
     if (dusk !== decalDusk) { decalDusk = dusk; decalMats.forEach(m => m.color.set(m.userData.yellow ? (dusk ? '#9C7F3A' : '#E8B83A') : (dusk ? '#7F8894' : '#FFFFFF'))); }
     cars.forEach(c => {
+      /* v69: every car drives at full size; it never shrinks at a gate or in front of the camera */
+      if (QA) qaPop('car', c, c.show ? 1 : 0, c.x, 1.5, roadZ(c.x) + c.z);
       if (!c.show) return;
-      const nb = nearBoundary(c.x); let sc = clamp(nb / 4, 0, 1);
-      /* v55: in the down-the-road views, keep the hero's side clear between the camera and the car */
-      if (aheadW > 0) sc *= 1 - aheadW * smooth(heroX - 50, heroX - 45, c.x) * (c.z > 0 ? smooth(heroX - 0.5, heroX - 4, c.x) : smooth(heroX + 10, heroX - 2, c.x));
-      if (sc <= 0.02) return;
+      const sc = 1;
       const d = laneDir(c.lane);
       const z = roadZ(c.x) + c.z;
       const yaw = -Math.atan(roadDZ(c.x)) + (d < 0 ? Math.PI : 0);
       tmpO.position.set(c.x, 0, z); tmpO.rotation.set(0, yaw, 0); tmpO.scale.setScalar(sc); tmpO.updateMatrix();
       const im = vmeshes[c.type], i = counts[c.type]++;
       im.setMatrixAt(i, tmpO.matrix);
-      const pal = PAL[regionAt(c.x)] || PAL.us; const p = pal[(c.s3 * pal.length) | 0];
+      const crg = c.rg || regionAt(c.x);   // v69: the paint goes with the body, so it changes only out of sight
+      const pal = PAL[crg] || PAL.us; const p = pal[(c.s3 * pal.length) | 0];
       let tint = p;
-      if (c.type === 'bus' && regionAt(c.x) === 'us') tint = [1.06, 0.86, 0.5];
-      if (c.type === 'taxi') tint = regionAt(c.x) === 'mexico' ? [1.04, 0.84, 0.9] : [0.75, 0.9, 1.0];
+      if (c.type === 'bus' && crg === 'us') tint = [1.06, 0.86, 0.5];
+      if (c.type === 'taxi') tint = crg === 'mexico' ? [1.04, 0.84, 0.9] : [0.75, 0.9, 1.0];
       if (EMERG[c.type]) {
         tint = [1, 1, 1];
         const cs = Math.cos(yaw), sn = Math.sin(yaw), on = Math.floor(t * 5 + c.s2 * 7) % 2;
@@ -912,8 +969,10 @@ export function buildWorld(scene, opts) {
       const { x0, x1, U, ey } = elevated;
       elevated.forEach((e, i) => {
         if (!still) e.s = (e.s + e.v * dt * (e.lane > 0 ? 1 : -1) + 1) % 1;
-        const x = x0 + 6 + e.s * (x1 - x0 - 12), y = ey(x);
-        const sc = clamp(y / 3, 0, 1);
+        /* v69: the loop runs on past both deck ends, down into the tunnel mouths and under the ground, at full size */
+        const x = x0 - 6 + e.s * (x1 - x0 + 12), y = x < x0 ? -0.8 * (x0 - x) : x > x1 ? -0.8 * (x - x1) : ey(x);
+        const sc = y > -2 ? 1 : 0;
+        if (QA && y > -1.5) qaPop('elev', e, sc, x, y, roadZ(x) - U + e.lane);
         tmpO.position.set(x, y, roadZ(x) - U + e.lane); tmpO.rotation.set(0, e.lane > 0 ? 0 : Math.PI, 0); tmpO.scale.setScalar(sc * 0.9); tmpO.updateMatrix();
         elevated.mesh.setMatrixAt(i, tmpO.matrix); elevated.mesh.setColorAt(i, tmpC.setRGB(...e.tint));
       });
@@ -930,6 +989,7 @@ export function buildWorld(scene, opts) {
       scooters.forEach((s, i) => {
         const x = s.x;
         const sc = clamp(Math.min(x - a0, a1 - x) / 6, 0, 1);
+        if (QA) qaPop('scoot', s, sc, x, 1, roadZ(x) + SCOOT_Z);
         tmpO.position.set(x, 0.1, roadZ(x) + SCOOT_Z + Math.sin(t * 2 + s.wob) * 0.05);
         tmpO.rotation.set(0, -Math.atan(roadDZ(x)), 0); tmpO.scale.setScalar(sc); tmpO.updateMatrix();
         scootMesh.setMatrixAt(i, tmpO.matrix); scootMesh.setColorAt(i, tmpC.setRGB(...s.tint));
@@ -945,24 +1005,33 @@ export function buildWorld(scene, opts) {
     signals.forEach(s => { const ph = sigPhase(s, t); if (ph !== s.ph) { s.ph = ph; s.lamps.forEach((l, i) => { l.material = i === ph ? lampOn[i] : lampOff; }); } });
 
     updateTrain(t); updateHeli(t, heroX, still);
+    if (QA) qaPop('heli', heli, heli.g.visible ? 1 : 0, heli.g.position.x, heli.g.position.y, heli.g.position.z);
     if (life) life.update(dt, t, heroX, still, dusk);
 
     /* v41 riders */
     const rc = {}; RIDE.forEach(k => rc[k] = 0);
     if (!still) {
       const bands = {};
+      /* v69: riders change, leave or join only out of sight. Sidewalk riders still keep off the stops' sidewalks,
+         but one already in view rides on through at full size and leaves the frame like anyone else. */
       riders.forEach(r => {
-        if (nearBoundary(r.x) < 1.5 || !r.type) { const rg = regionAt(r.x), cast = RCAST[rg] || RCAST.us; r.type = pickRide(r.s1, r.path ? cast.path : cast.road); const want = r.s2 < (RDENS[rg] || 0.5); if (!want) r.show = false; r.pend = want && !r.show; }
-        else r.pend = false;
+        r.pend = false;
+        const zz = roadZ(r.x) + r.z;
+        if (r.show && seen(r.x, 1, zz, 1.2)) { (bands[r.band] = bands[r.band] || []).push(r); return; }
+        const rg = regionAt(r.x);
+        if (rg !== r.rg || !r.type) { const cast = RCAST[rg] || RCAST.us; r.rg = rg; r.type = pickRide(r.s1, r.path ? cast.path : cast.road); r.want = r.s2 < (RDENS[rg] || 0.5); }
+        const blocked = r.path && nearStop(r.x) < 18;
+        if (r.show && (!r.want || blocked)) r.show = false;
+        r.pend = r.want && !blocked && !r.show && !seen(r.x, 1, zz, 1.2);
         if (r.show) (bands[r.band] = bands[r.band] || []).push(r); else { r.x = wrap(r.x + r.dir * r.vmax * dt); r.v = r.vmax; }
       });
       riders.forEach(r => { if (!r.pend) return; const b = bands[r.band] = bands[r.band] || []; if (b.every(o => Math.abs(o.x - r.x) > 7)) { r.show = true; r.v = r.vmax * 0.5; b.push(r); } });
       for (const k in bands) { const d = bands[k][0].dir; runBand(bands[k], d, () => RLEN, (r, ld) => stopFor(r.x, d, RLEN, r.z, 0.4, r.vmax, t, true, r.path, ld, RLEN), dt, L, wrap, 1.2, 6); }
     }
     for (const r of riders) {
-      if (!r.show || !r.type) continue;
-      let k = clamp(nearBoundary(r.x) / 4, 0, 1);
-      if (r.path) { let dmin = 1e9; for (const sx of stopXs) dmin = Math.min(dmin, Math.abs(sx - r.x)); k = Math.min(k, clamp((dmin - 16) / 4, 0, 1)); }
+      if (!r.show || !r.type) { if (QA) qaPop(r.path ? 'path' : 'moto', r, 0, r.x, 1, roadZ(r.x) + r.z); continue; }
+      const k = 1;   // v69: full size always; see the rules above for when a rider may leave or join
+      if (QA) qaPop(r.path ? 'path' : 'moto', r, k, r.x, 1, roadZ(r.x) + r.z);
       if (k <= 0.02) continue;
       const zz = roadZ(r.x) + r.z + (r.path ? Math.sin(t * 0.7 + r.ph) * 0.06 : 0);
       const yaw = -Math.atan(roadDZ(r.x)) + (r.dir < 0 ? Math.PI : 0);
@@ -1049,7 +1118,7 @@ export function buildWorld(scene, opts) {
     });
   }
 
-  return { update, setMode, setAhead, setZoomTint, regionAt, height, lookoutY, hero };
+  return { update, setMode, setAhead, setView, setZoomTint, regionAt, height, lookoutY, hero };
 }
 
 /* ---------- vehicles ---------- */
