@@ -336,10 +336,10 @@ window.ROAD_CONTENT = {
 
     {
       id: "finale", alias: ["reel"], era: null, scene: "finale",
-      kicker: "Finish",
-      title: "Eight chapters, one road.",
-      role: "Engineering, product, customer experience and software strategy, across the US, Mexico and China. Tap a chapter to drive back to it.",
-      what: "Exploring new leadership opportunities in automotive strategy, product and AI.",
+      kicker: "Open to new roles",
+      title: "Ready for the next leadership role.",
+      role: "20+ years in automotive across engineering, global product strategy, connected services and driver assist, in the US, Mexico and China.",
+      what: "Exploring leadership roles in automotive strategy, product and AI.",
       wins: [], callouts: [],
       reel: { src: (window.MF_REEL || {}).src || "assets/sizzle-reel-1min.mp4", label: ((window.MF_REEL || {}).name || "Meet Marcin") + ", " + ((window.MF_REEL || {}).length || "1:04") }
     }
@@ -571,5 +571,5 @@ window.ROAD_CONTENT.rail = {
   "connected":           { co: "GM",                    ro: "Business Strategy · Connected Services",                    yr: "2020–2022", t: "Business Strategy, Connected",            dm: "Connected services",         f: "digital" },
   "shanghai":            { co: "SAIC-GM",               ro: "Deputy Director · Software Strategy",                       yr: "2022–2025", t: "Deputy Director, Software Strategy",   dm: "Software strategy",          f: "digital" },
   "onstar":              { co: "GM",                    ro: "Global Planning & JVs · OnStar Product Marketing",          yr: "2025–2026", t: "OnStar Product Marketing",    dm: "Software product marketing", f: "digital" },
-  "finale":              { co: "Finish",                ro: "Eight chapters, one road",                                  yr: "2003–2026" }
+  "finale":              { co: "Finish",                ro: "Open to new leadership roles",                              yr: "2003–2026" }
 };
