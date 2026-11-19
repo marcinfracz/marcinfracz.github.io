@@ -145,7 +145,9 @@ const Voice = (() => {
   /* v73: Marcin's v5 narration. Stories s09a to s13d keep the v3 clips until they are re-recorded. */
   const V5 = new Set(["s01", "s01a", "s01b", "s02", "s02a", "s02b", "s03", "s03a", "s03b", "s03c", "s04", "s04a", "s04b", "s05", "s05a", "s05b", "s05c", "s06", "s06a", "s06b", "s07", "s07a", "s07b", "s07c", "s08", "s08a", "s08b", "s08c", "s09", "s10", "s11", "s12", "s13", "t00", "t99"]);
   /* v74: the finish says he is open to his next role (tour5-t99b) */
-  const src = id => id === 't99' ? `${AUDIO.voice}tour5-t99b.mp3` : `${AUDIO.voice}${V5.has(id) ? 'tour5' : 'tour3'}-${id}.mp3`;
+  /* v77: stop 8 uses tour5-s08m, where "Marcin" is spliced in from the approved finish take (MAR-sin) */
+  const FIX = { t99: 'tour5-t99b', s08: 'tour5-s08m' };
+  const src = id => FIX[id] ? `${AUDIO.voice}${FIX[id]}.mp3` : `${AUDIO.voice}${V5.has(id) ? 'tour5' : 'tour3'}-${id}.mp3`;
   /* v76: stop 6 opens with a short bridge clip ("Ross led him to General Motors.") before its own line */
   const PRE = { s06: `${AUDIO.voice}tour5-s06pre.mp3` };
   const seq = id => PRE[id] ? [PRE[id], src(id)] : [src(id)];
