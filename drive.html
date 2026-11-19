@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Drive mode · Marcin Fracz</title>
+<meta name="theme-color" content="#E9EDF2">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="road/drive.css?v=1">
+<script>
+  (function () {
+    var dark = null;
+    try { var p = JSON.parse(localStorage.getItem("mf-site-prefs-v7") || "{}"); if (typeof p.dark === "boolean") dark = p.dark; } catch (e) {}
+    if (dark === null) { try { dark = window.matchMedia("(prefers-color-scheme: dark)").matches; } catch (e) { dark = false; } }
+    document.documentElement.setAttribute("data-theme", dark ? "dusk" : "day");
+  })();
+</script>
+</head>
+<body>
+<canvas id="world" aria-hidden="true"></canvas>
+
+<header class="dv-top">
+  <a class="dv-back" href="road.html" aria-label="Back to The Road">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+    <span>The Road</span>
+  </a>
+  <span class="dv-title">Drive mode <em>Free play</em></span>
+  <div class="dv-line" id="dv-line" aria-label="Career stops"><i class="dv-car" id="dv-car"></i></div>
+  <div class="dv-ctl" role="group" aria-label="Drive settings">
+    <button type="button" id="b-cam" aria-pressed="false" title="Camera: driver seat (C)" aria-label="Switch camera">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+    </button>
+    <button type="button" id="b-voice" aria-pressed="false" title="Narration off (V)" aria-label="Narration">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg>
+    </button>
+    <button type="button" id="b-calm" aria-pressed="false" title="Calm motion off" aria-label="Calm motion">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12c2-3 4-3 6 0s4 3 6 0 4-3 6 0"/></svg>
+    </button>
+    <button type="button" id="b-light" title="Day or dusk" aria-label="Day or dusk">
+      <svg class="sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+    <button type="button" id="b-help" title="Controls" aria-label="Controls">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17h.01"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="dv-speed" id="dv-speed" aria-hidden="true"><b>0</b><span>mph</span></div>
+<p class="dv-cap" id="dv-cap" aria-live="polite"></p>
+<article class="dv-card" id="dv-card" aria-live="polite" hidden></article>
+
+<div class="dv-touch" id="dv-touch" hidden>
+  <div class="dv-steer"><button type="button" data-k="left" aria-label="Steer left">◀</button><button type="button" data-k="right" aria-label="Steer right">▶</button></div>
+  <div class="dv-pedals"><button type="button" data-k="brake" aria-label="Brake">Brake</button><button type="button" data-k="gas" class="gas" aria-label="Gas">Gas</button></div>
+</div>
+
+<div class="dv-veil" id="dv-veil" aria-hidden="true"></div>
+
+<section class="dv-intro" id="dv-intro" role="dialog" aria-labelledby="dv-intro-h">
+  <div class="dv-intro-in">
+    <p class="dv-kick">The Road · Drive mode</p>
+    <h1 id="dv-intro-h">Take the wheel.</h1>
+    <p class="dv-lead">Start at the Renaissance Center and drive 20+ years of automotive work. Each stop opens its story as you pull up.</p>
+    <ul class="dv-keys" id="dv-keys">
+      <li><kbd>W</kbd><kbd>↑</kbd> Drive</li>
+      <li><kbd>S</kbd><kbd>↓</kbd> Brake and reverse</li>
+      <li><kbd>A</kbd><kbd>D</kbd> Steer</li>
+      <li><kbd>Shift</kbd> Faster</li>
+      <li><kbd>C</kbd> Camera</li>
+      <li><kbd>V</kbd> Narration</li>
+    </ul>
+    <p class="dv-pad">Gamepad works too: left stick steers, triggers drive and brake.</p>
+    <div class="dv-go"><button type="button" id="dv-start" class="primary">Start driving</button><button type="button" id="dv-start-v">Start with narration</button></div>
+  </div>
+</section>
+
+<section class="dv-phone" id="dv-phone" hidden>
+  <div class="dv-intro-in">
+    <p class="dv-kick">The Road · Drive mode</p>
+    <h1>Best on a laptop or tablet.</h1>
+    <p class="dv-lead">Drive mode needs a bigger screen. The Road has the same stories, built for your phone.</p>
+    <div class="dv-go"><a class="primary" href="road.html">Open The Road</a><a href="index.html">Home</a></div>
+  </div>
+</section>
+
+<noscript><p class="dv-noscript">Drive mode needs JavaScript. <a href="road.html">Open The Road</a>.</p></noscript>
+
+<script src="content/road-content.js?v=74"></script>
+<script type="module" src="road/drive.js?v=1"></script>
+</body>
+</html>
