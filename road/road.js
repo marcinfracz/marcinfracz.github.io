@@ -1,8 +1,8 @@
 /* The Road: page app. Builds the 3D world, places one scene per stop, and
    drives the camera left to right (laptop and tablet) or top to bottom (phone). */
 import { THREE, TOKENS, setTheme, tok, roadZ, smooth, clamp, lerp } from './core.js';
-import { buildWorld } from './world.js?v=69';
-import { buildStage } from './stages.js?v=59';
+import { buildWorld } from './world.js?v=75';
+import { buildStage } from './stages.js?v=75';
 import { planCities, cityFootprints, buildCities } from './landmarks.js?v=56';
 import { flagURL, COUNTRY } from './marks.js?v=28';
 

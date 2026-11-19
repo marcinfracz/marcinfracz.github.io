@@ -5,6 +5,7 @@ import { THREE, reg, mat, ownMat, glowMat, mesh, at, box, cyl, sph, grp, label, 
 import * as CORE from './core.js';
 import { vehicleGeo } from './world.js?v=56';
 import { drawFlag, drawMark, onLogo } from './marks.js?v=28';
+import { buildPark } from './park.js?v=75';
 import { ketteringAB, bulldog, bulldogPoster, rossBuilding, burOak, blockMSign, wavingFlag, wave, signPanel, MAIZE, BLUE } from './landmarks.js?v=56';
 
 const pin = (parent, x, y, z) => { const o = new THREE.Object3D(); o.position.set(x, y, z); parent.add(o); return o; };
@@ -1076,7 +1077,10 @@ B.finale = (ctx) => {
   const moon = new THREE.Sprite(new THREE.SpriteMaterial({ map: moonTex, transparent: true, fog: false, depthWrite: false }));
   moon.scale.set(52, 52, 1); moon.position.copy(sun.position); moon.visible = false;
   g.add(moon);
-  return { group: g, anchors: { plaza: pin(col, 0, 8.4, 0) }, update(t, k) {
+  /* v74: the EUC jump park in the open field to the right of the road ahead (built in world coordinates) */
+  const park = buildPark(ctx, ctx.base.x); park.group.position.set(-ctx.base.x, -ctx.base.y, -ctx.base.z); g.add(park.group);
+  return { group: g, anchors: { plaza: pin(col, 0, 8.4, 0) }, update(t, k, dt) {
+    park.update(t, dt);
     sun.position.y = -12 + 64 * smooth(0, 1, k);
     const dusk = CORE.theme !== 'day'; sun.visible = !dusk; moon.visible = dusk; moon.position.set(sun.position.x, sun.position.y + 4, sun.position.z);
     const lit = Math.min(7, Math.floor(k * 9));

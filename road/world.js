@@ -2,6 +2,7 @@
    perception layer (radar, LiDAR, vision boxes, V2X). */
 import { cityFlat, cityRiver, cityKeepOut, cityWater } from './landmarks.js?v=56';
 import { buildLife } from './life.js?v=50';
+import { inPark } from './park.js?v=75';
 import { THREE, mat, ownMat, glowMat, reg, mesh, at, box, cyl, sph, grp, merge, bx, cy, label,
   smooth, clamp, lerp, rand, roadZ, roadDZ, tok } from './core.js';
 
@@ -297,6 +298,7 @@ export function buildWorld(scene, opts) {
   };
   function put(kind, x, z, s = 1, ry = 0, sy = 1, tint = [1, 1, 1]) {
     if (cities.length && cityKeepOut(cities, x, z)) return;
+    if (inPark(finale.x, x, z)) return;   // v74: the EUC jump park keeps its field clear
     const et = eraTint(x, kind === 'tree' ? 0.08 : 0.14);
     props[kind].list.push({ x, y: height(x, z), z, s, ry, sy, tint: [tint[0] * et[0], tint[1] * et[1], tint[2] * et[2]] });
   }
