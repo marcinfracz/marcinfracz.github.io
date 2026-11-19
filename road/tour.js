@@ -174,51 +174,51 @@ const Voice = (() => {
    visitor taps it, that stop's stories play one by one, each opening on screen; then the drive goes on.
    Without voice, the same captions run on a reading timer. */
 const CAPS = {
- "t00": "Twenty years inside the auto industry—from tier-one component engineering to running software strategy in Shanghai. This road traces how Marcin moves between hardware, commercial strategy, and AI to get complex programs shipped. The tour drives itself; tap Stories at any stop to dig into the decisions behind the work.",
+ "t00": "Twenty years inside the auto industry: from tier-one component engineering to running software strategy in Shanghai. This road traces how Marcin moves between hardware, commercial strategy, and AI to get complex programs shipped. The tour drives itself; tap Stories at any stop to dig into the decisions behind the work.",
  "s01": "Most engineers don't see a live production floor until after graduation. At Kettering, Marcin spent every other term inside Federal-Mogul, graduating cum laude with four years of real plant and testing discipline already built in.",
  "s01a": "Balancing a full mechanical engineering load with alternating industry terms meant theory was constantly tested against real manufacturing constraints.",
- "s01b": "Working across engine sealing programs for GM, Ford, Volkswagen, and Cummins—including gasket development on the 5.7-liter HEMI—gave him an early instinct for how suppliers and automakers actually negotiate trade-offs.",
- "s02": "Entering the industry during the 2007 downturn, Marcin stepped straight into value engineering and core program ownership—taking Chrysler's new 3.6-liter Pentastar head gasket from an early fatigue failure into volume production.",
+ "s01b": "Working across engine sealing programs for GM, Ford, Volkswagen, and Cummins, including gasket development on the 5.7-liter HEMI, gave him an early instinct for how suppliers and automakers actually negotiate trade-offs.",
+ "s02": "Entering the industry during the 2007 downturn, Marcin stepped straight into value engineering and core program ownership, taking Chrysler's new 3.6-liter Pentastar head gasket from an early fatigue failure into volume production.",
  "s02a": "The original gasket design was cracking under thermal cycling. Marcin engineered a multi-layer steel replacement, proved it on thermal pulsator rigs, and cleared it for launch.",
- "s02b": "Driving three million dollars in annual cost reductions took more than a CAD change—he had to align purchasing, operations, sales, and suppliers around the same business case, generating four patent disclosures along the way.",
- "s03": "In 2010, Marcin moved across the table to Chrysler, taking end-to-end release ownership for every sealing system on the Pentastar V6—an architecture that went on to surpass ten million engines built.",
+ "s02b": "Driving three million dollars in annual cost reductions took more than a CAD change; he had to align purchasing, operations, sales, and suppliers around the same business case, generating four patent disclosures along the way.",
+ "s03": "In 2010, Marcin moved across the table to Chrysler, taking end-to-end release ownership for every sealing system on the Pentastar V6, an architecture that went on to surpass ten million engines built.",
  "s03a": "Carrying a critical component from supplier validation into OEM release is rare. That continuity helped push the Pentastar past its first million engines within eighteen months of launch.",
  "s03b": "When a supplier quality spill threatened the rear main seal, Marcin made the call to halt plant shipments rather than risk field failures, then led the re-sourcing effort to protect launch volume.",
- "s03c": "Right as Chrysler and Fiat were integrating, he unified two separate purchasing playbooks into a single global head gasket strategy—cutting seven hundred thousand dollars a year in structural cost.",
- "s04": "At Johnson Controls, the scope expanded from powertrain components to full vehicle interiors—leading a cross-functional team to deliver complete seating systems for Nissan's Titan and Armada ahead of schedule.",
+ "s03c": "Right as Chrysler and Fiat were integrating, he unified two separate purchasing playbooks into a single global head gasket strategy, cutting seven hundred thousand dollars a year in structural cost.",
+ "s04": "At Johnson Controls, the scope expanded from powertrain components to full vehicle interiors, leading a cross-functional team to deliver complete seating systems for Nissan's Titan and Armada ahead of schedule.",
  "s04a": "Seating is where structure, safety, electronics, and craftsmanship collide. Marcin managed the program across twelve functions and two direct reports, beating launch timing while pulling cost out of every seat.",
  "s04b": "Working directly with Nissan's product planners, he stripped out low-take trim combinations that added plant complexity without moving the needle for buyers.",
- "s05": "While running Nissan seating programs full time, Marcin earned his MBA at Michigan Ross at night—shifting his focus from how to engineer a system to which products a company should bet on.",
+ "s05": "While running Nissan seating programs full time, Marcin earned his MBA at Michigan Ross at night, shifting his focus from how to engineer a system to which products a company should bet on.",
  "s05a": "Four years of evening coursework alongside a full-time engineering leadership role built the financial and strategic toolkit he needed to step out of pure R&D.",
  "s05b": "For his multidisciplinary action project in British Columbia, he spent a week on site with an open-innovation firm and delivered a market-entry roadmap straight to its CEO.",
  "s05c": "That combination of deep engineering credibility and Ross strategy training opened the door to General Motors' three-year, up-or-out leadership rotation.",
  "s06": "Ross led him to General Motors. His first GM rotation put him on the Chevrolet Traverse, using buyer-behavior analytics to strip out unprofitable build combinations and sharpen entry-level pricing.",
  "s06a": "Trimming ten percent of build combinations cleaned up dealer inventory and plant scheduling, while a sharper entry price point lifted launch consideration by six percent.",
- "s06b": "To get commercial and manufacturing teams on the same page, Marcin built his own complexity-modeling tool—turning messy option data into clear margin and volume trade-offs.",
- "s07": "When GM wanted to raise global dealer service retention, Marcin studied the highest-scoring region in the company—Ecuador—and scaled what made it work into a worldwide Chevrolet culture program.",
- "s07a": "On the ground in Quito and Guayaquil, the differentiator wasn't software—it was transparency. Letting owners watch their vehicles being serviced eliminated skepticism and drove top-decile trust scores.",
+ "s06b": "To get commercial and manufacturing teams on the same page, Marcin built his own complexity-modeling tool, turning messy option data into clear margin and volume trade-offs.",
+ "s07": "When GM wanted to raise global dealer service retention, Marcin studied the highest-scoring region in the company, Ecuador, and scaled what made it work into a worldwide Chevrolet culture program.",
+ "s07a": "On the ground in Quito and Guayaquil, the differentiator wasn't software; it was transparency. Letting owners watch their vehicles being serviced eliminated skepticism and drove top-decile trust scores.",
  "s07b": "To translate that service mindset across global dealer networks, Marcin partnered with the Disney Institute in Orlando to design a repeatable training curriculum.",
  "s07c": "Back in Detroit, he managed the program budget and led executive workshops at the Detroit Opera House to roll the standard out across leadership.",
- "s08": "For his international rotation in Mexico City, Marcin led the nationwide rollout of dealer Business Development Centers—turning inconsistent showroom follow-up into a disciplined sales engine and earning a promotion home.",
+ "s08": "For his international rotation in Mexico City, Marcin led the nationwide rollout of dealer Business Development Centers, turning inconsistent showroom follow-up into a disciplined sales engine and earning a promotion home.",
  "s08a": "Over six months on the ground across Mexico City, Guadalajara, and Monterrey, he personally visited more than three hundred fifty dealerships to drive adoption.",
  "s08b": "Most lost deals die in the first twenty-four hours. Marcin stood up dedicated follow-up teams inside dealerships and reported rollout performance directly to GM Mexico's Managing Director.",
  "s08c": "Knowing field visits wouldn't scale forever, he built an online training portal and video library so dealers could onboard new reps long after the launch team left.",
  "s09": "Promoted to Global Product Manager, Marcin aligned leadership across the US, Canada, and Korea around a single content and pricing architecture for GM's compact and midsize crossovers.",
  "s09a": "Aligning executives in three countries on one plan cut post-refresh price decay by 5% and supported $200 per-vehicle profit improvements on Equinox and Traverse.",
  "s09b": "For the next-generation Equinox, he led global customer content workshops, informed by market research in China in 2018.",
- "s10": "Tasked with launching two Korea-built crossovers—the Buick Encore GX and Chevrolet Trailblazer—just as COVID-19 fractured global supply chains, Marcin kept both programs on schedule.",
+ "s10": "Tasked with launching two Korea-built crossovers, the Buick Encore GX and Chevrolet Trailblazer, just as COVID-19 fractured global supply chains, Marcin kept both programs on schedule.",
  "s10a": "During the wire-harness shortage, he built a tool that matched builds to demand and harness supply. When the hero color wasn't ready, the show cars got off-line paint, and they arrived on time and under budget.",
  "s10b": "He added the Encore GX ST Black Roof Package within six months of production start, and built the greenhouse gas model that added a front-wheel-drive Trailblazer ACTIV to the lineup.",
- "s11": "In 2020, Marcin pivoted from vehicle hardware to recurring software revenue—building the commercial monetization strategy for Super Cruise and over-the-air upgrades across GM's North American brands.",
+ "s11": "In 2020, Marcin pivoted from vehicle hardware to recurring software revenue, building the commercial monetization strategy for Super Cruise and over-the-air upgrades across GM's North American brands.",
  "s11a": "He grew the team from 2 to 7 and won executive approval for an in-market trial of paid driver-assist upgrades, a high-margin revenue opportunity of about $30M.",
  "s11b": "He built the monetization strategy for Super Cruise across every GM brand in North America, then for the next-generation Ultra Cruise.",
  "s11c": "He also helped shape the over-the-air services behind revenue after the sale, part of GM's 2021 goal of $20 to 25B a year in software and services by 2030.",
- "s12": "In 2022, Marcin relocated to Shanghai as Deputy Director of Software Strategy at SAIC-GM—known as SGM—helping a legacy joint venture match the software pace of China's EV challengers.",
+ "s12": "In 2022, Marcin relocated to Shanghai as Deputy Director of Software Strategy at SAIC-GM, known as SGM, helping a legacy joint venture match the software pace of China's EV challengers.",
  "s12a": "He helped form SAIC-GM's software and digital business team of about 2,500 people, through approval by the GM, SAIC and SAIC-GM boards, and co-led a 49-person strategy, insights and research team.",
  "s12b": "He ran consumer research across Chinese cities on what drivers will pay for in driver assist. The research and pitch supported a nine-figure investment.",
  "s12c": "In the intelligent cockpit, he shaped an AI 'Model Integrator' strategy that brings voice and vision together.",
  "s12d": "GM China and SAIC-GM studies showed technology had become the new luxury for Chinese buyers. He helped realign the work and messaging to launch intelligent features faster.",
- "s13": "Returning to Michigan in 2025, Marcin took ownership of connected-service planning for China-built GM vehicles exported across eight global regions—aligning OnStar, regional P&Ls, and JV engineering teams on launch execution.",
+ "s13": "Returning to Michigan in 2025, Marcin took ownership of connected-service planning for China-built GM vehicles exported across eight global regions, aligning OnStar, regional P&Ls, and JV engineering teams on launch execution.",
  "s13a": "Each export region, from Mexico and South America to the Middle East, Korea, Israel, Australia and Central Asia, had its own connectivity needs and launch timing.",
  "s13b": "The plans covered the export portfolio: the Chevrolet Aveo, Spark EUV and Captiva, and the Cadillac XT5.",
  "s13c": "In August 2026 he kept driver assist in scope with a global strategy workshop on L2, L2+ and L2++. At GM Forward that October, GM said hands-free highway driving will expand: the same space this work covered.",
@@ -481,20 +481,20 @@ function replay() { /* voice switched mid-step: say the same thing again the new
 function place() {
   if (!running) return;
   if (!isPhone()) {
+    /* v78: a slim bar docked along the bottom, between the stop card and the chapter rail */
     const c = $('#card'), rail = $('#chapters');
-    /* v71: the card and rail are position:fixed, so offsetParent is always null; test their boxes instead */
     const shown = el => { if (!el) return null; const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== 'hidden' ? r : null; };
     const cr = shown(c), rr = shown(rail);
-    const cardR = cr ? cr.right : 16, rl = rr && rr.left > innerWidth / 2 ? rr.left : innerWidth;
-    let w = Math.min(460, innerWidth - 32);
-    let left = (16 + innerWidth) / 2 - w / 2;          /* same centred spot as before on wide screens */
-    if (left < cardR + 16) {                             /* tablets: centred would sit on the card, so dock beside it */
-      left = cardR + 16;
-      w = Math.max(300, Math.min(w, rl - 16 - left));
-    }
+    const lo = cr && cr.left < innerWidth / 2 ? cr.right + 16 : 16, hi = (rr && rr.left > innerWidth / 2 ? rr.left : innerWidth) - 14;
+    let w = Math.min(1120, Math.max(300, hi - lo)), left = lo + Math.max(0, (hi - lo - w) / 2);
     left = Math.max(16, Math.min(left, innerWidth - w - 16));
     ui.style.left = left + 'px'; ui.style.width = w + 'px';
-  } else { ui.style.left = ''; ui.style.width = ''; }
+    /* one row when the buttons fit beside the progress line, otherwise they drop under the caption */
+    const vis = [...ui.querySelectorAll('.tb-acts > button')].filter(b => !b.hidden);
+    const wh = $('#tb-where'), need = $('#tb-n').offsetWidth + (wh && wh.textContent ? Math.min(220, wh.scrollWidth) + 8 : 0) + 60
+      + vis.reduce((a, b) => a + b.offsetWidth + 6, 0) + 3 * 38 + 60;
+    ui.classList.add('dock'); ui.classList.toggle('narrow', w < need);
+  } else { ui.style.left = ''; ui.style.width = ''; ui.classList.remove('dock', 'narrow'); }
   const p = unitProgress(), f = $('#tb-fill');
   if (unit && unit.kind === 'window') {
     const cd = ui.querySelector('.tb-cd .cd'); if (cd) cd.style.strokeDashoffset = String(100 * (p || 0));

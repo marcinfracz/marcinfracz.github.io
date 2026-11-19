@@ -1115,3 +1115,75 @@ html { overflow: hidden; }
   html.touring.pd-on .tour3 #tb-pause::before { transform: translate(-50%, -50%); }
   html.touring.pd-on .tour3 #tb-pause[aria-pressed="true"]::before { transform: translate(-38%, -50%); }
 }
+
+/* v78: the start card, rebuilt as a pair with the finish card: one primary, the two tours side by side, the keys in a footer */
+.card.start { width: clamp(350px, 27vw, 410px); padding: 20px 22px 16px; }
+.card.start .hero { padding-bottom: 14px; margin: 0 0 12px; border-bottom: 1px solid var(--line); }
+.card.start .role { margin: 0 0 8px; font-size: 13.5px; line-height: 1.5; }
+.card.start .what { margin: 0 0 16px; font-size: 15px; line-height: 1.35; font-weight: 700; color: var(--ink); }
+.st-acts { display: grid; gap: 10px; }
+.st-acts .btn { width: 100%; height: 44px; justify-content: center; white-space: nowrap; }
+.st-acts .go-btn { height: 46px; padding: 0 18px; font-size: 15px; }
+.st-label { display: flex; align-items: center; gap: 10px; margin: 2px 0 0; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.st-label::before, .st-label::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.st-tours { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.st-tours .btn { min-width: 0; padding: 0 8px; gap: 6px; font-size: 13px; }
+@media (min-width: 768px) and (max-width: 1379px) { .st-tours .btn svg { display: none; } }
+.st-tours .tour-quiet { background: var(--surface-2); box-shadow: none; }
+.st-tours .btn:hover { background: var(--accent-soft); }
+.hint-mini.st-foot { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--line); gap: 5px; font-size: 11.5px; }
+.st-foot .st-foot-l { margin-right: 4px; font-weight: 700; color: var(--ink-2); }
+.st-foot .kbd { min-width: 20px; height: 18px; font-size: 10.5px; }
+@media (min-width: 768px) {
+  /* during the tour the bar at the bottom holds the controls, so the start card is just the introduction */
+  html.touring .card.start .st-acts, html.touring .card.start .st-foot { display: none; }
+  html.touring .card.start .what { margin-bottom: 0; }
+}
+@media (max-width: 767px) {
+  #m-start .st-acts { gap: 8px; margin-top: 10px; }
+  #m-start .st-acts .btn { height: 44px; }
+  #m-start .st-label { display: none; }
+  #m-start .st-tours .btn { font-size: 13px; padding: 0 8px; }
+  #m-start .swipe-hint { margin-top: 10px; }
+}
+
+/* v78 laptop and tablet tour: a slim bar docked at the bottom, between the stop card and the chapter rail; the round arrows step aside while it runs */
+@media (min-width: 768px) {
+  html.touring .road-step { display: none !important; }
+  .tour-box.tour3.dock { bottom: 16px; padding: 10px 12px 12px 18px; border-radius: 16px; display: grid; column-gap: 8px; align-items: center;
+    grid-template-columns: auto minmax(0, max-content) minmax(48px, 1fr) auto auto auto auto;
+    grid-template-areas: "n where bar acts cc vo x" "sub sub sub sub sub sub sub" "t t t t t t t";
+    transition: left .3s ease, width .3s ease; }
+  .tour-box.tour3.dock[hidden] { display: none; }
+  .tour3.dock .tb-top { display: contents; }
+  .tour3.dock .tb-n { grid-area: n; }
+  .tour3.dock .tb-where { grid-area: where; max-width: 220px; }
+  .tour3.dock .tb-bar { grid-area: bar; margin: 0 6px; }
+  .tour3.dock #tb-cc { grid-area: cc; } .tour3.dock #tb-voice { grid-area: vo; } .tour3.dock #tb-x { grid-area: x; }
+  .tour3.dock .tb-acts { grid-area: acts; flex-wrap: nowrap; gap: 6px; margin: 0 6px 0 4px; }
+  .tour3.dock .tb-btn { height: 36px; padding: 0 14px; white-space: nowrap; }
+  .tour3.dock .tb-stories { margin-right: 0; }
+  .tour3.dock .tb-sub { grid-area: sub; margin: 6px 0 0; }
+  .tour3.dock .tb-t { grid-area: t; margin: 8px 0 0; font-size: 14.5px; line-height: 1.45; max-height: 5.8em; overflow-y: auto; overscroll-behavior: contain; }
+  .tour3.dock.nocap .tb-t { display: none; }
+  .tour3.dock.nocap .tb-acts { margin-top: 0; }
+  /* narrower screens (tablets): the buttons drop to their own row under the caption */
+  .tour-box.tour3.dock.narrow { grid-template-columns: auto minmax(0, max-content) minmax(40px, 1fr) auto auto auto;
+    grid-template-areas: "n where bar cc vo x" "sub sub sub sub sub sub" "t t t t t t" "acts acts acts acts acts acts"; }
+  .tour3.dock.narrow .tb-where { max-width: 180px; }
+  .tour3.dock.narrow .tb-acts { margin: 10px 0 0; }
+  .tour3.dock.narrow .tb-stories { margin-right: auto; }
+  .tour3.dock.narrow .tb-t { max-height: 7.25em; }
+}
+.card.start .what { text-wrap: wrap; }
+.card.start .what .nw { display: inline-block; }
+.st-tours .btn { box-shadow: inset 0 0 0 1px var(--line); }
+@media (min-width: 768px) {
+  /* the taller start card sits a little higher so it never runs off a short screen */
+  .card.start { top: clamp(72px, 34vh, calc(100vh - 560px)); }
+}
+@media (min-width: 768px) and (max-width: 1379px) {
+  .hint-mini.st-foot { gap: 3px; font-size: 11px; flex-wrap: nowrap; white-space: nowrap; }
+  .st-foot .kbd { min-width: 16px; height: 16px; padding: 0 3px; font-size: 9.5px; }
+  .st-foot .st-foot-l { margin-right: 3px; }
+}
