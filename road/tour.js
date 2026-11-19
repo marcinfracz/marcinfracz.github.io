@@ -474,11 +474,16 @@ function place() {
   if (!running) return;
   if (!isPhone()) {
     const c = $('#card'), rail = $('#chapters');
-    const cr = c && c.offsetParent !== null ? c.getBoundingClientRect() : { right: 16 };
-    const rl = rail && rail.offsetParent !== null ? rail.getBoundingClientRect().left : innerWidth;
-    const room = rl - Math.max(cr.right, 16) - 24;   /* v71: narrow the box to fit beside the card on tablets */
-    const w = Math.min(460, innerWidth - 32, Math.max(320, room));
-    let left = (Math.max(cr.right, 16) + rl) / 2 - w / 2;
+    /* v71: the card and rail are position:fixed, so offsetParent is always null; test their boxes instead */
+    const shown = el => { if (!el) return null; const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== 'hidden' ? r : null; };
+    const cr = shown(c), rr = shown(rail);
+    const cardR = cr ? cr.right : 16, rl = rr && rr.left > innerWidth / 2 ? rr.left : innerWidth;
+    let w = Math.min(460, innerWidth - 32);
+    let left = (16 + innerWidth) / 2 - w / 2;          /* same centred spot as before on wide screens */
+    if (left < cardR + 16) {                             /* tablets: centred would sit on the card, so dock beside it */
+      left = cardR + 16;
+      w = Math.max(300, Math.min(w, rl - 16 - left));
+    }
     left = Math.max(16, Math.min(left, innerWidth - w - 16));
     ui.style.left = left + 'px'; ui.style.width = w + 'px';
   } else { ui.style.left = ''; ui.style.width = ''; }
