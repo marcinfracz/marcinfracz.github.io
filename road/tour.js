@@ -428,6 +428,7 @@ function head() {
   $('#tb-back').disabled = at === 0 && phase !== 'stories';
   $('#tb-pause').hidden = phase === 'end';
   ui.classList.toggle('at-end', phase === 'end');
+  ui.classList.toggle('at-last', at === last);
 }
 function syncPause() { const b = $('#tb-pause'); if (!b) return; b.textContent = paused ? 'Play' : 'Pause'; b.setAttribute('aria-pressed', String(paused)); if (ui) ui.classList.toggle('paused', paused); }
 function syncVoice() { const b = $('#tb-voice'); if (!b) return; b.setAttribute('aria-pressed', String(Voice.on)); b.setAttribute('aria-label', Voice.on ? 'Voice on' : 'Voice off'); b.classList.toggle('off', !Voice.on); syncCaps(); }
@@ -475,7 +476,8 @@ function place() {
     const c = $('#card'), rail = $('#chapters');
     const cr = c && c.offsetParent !== null ? c.getBoundingClientRect() : { right: 16 };
     const rl = rail && rail.offsetParent !== null ? rail.getBoundingClientRect().left : innerWidth;
-    const w = Math.min(460, innerWidth - 32);
+    const room = rl - Math.max(cr.right, 16) - 24;   /* v71: narrow the box to fit beside the card on tablets */
+    const w = Math.min(460, innerWidth - 32, Math.max(320, room));
     let left = (Math.max(cr.right, 16) + rl) / 2 - w / 2;
     left = Math.max(16, Math.min(left, innerWidth - w - 16));
     ui.style.left = left + 'px'; ui.style.width = w + 'px';
