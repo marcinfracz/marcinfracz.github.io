@@ -230,9 +230,10 @@ const placeName = i => { const s = STOPS()[i] || {}, p = (C().profile || {})[s.i
 const flowMode = () => isPhone() || !R();          /* phones, and the plain list without 3D, scroll the page instead */
 const readMs = t => Math.max(3500, 1200 + t.split(/\s+/).length * 270);
 const WINDOW_MS = 6000;
+const LOG = []; const L = (...a) => { LOG.push([Math.round(performance.now()), ...a]); if (LOG.length > 120) LOG.shift(); };
 
 let ui = null, running = false, paused = false, token = 0, raf = 0, lastFocus = null;
-let at = 0, phase = '', storyK = -1, unit = null, only = false, capsOn = prefs.captions !== false, driving = false;
+let lastCur = -1, at = 0, phase = '', storyK = -1, unit = null, only = false, capsOn = prefs.captions !== false, driving = false;
 
 /* a unit is one caption: a voice clip, or a reading timer. It can be paused, skipped or cancelled. */
 function runUnit(id, kind) {
@@ -251,7 +252,7 @@ function runUnit(id, kind) {
   });
 }
 function startTimer(u) { clearTimeout(u.timer); u.t0 = performance.now(); if (!paused) u.timer = setTimeout(() => finish(u, true), u.left); }
-function finish(u, ok) { if (u.done) return; u.done = true; clearTimeout(u.timer); if (u.audio) Voice.stop(); if (unit === u) unit = null; u.res(ok); }
+function finish(u, ok) { if (!u.done) L('finish', u.id || u.kind, ok); if (u.done) return; u.done = true; clearTimeout(u.timer); if (u.audio) Voice.stop(); if (unit === u) unit = null; u.res(ok); }
 function cancelUnit() { if (unit) finish(unit, false); }
 function skipUnit() { if (unit) finish(unit, true); }
 function pauseUnit() { if (!unit) return; if (unit.audio) Voice.el.pause(); else { clearTimeout(unit.timer); unit.left = Math.max(0, unit.left - (performance.now() - unit.t0)); } }
@@ -284,7 +285,7 @@ async function driveTo(i, my) {
       else r.go(i);
     }
     const t0 = performance.now(), card = $('#card');
-    while (performance.now() - t0 < 3200) {
+    while (performance.now() - t0 < 6500) {
       if (my !== token) return;
       if (r.cur === i && card && !card.classList.contains('out')) break;
       await wait(80);
@@ -295,7 +296,7 @@ async function driveTo(i, my) {
 
 /* ---------- the script ---------- */
 async function runFrom(i, opts = {}) {
-  const my = ++token;
+  const my = ++token; L('runFrom', i, JSON.stringify(opts), phase);
   cancelUnit(); paused = false; syncPause();
   for (let s = i; s <= LAST(); s++) {
     if (my !== token) return;
@@ -430,23 +431,26 @@ function syncCaps() { const b = $('#tb-cc'); if (!b) return; const show = capsOn
 
 /* ---------- controls ---------- */
 function next() {
+  L('next', at, phase, storyK);
   if (phase === 'end') return end();
   if (phase === 'stories' && storyK < nStories(at) - 1 && !only) { if (paused) { paused = false; syncPause(); } return skipUnit(); }
   if (phase === 'window' && only) { only = false; }
   runFrom(Math.min(LAST(), at + 1));
 }
 function back() {
+  L('back', at, phase, storyK);
   if (phase === 'stories' && storyK > 0) return runFrom(at, { story: storyK - 1 });
   if (phase === 'stories' || phase === 'window') return runFrom(at);
   runFrom(Math.max(0, at - 1));
 }
 function stories() {
+  L('stories', at, phase, storyK, paused);
   const n = nStories(at); if (!n || phase === 'end') return;
   if (phase === 'stories') return runFrom(Math.min(LAST(), at + 1));
   if (phase === 'window' && unit && !paused) { phase = 'stories'; return skipUnit(); }
   runFrom(at, { story: 0 });
 }
-function pauseTour() { if (paused || phase === 'end') return; paused = true; syncPause(); pauseUnit(); }
+function pauseTour() { L('pause', at, phase); if (paused || phase === 'end') return; paused = true; syncPause(); pauseUnit(); }
 function togglePause() {
   if (phase === 'end') return;
   if (!paused) return pauseTour();
@@ -477,7 +481,7 @@ function place() {
     const cd = ui.querySelector('.tb-cd .cd'); if (cd) cd.style.strokeDashoffset = String(100 * (p || 0));
   } else if (f && p != null) f.style.width = (p * 100).toFixed(1) + '%';
   /* the visitor drove the road by hand: pause where they stopped */
-  if (!flowMode() && !driving && !paused && phase !== 'end' && R().cur !== at) pauseTour();
+  if (!flowMode()) { const rc = R().cur; if (!driving && !paused && phase !== 'end' && rc !== lastCur && rc !== at) pauseTour(); lastCur = rc; }
   raf = requestAnimationFrame(place);
 }
 
@@ -532,4 +536,4 @@ document.querySelectorAll('#voice-seg button').forEach(b => b.addEventListener('
 const vol = $('#music-vol'); if (vol) vol.addEventListener('input', () => Music.setVol(vol.value / 100));
 syncMenu();
 
-window.__tour = { begin, end, get running() { return running; }, get stop() { return at; }, get phase() { return phase; }, get story() { return storyK; }, get paused() { return paused; }, music: Music, voice: Voice };
+window.__tour = { begin, end, get running() { return running; }, get stop() { return at; }, get phase() { return phase; }, get story() { return storyK; }, get paused() { return paused; }, log: LOG, music: Music, voice: Voice };
