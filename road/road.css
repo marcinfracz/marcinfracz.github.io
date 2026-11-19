@@ -1134,6 +1134,12 @@ html { overflow: hidden; }
 .hint-mini.st-foot { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--line); gap: 5px; font-size: 11.5px; }
 .st-foot .st-foot-l { margin-right: 4px; font-weight: 700; color: var(--ink-2); }
 .st-foot .kbd { min-width: 20px; height: 18px; font-size: 10.5px; }
+/* Drive mode entry: one quiet line under the start card's foot; desktop and tablet only */
+.card.start .st-dm { display: flex; align-items: center; gap: 6px; margin: 10px 0 0; font-size: 12px; font-weight: 700; color: var(--accent-ink); text-decoration: none; }
+.card.start .st-dm span { transition: transform .2s ease; }
+.card.start .st-dm:hover span, .card.start .st-dm:focus-visible span { transform: translateX(3px); }
+html.touring .card.start .st-dm { display: none; }
+@media (max-width: 767px) { .card.start .st-dm { display: none; } }
 @media (min-width: 768px) {
   /* during the tour the bar at the bottom holds the controls, so the start card is just the introduction */
   html.touring .card.start .st-acts, html.touring .card.start .st-foot { display: none; }
