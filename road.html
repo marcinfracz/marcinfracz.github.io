@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="road/road.css?v=66">
+<link rel="stylesheet" href="road/road.css?v=69">
 <link rel="stylesheet" href="road/phone-drive.css?v=64">
 <script>
   /* theme before first paint: shared with the desktop page */
@@ -69,7 +69,7 @@
       <button type="button" data-v="1" aria-pressed="false" data-cap="Tour voice on" title="Tour voice on" aria-label="Tour voice on"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button>
       <button type="button" data-v="0" aria-pressed="true" class="on" data-cap="Tour voice off" title="Tour voice off" aria-label="Tour voice off"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 9.5V6a3 3 0 0 0-5.6-1.5M9 9v2a3 3 0 0 0 4.6 2.5"/><path d="M18.5 11a6.5 6.5 0 0 1-1 3.4M5.5 11a6.5 6.5 0 0 0 10.4 5.2M12 17.5V21M3 3l18 18"/></svg></button>
     </div></div>
-    <button type="button" class="tour-menu-btn" id="tour-menu-btn" data-act="tour"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>Show me around</button>
+    <div class="tour-pair" role="group" aria-label="Show me around"><button type="button" class="tour-menu-btn" id="tour-menu-btn" data-act="tour" data-voice="1"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/></svg>Audio tour</button><button type="button" class="tour-menu-btn alt" data-act="tour" data-voice="0">Without sound</button></div>
   </div>
 </div>
     <button class="theme-btn" id="theme-btn" type="button" aria-label="Switch Day and Dusk">
@@ -119,8 +119,8 @@
 <script src="js/reel-player.js?v=62"></script>
 <script src="content/road-content.js?v=63"></script>
 <script src="road/phone-drive.js?v=66"></script>
-<script type="module" src="road/road.js?v=64"></script>
-<script type="module" src="road/tour.js?v=65"></script>
+<script type="module" src="road/road.js?v=69"></script>
+<script type="module" src="road/tour.js?v=69"></script>
 <script src="js/top-nav.js?v=43"></script>
 <script src="js/phone-menu.js?v=49"></script>
 <!-- Cloudflare Web Analytics --><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "18aafd4fcbc5429e9148c50c5ca2d470"}'></script><!-- End Cloudflare Web Analytics -->
