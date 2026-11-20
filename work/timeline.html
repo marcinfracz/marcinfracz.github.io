@@ -699,9 +699,27 @@ html[data-theme="dark"] .tile.keep img,html[data-theme="dark"] .lg.keep img,html
   .dock #zlabel{display:block;min-width:76px}
 }
 </style>
+<!-- Owner switch: ?me=1 keeps this browser out of analytics, ?me=0 turns it back on -->
+<script>
+(function () {
+  var me = false, q = null;
+  try { q = new URLSearchParams(location.search).get("me"); } catch (e) {}
+  try {
+    if (q === "1") localStorage.setItem("mf_me", "1");
+    else if (q === "0") localStorage.removeItem("mf_me");
+    me = localStorage.getItem("mf_me") === "1";
+  } catch (e) {}
+  if (q === "1") me = true; else if (q === "0") me = false;
+  window.__mfMe = me;
+  if (q !== null) {
+    try { var u = new URL(location.href); u.searchParams.delete("me"); history.replaceState(history.state, "", u.pathname + u.search + u.hash); } catch (e) {}
+  }
+})();
+</script>
 <!-- Microsoft Clarity with a Europe-only consent banner. Paste inside <head> on every page. -->
 <script>
 (function () {
+  if (window.__mfMe) return;
   var ID = "zg4o4r3obc";
   var KEY = "mf-analytics-consent";
 
