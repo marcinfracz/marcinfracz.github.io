@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="road/drive.css?v=1">
+<link rel="stylesheet" href="road/drive.css?v=2">
 <script>
   (function () {
     var dark = null;
@@ -28,8 +28,9 @@
     <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
     <span>The Road</span>
   </a>
-  <span class="dv-title">Drive mode <em>Free play</em></span>
+  <span class="dv-title">Drive mode <em id="dv-mode">Free play</em></span>
   <div class="dv-line" id="dv-line" aria-label="Career stops"><i class="dv-car" id="dv-car"></i></div>
+  <button type="button" class="dv-game" id="b-game" title="Chase game: 90 seconds (G)">Chase game</button>
   <div class="dv-ctl" role="group" aria-label="Drive settings">
     <button type="button" id="b-cam" aria-pressed="false" title="Camera: driver seat (C)" aria-label="Switch camera">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -73,9 +74,11 @@
       <li><kbd>Shift</kbd> Faster</li>
       <li><kbd>C</kbd> Camera</li>
       <li><kbd>V</kbd> Narration</li>
+      <li><kbd>G</kbd> Chase game</li>
     </ul>
     <p class="dv-pad">Gamepad works too: left stick steers, triggers drive and brake.</p>
-    <div class="dv-go"><button type="button" id="dv-start" class="primary">Start driving</button><button type="button" id="dv-start-v">Start with narration</button></div>
+    <div class="dv-go"><button type="button" id="dv-start" class="primary">Start driving</button><button type="button" id="dv-start-v">Start with narration</button><button type="button" id="dv-start-g">Play the chase game</button></div>
+    <p class="dv-pad dv-game-note">Chase game: 90 seconds to collect 8 AI pickups before the Deck Demander catches up.</p>
   </div>
 </section>
 
@@ -91,6 +94,6 @@
 <noscript><p class="dv-noscript">Drive mode needs JavaScript. <a href="road.html">Open The Road</a>.</p></noscript>
 
 <script src="content/road-content.js?v=74"></script>
-<script type="module" src="road/drive.js?v=1"></script>
+<script type="module" src="road/drive.js?v=2"></script>
 </body>
 </html>
