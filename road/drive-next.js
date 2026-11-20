@@ -507,7 +507,7 @@ function start() {
         free: () => underVeil(() => { game.stop(); fx.length = 0; applyMode('free'); syncGame(); }),
         links: { resume: 'assets/resume.pdf', contact: 'index.html#contact' },
         laneDist,   // pickups keep clear of the town's lanes and sidewalks
-        skills: false, skillLabels: [...new Set(NOTES.map(n => n.skill))],   // pure play by default; true brings back the handover's skill chips
+        skills: true, skillLabels: [...new Set(NOTES.map(n => n.skill))],   // Marcin picked skill labels back (Nov 20): each pickup names a skill, the end screen lists them
         groundY: (x, z) => Math.max(0, world.height(x, z))
       });
     }
