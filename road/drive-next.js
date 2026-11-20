@@ -308,7 +308,7 @@ function start() {
   let mode = null;
   const modeEl0 = $('#dv-mode');
   function syncModeUI() {
-    if (modeEl0) modeEl0.textContent = mode ? MODES[mode] + (mode === 'road' && voiceOn ? ', narrated' : '') : 'Open world preview';
+    if (modeEl0) modeEl0.textContent = mode ? MODES[mode] + (mode === 'road' && voiceOn ? ', narrated' : '') : 'Choose a mode';
     document.querySelectorAll('.dv-opt[data-mode]').forEach(b => b.classList.toggle('on', b.dataset.mode === mode && (!!b.dataset.voice) === (mode === 'road' && voiceOn)));
     root.setAttribute('data-drive-mode', mode || '');
     const tag = document.querySelector('#b-modes .dv-mode-tag'); if (tag) tag.textContent = mode ? MODES[mode] : '';   // narrow screens: the mode rides on the Modes button
