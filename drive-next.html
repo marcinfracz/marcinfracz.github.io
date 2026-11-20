@@ -11,12 +11,39 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="road/drive.css?v=2">
+<link rel="stylesheet" href="road/chase.css?v=1">
+<link rel="stylesheet" href="road/chase-next.css?v=2">
+<link rel="stylesheet" href="road/fieldnotes-next.css?v=2">
 <style>
-  /* preview only: the open world, no chase game yet */
-  #b-game, #dv-start-g, .dv-game-note { display: none !important; }
+  /* preview: the open world, with the mode selector (v3 Phase B and C) */
+  #b-game { display: none !important; }   /* the chase starts from the mode selector */
   .dv-map { position: fixed; left: 18px; bottom: 74px; z-index: 4; width: 188px; height: 188px; border-radius: 50%; box-shadow: 0 8px 24px rgba(20, 24, 30, .16); pointer-events: none; }
   .dv-coarse .dv-map { left: 18px; right: auto; bottom: auto; top: 116px; width: 132px; height: 132px; }
   .dv-pv { position: fixed; left: 18px; top: 78px; z-index: 4; margin: 0; padding: 6px 12px; border-radius: 999px; font: 600 12px/1.2 Inter, system-ui, sans-serif; color: var(--ink-2); background: var(--glass, rgba(250,250,247,.84)); }
+  /* the mode selector: The Road and the Games on one screen */
+  .dv-intro-in.dv-sel { width: min(860px, 100%); padding: 28px 30px 24px; max-height: calc(100vh - 32px); overflow: auto; }
+  .dv-sel h1 { font-size: 30px; }
+  .dv-groups { display: grid; grid-template-columns: 1fr 1.25fr; gap: 16px; margin-top: 20px; }
+  .dv-grp { border-radius: 16px; padding: 14px 14px 12px; background: color-mix(in srgb, var(--ink, #1E2124) 4%, transparent); }
+  .dv-grp h2 { margin: 0 0 2px; font-size: 15px; font-weight: 700; letter-spacing: -.01em; }
+  .dv-grp > p { margin: 0 0 10px; font-size: 12.5px; color: var(--ink-3); }
+  .dv-sub { margin: 10px 0 6px; font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-3); }
+  .dv-opt { display: block; width: 100%; text-align: left; margin: 0 0 8px; padding: 10px 12px; border: 1.5px solid transparent; border-radius: 12px; cursor: pointer;
+    background: var(--surface, #FAFAF7); color: var(--ink); font: inherit; text-decoration: none; box-shadow: 0 1px 2px rgba(0,0,0,.05); }
+  .dv-opt b { display: block; font-size: 14px; font-weight: 700; }
+  .dv-opt span { display: block; margin-top: 2px; font-size: 12.5px; line-height: 1.4; color: var(--ink-2); }
+  .dv-opt:hover { border-color: color-mix(in srgb, var(--accent) 60%, transparent); }
+  .dv-opt:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .dv-opt.on { border-color: var(--accent); }
+  .dv-opt small { display: block; margin-top: 4px; font-size: 11.5px; color: var(--ink-3); }
+  .dv-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .dv-sel .dv-keys { margin-top: 14px; grid-template-columns: repeat(4, auto); font-size: 12.5px; gap: 6px 16px; }
+  .dv-modes-btn { height: 34px; padding: 0 12px; border: 0; border-radius: 10px; cursor: pointer; font: 600 13px Inter, system-ui, sans-serif; background: var(--glass, rgba(250,250,247,.84)); color: var(--ink); }
+  .dv-modes-btn:hover { background: var(--line); }
+  .dv-mode-tag { display: none; font-weight: 500; color: var(--ink-2); }
+  .dv-mode-tag:not(:empty)::before { content: " · "; }
+  @media (max-width: 1180px) { .dv-mode-tag { display: inline; } }
+  @media (max-width: 980px) { .dv-groups { grid-template-columns: 1fr; } .dv-sel .dv-keys { grid-template-columns: repeat(2, auto); } }
 </style>
 <script>
   (function () {
@@ -36,6 +63,7 @@
     <span>The Road</span>
   </a>
   <span class="dv-title">Drive mode <em id="dv-mode">Open world preview</em></span>
+  <button type="button" class="dv-modes-btn" id="b-modes" title="Choose a mode (Esc)">Modes<span class="dv-mode-tag"></span></button>
   <div class="dv-line" id="dv-line" aria-label="Career stops"><i class="dv-car" id="dv-car"></i></div>
   <button type="button" class="dv-game" id="b-game" title="Chase game: 90 seconds (G)">Chase game</button>
   <div class="dv-ctl" role="group" aria-label="Drive settings">
@@ -70,22 +98,43 @@
 <div class="dv-veil" id="dv-veil" aria-hidden="true"></div>
 
 <section class="dv-intro" id="dv-intro" role="dialog" aria-labelledby="dv-intro-h">
-  <div class="dv-intro-in">
-    <p class="dv-kick">The Road · Drive mode</p>
-    <h1 id="dv-intro-h">Take the wheel.</h1>
-    <p class="dv-lead">Preview: the whole city is open. Turn off the main road into the streets, take the ramps up onto I-475, the Ambassador Bridge and the Yan'an Elevated Road.</p>
+  <div class="dv-intro-in dv-sel">
+    <p class="dv-kick">Drive mode · Open world preview</p>
+    <h1 id="dv-intro-h">Drive through Marcin's career, or just drive.</h1>
+    <p class="dv-lead">Pick a way in. The Modes button at the top brings you back here.</p>
+    <div class="dv-groups">
+      <div class="dv-grp" role="group" aria-labelledby="g-road">
+        <h2 id="g-road">The Road</h2>
+        <p>His career as a story, stop by stop.</p>
+        <a class="dv-opt" href="road.html"><b>Scroll The Road</b><span>The original page: scroll or swipe past each stop.</span><small>Its menu has the Audio tour (voice with captions) and Without sound (captions only).</small></a>
+        <div class="dv-row2">
+          <button type="button" class="dv-opt" id="dv-start" data-mode="road"><b>Drive The Road</b><span>Drive it yourself. Each stop's story opens as you pass.</span></button>
+          <button type="button" class="dv-opt" id="dv-start-v" data-mode="road" data-voice="1"><b>Drive with narration</b><span>The same drive, with the tour's voice and captions.</span></button>
+        </div>
+      </div>
+      <div class="dv-grp" role="group" aria-labelledby="g-games">
+        <h2 id="g-games">Games</h2>
+        <p>Drive the open city: streets, ramps, decks and bridges.</p>
+        <p class="dv-sub">Learn</p>
+        <button type="button" class="dv-opt" data-mode="notes"><b>Field notes</b><span>Find 16 notes off the main road and fill your Glovebox.</span></button>
+        <p class="dv-sub">Just play</p>
+        <div class="dv-row2">
+          <button type="button" class="dv-opt" data-mode="free"><b>Free play</b><span>No stories, no clock. Just the car and the city.</span></button>
+          <button type="button" class="dv-opt" id="dv-start-g" data-mode="chase"><b>City Chase</b><span>90 seconds, 6 pickups, and the Deck Demander on your tail.</span></button>
+        </div>
+      </div>
+    </div>
     <ul class="dv-keys" id="dv-keys">
       <li><kbd>W</kbd><kbd>↑</kbd> Drive</li>
-      <li><kbd>S</kbd><kbd>↓</kbd> Brake and reverse</li>
+      <li><kbd>S</kbd><kbd>↓</kbd> Brake</li>
       <li><kbd>A</kbd><kbd>D</kbd> Steer</li>
       <li><kbd>Shift</kbd> Faster</li>
       <li><kbd>C</kbd> Camera</li>
-      <li><kbd>V</kbd> Narration</li>
       <li><kbd>M</kbd> Map</li>
+      <li><kbd>B</kbd> Glovebox</li>
+      <li><kbd>Esc</kbd> Modes</li>
     </ul>
     <p class="dv-pad">Gamepad works too: left stick steers, triggers drive and brake.</p>
-    <div class="dv-go"><button type="button" id="dv-start" class="primary">Start driving</button><button type="button" id="dv-start-v">Start with narration</button><button type="button" id="dv-start-g">Play the chase game</button></div>
-    <p class="dv-pad dv-game-note">Chase game: 90 seconds to collect 8 AI pickups before the Deck Demander catches up.</p>
   </div>
 </section>
 
@@ -102,6 +151,6 @@
 
 <script src="content/road-content.js?v=74"></script>
 <p class="dv-pv">Open world preview, not linked from the site</p>
-<script type="module" src="road/drive-next.js?v=3"></script>
+<script type="module" src="road/drive-next.js?v=6"></script>
 </body>
 </html>
