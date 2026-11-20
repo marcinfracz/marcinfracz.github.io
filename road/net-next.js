@@ -1,7 +1,9 @@
 /* Drive mode, open world (preview). Turns the streets, ramps and bridges The Road already draws into
    surfaces you can drive on. Network idea and first draft by Grok, rebuilt by Claude so the drivable
    lines sit exactly on the drawn ones (same smoothing as landmarks.js). It only reads the shared
-   modules and the meshes they built: no Road file is changed. */
+   modules and the meshes they built: no Road file is changed.
+   v3 Phase B and C (Grok): the small map takes markers and a route line from other modules (Field notes,
+   the chase), through setMarks and setPath, so there is only ever one map. */
 import { THREE, roadZ } from './core.js';
 
 const MAIN_HALF = 8.3;          // the main road, curb to curb
@@ -253,6 +255,10 @@ export function createMinimap({ net, car, stops, roadZ: rz, parent }) {
   const g = cv.getContext('2d'); g.scale(dpr, dpr);
   let on = true;
   const toggle = () => { on = !on; cv.hidden = !on; };
+  /* markers from other modules: { x, z, color, r, shape: 'dot'|'square'|'ring', edge: true keeps it on the rim when off the map } */
+  const marks = new Map(), paths = new Map();
+  const setMarks = (owner, list) => { if (list && list.length) marks.set(owner, list); else marks.delete(owner); };
+  const setPath = (owner, pts, color) => { if (pts && pts.length > 1) paths.set(owner, { pts, color }); else paths.delete(owner); };
   function draw(css) {
     if (!on) return;
     const sc = (W / 2) / R;
@@ -289,11 +295,26 @@ export function createMinimap({ net, car, stops, roadZ: rz, parent }) {
       const [px, py] = P(s.x, rz(s.x) - 22);
       g.fillStyle = s.hl ? css.accent : css.stop; g.beginPath(); g.arc(px, py, s.hl ? 4.5 : 3.5, 0, Math.PI * 2); g.fill();
     });
+    // routes, then markers (pickups, the chaser, the next Field note)
+    paths.forEach(({ pts, color }) => {
+      g.strokeStyle = color || css.accent; g.lineWidth = 3; g.setLineDash([5, 4]); g.beginPath();
+      pts.forEach((q, i) => { const [px, py] = P(q.x, q.z); i ? g.lineTo(px, py) : g.moveTo(px, py); }); g.stroke(); g.setLineDash([]);
+    });
+    marks.forEach(list => list.forEach(m => {
+      let [px, py] = P(m.x, m.z);
+      const dx = px - W / 2, dy = py - H / 2, d = Math.hypot(dx, dy), rim = W / 2 - 9;
+      if (d > rim) { if (!m.edge) return; px = W / 2 + dx / d * rim; py = H / 2 + dy / d * rim; }
+      const r = m.r || 4;
+      g.fillStyle = m.color || css.accent; g.strokeStyle = css.bg; g.lineWidth = 1.5;
+      g.beginPath();
+      if (m.shape === 'square') g.rect(px - r, py - r, r * 2, r * 2); else g.arc(px, py, r, 0, Math.PI * 2);
+      if (m.shape === 'ring') { g.strokeStyle = m.color || css.accent; g.lineWidth = 2.5; g.stroke(); } else { g.fill(); g.stroke(); }
+    }));
     g.restore();
     // the car
     g.fillStyle = css.accent; g.strokeStyle = css.ink; g.lineWidth = 1.5;
     g.beginPath(); g.moveTo(W / 2, H / 2 - 8); g.lineTo(W / 2 + 6, H / 2 + 6); g.lineTo(W / 2, H / 2 + 3); g.lineTo(W / 2 - 6, H / 2 + 6); g.closePath(); g.fill(); g.stroke();
     g.strokeStyle = css.ring; g.lineWidth = 1; g.beginPath(); g.arc(W / 2, H / 2, W / 2 - 1, 0, Math.PI * 2); g.stroke();
   }
-  return { draw, toggle, canvas: cv };
+  return { draw, toggle, canvas: cv, setMarks, setPath, get marks() { return marks; }, get on() { return on; } };
 }

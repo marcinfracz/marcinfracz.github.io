@@ -1,12 +1,17 @@
 /* Drive mode, open-world PREVIEW (v3 Phase A). Same as drive.js, plus: leave the main road, turn into the
    cities, take the ramps up onto the elevated roads and bridges, with a small map. Network by Grok and Claude.
    First draft by Grok, finished by Claude. It only reads the shared modules and content:
-   road.js, tour.js and every other Road file stay exactly as they are. */
+   road.js, tour.js and every other Road file stay exactly as they are.
+   v3 Phase B and C (Grok, for Claude's review): a mode selector (The Road, then Games: Learn and Just play),
+   Field notes and the Glovebox (fieldnotes-next.js), the City Chase on the network (chase-next.js), a route
+   graph (route-next.js), softer and smoother car contact with walls, curbs and decks, and NPC limits. */
 import { THREE, TOKENS, setTheme, roadZ, roadDZ, smooth, clamp, lerp } from './core.js';
-import { buildWorld } from './world.js?v=76';
+import { buildWorld, vehicleGeo } from './world.js?v=76';
 import { buildStage } from './stages.js?v=76';
-import { planCities, cityFootprints, buildCities } from './landmarks.js?v=76';
-import { createNet, createMinimap } from './net-next.js?v=5';
+import { planCities, cityFootprints, buildCities, tPose } from './landmarks.js?v=76';
+import { createNet, createMinimap } from './net-next.js?v=6';
+import { createRoutes } from './route-next.js?v=2';
+import { createFieldNotes, NOTES } from './fieldnotes-next.js?v=3';
 
 const C = window.ROAD_CONTENT;
 const $ = s => document.querySelector(s);
@@ -145,6 +150,52 @@ function start() {
   world.setMode('off');
   /* the open world: every street, ramp and deck the towns draw, and the buildings you can't drive through */
   const net = createNet({ cities, height: world.height, town, stages });   // the sensor overlays belong to the side view; from the seat they only clutter
+  const routes = createRoutes({ net, roadZ, xLo: X_LO, xHi: X_HI, mainOff: LANE_B });
+
+  /* the town's lanes and sidewalks, sampled every 1.5 m: pickups are placed clear of them */
+  const laneGrid = new Map(), LG = 6;
+  town.cities.forEach(b => { const T = b.anim && b.anim.traffic; if (!T || !T.rings) return;
+    T.rings.forEach(R => { for (let u = 0; u < R.Lr; u += 1.5) { const f = { R, u }; tPose(f); const k = Math.floor(f.x / LG) * 4096 + Math.floor(f.z / LG); if (!laneGrid.has(k)) laneGrid.set(k, []); laneGrid.get(k).push([f.x, f.y, f.z]); } }); });
+  function laneDist(x, z, y, r = 8) {
+    let best = 99; const i0 = Math.floor((x - r) / LG), i1 = Math.floor((x + r) / LG), j0 = Math.floor((z - r) / LG), j1 = Math.floor((z + r) / LG);
+    for (let i = i0; i <= i1; i++) for (let j = j0; j <= j1; j++) { const L = laneGrid.get(i * 4096 + j); if (!L) continue;
+      for (const q of L) { if (y != null && Math.abs(q[1] - y) > 1.6) continue; const d = Math.hypot(q[0] - x, q[2] - z); if (d < best) best = d; } }
+    return best;
+  }
+  /* yielding: a town car or walker about to step into the strip ahead of you waits at the edge, one already in it carries on clear */
+  const yieldStats = { holds: 0, spotHolds: 0 };
+  function townYield() {
+    // live Field notes and pickups in sight: town cars and walkers stop short of them rather than drive through
+    const spots = [].concat(notes ? notes.spots() : [], game && game.active && game.spots ? game.spots() : []).filter(q => Math.abs(q.x - camera.position.x) < 230);
+    const nearSpot = (x, z, y) => spots.some(q => Math.abs(q.y - y) < 1.6 && (q.x - x) ** 2 + (q.z - z) ** 2 < 2.8 * 2.8);
+    const sp = Math.max(0, car.v), fx = Math.cos(car.yaw), fz = -Math.sin(car.yaw), reach = 6 + sp * 1.3;
+    const inStrip = (x, z, y) => { const dx = x - car.x, dz = z - car.z, a = dx * fx + dz * fz, l = Math.abs(-dx * fz + dz * fx); return a > -2 && a < reach && l < 2.8 && Math.abs(y - car.y) < 1.6; };
+    town.cities.forEach(b => { const T = b.anim && b.anim.traffic; if (!T || !T.movers || car.x < b.x0 - 30 || car.x > b.x1 + 30) return;
+      T.movers.forEach(m => {
+        if (m.vmax0 == null) m.vmax0 = m.vmax;
+        const near = Math.abs(m.x - car.x) < reach + 6 && Math.abs(m.z - car.z) < reach + 6;
+        let hold = false;
+        const la = Math.max(m.v, 1.5) * 1.2, ax = m.x + m.hx * la, az = m.z + m.hz * la;
+        if (near && started && !jumping) hold = !inStrip(m.x, m.z, m.y) && inStrip(ax, az, m.y);
+        if (hold && m.vmax) yieldStats.holds++;
+        if (!hold && spots.length && !nearSpot(m.x, m.z, m.y) && nearSpot(ax, az, m.y)) { hold = true; if (m.vmax) yieldStats.spotHolds++; }
+        m.vmax = hold ? 0 : m.vmax0;
+      }); });
+  }
+
+  /* NPC limits: at most TOWN_CARS moving cars per town. This runs once, before the first frame is drawn
+     (the mode selector is up), so nothing ever vanishes in view. Hidden ones are skipped by every collision. */
+  const TOWN_CARS = lite ? 8 : 14;
+  const npcStats = { townCars: 0, townCarsHidden: 0, people: 0 };
+  town.cities.forEach(b => {
+    let moving = 0;
+    (b.vSets || []).forEach(({ list }) => list.forEach(q => {
+      if (q.park || !q.m) return;
+      npcStats.townCars++;
+      if (++moving > TOWN_CARS) { q.sc = 0.0001; if (q.sx) q.sx = 0.0001; q.npcOff = true; npcStats.townCarsHidden++; }
+    }));
+    npcStats.people += (b.anim.people || []).length;
+  });
 
   /* the traffic, for soft bumps: the instanced vehicle meshes the world made */
   const N = lite ? 140 : 300;
@@ -155,6 +206,13 @@ function start() {
     if (bb.max.x - bb.min.x < 3.2) return;
     traffic.push({ m: o, hl: (bb.max.x - bb.min.x) / 2, hw: (bb.max.z - bb.min.z) / 2 });
   });
+  /* review fix: Drive mode shows no police cars (the no-police rule). The police mesh and the roof beacons are
+     hidden before the first frame, so nothing pops and nothing flashes red and blue. The Road is unchanged. */
+  { const pg = vehicleGeo('police'); pg.computeBoundingBox(); const pl = pg.boundingBox.max.x - pg.boundingBox.min.x, pn = pg.attributes.position.count;
+    for (let i = traffic.length - 1; i >= 0; i--) { const g = traffic[i].m.geometry;
+      if (g.attributes.position.count === pn && Math.abs(traffic[i].hl * 2 - pl) < 0.01) { traffic[i].m.visible = false; traffic.splice(i, 1); } }
+    pg.dispose();
+    scene.children.forEach(o => { if (o.isInstancedMesh && o.instanceMatrix.count === 60 && o.geometry.type === 'BoxGeometry' && o.geometry.parameters.width === 0.42) o.visible = false; }); }
 
   /* Mexico and Shanghai: a soft amber light that fades upward, visible from down the road */
   const fade = (() => { const c = document.createElement('canvas'); c.width = 4; c.height = 64; const g = c.getContext('2d');
@@ -188,6 +246,7 @@ function start() {
   const car = { x: STOPS[0].x - 18, z: 0, y: 0, yaw: 0, v: 0, steer: 0, pitch: 0, surf: null };
   car.z = roadZ(car.x) + LANE_B; car.yaw = -Math.atan(roadDZ(car.x)); car.y = net.ground(car.x, car.z);
   const map = createMinimap({ net, car, stops: STOPS.map(s => ({ x: s.x, hl: HIGHLIGHT.has(s.id) })), roadZ });
+  const notes = createFieldNotes({ THREE, scene, camera, car, net, routes, map, content: C, calm: () => calm, theme: () => themeName, TOKENS, ctl: document.querySelector('.dv-ctl') });
   const mapCss = () => { const T = TOKENS[themeName] || {}; const dusk = themeName === 'dusk';
     return { bg: dusk ? 'rgba(24,28,34,.82)' : 'rgba(250,250,247,.86)', road: dusk ? '#5B6673' : '#AEB8C4', street: dusk ? '#46515D' : '#C9D1DA', walk: dusk ? '#3A434D' : '#DDE3E8', deck: dusk ? '#8A97A6' : '#7F8C9B', stop: dusk ? '#9AA6B4' : '#6F7C8A', accent: T.accent || '#E8A33D', ink: dusk ? '#F2F4F6' : '#1E2124', ring: dusk ? 'rgba(255,255,255,.18)' : 'rgba(30,33,36,.14)' }; };
 
@@ -236,25 +295,48 @@ function start() {
   function toggleCam() { chase = !chase; prefs.cam = chase ? 'chase' : 'seat'; savePrefs(); syncBtns(); }
   function toggleVoice() { voiceOn = !voiceOn; syncBtns(); if (!voiceOn) stopVoice(); else if (near >= 0) { voiceFor = -1; playVoice(near); } }
   $('#b-cam').addEventListener('click', toggleCam);
-  $('#b-voice').addEventListener('click', toggleVoice);
+  $('#b-voice').addEventListener('click', () => { if (mode && mode !== 'road') { choose('road', !voiceOn); return; } toggleVoice(); syncModeUI(); });
   $('#b-calm').addEventListener('click', () => { calm = !calm; prefs.calm = calm; savePrefs(); syncBtns(); });
-  $('#b-help').addEventListener('click', () => openIntro(true));
+  $('#b-help').addEventListener('click', () => openIntro(true));   // the selector also lists the controls
 
   /* intro */
   const intro = $('#dv-intro');
   let started = false;
+  /* ---------- modes: The Road (drive it, with or without narration), then Games: Learn (Field notes) and
+     Just play (Free play, City Chase). Every switch happens under the veil, so nothing pops in view. ---------- */
+  const MODES = { road: 'Drive The Road', notes: 'Field notes', free: 'Free play', chase: 'City Chase' };
+  let mode = null;
+  const modeEl0 = $('#dv-mode');
+  function syncModeUI() {
+    if (modeEl0) modeEl0.textContent = mode ? MODES[mode] + (mode === 'road' && voiceOn ? ', narrated' : '') : 'Open world preview';
+    document.querySelectorAll('.dv-opt[data-mode]').forEach(b => b.classList.toggle('on', b.dataset.mode === mode && (!!b.dataset.voice) === (mode === 'road' && voiceOn)));
+    root.setAttribute('data-drive-mode', mode || '');
+    const tag = document.querySelector('#b-modes .dv-mode-tag'); if (tag) tag.textContent = mode ? MODES[mode] : '';   // narrow screens: the mode rides on the Modes button
+  }
   function openIntro(again) {
     intro.hidden = false; intro.classList.toggle('again', !!again);
-    $('#dv-start').textContent = again ? 'Keep driving' : 'Start driving';
-    $('#dv-start').focus();
+    const on = document.querySelector('.dv-opt.on') || $('#dv-start'); on.focus();
   }
-  function begin(withVoice) {
+  function begin(withVoice) { choose('road', !!withVoice); }    // kept for the QA hook and older callers
+  function applyMode(m, withVoice) {
+    if (mode === 'chase' && m !== 'chase') endGame();
+    mode = m;
+    storiesPaused = m !== 'road';                                 // story cards belong to The Road, not to the games
+    if (m === 'road' ? (!!withVoice !== voiceOn) : voiceOn) toggleVoice();
+    notes.setActive(m === 'notes');
+    syncModeUI();
+  }
+  function choose(m, withVoice, now) {
     intro.hidden = true; started = true;
-    if (withVoice && !voiceOn) toggleVoice();
     canvas.focus && canvas.focus();
+    if (m === mode && m !== 'chase' && (m !== 'road' || !!withVoice === voiceOn)) return;
+    const go = () => { applyMode(m, withVoice); if (m === 'chase') startGame(); };
+    if (now || mode === null) { go(); return; }                     // the first pick: the selector itself was covering the view
+    veil.classList.add('on');
+    setTimeout(() => { go(); snapCam = true; setTimeout(() => veil.classList.remove('on'), 200); }, calm ? 120 : 280);
   }
-  $('#dv-start').addEventListener('click', () => begin(false));
-  $('#dv-start-v').addEventListener('click', () => begin(true));
+  document.querySelectorAll('.dv-opt[data-mode]').forEach(b => b.addEventListener('click', () => choose(b.dataset.mode, !!b.dataset.voice)));
+  $('#b-modes').addEventListener('click', () => openIntro(true));
   $('#dv-start').focus();
 
   /* touch pedals, for tablets */
@@ -264,7 +346,7 @@ function start() {
     const pad = $('#dv-touch'); pad.hidden = false; root.classList.add('dv-coarse');
     pad.querySelectorAll('button').forEach(b => {
       const k = b.dataset.k;
-      const on = e => { e.preventDefault(); touch[k] = true; b.classList.add('on'); if (!started) begin(false); };
+      const on = e => { e.preventDefault(); touch[k] = true; b.classList.add('on'); if (!started) choose('road', false); };
       const off = e => { e.preventDefault(); touch[k] = false; b.classList.remove('on'); };
       b.addEventListener('pointerdown', on); b.addEventListener('pointerup', off); b.addEventListener('pointercancel', off); b.addEventListener('pointerleave', off);
     });
@@ -277,10 +359,15 @@ function start() {
   addEventListener('keydown', e => {
     const k = e.key.toLowerCase();
     if (e.target && /input|textarea/i.test(e.target.tagName)) return;
-    if (!intro.hidden) { if (k === 'enter' || k === 'escape' || ['w', 'arrowup'].includes(k)) { begin(false); } if (k === 'escape') e.preventDefault(); return; }
+    if (!intro.hidden) {
+      if (k === 'escape') { e.preventDefault(); if (started) { intro.hidden = true; canvas.focus && canvas.focus(); } return; }
+      if (['w', 'arrowup'].includes(k) && !started) choose('road', false);
+      return;
+    }
     if (k === 'c' && !e.repeat) toggleCam();
-    if (k === 'v' && !e.repeat) toggleVoice();
+    if (k === 'v' && !e.repeat && mode === 'road') { toggleVoice(); syncModeUI(); }   // narration belongs to The Road
     if (k === 'm' && !e.repeat) map.toggle();
+    if (k === 'b' && !e.repeat && mode === 'notes') notes.toggleBox();
     if (k === 'escape') { openIntro(true); return; }
     if (DRIVE_KEYS.has(k)) { keys[k] = true; if (k.startsWith('arrow') || k === ' ') e.preventDefault(); }
   });
@@ -298,7 +385,7 @@ function start() {
       const a = p.buttons[0] && p.buttons[0].pressed ? 1 : 0, b = p.buttons[1] && p.buttons[1].pressed ? 1 : 0;
       const y = p.buttons[3] && p.buttons[3].pressed;
       if (y && !padCamWas) toggleCam(); padCamWas = !!y;
-      if ((rt > 0.05 || a) && !started) begin(false);
+      if ((rt > 0.05 || a) && !started) choose('road', false);
       return { steer: -ax, gas: Math.max(rt, a), brake: Math.max(lt, b) };
     }
     return null;
@@ -309,7 +396,7 @@ function start() {
   let jumping = false;
   function jumpTo(i) {
     if (jumping || (game && game.active)) return;
-    if (!started) begin(false);
+    if (!started) choose('road', false, true);
     jumping = true; veil.classList.add('on');
     setTimeout(() => {
       const x = Math.max(X_LO + 2, STOPS[i].x - 26);
@@ -386,43 +473,75 @@ function start() {
   let game = null, storiesPaused = false;
   const fx = [];                      // { f, until } speed effects from the game
   const speedMul = () => { let m = 1; for (let i = fx.length - 1; i >= 0; i--) { if (fx[i].until <= t) fx.splice(i, 1); else m *= fx[i].f; } return Math.min(m, 1.4); };   // boosts never stack past 1.4x
-  const gameBtn = $('#b-game'), modeEl = $('#dv-mode');
+  const gameBtn = $('#b-game');
   function syncGame() {
     const on = !!(game && game.active);
     gameBtn.textContent = on ? 'End chase' : 'Chase game';
     gameBtn.classList.toggle('on', on);
-    if (modeEl) modeEl.textContent = on ? 'Chase game' : 'Free play';
+    syncModeUI();
   }
   function endGame() { if (game && game.active) game.stop(); fx.length = 0; syncGame(); }
   async function startGame() {
-    if (!started) begin(false);
+    if (!started) { started = true; intro.hidden = true; }
+    if (mode !== 'chase') applyMode('chase');
     if (!game) {
       if (!document.querySelector('link[href*="chase.css"]')) {
         const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'road/chase.css?v=1'; document.head.appendChild(l);
       }
+      if (!document.querySelector('link[href*="chase-next.css"]')) {
+        const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'road/chase-next.css?v=2'; document.head.appendChild(l);
+      }
       const hudBox = document.createElement('div'); hudBox.className = 'dv-chase'; document.body.appendChild(hudBox);
-      const { createChase } = await import('./chase.js?v=1');
+      const { createChase } = await import('./chase-next.js?v=3');
+      // the end screen's buttons: a new round or Free play, each under the veil so the old round never vanishes in view
+      const underVeil = f => { veil.classList.add('on'); setTimeout(() => { f(); snapCam = true; setTimeout(() => veil.classList.remove('on'), 200); }, calm ? 120 : 280); };
       game = createChase({
-        THREE, scene, camera, car, roadZ, roadDZ, CURB, xMin: X_LO, xMax: X_HI,
+        THREE, scene, camera, car, roadZ, roadDZ, CURB, xMin: X_LO, xMax: X_HI, net, routes, map,
         stops: STOPS.map(s => ({ id: s.id, x: s.x, title: s.title })),
         slow: (f, sec) => fx.push({ f, until: t + sec }),
         boost: (f, sec) => fx.push({ f, until: t + sec }),
         hud: hudBox, theme: () => themeName, TOKENS, calm: () => calm,
-        pauseStories: b => { storiesPaused = !!b; },
+        pauseStories: () => {},
         exit: () => { fx.length = 0; syncGame(); },
-        links: { resume: 'assets/resume.pdf', contact: 'index.html' },
+        again: () => underVeil(() => { game.stop(); fx.length = 0; game.start(); syncGame(); }),
+        free: () => underVeil(() => { game.stop(); fx.length = 0; applyMode('free'); syncGame(); }),
+        links: { resume: 'assets/resume.pdf', contact: 'index.html#contact' },
+        laneDist,   // pickups keep clear of the town's lanes and sidewalks
+        skills: false, skillLabels: [...new Set(NOTES.map(n => n.skill))],   // pure play by default; true brings back the handover's skill chips
         groundY: (x, z) => Math.max(0, world.height(x, z))
       });
     }
     if (game.active) game.stop();
     fx.length = 0;
+    // the chaser must start out of sight behind you: near the start line there is no road behind, so the round
+    // begins a little further on (this runs under the veil or the selector, never in view)
+    if (car.x < X_LO + 300 || car.x > X_HI - 300) { const x = car.x < X_LO + 300 ? X_LO + 320 : X_HI - 320; car.x = x; car.z = roadZ(x) + LANE_B; car.yaw = -Math.atan(roadDZ(x)); car.v = 0; car.steer = 0; car.y = net.ground(car.x, car.z); car.pitch = 0; car.surf = null; snapCam = true; placeCamera(1); camera.updateMatrixWorld(); }
     game.start(); syncGame();
   }
-  gameBtn.addEventListener('click', () => { if (game && game.active) endGame(); else startGame(); });
-  $('#dv-start-g').addEventListener('click', () => startGame());
+  gameBtn.addEventListener('click', () => { if (game && game.active) choose('free'); else choose('chase'); });
 
   /* ---------- physics: arcade, forgiving, no damage ---------- */
   const fwd = new THREE.Vector3();
+  /* contact helpers (v3): lose speed only for the part of the hit that is head-on, and ease the nose along
+     the wall, deck edge or car you touched, so you slide clear instead of sticking or juddering */
+  const phys = { stuckT: 0, stuck: 0, stuckLog: [], ghost: 0, npcHits: 0, npcBlocks: 0, npcContact: false, wallHits: 0, blockT: 0, hitLog: [] };
+  function turnToward(a, dt, rate) {
+    let d = a - car.yaw; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI;
+    if (Math.abs(d) > Math.PI / 2) { d += d > 0 ? -Math.PI : Math.PI; }        // whichever way along it is closer
+    car.yaw += clamp(d, -rate * dt, rate * dt);
+  }
+  function contact(nx, nz, dt, loss) {
+    const fx = Math.cos(car.yaw), fz = -Math.sin(car.yaw), into = -(fx * nx + fz * nz) * Math.sign(car.v || 1);
+    if (into > 0) car.v *= 1 - Math.min(0.6, dt * loss * into);
+    // the nose eases along the tangent, (nz, -nx) as a heading, only when you are rolling and not steering yourself
+    if (into > 0 && into < 0.9 && Math.abs(car.v) > 3 && Math.abs(car.steer) < 0.3) turnToward(Math.atan2(nx, nz), dt, 2.2);
+  }
+  function alignToEdge(e, dt) {
+    let bi = 0, bd = 1e9; const P = e.pts;
+    for (let i = 0; i < P.length; i += 2) { const d = (P[i][0] - car.x) ** 2 + (P[i][2] - car.z) ** 2; if (d < bd) { bd = d; bi = i; } }
+    const a = P[Math.max(0, bi - 2)], b = P[Math.min(P.length - 1, bi + 2)];
+    turnToward(Math.atan2(-(b[2] - a[2]), b[0] - a[0]), dt, 2.6);
+  }
   function drive(dt) {
     const pad = readPad();
     let gas = 0, brake = 0, steerIn = 0;
@@ -445,7 +564,7 @@ function start() {
     car.v = clamp(car.v, -7, 33 * Math.max(1, speedMul()));
     // turn rate grows with speed at first, then eases off so it never feels twitchy
     const sp = Math.abs(car.v);
-    const turn = car.steer * Math.min(1, sp / 5) * (1.35 - 0.55 * clamp(sp / 30, 0, 1)) * (calm ? 0.75 : 1);
+    const turn = car.steer * Math.min(1, (phys.blockT > 0 ? Math.max(sp, 3.5) : sp) / 5) * (1.35 - 0.55 * clamp(sp / 30, 0, 1)) * (calm ? 0.75 : 1);
     car.yaw += turn * Math.sign(car.v || 1) * dt;
     fwd.set(Math.cos(car.yaw), 0, -Math.sin(car.yaw));
     const px = car.x, pz = car.z;
@@ -456,8 +575,12 @@ function start() {
     let sf = ok(car.x, car.z);
     if (!sf) {
       const sa = ok(car.x, pz), sb = ok(px, car.z);
-      if (sa) { car.z = pz; sf = sa; } else if (sb) { car.x = px; sf = sb; } else { car.x = px; car.z = pz; sf = ok(px, pz); }
-      car.v *= 1 - Math.min(0.85, dt * 7);
+      let slid = true;
+      if (sa) { car.z = pz; sf = sa; } else if (sb) { car.x = px; sf = sb; } else { car.x = px; car.z = pz; sf = ok(px, pz); slid = false; }
+      car.v *= 1 - Math.min(0.85, dt * (slid ? 2.4 : 6));        // a glancing touch keeps most of your speed
+      if (!slid) { car.v = Math.sign(car.v) * Math.min(Math.abs(car.v), 0.6); phys.blockT = 0.6; }   // nose in: you stop, and can steer out at walking pace
+      if (pe) alignToEdge(pe, dt);                                  // on a ramp or deck: the nose eases back along it
+      phys.wallHits++;
     }
     if (sf) { car.surf = sf; car.y += (sf.y - car.y) * Math.min(1, dt * 14); }
     // the edge of the map: far out in the fields, a gentle push back toward the road
@@ -471,17 +594,20 @@ function start() {
       const hl = b.hl + 1.15, hw = b.hw + 1.15;
       if (Math.abs(along) >= hl || Math.abs(side) >= hw) return;
       const pa = hl - Math.abs(along), ps = hw - Math.abs(side);
-      if (ps < pa) { const k = Math.sign(side || 1) * ps; car.x += -b.uz * k; car.z += b.ux * k; }
-      else { const k = Math.sign(along || 1) * pa; car.x += b.ux * k; car.z += b.uz * k; }
-      car.v *= 1 - Math.min(0.6, dt * 5);
+      if (ps < pa) { const k = Math.sign(side || 1) * ps; car.x += -b.uz * k; car.z += b.ux * k; contact(-b.uz * Math.sign(k), b.ux * Math.sign(k), dt, 6); }
+      else { const k = Math.sign(along || 1) * pa; car.x += b.ux * k; car.z += b.uz * k; contact(b.ux * Math.sign(k), b.uz * Math.sign(k), dt, 6); }
+      phys.wallHits++;
     });
+    let npcTouch = false;
+    const ghost = phys.ghost > 0;                                   // stuck against a car or a person: you ease through
     // the town's own cars and people: you ease off and slide clear, they carry on
-    town.cities.forEach(b => {
+    if (!ghost) town.cities.forEach(b => {
       if (!b.g.visible || !b.near.visible || car.x < b.x0 - 20 || car.x > b.x1 + 20) return;
       (b.vSets || []).forEach(({ im, list }) => {
         if (!im.geometry.boundingBox) im.geometry.computeBoundingBox();
         const bb = im.geometry.boundingBox, gl = (bb.max.x - bb.min.x) / 2, gw = (bb.max.z - bb.min.z) / 2;
         list.forEach(q => {
+          if (q.npcOff) return;
           const m = q.m, x = m ? m.x : q.x, z = m ? m.z : q.z, y = m ? m.y : car.y, ry = m ? m.yaw : q.ry, sc = m ? (q.sx || q.sc || 1) : 0.8;
           const ddx = car.x - x; if (ddx > 8 || ddx < -8) return;
           if (Math.abs(y - car.y) > 1.6) return;
@@ -490,9 +616,9 @@ function start() {
           const hl = gl * sc + 2.1, hw = gw * (m ? (q.sc || 1) : 0.8) + 1.0;
           if (Math.abs(along) > hl || Math.abs(side) > hw) return;
           const pa = hl - Math.abs(along), ps = hw - Math.abs(side);
-          if (ps < pa) { const k = Math.sign(side || 1) * ps; car.x += -uz * k; car.z += ux * k; }
-          else { const k = Math.sign(along || 1) * pa; car.x += ux * k; car.z += uz * k; }
-          car.v *= 1 - Math.min(0.6, dt * 3);
+          if (ps < pa) { const k = Math.sign(side || 1) * ps; car.x += -uz * k; car.z += ux * k; contact(-uz * Math.sign(k), ux * Math.sign(k), dt, 3); }
+          else { const k = Math.sign(along || 1) * pa; car.x += ux * k; car.z += uz * k; contact(ux * Math.sign(k), uz * Math.sign(k), dt, 3); }
+          npcTouch = npcTouch || 'town car';
         });
       });
       b.anim.people.forEach(q => {
@@ -501,6 +627,7 @@ function start() {
         if (d > 1.9 || d < 1e-3) return;
         car.x += ddx / d * (1.9 - d); car.z += ddz / d * (1.9 - d);
         car.v *= 1 - Math.min(0.9, dt * 10);
+        npcTouch = npcTouch || 'person';
       });
     });
     // nose up on a ramp, down on the way off it
@@ -512,7 +639,7 @@ function start() {
     if (car.x > X_HI) { car.x += (X_HI - car.x) * Math.min(1, dt * 5); if (car.v * fwd.x > 0) car.v *= 1 - Math.min(1, dt * 4); }
 
     // traffic: a soft bump that slides you clear and takes some speed
-    if (car.y < net.ground(car.x, car.z) + 1.2) traffic.forEach(T => {   // not when you are up on a deck above them
+    if (!ghost && car.y < net.ground(car.x, car.z) + 1.2) traffic.forEach(T => {   // not when you are up on a deck above them
       const m = T.m, a = m.instanceMatrix.array;
       for (let i = 0; i < m.count; i++) {
         const o = i * 16, tx = a[o + 12], tz = a[o + 14];
@@ -524,11 +651,25 @@ function start() {
         const hl = T.hl * s + 2.3, hw = T.hw * s + 1.0;
         if (Math.abs(along) > hl || Math.abs(side) > hw) continue;
         const pa = hl - Math.abs(along), ps = hw - Math.abs(side);
-        if (ps < pa) { const k = Math.sign(side || 1) * ps; car.x += -uz * k; car.z += ux * k; }
-        else { const k = Math.sign(along || 1) * pa; car.x += ux * k; car.z += uz * k; }
-        car.v *= 1 - Math.min(0.6, dt * 3);
+        if (ps < pa) { const k = Math.sign(side || 1) * ps; car.x += -uz * k; car.z += ux * k; contact(-uz * Math.sign(k), ux * Math.sign(k), dt, 3); }
+        else { const k = Math.sign(along || 1) * pa; car.x += ux * k; car.z += uz * k; contact(ux * Math.sign(k), uz * Math.sign(k), dt, 3); }
+        npcTouch = npcTouch || 'traffic';
       }
     });
+    // pinned in a corner (a wall one way, water the other): your speed follows how far you really moved, so you stop instead of buzzing in place
+    { const real = Math.hypot(car.x - px, car.z - pz) / dt, sp2 = Math.abs(car.v);
+      if (sp2 > 0.5 && real < sp2 * 0.45) { car.v = Math.sign(car.v) * (sp2 + (real - sp2) * Math.min(1, dt * 8)); phys.blockT = 0.6; } }
+    // NPC contact episodes, and the stuck guard: pressing on but not moving for 0.8 s lets you ease through NPCs for 1.5 s
+    if (npcTouch && !phys.npcContact) { phys.npcHits++; phys.recent = (phys.recent || []).filter(q => t - q < 3); phys.recent.push(t);
+      if (phys.recent.length >= 3 && phys.ghost <= 0) { phys.ghost = 1.5; phys.npcBlocks++; phys.recent = []; }   // nudging the same slow car again and again: ease past it
+      if (phys.hitLog.length < 400) phys.hitLog.push([npcTouch, +car.x.toFixed(1), +car.z.toFixed(1), car.surf && car.surf.kind]); }
+    phys.npcContact = npcTouch;
+    if (phys.ghost > 0) phys.ghost -= dt;
+    if (phys.blockT > 0) phys.blockT -= dt;
+    if (started && !jumping && gas > 0 && Math.abs(car.v) < 1.0) phys.stuckT += dt; else phys.stuckT = Math.max(0, phys.stuckT - dt * 2);
+    if (phys.stuckT > 0.8 && npcTouch && phys.ghost <= 0) { phys.ghost = 1.5; phys.npcBlocks++; }
+    if (phys.stuckT > 1.5 && !phys.stuckOn) { phys.stuckOn = true; phys.stuck++; if (phys.stuckLog.length < 40) phys.stuckLog.push([+car.x.toFixed(1), +car.z.toFixed(1), +car.y.toFixed(1), car.surf && car.surf.kind]); }
+    if (phys.stuckT < 0.2) phys.stuckOn = false;
   }
 
   /* ---------- camera ---------- */
@@ -576,20 +717,25 @@ function start() {
   const speedB = $('#dv-speed b');
   let t = 0, visible = true, lastMph = -1;
   document.addEventListener('visibilitychange', () => { visible = !document.hidden; if (visible) clock.getDelta(); else for (const k in keys) keys[k] = false; });
+  let qaHold = false;                 // QA: the automated driver steps the world itself
   function frame() {
     requestAnimationFrame(frame);
-    if (!visible) return;
-    const dt = Math.min(0.05, clock.getDelta());
+    if (!visible || qaHold) return;
+    step(Math.min(0.05, clock.getDelta()), true);
+  }
+  function step(dt, draw) {
     t += dt;
     const steps = Math.max(1, Math.ceil(dt / 0.017));
     for (let n = 0; n < steps; n++) drive(dt / steps);
     if (game && game.active && intro.hidden) game.update(dt, t);
+    if (intro.hidden) notes.update(dt, t);
 
     placeCamera(dt);
     camera.updateMatrixWorld();
     viewM.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse); viewF.setFromProjectionMatrix(viewM);
     world.setView(viewF, camera.position, scene.fog.far);    // traffic only changes where you are not looking
     world.update(dt, t, car.x, car.v * Math.cos(car.yaw + Math.atan(roadDZ(car.x))), false);
+    townYield();
     town.update(t, dt, car.x, TOWN_Z, false);
     world.setZoomTint(0, themeName);
 
@@ -612,6 +758,7 @@ function start() {
     });
     beacons.forEach(b => { const p = calm ? 0 : Math.sin(t * 1.6) * 0.05; b.m.opacity = 0.2 + p; });
 
+    if (!draw) return;
     renderer.render(scene, camera);
 
     // HUD
@@ -624,5 +771,8 @@ function start() {
   let frameN = 0;
   frame();
 
-  if (QA) window.__drive = { net, map, town, traffic, camPos, hero, snap: () => { snapCam = true; }, get game() { return game; }, startGame, endGame, fx, car, STOPS, jumpTo, get near() { return near; }, setCam: c => { chase = c; syncBtns(); }, begin, keys, Tour, sim: (sec, k) => { Object.assign(keys, k || {}); for (let n = 0; n < sec * 60; n++) drive(1 / 60); for (const q in keys) keys[q] = false; return { x: +car.x.toFixed(1), dz: +(car.z - roadZ(car.x)).toFixed(2), y: +car.y.toFixed(2), v: +car.v.toFixed(1), yaw: +car.yaw.toFixed(2), kind: car.surf && car.surf.kind, name: car.surf && car.surf.name }; } };
+  if (QA) window.__drive = { laneDist, yieldStats, net, map, town, traffic, camPos, hero, snap: () => { snapCam = true; }, get game() { return game; }, startGame, endGame, fx, car, STOPS, jumpTo, get near() { return near; }, setCam: c => { chase = c; syncBtns(); }, begin, keys, Tour,
+    routes, notes, phys, npcStats, choose, get mode() { return mode; }, camera, scene, renderer, X_LO, X_HI,
+    hold: h => { qaHold = !!h; if (!h) clock.getDelta(); }, step: (dt, draw) => step(dt, !!draw), render: () => { placeCamera(1); camera.updateMatrixWorld(); renderer.render(scene, camera); map.draw(mapCss()); updateCard(); },
+    get t() { return t; }, get storiesPaused() { return storiesPaused; }, mapCss, sim: (sec, k) => { Object.assign(keys, k || {}); for (let n = 0; n < sec * 60; n++) drive(1 / 60); for (const q in keys) keys[q] = false; return { x: +car.x.toFixed(1), dz: +(car.z - roadZ(car.x)).toFixed(2), y: +car.y.toFixed(2), v: +car.v.toFixed(1), yaw: +car.yaw.toFixed(2), kind: car.surf && car.surf.kind, name: car.surf && car.surf.name }; } };
 }

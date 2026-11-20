@@ -1,0 +1,8 @@
+/* City Chase (Phase C): small additions on top of chase.css (v1, loaded as is). */
+.cn-mode { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--accent-ink, #8A520C); }
+.cn-kick { margin: 0 0 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3); }
+.cn-route { margin: -12px 0 18px; font-size: 13px; color: var(--ink-3); }
+[data-theme="dusk"] .cn-mode { color: var(--accent, #F2B456); }
+/* optional skill chips (api.skills = true) */
+.cn-chips { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 4px 0 12px; }
+.cn-chips span { font: 500 12px/1.2 Inter, system-ui, sans-serif; padding: 5px 9px; border-radius: 999px; background: rgba(90, 110, 140, 0.14); color: inherit; }

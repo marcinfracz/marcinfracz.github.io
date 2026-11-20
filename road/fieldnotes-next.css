@@ -1,0 +1,51 @@
+/* Field notes (Phase B): toast, Glovebox and header button. Inter, glass, bluish gray; light and dark. */
+.fn-toast { position: fixed; right: 18px; top: 78px; z-index: 45; width: min(360px, 88vw); padding: 12px 14px 10px; border-radius: 18px;
+  background: var(--glass, rgba(250,250,247,.88)); backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow: var(--shadow, 0 12px 36px rgba(30,40,55,.16)); font-family: Inter, system-ui, sans-serif; color: var(--ink, #1E2124);
+  opacity: 0; transform: translateY(-8px); transition: opacity .3s ease, transform .3s ease; pointer-events: none; }
+.fn-toast.on { opacity: 1; transform: none; }
+.fn-head { margin: 0 0 8px; font-size: 12px; font-weight: 600; color: var(--ink-3, #5E6A78); letter-spacing: .01em; }
+.fn-head b { color: var(--ink-2, #4A5562); font-weight: 700; margin-left: 4px; }
+.fn-foot { margin: 8px 0 0; font-size: 11px; color: var(--ink-3, #5E6A78); }
+
+/* one card per format: each looks like the thing it is */
+.fn-card { --fc: #4A5562; --fn-bg: #FAFAF7; --fn-ink: #1E2124; --fn-ink3: #5E6A78; position: relative; padding: 12px 14px; border-radius: 12px; background: var(--fn-bg); color: var(--fn-ink); border: 1.5px solid color-mix(in srgb, var(--fc) 55%, transparent); }
+.fn-k { margin: 0 0 4px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--fc); }
+.fn-t { margin: 0; font-size: 15px; font-weight: 600; line-height: 1.35; letter-spacing: -0.01em; }
+.fn-e { margin: 6px 0 0; font-size: 11px; font-weight: 500; color: var(--fn-ink3); }
+.fn-postcard { --fc: #2E9C8F; padding-right: 64px; }
+.fn-postcard::after { content: ""; position: absolute; right: 12px; top: 12px; width: 34px; height: 40px; border: 2px dashed var(--fc); border-radius: 3px; }
+.fn-plate { --fc: #4A5562; border-width: 3px; border-radius: 10px; text-align: center; box-shadow: inset 0 0 0 4px var(--fn-bg), inset 0 0 0 5px color-mix(in srgb, var(--fc) 40%, transparent); }
+.fn-plate .fn-t { font-weight: 700; letter-spacing: .01em; }
+.fn-tag { --fc: #C8693A; padding-left: 38px; border-radius: 6px 16px 16px 6px; }
+.fn-tag::before { content: ""; position: absolute; left: 13px; top: 50%; width: 12px; height: 12px; margin-top: -6px; border-radius: 50%; border: 2.5px solid var(--fc); }
+.fn-ticket { --fc: #7357D8; padding-right: 44px; border-style: solid; }
+.fn-ticket::after { content: ""; position: absolute; right: 26px; top: 8px; bottom: 8px; border-right: 2px dotted var(--fc); }
+.fn-stamp { --fc: #1F8FD1; border: 2.5px double var(--fc); border-radius: 18px; transform: rotate(-1.2deg); }
+[data-theme="dusk"] .fn-card { --fn-bg: #222830; --fn-ink: #E6EAF0; --fn-ink3: #9AA6B4; }
+[data-theme="dusk"] .fn-postcard { --fc: #5CC8BA; } [data-theme="dusk"] .fn-plate { --fc: #AEB8C4; } [data-theme="dusk"] .fn-tag { --fc: #E79A6E; }
+[data-theme="dusk"] .fn-ticket { --fc: #A891F0; } [data-theme="dusk"] .fn-stamp { --fc: #6CB8E8; }
+
+/* Glovebox */
+.fn-box { position: fixed; inset: 0; z-index: 58; display: flex; align-items: center; justify-content: center; background: color-mix(in srgb, var(--sky, #E9EDF2) 55%, transparent); font-family: Inter, system-ui, sans-serif; }
+.fn-box[hidden], .fn-toast[hidden] { display: none; }
+.fn-box-in { width: min(520px, 92vw); max-height: min(720px, 86vh); overflow: auto; padding: 22px 24px; border-radius: 22px; background: var(--glass-2, rgba(250,250,247,.94));
+  backdrop-filter: blur(16px) saturate(1.2); -webkit-backdrop-filter: blur(16px) saturate(1.2); box-shadow: var(--shadow, 0 12px 36px rgba(30,40,55,.16)); color: var(--ink); }
+.fn-box header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 10px; }
+.fn-box h2 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.02em; }
+.fn-count { margin: 0; font-size: 13px; font-weight: 600; color: var(--ink-3); flex: 1; }
+.fn-x { border: 0; background: transparent; color: var(--ink-2); font-size: 16px; cursor: pointer; padding: 4px 8px; border-radius: 8px; }
+.fn-where { border: 0; border-radius: 12px; padding: 9px 16px; font: 600 14px Inter, system-ui, sans-serif; cursor: pointer; background: var(--accent, #E8A33D); color: #1E2124; }
+.fn-hint { margin: 6px 0 12px; font-size: 12px; color: var(--ink-3); }
+.fn-sk-h { margin: 6px 0 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); }
+.fn-skills { list-style: none; margin: 0 0 14px; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.fn-skills li { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: color-mix(in srgb, var(--accent, #E8A33D) 18%, transparent); color: var(--ink-2); }
+.fn-list { display: grid; gap: 10px; }
+.fn-empty { margin: 0; font-size: 14px; color: var(--ink-2); }
+.fn-where:focus-visible, .fn-x:focus-visible, .fn-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* header button, next to the drive settings */
+.fn-btn { display: inline-flex; align-items: center; gap: 5px; width: auto !important; padding: 0 10px !important; }
+.fn-btn .fn-n { font: 600 12px Inter, system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+.dv-coarse .fn-toast { top: 260px; }
+.fn-btn[hidden] { display: none !important; }
