@@ -166,3 +166,11 @@ kbd { display: inline-grid; place-items: center; min-width: 26px; height: 26px; 
 @media (prefers-reduced-motion: reduce) {
   .dv-card, .dv-cap, .dv-veil, .dv-tick::after, .dv-tick::before { transition: none; }
 }
+
+/* ---------- chase game entry (Phase 2) ---------- */
+.dv-game { flex: 0 0 auto; height: 36px; padding: 0 14px; border: 0; border-radius: 10px; cursor: pointer; white-space: nowrap;
+  font: 700 13px/1 Inter, system-ui, sans-serif; background: var(--accent-soft); color: var(--accent-ink); }
+.dv-game:hover { background: var(--accent); color: #1E2124; }
+.dv-game.on { background: var(--surface-2); color: var(--ink-2); }
+.dv-intro.again .dv-go #dv-start-g, .dv-intro.again .dv-game-note { display: none; }
+.dv-game-note { margin-top: 12px; }

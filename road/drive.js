@@ -273,6 +273,7 @@ function start() {
     if (!intro.hidden) { if (k === 'enter' || k === 'escape' || ['w', 'arrowup'].includes(k)) { begin(false); } if (k === 'escape') e.preventDefault(); return; }
     if (k === 'c' && !e.repeat) toggleCam();
     if (k === 'v' && !e.repeat) toggleVoice();
+    if (k === 'g' && !e.repeat) { if (game && game.active) endGame(); else startGame(); }
     if (k === 'escape') { openIntro(true); return; }
     if (DRIVE_KEYS.has(k)) { keys[k] = true; if (k.startsWith('arrow') || k === ' ') e.preventDefault(); }
   });
@@ -300,7 +301,7 @@ function start() {
   const veil = $('#dv-veil');
   let jumping = false;
   function jumpTo(i) {
-    if (jumping) return;
+    if (jumping || (game && game.active)) return;
     if (!started) begin(false);
     jumping = true; veil.classList.add('on');
     setTimeout(() => {
@@ -343,7 +344,8 @@ function start() {
     let best = -1, bd = 1e9;
     STOPS.forEach((s, i) => { const d = Math.abs(car.x - s.x) + Math.max(0, Math.abs(car.z - roadZ(s.x)) - 10); if (d < bd) { bd = d; best = i; } });
     const r = best === LAST ? STOP_R + 14 : STOP_R;
-    const nn = bd < r ? best : (near >= 0 && bd < r + 10 && best === near ? near : -1);   // a little hysteresis so the card never flickers
+    let nn = bd < r ? best : (near >= 0 && bd < r + 10 && best === near ? near : -1);   // a little hysteresis so the card never flickers
+    if (storiesPaused) nn = -1;   // the chase game keeps the road clear of story cards
     if (nn !== near) {
       near = nn;
       if (near >= 0) {
@@ -373,6 +375,45 @@ function start() {
   addEventListener('resize', resize);
   resize();
 
+  /* ---------- the chase game (Phase 2): loaded only when asked for ---------- */
+  let game = null, storiesPaused = false;
+  const fx = [];                      // { f, until } speed effects from the game
+  const speedMul = () => { let m = 1; for (let i = fx.length - 1; i >= 0; i--) { if (fx[i].until <= t) fx.splice(i, 1); else m *= fx[i].f; } return Math.min(m, 1.4); };   // boosts never stack past 1.4x
+  const gameBtn = $('#b-game'), modeEl = $('#dv-mode');
+  function syncGame() {
+    const on = !!(game && game.active);
+    gameBtn.textContent = on ? 'End chase' : 'Chase game';
+    gameBtn.classList.toggle('on', on);
+    if (modeEl) modeEl.textContent = on ? 'Chase game' : 'Free play';
+  }
+  function endGame() { if (game && game.active) game.stop(); fx.length = 0; syncGame(); }
+  async function startGame() {
+    if (!started) begin(false);
+    if (!game) {
+      if (!document.querySelector('link[href*="chase.css"]')) {
+        const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'road/chase.css?v=1'; document.head.appendChild(l);
+      }
+      const hudBox = document.createElement('div'); hudBox.className = 'dv-chase'; document.body.appendChild(hudBox);
+      const { createChase } = await import('./chase.js?v=1');
+      game = createChase({
+        THREE, scene, camera, car, roadZ, roadDZ, CURB, xMin: X_LO, xMax: X_HI,
+        stops: STOPS.map(s => ({ id: s.id, x: s.x, title: s.title })),
+        slow: (f, sec) => fx.push({ f, until: t + sec }),
+        boost: (f, sec) => fx.push({ f, until: t + sec }),
+        hud: hudBox, theme: () => themeName, TOKENS, calm: () => calm,
+        pauseStories: b => { storiesPaused = !!b; },
+        exit: () => { fx.length = 0; syncGame(); },
+        links: { resume: 'assets/resume.pdf', contact: 'index.html' },
+        groundY: (x, z) => Math.max(0, world.height(x, z))
+      });
+    }
+    if (game.active) game.stop();
+    fx.length = 0;
+    game.start(); syncGame();
+  }
+  gameBtn.addEventListener('click', () => { if (game && game.active) endGame(); else startGame(); });
+  $('#dv-start-g').addEventListener('click', () => startGame());
+
   /* ---------- physics: arcade, forgiving, no damage ---------- */
   const fwd = new THREE.Vector3();
   function drive(dt) {
@@ -384,7 +425,7 @@ function start() {
     if (keys.d || keys.arrowright || touch.right) steerIn -= 1;
     if (pad) { gas = Math.max(gas, pad.gas); brake = Math.max(brake, pad.brake); if (pad.steer) steerIn = pad.steer; }
     if (!started || jumping) { gas = 0; brake = car.v > 0 ? 0.6 : 0; steerIn = 0; }
-    const vmax = (keys.shift ? 31 : 22) * (calm ? 0.72 : 1);
+    const vmax = (keys.shift ? 31 : 22) * (calm ? 0.72 : 1) * speedMul();
     // keyboard steering eases in; a stick is used as it is
     const ease = pad && pad.steer ? 1 : Math.min(1, dt * (calm ? 3.2 : 5));
     car.steer += (steerIn - car.steer) * ease;
@@ -392,7 +433,7 @@ function start() {
     if (brake > 0) { car.v -= brake * (car.v > 0.4 ? 19 : 6) * dt; }
     if (!gas && !brake) car.v -= Math.sign(car.v) * Math.min(Math.abs(car.v), (1.4 + Math.abs(car.v) * 0.12) * dt);
     if (car.v > vmax) car.v += (vmax - car.v) * Math.min(1, dt * 2);
-    car.v = clamp(car.v, -7, 33);
+    car.v = clamp(car.v, -7, 33 * Math.max(1, speedMul()));
     // turn rate grows with speed at first, then eases off so it never feels twitchy
     const sp = Math.abs(car.v);
     const turn = car.steer * Math.min(1, sp / 5) * (1.35 - 0.55 * clamp(sp / 30, 0, 1)) * (calm ? 0.75 : 1);
@@ -480,6 +521,7 @@ function start() {
     t += dt;
     const steps = Math.max(1, Math.ceil(dt / 0.017));
     for (let n = 0; n < steps; n++) drive(dt / steps);
+    if (game && game.active && intro.hidden) game.update(dt, t);
 
     placeCamera(dt);
     camera.updateMatrixWorld();
@@ -519,5 +561,5 @@ function start() {
   }
   frame();
 
-  if (QA) window.__drive = { car, STOPS, jumpTo, get near() { return near; }, setCam: c => { chase = c; syncBtns(); }, begin, keys, Tour, sim: (sec, k) => { Object.assign(keys, k || {}); for (let n = 0; n < sec * 60; n++) drive(1 / 60); for (const q in keys) keys[q] = false; return { x: +car.x.toFixed(1), dz: +(car.z - roadZ(car.x)).toFixed(2), v: +car.v.toFixed(1), yaw: +car.yaw.toFixed(2) }; } };
+  if (QA) window.__drive = { get game() { return game; }, startGame, endGame, fx, car, STOPS, jumpTo, get near() { return near; }, setCam: c => { chase = c; syncBtns(); }, begin, keys, Tour, sim: (sec, k) => { Object.assign(keys, k || {}); for (let n = 0; n < sec * 60; n++) drive(1 / 60); for (const q in keys) keys[q] = false; return { x: +car.x.toFixed(1), dz: +(car.z - roadZ(car.x)).toFixed(2), v: +car.v.toFixed(1), yaw: +car.yaw.toFixed(2) }; } };
 }
