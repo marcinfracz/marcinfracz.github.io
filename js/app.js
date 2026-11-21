@@ -1727,7 +1727,7 @@
     if (!reduce) { setInterval(nextNote, 7000); setInterval(nextPart, 5000); setInterval(stepLoop, 1400); }
     function openFromHash() {
       var h = (window.location.hash || "").replace("#", "");
-      var map = { contact: "contact-win", about: "about", work: "work", projects: "projects", notes: "notes-win", howiwork: "about" };
+      var map = { contact: "contact-win", about: "about", work: "work", projects: "projects", notes: "notes-win", howiwork: "about", finder: "finder", terminal: "terminal", browser: "browser" };
       if (map[h]) openWindow(map[h]);
     }
     openFromHash();
