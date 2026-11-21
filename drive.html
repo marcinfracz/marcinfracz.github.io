@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="road/chase.css?v=1">
 <link rel="stylesheet" href="road/chase-next.css?v=2">
 <link rel="stylesheet" href="road/fieldnotes-next.css?v=2">
+<link rel="stylesheet" href="road/drive-r3.css?v=1">
 <style>
   /* the open world, with the mode selector (v3 Phase B and C) */
   #b-game { display: none !important; }   /* the chase starts from the mode selector */
@@ -70,6 +71,27 @@
   .dv-touch button.boost { height: 120px; }
   .dv-touch button.boost.on { background: var(--accent); color: #1E2124; }
   @media (prefers-reduced-motion: reduce) { .dv-speed .dv-blab { transition: none; } }
+  /* menu v2 (Claude): icons first, less text */
+  .dv-intro-in.dv-sel { width: min(940px, 100%); }
+  .dv-grp h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; font-size: 16px; }
+  .dv-gi { display: inline-flex; color: var(--accent-ink, var(--ink)); }
+  .dv-gi svg { width: 22px; height: 22px; }
+  .dv-sel .dv-groups { grid-template-columns: 1fr 1fr; }
+  .dv-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .dv-tiles .dv-opt { margin: 0; padding: 14px 8px 12px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .dv-ic { display: grid; place-items: center; width: 52px; height: 52px; margin-bottom: 6px; border-radius: 50%; color: var(--accent-ink, var(--ink));
+    background: color-mix(in srgb, var(--accent) 18%, transparent); }
+  .dv-tiles .dv-opt b { font-size: 14px; }
+  .dv-tiles .dv-opt span { margin-top: 0; font-size: 12px; color: var(--ink-3); }
+  .dv-tiles .dv-opt.on .dv-ic, .dv-tiles .dv-opt:hover .dv-ic { background: var(--accent); color: #1E2124; }
+  .dv-vehrow { margin-top: 10px; }
+  .dv-veh { display: inline-flex; align-items: center; gap: 7px; }
+  .dv-vehnote { flex-basis: auto; margin: 0 0 0 4px; }
+  .dv-sel .dv-keys { grid-template-columns: repeat(6, auto); font-size: 12px; gap: 6px 14px; }
+  @media (max-width: 1180px) { .dv-sel .dv-keys { grid-template-columns: repeat(4, auto); } }
+  @media (max-width: 900px) { .dv-sel .dv-groups { grid-template-columns: 1fr; } }
+  @media (max-width: 980px) { .dv-sel .dv-keys { grid-template-columns: repeat(3, auto); } }
+  @media (prefers-reduced-motion: reduce) { .dv-ic { transition: none; } }
 </style>
 <script>
   (function () {
@@ -135,32 +157,26 @@
   <div class="dv-intro-in dv-sel">
     <p class="dv-kick">The Road · Drive mode</p>
     <h1 id="dv-intro-h">Drive through Marcin's career, or just drive.</h1>
-    <p class="dv-lead">Pick a way in. The Modes button at the top brings you back here.</p>
     <div class="dv-groups">
       <div class="dv-grp" role="group" aria-labelledby="g-road">
-        <h2 id="g-road">The Road</h2>
-        <p>His career as a story, stop by stop.</p>
-        <a class="dv-opt" href="road.html"><b>Scroll The Road</b><span>The original page: scroll or swipe past each stop.</span><small>Its menu has the Audio tour (voice with captions) and Without sound (captions only).</small></a>
-        <div class="dv-row2">
-          <button type="button" class="dv-opt" id="dv-start" data-mode="road"><b>Drive The Road</b><span>Drive it yourself. Each stop's story opens as you pass.</span></button>
-          <button type="button" class="dv-opt" id="dv-start-v" data-mode="road" data-voice="1"><b>Drive with narration</b><span>The same drive, with the tour's voice and captions.</span></button>
+        <h2 id="g-road"><i class="dv-gi"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3 5 21M15 3l4 18M12 4v2.5M12 10v3M12 16.5V20"/></svg></i>The Road</h2>
+        <div class="dv-tiles">
+          <a class="dv-opt" href="road.html"><i class="dv-ic"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="3" width="10" height="18" rx="5"/><path d="M12 7v3.5"/></svg></i><b>Scroll</b><span>Audio tour</span></a>
+          <button type="button" class="dv-opt" id="dv-start" data-mode="road"><i class="dv-ic"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="2.2"/><path d="M3.8 10.5c2.6-.8 5.3-1 8.2-1s5.6.2 8.2 1M10.5 14 8 19.6M13.5 14l2.5 5.6"/></svg></i><b>Drive</b><span>Stops as you go</span></button>
+          <button type="button" class="dv-opt" id="dv-start-v" data-mode="road" data-voice="1"><i class="dv-ic"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3.5" y="14" width="4" height="6" rx="1.5"/><rect x="16.5" y="14" width="4" height="6" rx="1.5"/></svg></i><b>Narrated drive</b><span>Voice and captions</span></button>
         </div>
       </div>
       <div class="dv-grp" role="group" aria-labelledby="g-games">
-        <h2 id="g-games">Games</h2>
-        <p>Drive the open city: streets, ramps, decks and bridges.</p>
-        <p class="dv-sub">Learn</p>
-        <button type="button" class="dv-opt" data-mode="notes"><b>Field notes</b><span>Find 16 notes off the main road and fill your Glovebox.</span></button>
-        <p class="dv-sub">Just play</p>
-        <div class="dv-row2">
-          <button type="button" class="dv-opt" data-mode="free"><b>Free play</b><span>No stories, no clock. Just you and the city.</span></button>
-          <button type="button" class="dv-opt" id="dv-start-g" data-mode="chase"><b>City Chase</b><span>90 seconds, 6 pickups, and the Deck Demander on your tail.</span></button>
+        <h2 id="g-games"><i class="dv-gi"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 8h10a4 4 0 0 1 4 4v1.5a3 3 0 0 1-5.3 1.9L14.5 14h-5l-1.2 1.4A3 3 0 0 1 3 13.5V12a4 4 0 0 1 4-4z"/><path d="M7.5 10.5v3M6 12h3"/><circle cx="16" cy="11" r=".6" fill="currentColor"/><circle cx="17.6" cy="12.8" r=".6" fill="currentColor"/></svg></i>Games</h2>
+        <div class="dv-tiles">
+          <button type="button" class="dv-opt" data-mode="notes"><i class="dv-ic"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h10l3 3V20.5H6z"/><path d="M9 10h7M9 13.5h7M9 17h4"/></svg></i><b>Field notes</b><span>Find 16 notes</span></button>
+          <button type="button" class="dv-opt" data-mode="free"><i class="dv-ic"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></svg></i><b>Free play</b><span>No clock</span></button>
+          <button type="button" class="dv-opt" id="dv-start-g" data-mode="chase"><i class="dv-ic"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 2M10 2.8h4M12 2.8V6"/></svg></i><b>City Chase</b><span>90 s, 6 pickups</span></button>
         </div>
         <div class="dv-vehrow" role="group" aria-label="Vehicle for the games">
-          <p class="dv-sub">Ride</p>
-          <button type="button" class="dv-veh" data-veh="car" aria-pressed="true">Car</button>
-          <button type="button" class="dv-veh" data-veh="euc" aria-pressed="false">Electric unicycle</button>
-          <p class="dv-vehnote">For the games. The Road is always driven in the car. Press U to switch while you play.</p>
+          <button type="button" class="dv-veh" data-veh="car" aria-pressed="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15.5V12l2-4.5h12l2 4.5v3.5H4z"/><circle cx="7.5" cy="16.5" r="1.8"/><circle cx="16.5" cy="16.5" r="1.8"/></svg>Car</button>
+          <button type="button" class="dv-veh" data-veh="euc" aria-pressed="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="15.5" r="5.5"/><circle cx="12" cy="15.5" r="1.4"/><path d="M12 10V4.5M9.5 4.5h5"/></svg>Electric unicycle (EUC)</button>
+          <p class="dv-vehnote">Games only. U switches.</p>
         </div>
       </div>
     </div>
@@ -174,9 +190,11 @@
       <li><kbd>C</kbd> Camera</li>
       <li><kbd>M</kbd> Map</li>
       <li><kbd>B</kbd> Glovebox</li>
+      <li><kbd>R</kbd> Respawn</li>
+      <li><kbd>K</kbd> Show or hide keys</li>
       <li><kbd>Esc</kbd> Modes</li>
     </ul>
-    <p class="dv-pad">Gamepad works too: left stick steers, triggers drive and brake, right bumper boosts.</p>
+    <p class="dv-pad">Gamepad works too.</p>
   </div>
 </section>
 
@@ -192,6 +210,6 @@
 <noscript><p class="dv-noscript">Drive mode needs JavaScript. <a href="road.html">Open The Road</a>.</p></noscript>
 
 <script src="content/road-content.js?v=74"></script>
-<script type="module" src="road/drive-r2.js?v=1"></script>
+<script type="module" src="road/drive-r3.js?v=1"></script>
 </body>
 </html>
