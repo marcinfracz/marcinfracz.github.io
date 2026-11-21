@@ -1,0 +1,53 @@
+/* Drive mode radio (round 4, Claude): the radio button, the station list, the station toast and the talk captions.
+   Same glass surfaces, tokens and type as the rest of Drive mode; light and dark. */
+
+.dv-ctl .r4-btn { position: relative; }
+.dv-ctl .r4-btn.on { background: color-mix(in srgb, var(--c) 22%, transparent); color: var(--ink); }
+.dv-ctl .r4-btn.open { background: var(--surface-2); color: var(--ink); }
+.r4-dot { position: absolute; right: 6px; top: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--c); opacity: 0; transition: opacity .2s; }
+.r4-btn.on .r4-dot { opacity: 1; box-shadow: 0 0 0 2px var(--surface); }
+
+.r4-pop { position: fixed; top: 74px; right: 16px; z-index: 6; width: 300px; max-height: calc(100vh - 96px); overflow: auto;
+  padding: 12px 10px 10px; border-radius: 16px; background: var(--glass-2); box-shadow: var(--shadow);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); font-family: Inter, system-ui, sans-serif; }
+.r4-pop[hidden] { display: none; }
+.r4-h { display: flex; align-items: baseline; justify-content: space-between; margin: 0 6px 8px; font-size: 13px; font-weight: 800; letter-spacing: .02em; color: var(--ink); }
+.r4-h span { font-size: 11.5px; font-weight: 600; color: var(--ink-3); }
+.r4-list { display: grid; gap: 2px; }
+.r4-st { display: grid; grid-template-columns: 14px 1fr; column-gap: 10px; align-items: center; width: 100%; padding: 7px 8px; border: 0; border-radius: 10px;
+  background: none; color: var(--ink); text-align: left; cursor: pointer; font: inherit; }
+.r4-st:hover, .r4-st:focus-visible { background: var(--surface-2); outline: none; }
+.r4-st.on { background: color-mix(in srgb, var(--c, var(--accent)) 20%, transparent); }
+.r4-st b { grid-column: 2; font-size: 14px; font-weight: 700; }
+.r4-st span { grid-column: 2; font-size: 12px; color: var(--ink-3); }
+.r4-sw { grid-row: 1 / span 2; width: 12px; height: 12px; border-radius: 50%; background: var(--c); }
+.r4-off { grid-template-columns: 1fr; }
+.r4-off b { grid-column: 1; color: var(--ink-2); }
+.r4-off.on { --c: var(--line); }
+.r4-vol { display: flex; align-items: center; gap: 10px; margin: 10px 8px 4px; font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
+.r4-vol input { flex: 1; accent-color: var(--accent); }
+.r4-note { margin: 6px 8px 2px; font-size: 11.5px; line-height: 1.4; color: var(--ink-3); }
+
+.r4-toast { position: fixed; top: 80px; left: 50%; z-index: 5; display: flex; flex-direction: column; align-items: center; gap: 1px; min-width: 200px; max-width: min(460px, 80vw);
+  padding: 9px 18px 10px; border-radius: 14px; background: var(--glass-2); box-shadow: var(--shadow), inset 0 -3px 0 var(--c, var(--accent));
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); font-family: Inter, system-ui, sans-serif; text-align: center;
+  transform: translate(-50%, -6px); opacity: 0; transition: opacity .3s ease, transform .3s ease; pointer-events: none; }
+.r4-toast[hidden] { display: none; }
+.r4-toast.on { opacity: 1; transform: translate(-50%, 0); }
+.r4-toast .r4-f { font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--ink-3); }
+.r4-toast b { font-size: 17px; font-weight: 800; letter-spacing: -.01em; color: var(--ink); }
+.r4-toast em { font-style: normal; font-size: 12.5px; color: var(--ink-2); }
+
+.r4-cap { position: fixed; top: 150px; left: 50%; z-index: 4; max-width: min(560px, 76vw); margin: 0; padding: 7px 14px; border-radius: 12px;
+  background: var(--glass); box-shadow: var(--shadow); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  font: 500 13.5px/1.4 Inter, system-ui, sans-serif; color: var(--ink); text-align: center;
+  transform: translateX(-50%); opacity: 0; transition: opacity .3s ease; pointer-events: none; }
+.r4-cap[hidden] { display: none; }
+.r4-cap.on { opacity: .95; }
+.r4-cap b { font-weight: 700; color: var(--ink-2); margin-right: 4px; }
+
+/* tablets: the speed readout sits at the top, so the toast and captions go just under it */
+.dv-coarse .r4-toast { top: 168px; }
+.dv-coarse .r4-cap { top: 238px; }
+
+@media (prefers-reduced-motion: reduce) { .r4-toast, .r4-cap { transition: opacity .2s; transform: translateX(-50%); } }

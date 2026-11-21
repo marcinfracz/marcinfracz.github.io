@@ -1,0 +1,15 @@
+Drive mode radio: credits and licences (round 4, Nov 21, 2026)
+
+Music
+- Every song on Night Shift FM, Low Gear, Curbside 97, Redline Rock and Radio Carretera is original.
+  The music is composed and played live in the visitor's browser by road/radio-r4.js (Web Audio synthesis).
+  No recordings, samples or third-party tracks are used, so there is nothing to license.
+- Song titles and artist names are fictional.
+
+Talk, ads, DJ lines and station IDs
+- Scripts are original, written for this site (road/radio-r4.js).
+- Hosts, callers, DJs and advertised companies are fictional.
+- Voices are the visitor's own browser speech voices (Web Speech API). No voice recordings are shipped.
+
+Not used
+- No copyrighted songs, and no station names, DJs, songs or branding from any video game.
