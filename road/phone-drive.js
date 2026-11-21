@@ -1,4 +1,4 @@
-/* Phone drive (v64 proposal): on phones the Road reads scene first.
+/* Phone drive (v64 proposal; v67 folding cards): on phones the Road reads scene first.
    - each stop is one screen: the 3D scene on top, a short glance card below
    - one swipe = one stop (scroll snap), the camera drives between stops
    - summary, extra results and stories open in a bottom sheet
@@ -74,14 +74,42 @@
   /* results that do not fit the glance card move to the top of the sheet, so nothing is cut off */
   var cards = [];
   function fit() {
+    /* measure with the cards open, so folding never moves results into the sheet */
+    var root = document.documentElement, was = root.classList.contains('pd-min');
+    if (was) { root.classList.add('pd-nofx'); root.classList.remove('pd-min'); }
     cards.forEach(function (o) {
       var card = o.card, hl = card.querySelector(':scope > ul.hl');
+      /* the fold button rides at the end of the actions row, only when it fits on that row */
+      if (o.hide) { o.hide.hidden = false; if (o.hide.offsetTop > o.foot.firstElementChild.offsetTop + 4) o.hide.hidden = true; }
       if (!hl) return;
       /* put back what an earlier pass moved, then measure again */
       while (o.moved.length) hl.appendChild(o.moved.pop());
       while ((hl.scrollHeight > hl.clientHeight + 1 || card.scrollHeight > card.clientHeight + 1) && hl.children.length > 1) { var li = hl.lastElementChild; o.moved.push(li); o.spill.insertBefore(li, o.spill.firstChild); }
       o.spill.hidden = !o.spill.children.length;
     });
+    if (was) { root.classList.add('pd-min'); settle(); }
+  }
+  function settle() {
+    var root = document.documentElement;
+    requestAnimationFrame(function () { requestAnimationFrame(function () { root.classList.remove('pd-nofx'); }); });
+  }
+  /* fold or open the stop cards (one setting for the whole drive); the card in view animates its height */
+  function setMin(on, anim) {
+    var root = document.documentElement;
+    if (root.classList.contains('pd-min') === on) return;
+    var sec = secs[cur], c = sec && sec.classList.contains('pd-g') ? sec.querySelector('.fcard') : null;
+    var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!c || !anim || still || root.classList.contains('touring') || !MQ.matches) { root.classList.toggle('pd-min', on); return; }
+    var h0 = c.getBoundingClientRect().height;
+    c.classList.remove('pd-anim'); c.style.height = '';
+    root.classList.toggle('pd-min', on);
+    var h1 = c.getBoundingClientRect().height;
+    c.style.height = h0 + 'px'; void c.offsetHeight;
+    c.classList.add('pd-anim'); c.style.height = h1 + 'px';
+    clearTimeout(c._pdT);
+    c._pdT = setTimeout(function () { c.classList.remove('pd-anim'); c.style.height = ''; }, 380);
+    var f = on ? c.querySelector('.pd-pill') : c.querySelector('.pd-hide');
+    if (f && document.activeElement && c.contains(document.activeElement)) f.focus({ preventScroll: true });
   }
 
   function glance(sec, i) {
@@ -127,6 +155,43 @@
     card.appendChild(foot);
     foot.querySelector('.pd-open').addEventListener('click', function () { openSheet(shortTitle(s) + ' · ' + roleOf(s), more); });
 
+    /* v67: the card folds down to a slim pill with the stop name, so the scene can be seen first */
+    var hide = document.createElement('button');
+    hide.type = 'button'; hide.className = 'pd-hide'; hide.setAttribute('aria-label', 'Hide details');
+    hide.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+    hide.addEventListener('click', function () { setMin(true, true); });
+    foot.appendChild(hide);
+    /* the handle at the top folds the card too (tap or swipe down) */
+    var grip = document.createElement('button'); grip.type = 'button'; grip.className = 'pd-grip'; grip.setAttribute('aria-label', 'Hide details');
+    grip.addEventListener('click', function () { setMin(true, true); });
+    card.insertBefore(grip, card.firstChild);
+    var ek = eraIndex(s), era = ERAS[ek], sub = ((C.profile || {})[s.id] || {}).group || roleOf(s);
+    var pill = document.createElement('button');
+    pill.type = 'button'; pill.className = 'pd-pill'; pill.setAttribute('aria-label', 'Show details: ' + shortTitle(s));
+    pill.innerHTML = (era ? '<b class="pd-pill-n" style="--c:' + esc(era.color) + '">' + esc(era.n) + '</b>' : '')
+      + '<span class="pd-pill-t"><b>' + esc(shortTitle(s)) + '</b>' + (sub ? '<span>' + esc(sub) + '</span>' : '') + '</span>'
+      + '<span class="pd-pill-c"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></span>';
+    pill.addEventListener('click', function () { setMin(false, true); });
+    card.appendChild(pill);
+    /* a downward swipe that starts on the card's header folds it too */
+    var y0 = null, x0 = 0;
+    card.addEventListener('touchstart', function (e) {
+      y0 = null;
+      if (document.documentElement.classList.contains('pd-min') || document.documentElement.classList.contains('touring')) return;
+      if (!e.target.closest('.co-head, .pd-grip')) return;
+      y0 = e.touches[0].clientY; x0 = e.touches[0].clientX;
+    }, { passive: true });
+    card.addEventListener('touchmove', function (e) {
+      if (y0 == null) return;
+      var dy = e.touches[0].clientY - y0, dx = Math.abs(e.touches[0].clientX - x0);
+      if (dy > 6 && dy > dx) e.preventDefault();
+    }, { passive: false });
+    card.addEventListener('touchend', function (e) {
+      if (y0 == null) return;
+      var dy = e.changedTouches[0].clientY - y0; y0 = null;
+      if (dy > 40) setMin(true, true);
+    }, { passive: true });
+
     var nx = STOPS[i + 1];
     if (nx) {
       var hint = document.createElement('button');
@@ -136,7 +201,7 @@
       sec.appendChild(hint);
     }
     sec.classList.add('pd-g');
-    cards.push({ card: card, spill: spill, moved: [] });
+    cards.push({ card: card, spill: spill, moved: [], foot: foot, hide: hide });
   }
 
   /* ---------- chapter strip ---------- */
@@ -200,6 +265,8 @@
     secs = [].slice.call(flow.querySelectorAll(':scope > section'));
     secs.forEach(glance);
     buildSheet(); buildStrip();
+    /* v67: phones open with the stop cards folded, so the scene comes first */
+    document.documentElement.classList.add('pd-nofx', 'pd-min'); settle();
     document.documentElement.classList.add('pd-on');
     var tick = false;
     document.addEventListener('scroll', function () { if (!tick) { tick = true; requestAnimationFrame(function () { tick = false; track(); }); } }, { passive: true, capture: true });
@@ -212,11 +279,12 @@
       mo.disconnect(); closeSheet();
       document.documentElement.classList.remove('pd-on');
       cards.forEach(function (o) { while (o.moved.length) o.card.querySelector(':scope > ul.hl').appendChild(o.moved.pop()); });
-      flow.querySelectorAll('.pd-open, .pd-demo-btn, .pd-next').forEach(function (n) { n.remove(); });
+      flow.querySelectorAll('.pd-open, .pd-demo-btn, .pd-next, .pd-hide, .pd-grip, .pd-pill').forEach(function (n) { n.remove(); });
+      document.documentElement.classList.remove('pd-min');
       flow.querySelectorAll('.pd-more').forEach(function (n) { n.hidden = false; });
       if (strip) strip.remove();
     }).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
     track();
-    window.MFPhoneDrive = { open: function (i) { var b = secs[i] && secs[i].querySelector('.pd-open'); if (b) b.click(); }, close: closeSheet, list: openList, go: goStop };
+    window.MFPhoneDrive = { fold: function (on) { setMin(on !== false, true); }, open: function (i) { var b = secs[i] && secs[i].querySelector('.pd-open'); if (b) b.click(); }, close: closeSheet, list: openList, go: goStop };
   });
 })();
