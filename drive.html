@@ -51,8 +51,8 @@
   .dv-home svg { flex: none; }
   @media (max-width: 1180px), (pointer: coarse) { .dv-top .dv-home span { display: none; } .dv-top .dv-home { padding: 0 9px; } }
   /* round 2: the vehicle switch in the top bar, shown only in the games */
-  #b-veh .ic-euc, [data-veh-pref="euc"] #b-veh .ic-car { display: none; }
-  [data-veh-pref="euc"] #b-veh .ic-euc { display: block; }
+  #b-veh .ic-euc, #b-veh .ic-bike, [data-veh-pref="euc"] #b-veh .ic-car, [data-veh-pref="bike"] #b-veh .ic-car { display: none; }
+  [data-veh-pref="euc"] #b-veh .ic-euc, [data-veh-pref="bike"] #b-veh .ic-bike { display: block; }
   html:not([data-drive-mode="notes"]):not([data-drive-mode="free"]):not([data-drive-mode="chase"]) #b-veh { display: none; }
   /* round 2: the vehicle choice in the selector */
   .dv-vehrow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 4px; }
@@ -120,9 +120,10 @@
   <div class="dv-line" id="dv-line" aria-label="Career stops"><i class="dv-car" id="dv-car"></i></div>
   <button type="button" class="dv-game" id="b-game" title="Chase game: 90 seconds (G)">Chase game</button>
   <div class="dv-ctl" role="group" aria-label="Drive settings">
-    <button type="button" id="b-veh" aria-pressed="false" title="Driving the car. Switch to the electric unicycle (U)" aria-label="Car or electric unicycle">
+    <button type="button" id="b-veh" aria-pressed="false" title="Driving the car. Switch ride (U)" aria-label="Switch ride">
       <svg class="ic-car" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15.5V12l2-4.5h12l2 4.5v3.5H4z"/><circle cx="7.5" cy="16.5" r="1.8"/><circle cx="16.5" cy="16.5" r="1.8"/></svg>
       <svg class="ic-euc" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.8 12.8V7.4a1.3 1.3 0 0 1 1.3-1.3h3.8a1.3 1.3 0 0 1 1.3 1.3V12.8z"/><path d="M8.8 9.53A5.1 5.1 0 1 0 15.2 9.53"/><path d="M10.8 6.1V5.1h2.4v1"/></svg>
+      <svg class="ic-bike" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="15" r="3.4"/><circle cx="18" cy="15" r="3.4"/><path d="M6 15l3.6-6h5.2M11.6 15l-2-6M11.6 15l3.6-6 2.8 6M6 15h5.6M14.4 7.2l.8 1.8"/></svg>
     </button>
     <button type="button" id="b-cam" aria-pressed="false" title="Camera: driver seat (C)" aria-label="Switch camera">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
@@ -177,6 +178,7 @@
         <div class="dv-vehrow" role="group" aria-label="Vehicle for the games">
           <button type="button" class="dv-veh" data-veh="car" aria-pressed="true"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15.5V12l2-4.5h12l2 4.5v3.5H4z"/><circle cx="7.5" cy="16.5" r="1.8"/><circle cx="16.5" cy="16.5" r="1.8"/></svg>Car</button>
           <button type="button" class="dv-veh" data-veh="euc" aria-pressed="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.8 12.8V7.4a1.3 1.3 0 0 1 1.3-1.3h3.8a1.3 1.3 0 0 1 1.3 1.3V12.8z"/><path d="M8.8 9.53A5.1 5.1 0 1 0 15.2 9.53"/><path d="M10.8 6.1V5.1h2.4v1"/></svg>Electric unicycle (EUC)</button>
+          <button type="button" class="dv-veh" data-veh="bike" aria-pressed="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="15" r="3.4"/><circle cx="18" cy="15" r="3.4"/><path d="M6 15l3.6-6h5.2M11.6 15l-2-6M11.6 15l3.6-6 2.8 6M6 15h5.6M14.4 7.2l.8 1.8"/></svg>Bike</button>
           <p class="dv-vehnote">Games only. U switches.</p>
         </div>
       </div>
@@ -187,7 +189,7 @@
       <li><kbd>A</kbd><kbd>D</kbd> Steer</li>
       <li><kbd>Shift</kbd> Boost</li>
       <li><kbd>Space</kbd> Handbrake or hop</li>
-      <li><kbd>U</kbd> Car or unicycle</li>
+      <li><kbd>U</kbd> Switch ride</li>
       <li><kbd>C</kbd> Camera</li>
       <li><kbd>M</kbd> Map</li>
       <li><kbd>B</kbd> Glovebox</li>
@@ -212,7 +214,7 @@
 <noscript><p class="dv-noscript">Drive mode needs JavaScript. <a href="road.html">Open The Road</a>.</p></noscript>
 
 <script src="content/road-content.js?v=74"></script>
-<script type="module" src="road/drive-r4.js?v=1"></script>
+<script type="module" src="road/drive-r6.js?v=1"></script>
 <script type="module" src="road/radio-r4.js?v=1"></script>
 </body>
 </html>
