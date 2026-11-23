@@ -161,6 +161,19 @@ html[data-theme="dark"] .bx{box-shadow:0 0 0 1px rgba(255,255,255,.12),0 10px 24
 .narrow .lg-chip{gap:5px;padding:0 7px 0 6px}.narrow .lg-chip b{font-size:9px;letter-spacing:.04em}.narrow .lg-chip img{height:17px}
 .lg-chip.cmp{gap:4px;padding:0 6px 0 5px}.lg-chip.cmp b{font-size:8.5px;letter-spacing:.02em;width:min-content}.lg-chip.cmp img{height:16px}
 .lg-chip.only b,.tiny .lg-chip b{display:none}.lg-chip.only{padding:0 6px}.tiny .lg-chip{padding:0 4px;height:26px;border-radius:7px}.tiny .lg-chip img{height:15px}
+/* v84: General Motors is one tall frame from 2014 to today; SAIC-GM and OnStar sit inside its lower half */
+.lg-chip.wrap{height:64px;padding-bottom:32px;background:linear-gradient(#fff 0 32px,rgba(255,255,255,.45) 32px)}
+html[data-theme="dark"] .lg-chip.wrap{background:linear-gradient(#fff 0 32px,rgba(255,255,255,.07) 32px)}
+.tiny .lg-chip.wrap{height:64px;padding-bottom:32px}
+.lg-chip.sub{height:27px;border-radius:7px;background:color-mix(in srgb,var(--f-digital) 9%,#fff);box-shadow:0 0 0 1px color-mix(in srgb,var(--f-digital) 28%,transparent)}
+.lg-chip.sub img{height:16px}
+.lg-chip.sub b{white-space:nowrap;width:auto}
+.lg-chip.sub em{font-style:normal;font-size:9.5px;font-weight:600;color:#5b6472;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.lg-chip.cmp em,.lg-chip.only em,.tiny .lg-chip em{display:none}
+.tiny .lg-chip.sub{height:22px}
+.pin.deg::before{top:-20px;height:20px}
+.badge.flagb{overflow:hidden;padding:0;background:none;box-shadow:0 0 0 1px var(--line)}
+.badge.flagb img{width:100%;height:100%;object-fit:cover;display:block}
 @media (max-width:600px){.z-s.narrow .bx-g{font-size:10px}}
 /* v33: small boxes break long words at a syllable instead of clipping them ("Enginee") */
 .z-s.narrow .bx-g{font-size:10px!important;line-height:1.16!important;-webkit-line-clamp:4!important}.z-s .bx{padding:7px 5px 7px 6px}.z-s .bx-s{font-size:10.5px!important;line-height:1.18!important;-webkit-line-clamp:4!important}.z-s .bx-s,.z-s .bx-g,.z-m .bx-s{hyphens:auto;-webkit-hyphens:auto;overflow-wrap:break-word}
@@ -177,7 +190,6 @@ html[data-theme="dark"] .bx{box-shadow:0 0 0 1px rgba(255,255,255,.12),0 10px 24
 .pin-t b{font-size:10.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
 .pin-t i{font-style:normal;font-size:10px;color:var(--muted)}
 .pin.nolabel .pin-t{display:none}
-.pin.deg::before{top:-56px;height:56px}
 .pin-lg{display:block;line-height:0;padding:4px 7px;margin-bottom:4px;border-radius:7px;background:#fff;box-shadow:0 0 0 1px var(--line),0 4px 10px -6px rgba(10,16,28,.35)}
 .pin-lg img{height:18px;width:auto;display:block}
 .pin.hide{visibility:hidden}
@@ -668,6 +680,7 @@ html[data-theme="dark"] .tile.keep img,html[data-theme="dark"] .lg.keep img,html
   .vt-t .vt-co{display:block;font-size:13px;color:var(--ink2);margin-top:2px}
   .vt-t .vt-m{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;font-size:12.5px;color:var(--muted);margin-top:3px}
   .vt-t .vt-m img{width:18px;height:12px;border-radius:2px;object-fit:cover;box-shadow:0 0 0 1px var(--line)}
+  .vt-trip{display:block;font-size:12px;color:var(--muted);margin-top:3px}
   .vt-intl{display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:3px 9px;border-radius:999px;background:color-mix(in srgb,var(--f-digital) 12%,transparent);color:var(--ink);font-size:11.5px;font-weight:700}
   .vt-intl img{width:16px;height:11px;border-radius:2px;object-fit:cover}
   .vt-pin .vt-dot{width:34px;height:34px;display:grid;place-items:center;background:var(--surface);overflow:hidden}
@@ -816,7 +829,7 @@ html[data-theme="dark"] .tile.keep img,html[data-theme="dark"] .lg.keep img,html
 
 <footer class="dock" id="dock">
   <div class="legend" aria-label="Legend">
-    <span class="dk-l">Legend</span>    <span class="lk"><i class="lk-img"><img src="../assets/road/logos/kettering-seal.png" alt=""></i>Degree</span><span class="lk"><i class="lk-img"><img src="../assets/flags/ec.svg" alt=""></i>Country project (below the line)</span><span class="lk"><i class="lk-img"><img src="../assets/flags/mx.svg" alt=""></i>International assignment (flag on its bracket)</span><a class="lk-pv" href="../privacy.html">Privacy</a>
+    <span class="dk-l">Legend</span>    <span class="lk"><i class="lk-img"><img src="../assets/road/logos/kettering-seal.png" alt=""></i>Degree</span><span class="lk"><i class="lk-img"><img src="../assets/flags/mx.svg" alt=""></i>Assignment abroad</span><a class="lk-pv" href="../privacy.html">Privacy</a>
   </div>
   <div class="zoom" role="group" aria-label="Zoom">
     <span class="dk-l">Zoom</span>
@@ -875,11 +888,11 @@ function UY(y) { for (const s of SLOTS) if (y <= s.to) return s.s + Math.max(0, 
 const GM_START = SLOT.traverse.s;
 const LAST_E = ROLES[ROLES.length - 1].e;
 
-const PINS = [
-  { id: 'kettering', kind: 'deg', at: 2007, t: 'BSME, Kettering', sub: '2007' },
-  { id: 'flag-CA-2012', kind: 'flag', c: 'CA', at: 2012.8, t: 'Canada', sub: '2012 · Victoria, BC', role: 'ross',
+/* v84 (Volker review): trips abroad leave the axis and live as stories inside their role.
+   Only the two degrees stay as pins under the line. */
+const TRIPS = [
+  { id: 'flag-CA-2012', kind: 'flag', c: 'CA', at: 2012.8, t: 'Canada', sub: '2012 · Victoria, BC', role: 'ross', told: 1, /* already a story in the MBA */
     text: 'Ross MAP consulting project: a week on site with IdeaConnection, an open innovation firm in Victoria, British Columbia, building a market entry strategy for new revenue models.' },
-  { id: 'ross', kind: 'deg', at: 2014.25, t: 'MBA, Michigan Ross', sub: '2014' },
   { id: 'flag-EC', kind: 'flag', c: 'EC', at: 2015.75, t: 'Ecuador', sub: '2015 · Quito, Guayaquil', role: 'customer-experience',
     text: "Field study with GM Ecuador's dealers in Quito and Guayaquil, the market that led every GM region in service satisfaction." },
   { id: 'flag-CA', kind: 'flag', c: 'CA', at: 2017.45, t: 'Canada', sub: '2017', role: 'equinox',
@@ -888,6 +901,11 @@ const PINS = [
     text: 'Market research in China that informed the global content workshops for the next-gen Chevrolet Equinox.' },
   { id: 'flag-KR', kind: 'flag', c: 'KR', at: 2019.6, t: 'Korea', sub: '2019', role: 'trailblazer-encore',
     text: 'Korea, where both the Buick Encore GX and the Chevrolet Trailblazer are built.' }
+];
+const TRIP = Object.fromEntries(TRIPS.map(p => [p.id, p]));
+const PINS = [
+  { id: 'kettering', kind: 'deg', at: 2007, t: 'BSME, Kettering', sub: '2007' },
+  { id: 'ross', kind: 'deg', at: 2014.25, t: 'MBA, Michigan Ross', sub: '2014' }
 ];
 const CLR = new Set(['sgm', 'patac', 'sgmw', 'ross-stack', 'ross', 'ideaconnection', 'kettering-wordmark', 'kettering-seal']);
 const KEEP = new Set(['patac', 'kettering-seal']);
@@ -901,9 +919,10 @@ const EMP = [
   { n: 'fm-emblem', r: 1, t: 'Federal-Mogul', a: 'fm-coop', b: 'federal-mogul' },
   { n: 'chrysler-group-mark', r: 467 / 448, t: 'Chrysler Group', a: 'chrysler', b: 'chrysler' },
   { n: 'jci-emblem', r: 227 / 226, t: 'Johnson Controls', a: 'johnson-controls', b: 'johnson-controls' },
-  { n: 'generalmotors', r: 1, t: 'General Motors', a: 'traverse', b: 'connected', span: 1 },
-  { n: 'sgm', r: 640 / 407, t: 'SAIC-GM', a: 'shanghai', b: 'shanghai' },
-  { n: 'onstar', r: 1, t: 'OnStar', a: 'onstar', b: 'onstar' }
+  /* v84 (Volker review): General Motors runs unbroken from 2014 to today; SAIC-GM and OnStar sit inside it */
+  { n: 'generalmotors', r: 1, t: 'General Motors', a: 'traverse', b: 'onstar', span: 1, wrap: 1 },
+  { n: 'sgm', r: 640 / 407, t: 'SAIC-GM', d: "GM's China joint venture", a: 'shanghai', b: 'shanghai', sub: 1 },
+  { n: 'onstar', r: 1, t: 'OnStar', d: "GM's connected-car service", a: 'onstar', b: 'onstar', sub: 1 }
 ];
 
 /* round 28: two levels of brackets. On top, the two halves of the career: engineering, then business
@@ -913,7 +932,7 @@ const CHAPTERS = [
   { id: 'ch-eng', tier: 1, a: 'fm-coop', b: 'johnson-controls', t: 'Engineering', short: 'Engineering', years: '2003–2014', acc: 'var(--f-eng)',
     text: 'A decade of automotive engineering: co-op and product engineering at Federal-Mogul, design release at Chrysler Group and senior product engineering at Johnson Controls, with a Kettering degree and an evening MBA at Michigan Ross, including a consulting project on site in Canada.',
     ids: ['fm-coop', 'kettering', 'federal-mogul', 'chrysler', 'johnson-controls', 'ross'] },
-  { id: 'ch-gm', tier: 1, a: 'traverse', b: 'onstar', t: 'Business · General Motors, SAIC-GM and OnStar', short: 'General Motors', years: '2014–2026', acc: 'var(--f-digital)', cls: 'gm',
+  { id: 'ch-gm', tier: 1, a: 'traverse', b: 'onstar', t: 'Business · General Motors', short: 'General Motors', years: '2014–2026', acc: 'var(--f-digital)', cls: 'gm',
     text: 'Twelve years at General Motors: the leadership development program, global product management for crossovers, connected services strategy, Deputy Director of Software Strategy at SAIC-GM, GM\'s joint venture in Shanghai, and OnStar International.',
     ids: ['traverse', 'customer-experience', 'mexico', 'equinox', 'trailblazer-encore', 'connected', 'shanghai', 'onstar'] },
   { id: 'ch-program', tier: 2, a: 'traverse', b: 'mexico', t: 'Leadership development program', short: 'Leadership program', years: '2014–2016', acc: 'var(--f-cx)', cls: 'gmp',
@@ -931,7 +950,7 @@ const ORDER = ['fm-coop', 'kettering', 'federal-mogul', 'chrysler', 'johnson-con
 const FOCUS_OF = id => SLOT[id] ? SLOT[id].focus : id === 'now' ? 'now' : 'eng';
 const accOf = id => id === 'kettering' || id === 'ross' ? 'var(--cap-bg)' : FOCUS_OF(id) === 'now' ? 'var(--now)' : `var(--f-${FOCUS_OF(id)})`;
 const unitOf = id => SLOT[id] ? (SLOT[id].s + SLOT[id].e) / 2 : PIN[id] ? UY(PIN[id].at) : CH[id] ? (SLOT[CH[id].a].s + SLOT[CH[id].b].e) / 2 : 0;
-const known = id => !!(SLOT[id] || PIN[id] || CH[id]);
+const known = id => !!(SLOT[id] || PIN[id] || CH[id] || TRIP[id]);
 
 /* round 25: one flag style on this page, round colour flags (as on the trip markers); the globe is drawn to match */
 const GLOBE_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" fill="#2f6fb3"/><g fill="none" stroke="#fff" stroke-width="1.4" opacity=".95"><circle cx="12" cy="12" r="7.4"/><ellipse cx="12" cy="12" rx="3.2" ry="7.4"/><path d="M4.6 12h14.8M6 8h12M6 16h12"/></g></svg>';
@@ -996,9 +1015,9 @@ const SHY = { Engineering: 'Engi&shy;neering', Engineer: 'Engi&shy;neer', Manage
 /* v50: no word breaks in role titles. Whole words only; a hyphenated word like Co-op never splits */
 const shy = t => t.replace(/-/g, '\u2011');
 const brEls = CHAPTERS.map(c => mk('a', 'br t' + c.tier + (c.cls ? ' ' + c.cls : ''), `<span class="br-l">${c.flag ? `<span class="br-fl">${chick(c.flag)}</span>` : ''}<span class="f">${esc(c.t)} <i>· ${esc(c.years)}</i></span><span class="s">${esc(c.short)}</span></span>`, { href: '#' + c.id, 'data-open': c.id, 'aria-label': `${c.t}, ${c.years}` }));
-const lgEls = EMP.map(e => mk('span', 'lg-chip span',
-  `<img src="../assets/road/logos/${e.n}.png" alt="" width="${Math.round(20 * e.r)}" height="20"><b>${esc(e.t)}</b>`,
-  { title: e.t }));
+const lgEls = EMP.map(e => mk('span', 'lg-chip span' + (e.wrap ? ' wrap' : '') + (e.sub ? ' sub' : ''),
+  `<img src="../assets/road/logos/${e.n}.png" alt="" width="${Math.round(20 * e.r)}" height="20"><b>${esc(e.t)}</b>${e.d ? `<em>${esc(e.d)}</em>` : ''}`,
+  { title: e.d ? `${e.t}, ${e.d}` : e.t }));
 const bxEls = ROLES.map(s => {
   const p = PROF[s.id] || {};
   const hl = (p.hl || []).slice(0, 3).map(x => `<li>${md(x)}</li>`).join('');
@@ -1080,6 +1099,7 @@ function modeFor(u, hMax) {
   return MODES[Math.min(a, b)];
 }
 const BOX_H = { xs: 72, s: 108, m: 110, l: 176, xl: 236 };
+const SUBH = 32; /* v84: extra height of the General Motors frame that holds SAIC-GM and OnStar */
 /* v63: newest first. The layer is mirrored as a whole; each piece is flipped back so its text reads normally.
    The axis keeps the mirror (its arrow points left, into now) and pins flip their parts instead. */
 let REV = (() => {
@@ -1097,7 +1117,7 @@ const ex = x => REV ? W - x : x;
 
 function render() {
   /* vertical: centre the band between the intro and the dock */
-  const avail = Math.max(240, bandBot - bandTop), hMax = Math.max(40, Math.min(avail - 290, 236));
+  const avail = Math.max(240, bandBot - bandTop), hMax = Math.max(40, Math.min(avail - 262, 236));
   const m2 = modeFor(U, hMax);
   if (m2 !== mode) { stage.classList.remove('z-' + mode); mode = m2; stage.classList.add('z-' + mode); }
   stage.classList.toggle('tiny', 2 * U - 6 < 50);
@@ -1105,7 +1125,7 @@ function render() {
   hBox = Math.min(mode === 'xs' && 2 * U - 6 < 50 ? 44 : BOX_H[mode], hMax);
   stage.classList.toggle('xs-low', hBox < 64);
   stage.classList.toggle('roomy', hBox >= 100);
-  const up = 40 + hBox + 164, dn = 56 + 94;
+  const up = 40 + hBox + 164 + SUBH, dn = 20 + 70;
   const y0 = bandTop + Math.max(0, (avail - up - dn) / 2) + up;
   const boxTop = y0 - 40 - hBox, dnTop = y0 + 56;
 
@@ -1134,7 +1154,7 @@ function render() {
   /* chapter brackets, labels stay on screen */
   CHAPTERS.forEach((c, i) => {
     const a = sx(SLOT[c.a].s) + 3, b = sx(SLOT[c.b].e) - 3, el = brEls[i], w = Math.max(0, b - a);
-    el.style.width = w + 'px'; T(el, a, boxTop - (c.tier === 1 ? 128 : c.tier === 2 ? 90 : 54));
+    el.style.width = w + 'px'; T(el, a, boxTop - SUBH - (c.tier === 1 ? 128 : c.tier === 2 ? 90 : 54));
     /* v38: an assignment's label may run on to the right, up to the next bracket in its row */
     const nx = c.tier === 3 ? CHAPTERS.filter(d => d.tier === 3 && SLOT[d.a].s > SLOT[c.b].s).map(d => sx(SLOT[d.a].s) - 9) : [];
     const re = c.tier === 3 ? Math.min(W - M, ...nx) : Math.min(b, W - M);
@@ -1148,7 +1168,7 @@ function render() {
   if (lgKey !== stage.className) { lgKey = stage.className; lgEls.forEach((el, i) => { el.style.maxWidth = 'none'; el.style.width = ''; el.classList.remove('cmp', 'only'); lgW[i] = el.offsetWidth; el.classList.add('cmp'); lgC[i] = el.offsetWidth; el.classList.replace('cmp', 'only'); lgI[i] = el.offsetWidth; el.classList.remove('only'); }); }
   EMP.forEach((e, i) => {
     const el = lgEls[i], a = sx(SLOT[e.a].s) + 3, b = sx(SLOT[e.b].e) - 3;
-    const lo = Math.max(a, M), hi = Math.min(b, W - M), vis = hi - lo;
+    const inset = e.sub ? 5 : 0, lo = Math.max(a, M), hi = Math.min(b, W - M), vis = hi - lo - 2 * inset;
     /* round 28: sized to the visible part of its own span, so it never sits over another company's boxes */
     const v = (lgW[i] || 90) <= vis ? 0 : (lgC[i] || 80) <= vis ? 1 : 2;
     el.classList.toggle('cmp', v === 1); el.classList.toggle('only', v === 2);
@@ -1156,7 +1176,8 @@ function render() {
     el.style.maxWidth = Math.max(0, vis).toFixed(1) + 'px';
     el.classList.toggle('off', vis < (lgI[i] || 34) || b - a < 20);
     /* v39: every company box spans its own roles, edge to edge, like General Motors */
-    el.style.width = Math.max(0, vis).toFixed(1) + 'px'; T(el, lo, boxTop - 36);
+    /* v84: the General Motors chip is a tall frame; SAIC-GM and OnStar chips sit inside its lower half */
+    el.style.width = Math.max(0, vis).toFixed(1) + 'px'; T(el, lo + inset, e.wrap ? boxTop - 36 - SUBH : e.sub ? boxTop - 33 : boxTop - 36);
   });
   const gx = Math.max(M, sx(GM_START) + 3);
   T(zoneUp, gx, boxTop - 88); T(zoneDn, gx, dnTop + hBox + 12);
@@ -1167,8 +1188,8 @@ function render() {
   PINS.forEach((p, i) => {
     const el = pinEls[i], x = sx(UY(p.at)) - 13;
     if (p.kind === 'deg') {
-      /* v52: degrees sit in a row of their own under the flags: round school logo, name and year beside it */
-      T(el, x, y0 + 56);
+      /* v52: degrees sit in a row of their own: round school logo, name and year beside it (v84: right under the line, no flags above) */
+      T(el, x, y0 + 20);
       const clash = x < lastCap + 30; el.classList.toggle('hide', clash);
       if (clash) return;
       lastCap = x;
@@ -1580,7 +1601,10 @@ function roleHTML(id) {
   const chips = [s.place && `<li class="chip">${home ? `<img src="${flagURL(home)}" alt="${esc(COUNTRY[home] || home)}">` : ico('pin')}${esc(s.place)}</li>`, s.span && `<li class="chip">${ico('cal')}${esc(s.span)}</li>`,
     ...(TAGS[id] || [`<i></i>${esc(focusName(id))}`]).map(t => TAGS[id] ? `<li class="chip tag">${esc(t)}</li>` : `<li class="chip tag">${t}</li>`), e && `<li class="chip tag">Chapter ${e.n} · ${esc(e.short || e.label)}</li>`].filter(Boolean).join('') + flags;
   const stories = (s.callouts || []).map((c, k) => { const [t, lede] = splitCallout(c.text); const body = (p.stories && p.stories[k]) || lede;
-    return `<li class="story"><span class="badge">${ico(pick(t) !== 'check' ? pick(t) : pick(body))}</span><div><b><small>${LET(k)}</small>${esc(t)}</b><p>${esc(body)}</p>${marksHTML(p, k)}</div></li>`; }).join('');
+    return `<li class="story"><span class="badge">${ico(pick(t) !== 'check' ? pick(t) : pick(body))}</span><div><b><small>${LET(k)}</small>${esc(t)}</b><p>${esc(body)}</p>${marksHTML(p, k)}</div></li>`; }).join('') +
+    /* v84: trips abroad for this role, told as stories with their flag */
+    TRIPS.filter(tr => tr.role === id && !tr.told).map((tr, k) => `<li class="story trip"><span class="badge flagb"><img src="${flagURL(tr.c)}" alt=""></span><div><b><small>${LET((s.callouts || []).length + k)}</small>${esc(tr.t)} · ${esc(tr.sub)}</b><p>${esc(tr.text)}</p></div></li>`).join('');
+  const nStories = (s.callouts || []).length + TRIPS.filter(tr => tr.role === id && !tr.told).length;
   const work = (WORK[id] || []).map(x => `<a class="lnk" href="${esc(x.href.replace(/^work\//, ''))}" title="${esc(x.text)} (synthetic data)">${esc(x.pill === 'Kit' ? 'Everyday kit' : 'Live demo: ' + x.title)}${ico('ext')}</a>`).join('');
   const m = s.more, more = m && m.blocks ? `<details class="m-more"><summary>${esc(m.title || 'More')}</summary>${m.blocks.map(b => `<h4>${esc(b.h)}</h4><p>${esc(b.p)}</p>`).join('')}${m.sources && m.sources.length ? '<div class="src">' + m.sources.map(x => `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.label)}</a>`).join('') + '</div>' : ''}</details>` : '';
   const i = ORDER.indexOf(id), pv = ORDER[i - 1], nx = ORDER[i + 1];
@@ -1595,7 +1619,7 @@ function roleHTML(id) {
       ${p.summary ? `<p class="m-sum">${esc(p.summary)}</p>` : ''}
       ${p.hl && p.hl.length ? `<p class="m-h">Highlights</p><div class="kpis">${kpisHTML(p)}</div>` : ''}
       <p class="m-h">At a glance</p><div class="viz">${chart}${map}${arc}</div>
-      ${stories ? `<p class="m-h">Stories</p><ol class="stories${(s.callouts || []).length > 2 ? ' many' : ''}" style="--n:${(s.callouts || []).length}">${stories}</ol>` : ''}${more}
+      ${stories ? `<p class="m-h">Stories</p><ol class="stories${nStories > 2 ? ' many' : ''}" style="--n:${nStories}">${stories}</ol>` : ''}${more}
     </div>
     <nav class="m-nav" aria-label="Roles">${pv ? `<button type="button" data-step="-1">‹ Previous<b>${esc(navName(pv))}</b></button>` : '<span></span>'}${nx ? `<button type="button" class="nx" data-step="1">Next ›<b>${esc(navName(nx))}</b></button>` : ''}</nav>`;
 }
@@ -1633,6 +1657,7 @@ let curId = null, lastFocus = null;
 function openModal(id, how) {
   const sheet = $('#sheet'), modal = $('#modal');
   let html, accent, small = false;
+  if (TRIP[id]) id = TRIP[id].role; /* v84: trips now live inside their role */
   if (CH[id]) { html = chapterHTML(CH[id]); accent = CH[id].acc; small = true; }
   else if (PIN[id] && PIN[id].kind === 'flag') { html = flagHTML(PIN[id]); accent = accOf(PIN[id].role); small = true; }
   else if (STOP[id] && known(id)) { html = roleHTML(id); accent = accOf(id); }
@@ -1706,21 +1731,23 @@ const VT = (() => {
   const pinYear = p => p.at, roleYear = r => r.from;
   const items = [...ROLES.map(r => ({ k: 'role', y: roleYear(r), r })), ...PINS.map(p => ({ k: 'pin', y: pinYear(p), p }))].sort((a, b) => a.y - b.y);
   const ri = id => ROLES.findIndex(x => x.id === id);
-  const empTile = id => { const k = ri(id), e = EMP.find(e => k >= ri(e.a) && k <= ri(e.b));
+  const empTile = id => { const k = ri(id), e = EMP.find(e => e.sub && k >= ri(e.a) && k <= ri(e.b)) || EMP.find(e => k >= ri(e.a) && k <= ri(e.b));
     return e ? `<span class="tile${lgCls(e.n)}"><img src="${LOGO(e.n)}" alt="${esc(e.t)}"></span>` : tileHTML(id); };
   const card = r => {
     const p = PROF[r.id] || {};
     const intl = CHAPTERS.find(c => c.tier === 3 && c.a === r.id);
+    const sub = EMP.find(e => e.sub && e.a === r.id), trips = TRIPS.filter(t => t.role === r.id);
     return `<a class="vt-row" href="#${r.id}" data-open="${r.id}" data-id="${r.id}" style="--acc:${accOf(r.id)}"><span class="vt-dot" aria-hidden="true"></span>
-      <span class="vt-card">${empTile(r.id)}<span class="vt-t"><b>${esc(r.label)}</b><span class="vt-co">${esc(r.co)}${p.group && p.group !== r.co ? ' · ' + esc(p.group) : ''}</span>
-      <span class="vt-m">${r.flag ? `<img src="${flagURL(r.flag)}" alt="">` : ''}${esc(r.years)} · ${esc(r.kicker)}</span>
+      <span class="vt-card">${empTile(r.id)}<span class="vt-t"><b>${esc(r.label)}</b><span class="vt-co">${esc(r.co)}${sub ? ' · ' + esc(sub.d) : p.group && p.group !== r.co ? ' · ' + esc(p.group) : ''}</span>
+      <span class="vt-m">${r.flag && !intl ? `<img src="${flagURL(r.flag)}" alt="">` : ''}${esc(r.years)} · ${esc(r.kicker)}</span>
+      ${trips.length ? `<span class="vt-trip">Trips: ${trips.map(t => esc(t.t)).join(', ')}</span>` : ''}
       ${intl ? `<span class="vt-intl"><img src="${flagURL(intl.flag)}" alt="">${esc(intl.short)}</span>` : ''}</span></span></a>`;
   };
   const pin = p => {
     const ico = p.round ? `<img src="../assets/road/logos/${p.round}.png" alt="">` : p.kind === 'deg' ? CAP : `<img src="${flagURL(p.c)}" alt="">`;
     const lg = p.logo ? `<img class="vt-lg" src="${LOGO(p.logo[0])}" alt="${esc(p.logo[2])}">` : '';
     return `<a class="vt-row vt-pin ${p.kind}" href="#${p.id}" data-open="${p.id}" data-id="${p.role || p.id}"><span class="vt-dot" aria-hidden="true">${ico}</span>
-      <span class="vt-p">${lg}<b>${esc(p.t)}</b><span>${esc(p.kind === 'flag' ? 'Country project · ' + p.sub : p.sub)}</span></span></a>`;
+      <span class="vt-p">${lg}<b>${esc(p.t)}</b><span>${esc(p.kind === 'flag' ? 'Country project · ' + p.sub : p.sub)}</span>${TRIPS.some(t => t.role === p.id) ? `<span class="vt-trip">Trips: ${TRIPS.filter(t => t.role === p.id).map(t => esc(t.t)).join(', ')}</span>` : ''}</span></a>`;
   };
   const ch = (id, sub) => { const c = CH[id]; return `<a class="vt-ch${sub ? ' sub' : ''}" href="#${id}" data-open="${id}" style="--acc:${c.acc}">${esc(sub ? c.t : c.short)} <span>${esc(c.years)}</span></a>`; };
   const today = `<div class="vt-row vt-pin vt-now" aria-label="Today"><span class="vt-dot" aria-hidden="true"></span><span class="vt-p"><b>Today</b><span>Exploring new leadership opportunities</span></span></div>`;
