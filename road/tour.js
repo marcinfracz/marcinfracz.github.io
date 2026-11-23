@@ -413,7 +413,7 @@ function build() {
     runFrom(at, { story: k, only: true });
   }, true);
   /* driving the road by hand pauses the tour where the visitor stopped */
-  const handDrive = e => { if (!running || paused || !flowMode() || !ui || ui.contains(e.target)) return; if (e.target.closest && e.target.closest('.bar, .ctl-pop, .pd-sheet, .pm-sheet, #reel-pop, .reel-pop')) return; pauseTour(); };
+  const handDrive = e => { if (!running || paused || !flowMode() || !ui || ui.contains(e.target)) return; if (e.target.closest && e.target.closest('.bar, .ctl-pop, .pd-sheet, .pm-sheet, #reel-pop, .reel-pop, .pd-pill, .pd-hide, .pd-grip')) return; if (window.MFPhoneDrive && MFPhoneDrive.folding && MFPhoneDrive.folding(e)) return; pauseTour(); };
   addEventListener('wheel', handDrive, { passive: true, capture: true });
   addEventListener('touchmove', handDrive, { passive: true, capture: true });
   document.addEventListener('visibilitychange', () => { if (document.hidden && running) pauseTour(); });

@@ -98,7 +98,7 @@
   .pd-panel, .pd-veil, .pd-segs i b { transition: none; }
 }
 
-/* v67: stop cards fold to a slim pill (stop name and a chevron) and open again; phones open folded; the guided tour always shows the full card */
+/* v67: stop cards fold to a slim pill (stop name and a chevron) and open again; phones open folded; v68: the guided tour opens the card and it folds there too */
 @media (max-width: 767px) {
   html.pd-on .flow .pd-g .fcard { position: relative; transition: border-radius .3s ease; }
   html.pd-on .flow .pd-g .fcard > * { transition: opacity .22s ease .1s, visibility 0s; }
@@ -115,11 +115,10 @@
   .pd-pill-t b { font: 700 14.5px/1.2 Inter, system-ui, sans-serif; }
   .pd-pill-t span { font: 500 12px/1.25 Inter, system-ui, sans-serif; color: var(--ink-3); }
   .pd-pill-c { flex: none; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--surface-2); color: var(--ink-2); }
-  html.pd-on.pd-min:not(.touring) .flow .pd-g .fcard { height: 52px; border-radius: 26px; }
-  html.pd-on.pd-min:not(.touring) .flow .pd-g .fcard > :not(.pd-pill) { opacity: 0; visibility: hidden; transition: opacity .14s ease, visibility 0s .14s; }
-  html.pd-on.pd-min:not(.touring) .flow .pd-g .fcard > .pd-pill { opacity: 1; visibility: visible; transition: opacity .2s ease .12s, visibility 0s; }
+  html.pd-on.pd-min .flow .pd-g .fcard { height: 52px; border-radius: 26px; }
+  html.pd-on.pd-min .flow .pd-g .fcard > :not(.pd-pill) { opacity: 0; visibility: hidden; transition: opacity .14s ease, visibility 0s .14s; }
+  html.pd-on.pd-min .flow .pd-g .fcard > .pd-pill { opacity: 1; visibility: visible; transition: opacity .2s ease .12s, visibility 0s; }
   html.pd-nofx .flow .pd-g .fcard, html.pd-nofx .flow .pd-g .fcard > * { transition: none !important; }
-  html.touring .pd-g .pd-hide, html.touring .pd-g .pd-grip { display: none; }
 }
 @media (max-width: 767px) and (prefers-reduced-motion: reduce) {
   html.pd-on .flow .pd-g .fcard, html.pd-on .flow .pd-g .fcard > * { transition: none !important; }

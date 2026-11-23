@@ -72,7 +72,7 @@
     return shortTitle(b);
   }
   /* results that do not fit the glance card move to the top of the sheet, so nothing is cut off */
-  var cards = [];
+  var cards = [], sw = null; /* sw: a fold swipe in progress */
   function fit() {
     /* measure with the cards open, so folding never moves results into the sheet */
     var root = document.documentElement, was = root.classList.contains('pd-min');
@@ -99,7 +99,7 @@
     if (root.classList.contains('pd-min') === on) return;
     var sec = secs[cur], c = sec && sec.classList.contains('pd-g') ? sec.querySelector('.fcard') : null;
     var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!c || !anim || still || root.classList.contains('touring') || !MQ.matches) { root.classList.toggle('pd-min', on); return; }
+    if (!c || !anim || still || !MQ.matches) { root.classList.toggle('pd-min', on); return; }
     var h0 = c.getBoundingClientRect().height;
     c.classList.remove('pd-anim'); c.style.height = '';
     root.classList.toggle('pd-min', on);
@@ -174,21 +174,21 @@
     pill.addEventListener('click', function () { setMin(false, true); });
     card.appendChild(pill);
     /* a downward swipe that starts on the card's header folds it too */
-    var y0 = null, x0 = 0;
+    /* v68: works during the guided tour too */
     card.addEventListener('touchstart', function (e) {
-      y0 = null;
-      if (document.documentElement.classList.contains('pd-min') || document.documentElement.classList.contains('touring')) return;
+      sw = null;
+      if (document.documentElement.classList.contains('pd-min')) return;
       if (!e.target.closest('.co-head, .pd-grip')) return;
-      y0 = e.touches[0].clientY; x0 = e.touches[0].clientX;
+      sw = { y: e.touches[0].clientY, x: e.touches[0].clientX };
     }, { passive: true });
     card.addEventListener('touchmove', function (e) {
-      if (y0 == null) return;
-      var dy = e.touches[0].clientY - y0, dx = Math.abs(e.touches[0].clientX - x0);
+      if (!sw) return;
+      var dy = e.touches[0].clientY - sw.y, dx = Math.abs(e.touches[0].clientX - sw.x);
       if (dy > 6 && dy > dx) e.preventDefault();
     }, { passive: false });
     card.addEventListener('touchend', function (e) {
-      if (y0 == null) return;
-      var dy = e.changedTouches[0].clientY - y0; y0 = null;
+      if (!sw) return;
+      var dy = e.changedTouches[0].clientY - sw.y; sw = null;
       if (dy > 40) setMin(true, true);
     }, { passive: true });
 
@@ -284,7 +284,16 @@
       flow.querySelectorAll('.pd-more').forEach(function (n) { n.hidden = false; });
       if (strip) strip.remove();
     }).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    /* v68: the guided tour starts with the card open, as before; it can then be folded and opened like the drive */
+    var wasT = document.documentElement.classList.contains('touring');
+    new MutationObserver(function () {
+      var t = document.documentElement.classList.contains('touring');
+      if (t && !wasT) setMin(false, true);
+      wasT = t;
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
     track();
-    window.MFPhoneDrive = { fold: function (on) { setMin(on !== false, true); }, open: function (i) { var b = secs[i] && secs[i].querySelector('.pd-open'); if (b) b.click(); }, close: closeSheet, list: openList, go: goStop };
+    window.MFPhoneDrive = { fold: function (on) { setMin(on !== false, true); },
+      /* true while a downward fold swipe is under way, so the tour does not read it as driving by hand */
+      folding: function (e) { var t = e && e.touches && e.touches[0]; return !!(sw && t && t.clientY - sw.y > 0); }, open: function (i) { var b = secs[i] && secs[i].querySelector('.pd-open'); if (b) b.click(); }, close: closeSheet, list: openList, go: goStop };
   });
 })();
