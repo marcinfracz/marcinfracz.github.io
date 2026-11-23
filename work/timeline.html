@@ -358,6 +358,21 @@ html[data-theme="dark"] .map .land{stroke:color-mix(in srgb,var(--ink) 11%,trans
 .m-side.low{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);transform:translateX(-50%)}
 .m-side.edge i{width:36px;height:36px;background:var(--surface);color:var(--ink);box-shadow:0 0 0 1px var(--line),0 8px 20px -8px rgba(0,0,0,.5)}
 .m-side.edge i svg{width:20px;height:20px}
+/* v85: say which way each arrow goes (left = earlier role, right = later role, by date) */
+.m-side em{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);font-style:normal;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;opacity:.75}
+.m-side em small{display:none}
+.m-side.edge:not(.low) em{display:none}
+/* v85: on phones the arrows are pills that float clear of the screen bottom, and the sheet ends with room for them */
+.m-side.low{display:flex;align-items:center;gap:8px;bottom:calc(env(safe-area-inset-bottom,0px) + 26px);padding:4px 14px 4px 4px;border-radius:999px;background:var(--surface);color:var(--ink);box-shadow:0 0 0 1px var(--line),0 10px 24px -10px rgba(0,0,0,.55)}
+.m-side.low[hidden]{display:none}
+#m-prev.low{left:16px!important;transform:none}
+#m-next.low{left:auto!important;right:16px;transform:none;flex-direction:row-reverse;padding:4px 4px 4px 14px}
+.m-side.low i{width:34px;height:34px;box-shadow:none;background:color-mix(in srgb,var(--ink) 7%,transparent)}
+.m-side.low i svg{width:18px;height:18px}
+.m-side.low em{position:static;transform:none;opacity:1;font-size:10.5px;font-weight:700;line-height:1.25;text-align:left;color:var(--muted)}
+#m-next.low em{text-align:right}
+.m-side.low em small{display:block;font-size:12.5px;letter-spacing:0;text-transform:none;color:var(--ink);font-weight:700}
+#sheet.has-low .m-body{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 96px)}
 .sheet:has(.m-nav) .m-body{padding-bottom:26px}
 .m-nav{display:none;justify-content:space-between;gap:10px;margin:18px 30px 0;padding:12px 0 20px;border-top:1px solid var(--line)}
 .m-nav button{display:flex;flex-direction:column;gap:2px;border:0;background:none;cursor:pointer;font:600 11px var(--font);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:6px 0;max-width:48%;text-align:left;min-width:0}
@@ -843,8 +858,8 @@ html[data-theme="dark"] .tile.keep img,html[data-theme="dark"] .lg.keep img,html
 <div class="modal" id="modal" hidden>
   <div class="shade" id="shade"></div>
   <article class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="m-title" tabindex="-1"></article>
-  <button class="m-side" id="m-prev" type="button" data-step="-1" hidden><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></i><span></span></button>
-  <button class="m-side" id="m-next" type="button" data-step="1" hidden><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></i><span></span></button>
+  <button class="m-side" id="m-prev" type="button" data-step="-1" hidden><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></i><em></em><span></span></button>
+  <button class="m-side" id="m-next" type="button" data-step="1" hidden><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></i><em></em><span></span></button>
 </div>
 
 <noscript><p style="position:fixed;top:120px;left:20px">The timeline needs JavaScript. <a href="../road.html">Drive the Road instead</a>.</p></noscript>
@@ -1690,9 +1705,11 @@ function placeSides() {
     b.classList.toggle('edge', !roomy); b.classList.toggle('low', !mid);
     b.style.left = (mid ? x : sel === '#m-prev' ? 34 : innerWidth - 34) + 'px';
     b.style.setProperty('--mw', Math.min(150, m - 20) + 'px');
-    const nm = navName(id); b.querySelector('span').textContent = nm;
-    b.setAttribute('aria-label', (sel === '#m-prev' ? 'Previous role: ' : 'Next role: ') + nm); b.title = nm;
+    const nm = navName(id), y = yrs(STOP[id] || {}), dir = sel === '#m-prev' ? 'Earlier' : 'Later'; b.querySelector('span').textContent = nm;
+    b.querySelector('em').innerHTML = esc(dir) + (y ? `<small>${esc(y)}</small>` : '');
+    b.setAttribute('aria-label', dir + ' role: ' + nm + (y ? ', ' + y : '')); b.title = nm;
   });
+  $('#sheet').classList.toggle('has-low', ['#m-prev', '#m-next'].some(sel => !$(sel).hidden && $(sel).classList.contains('low')));
 }
 addEventListener('resize', () => { if (!$('#modal').hidden) placeSides(); });
 function stepModal(d) { const n = ORDER[ORDER.indexOf(curId) + d]; if (n) openModal(n, 'replace'); }
