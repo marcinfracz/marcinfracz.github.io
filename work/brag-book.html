@@ -107,6 +107,7 @@ main{max-width:1600px;margin:0 auto;padding:calc(env(safe-area-inset-top,0px) + 
 .org .logos .chip img{height:26px;opacity:1}
 .org .logos .mono{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:var(--ink);color:var(--surface);font:800 12px/1 var(--font)}
 html[data-theme="dark"] .org .logos>img:not(.keep){filter:invert(1);opacity:.9}
+html[data-theme="dark"] .org .logos>img[src*="onstar.png"]{filter:none;opacity:1} /* v86: current OnStar mark keeps its blue */
 .org .logos img.keep{opacity:1}
 .org .meta{font:700 12px/1.35 var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
 .c-left h2{margin:14px 0 0;font:800 clamp(30px,2.7vw,42px)/1.06 var(--font);letter-spacing:-.025em;text-wrap:balance}

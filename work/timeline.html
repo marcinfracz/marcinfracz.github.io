@@ -107,6 +107,13 @@ html[data-theme="dark"] .bx{box-shadow:0 0 0 1px rgba(255,255,255,.12),0 10px 24
 .bx-hl b{font-weight:800}
 .bx-y{margin-top:auto;font-size:10.5px;font-weight:600;opacity:.85;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .bx-go{display:none;font-weight:700;opacity:.95;white-space:nowrap}
+/* v86: company logo in a small white tag at the box's bottom right */
+.bx-lg{margin-left:auto;flex:none;display:inline-flex;align-items:center;height:20px;padding:0 6px;border-radius:5px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);line-height:0}
+.bx-lg img{height:14px;width:auto;display:block}
+.bx-lg+.bx-go{margin-left:0}
+.tiny .bx-lg,.z-xs .bx-lg{display:none}
+.z-l .bx-lg,.z-xl .bx-lg{height:26px;padding:0 8px}.z-l .bx-lg img,.z-xl .bx-lg img{height:18px}
+html[data-theme="dark"] img[src*="logos/onstar.png"]{filter:none!important;opacity:1!important}
 .bx.dim{opacity:.28}
 /* semantic zoom: more detail as you zoom in */
 .z-xs .bx{padding:6px 7px;justify-content:center}
@@ -503,7 +510,7 @@ html[data-theme="dark"] .bx.lens-on{box-shadow:0 0 0 2px #fff,0 14px 28px -10px 
 .z-l .bx-sum{display:none!important}
 .lg-chip{justify-content:center}
 .br-l{display:flex;align-items:center;gap:6px}
-.br-fl{flex:none;width:16px;height:16px;line-height:0}
+.br-fl{flex:none;width:22px;height:22px;line-height:0} /* v86: flags sized like the school and company logos */
 .br-fl .rf{box-shadow:0 0 0 1.5px var(--ring),0 2px 5px rgba(0,0,0,.2)}
 .lk i.lk-img{overflow:hidden;line-height:0}.lk i.lk-img img{width:100%;height:100%;object-fit:cover}
 .zseg{display:flex;align-items:center;gap:2px}
@@ -660,6 +667,8 @@ html[data-theme="dark"] .tile.keep img,html[data-theme="dark"] .lg.keep img,html
 .z-s.narrow .bx-g,.z-s.narrow .bx-s,.z-xs .bx-g{letter-spacing:-.015em}
 .z-s .bx-d{-webkit-line-clamp:3}
 .z-s.narrow .bx-d{-webkit-line-clamp:3;font-size:8px!important;letter-spacing:.02em;padding:2px 4px 1px}
+/* v86: every title keeps room for two lines, so the role type tags start at the same height across boxes */
+.z-s.roomy .bx-s{min-height:2.36em}.z-s.roomy.narrow .bx-g{min-height:2.32em}.z-m .bx-s{min-height:2.44em}.z-l .bx-s{min-height:2.5em}.z-xl .bx-t{min-height:2.5em}
 .z-m .bx-d,.z-s.roomy .bx-d{display:-webkit-box}
 /* v45: phones get a real vertical timeline: one line down the left, every role a tappable card
    with its logo, title, years and place. The zoomable desktop timeline stays for 768px and up. */
@@ -935,7 +944,7 @@ const EMP = [
   { n: 'chrysler-group-mark', r: 467 / 448, t: 'Chrysler Group', a: 'chrysler', b: 'chrysler' },
   { n: 'jci-emblem', r: 227 / 226, t: 'Johnson Controls', a: 'johnson-controls', b: 'johnson-controls' },
   /* v84 (Volker review): General Motors runs unbroken from 2014 to today; SAIC-GM and OnStar sit inside it */
-  { n: 'generalmotors', r: 1, t: 'General Motors', a: 'traverse', b: 'onstar', span: 1, wrap: 1 },
+  { n: 'generalmotors', r: 1, t: 'General Motors', a: 'traverse', b: 'onstar', span: 1 }, /* v86: SAIC-GM and OnStar logos now sit inside their role boxes */
   { n: 'sgm', r: 640 / 407, t: 'SAIC-GM', d: "GM's China joint venture", a: 'shanghai', b: 'shanghai', sub: 1 },
   { n: 'onstar', r: 1, t: 'OnStar', d: "GM's connected-car service", a: 'onstar', b: 'onstar', sub: 1 }
 ];
@@ -1033,6 +1042,8 @@ const brEls = CHAPTERS.map(c => mk('a', 'br t' + c.tier + (c.cls ? ' ' + c.cls :
 const lgEls = EMP.map(e => mk('span', 'lg-chip span' + (e.wrap ? ' wrap' : '') + (e.sub ? ' sub' : ''),
   `<img src="../assets/road/logos/${e.n}.png" alt="" width="${Math.round(20 * e.r)}" height="20"><b>${esc(e.t)}</b>${e.d ? `<em>${esc(e.d)}</em>` : ''}`,
   { title: e.d ? `${e.t}, ${e.d}` : e.t }));
+/* v86: company logo inside the role box, for the roles outside GM's own badge */
+const BXLG = { shanghai: ['sgm', 'SAIC-GM'], onstar: ['onstar', 'OnStar'] };
 const bxEls = ROLES.map(s => {
   const p = PROF[s.id] || {};
   const hl = (p.hl || []).slice(0, 3).map(x => `<li>${md(x)}</li>`).join('');
@@ -1042,7 +1053,7 @@ const bxEls = ROLES.map(s => {
     (tg.length ? `<span class="bx-d">${esc(tg[0])}</span><ul class="bx-tags">${tg.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : '') +
     (OUT[s.id] ? `<span class="bx-o">${esc(OUT[s.id])}</span>` : '') +
     `<span class="bx-sum">${esc(p.summary || '')}</span><ul class="bx-hl">${hl}</ul>` +
-    `<span class="bx-y"><span class="yl">${esc(s.years)}</span><span class="yc">${esc(s.years.replace(/^(\d{4})–\d{2}(\d{2})$/, '$1–$2'))}</span><span class="bx-go">Details ›</span></span>`,
+    `<span class="bx-y"><span class="yl">${esc(s.years)}</span><span class="yc">${esc(s.years.replace(/^(\d{4})–\d{2}(\d{2})$/, '$1–$2'))}</span>${BXLG[s.id] ? `<span class="bx-lg" title="${esc(BXLG[s.id][1])}"><img src="../assets/road/logos/${BXLG[s.id][0]}.png" alt="${esc(BXLG[s.id][1])}"></span>` : ''}<span class="bx-go">Details ›</span></span>`,
     { href: '#' + s.id, 'data-open': s.id, 'aria-label': `${s.label}, ${s.co}, ${s.kicker}, ${s.years}${tg.length ? '. ' + tg.join(', ') : ''}` });
 });
 const CAP = '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M12 4 1 9l11 5 9-4.1V16h2V9z" fill="currentColor"/><path d="M6 12.6V16c0 1.7 2.7 3 6 3s6-1.3 6-3v-3.4l-6 2.7z" fill="currentColor"/></svg>';
@@ -1113,8 +1124,8 @@ function modeFor(u, hMax) {
   const b = hMax >= 236 ? 4 : hMax >= 176 ? 3 : hMax >= 104 ? 2 : hMax >= 70 ? 1 : 0;
   return MODES[Math.min(a, b)];
 }
-const BOX_H = { xs: 72, s: 108, m: 110, l: 176, xl: 236 };
-const SUBH = 32; /* v84: extra height of the General Motors frame that holds SAIC-GM and OnStar */
+const BOX_H = { xs: 72, s: 122, m: 124, l: 200, xl: 236 }; /* v86: slightly taller so titles and role types line up */
+const SUBH = 0; /* v84: extra height of the General Motors frame that holds SAIC-GM and OnStar */
 /* v63: newest first. The layer is mirrored as a whole; each piece is flipped back so its text reads normally.
    The axis keeps the mirror (its arrow points left, into now) and pins flip their parts instead. */
 let REV = (() => {
@@ -1182,6 +1193,7 @@ function render() {
   /* employer logos: one chip each, centred over the visible part of its span */
   if (lgKey !== stage.className) { lgKey = stage.className; lgEls.forEach((el, i) => { el.style.maxWidth = 'none'; el.style.width = ''; el.classList.remove('cmp', 'only'); lgW[i] = el.offsetWidth; el.classList.add('cmp'); lgC[i] = el.offsetWidth; el.classList.replace('cmp', 'only'); lgI[i] = el.offsetWidth; el.classList.remove('only'); }); }
   EMP.forEach((e, i) => {
+    if (e.sub) { lgEls[i].style.display = 'none'; return; } /* v86: shown as a logo inside the role box instead */
     const el = lgEls[i], a = sx(SLOT[e.a].s) + 3, b = sx(SLOT[e.b].e) - 3;
     const inset = e.sub ? 5 : 0, lo = Math.max(a, M), hi = Math.min(b, W - M), vis = hi - lo - 2 * inset;
     /* round 28: sized to the visible part of its own span, so it never sits over another company's boxes */
