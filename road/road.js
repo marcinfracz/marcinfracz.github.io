@@ -957,13 +957,20 @@ function start() {
     while (ov.scrollHeight > ov.clientHeight + 1 && k > 0.74) { k = +(k - 0.02).toFixed(2); ov.style.setProperty('--ovs', k); }
   }
   addEventListener('resize', () => { if (ov && !ov.hidden) fitOverview(); });
+  /* v81: the highlighted row follows the car while the overview is open, however the car moves */
+  var ovCur = -1;
+  function markOverview() {
+    if (!ov || ov.hidden || ovCur === cur) return;
+    ovCur = cur;
+    ov.querySelectorAll('.ov-stop').forEach(b => b.classList.toggle('on', +b.dataset.i === cur));
+  }
   function syncOverview() {
     if (!ov) return;
     const on = zOutT > 0 && !isPhone();
     clearTimeout(ovT);
     if (on) {
       ov.hidden = false;
-      ov.querySelectorAll('.ov-stop').forEach(b => b.classList.toggle('on', +b.dataset.i === cur));
+      ovCur = -1; markOverview();
       fitOverview();
       requestAnimationFrame(() => ov.classList.add('on'));
     } else { ov.classList.remove('on'); ovT = setTimeout(() => { ov.hidden = true; }, 260); }
@@ -1313,6 +1320,7 @@ function start() {
       const n = nearest(pos);
       if (!rush && n !== cur && Math.abs(pos - STOPS[n].x) < 26 && (Math.abs(vel) < 45 || n === nearest(target))) { cur = n; setFocus(-1); renderCard(); }
       else if (!rush && flyOut && n === cur && Math.abs(pos - STOPS[cur].x) < 26) { flyOut = false; card.classList.remove('out'); }
+      markOverview();
     }
     const v = rush ? 0 : (pos - prevPos) / Math.max(dt, 1e-3); prevPos = pos;
     if (isPhone()) zOutT = 0;
