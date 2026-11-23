@@ -77,6 +77,18 @@ html[data-theme="dark"] .sun,html:not([data-theme="dark"]) .moon{display:none}
 .order-btn{pointer-events:auto;display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 10px;border-radius:999px;border:1px solid var(--glass-line);background:var(--glass);color:var(--ink);font:700 12px var(--font);cursor:pointer;white-space:nowrap}
 .order-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .order-btn:hover{border-color:var(--ink)}
+/* v87: the order and scale switches sit together; to scale shows as on when pressed */
+.ord-grp{display:inline-flex;gap:8px;pointer-events:none}.ord-grp>*{pointer-events:auto}
+.scale-btn.on{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+@media (max-width:767px){.scale-btn{display:none!important}}
+.bx.thin>*{display:none!important}
+.bx.thin>.bx-g{display:block!important;writing-mode:vertical-rl;transform:rotate(180deg);align-self:flex-start;max-height:100%;font-size:10px!important;line-height:1.15!important;white-space:normal;overflow:hidden;letter-spacing:0}
+.bx.thin{padding:8px 4px!important;justify-content:flex-start!important}
+.bx.slim>:not(.bx-g):not(.bx-y){display:none!important}
+.bx.slim>.bx-g{display:-webkit-box!important;font-size:12px!important;line-height:1.2!important}
+/* v87: a tag longer than a narrow box wraps inside it */
+.bx .bx-tags li{max-width:100%;box-sizing:border-box;white-space:normal}
+.bx.slim{justify-content:space-between!important}.bx.slim .bx-y .yl,.bx.slim .bx-go,.bx.slim .bx-lg{display:none!important}.bx.slim .bx-y .yc{display:inline!important}
 .ax{height:3px;border-radius:2px;background:var(--axis)}
 .ax.e{background:var(--axis-e)}
 .ax.gm::after{content:"";position:absolute;right:-9px;top:-5px;border-left:11px solid var(--axis);border-top:6.5px solid transparent;border-bottom:6.5px solid transparent}
@@ -660,7 +672,7 @@ html[data-theme="dark"] .tile.keep img,html[data-theme="dark"] .lg.keep img,html
 }
 /* v50: role titles: two lines at most, whole words, never hyphenated; the domain reads as a small tag */
 .bx-t,.bx-s,.bx-g{hyphens:none!important;-webkit-hyphens:none!important;overflow-wrap:normal!important;word-break:normal!important;-webkit-line-clamp:2!important}
-.bx-d{display:none;align-self:flex-start;max-width:100%;box-sizing:border-box;margin-top:2px;padding:3px 5px 2px;border-radius:4px;background:rgba(255,255,255,.2);font-size:8.5px!important;font-weight:800;letter-spacing:.04em;text-transform:uppercase;line-height:1.25;opacity:1;-webkit-line-clamp:2;hyphens:none;overflow-wrap:normal}
+.bx-d{display:none;align-self:stretch;max-width:100%;box-sizing:border-box;margin-top:5px;padding:3px 5px 2px;border-radius:4px;background:rgba(255,255,255,.2);font-size:8.5px!important;font-weight:800;letter-spacing:.04em;text-transform:uppercase;line-height:1.25;opacity:1;-webkit-line-clamp:2;hyphens:none;overflow-wrap:normal}
 .bx-d::before{display:none}
 .z-s.narrow .bx{padding-left:5px!important;padding-right:4px!important}
 .z-xs .bx-g{-webkit-line-clamp:4!important}
@@ -905,12 +917,17 @@ const SLOTS = [
   { id: 'onstar', lane: 'up', focus: 'digital', from: 2025.4, to: 2026.4, w: 2, co: 'OnStar', kicker: 'Warren, MI', label: 'Global Planning & Joint Ventures, OnStar Product Marketing', short: 'OnStar Product Marketing', tag: 'OnStar Product Marketing', years: '2025–2026' },
   { id: '_end', from: 2026.4, to: 2027, w: 1.3 }
 ];
-let acc = 0; SLOTS.forEach(s => { s.s = acc; acc += s.w; s.e = acc; });
-const TOTAL = acc, ROLES = SLOTS.filter(s => s.lane), SLOT = Object.fromEntries(ROLES.map(s => [s.id, s]));
+/* v87: "To scale" switch. Default: every role gets about the same width. To scale: width follows the years, same total length */
+let SCALE = false, TOTAL = 0;
+SLOTS.forEach(s => { s.w0 = s.w; });
+const KS = SLOTS.filter(s => s.lane).reduce((a, s) => a + s.w0, 0) / SLOTS.filter(s => s.lane).reduce((a, s) => a + (s.to - s.from), 0);
+function layoutSlots() { let acc = 0; SLOTS.forEach(s => { s.w = SCALE && s.lane ? (s.to - s.from) * KS : s.w0; s.s = acc; acc += s.w; s.e = acc; }); TOTAL = acc; }
+layoutSlots();
+const ROLES = SLOTS.filter(s => s.lane), SLOT = Object.fromEntries(ROLES.map(s => [s.id, s]));
 /* year -> unit, piecewise across the slots */
 function UY(y) { for (const s of SLOTS) if (y <= s.to) return s.s + Math.max(0, (y - s.from) / (s.to - s.from)) * s.w; return TOTAL; }
-const GM_START = SLOT.traverse.s;
-const LAST_E = ROLES[ROLES.length - 1].e;
+let GM_START = SLOT.traverse.s;
+let LAST_E = ROLES[ROLES.length - 1].e;
 
 /* v84 (Volker review): trips abroad leave the axis and live as stories inside their role.
    Only the two degrees stay as pins under the line. */
@@ -1092,9 +1109,15 @@ function paintOrder() {
   orderBtn.setAttribute('aria-label', REV ? 'Showing newest first. Switch to oldest first' : 'Showing oldest first. Switch to newest first');
   $('#layer').classList.toggle('rev', REV);
 }
+/* v87: "To scale" sits beside the order switch on laptops and tablets */
+const scaleBtn = document.createElement('button'); scaleBtn.type = 'button'; scaleBtn.className = 'order-btn scale-btn'; scaleBtn.id = 'scale';
+scaleBtn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h18v8H3zM7 8v3M11 8v4M15 8v3M19 8v4"/></svg>To scale';
+const ordGrp = document.createElement('div'); ordGrp.className = 'ord-grp'; ordGrp.append(orderBtn, scaleBtn);
+function paintScale() { scaleBtn.classList.toggle('on', SCALE); scaleBtn.setAttribute('aria-pressed', SCALE); scaleBtn.setAttribute('aria-label', SCALE ? 'Showing roles to scale. Switch back to even widths' : 'Show roles to scale, every year the same length'); }
+paintScale();
 function placeOrder() {
   const want = innerWidth >= 768 ? $('#dock') : $('#intro');
-  if (want && orderBtn.parentNode !== want) want.appendChild(orderBtn);
+  if (want && ordGrp.parentNode !== want) want.appendChild(ordGrp);
 }
 function placeLenses() {
   placeOrder();
@@ -1174,21 +1197,32 @@ function render() {
   ROLES.forEach((s, i) => {
     const el = bxEls[i];
     el.style.width = (s.w * U - 6).toFixed(1) + 'px'; el.style.height = hBox + 'px';
+    /* v87: in the to-scale view a short role can be much narrower than the rest: its title then runs up the box */
+    const bw = s.w * U - 6, cut = SCALE ? Math.min((2 * U - 6) * 0.8, 200) : 0, th = bw < Math.min(cut, 90) || (SCALE && +el.dataset.ft === U), sl = !th && bw < cut;
+    if (el.classList.contains('thin') !== th) el.classList.toggle('thin', th);
+    if (el.classList.contains('slim') !== sl) el.classList.toggle('slim', sl);
     T(el, sx(s.s) + 3, s.lane === 'up' ? boxTop : dnTop);
   });
 
   /* chapter brackets, labels stay on screen */
+  const rowEnd = {};
   CHAPTERS.forEach((c, i) => {
     const a = sx(SLOT[c.a].s) + 3, b = sx(SLOT[c.b].e) - 3, el = brEls[i], w = Math.max(0, b - a);
     el.style.width = w + 'px'; T(el, a, boxTop - SUBH - (c.tier === 1 ? 128 : c.tier === 2 ? 90 : 54));
     /* v38: an assignment's label may run on to the right, up to the next bracket in its row */
-    const nx = c.tier === 3 ? CHAPTERS.filter(d => d.tier === 3 && SLOT[d.a].s > SLOT[c.b].s).map(d => sx(SLOT[d.a].s) - 9) : [];
-    const re = c.tier === 3 ? Math.min(W - M, ...nx) : Math.min(b, W - M);
-    const lw = brW[i] || { f: 200, s: 80 }, vis = re - Math.max(a, M);
+    /* v87: to scale, short brackets get narrow: a label may run past its bracket, right or left, until it meets its neighbour */
+    const run = SCALE && c.tier >= 2;
+    const nx = run ? CHAPTERS.map((d, j) => [d, j]).filter(([d]) => d.tier === c.tier && SLOT[d.a].s > SLOT[c.b].s).map(([d, j]) => Math.min(sx(SLOT[d.a].s) + 3, W - M - (brW[j] || { s: 80 }).s - 16) - 12)
+      : c.tier === 3 ? CHAPTERS.filter(d => d.tier === 3 && SLOT[d.a].s > SLOT[c.b].s).map(d => sx(SLOT[d.a].s) - 9) : [];
+    const re = c.tier === 3 || run ? Math.min(W - M, ...nx) : Math.min(b, W - M);
+    const lo = run ? Math.max(M, (rowEnd[c.tier] ?? -1e9) + 12) : Math.max(a, M);
+    const lw = brW[i] || { f: 200, s: 80 }, vis = re - lo;
     const v = lw.f + 16 <= vis ? 'f' : lw.s + 16 <= vis ? 's' : 'n';
     el.classList.toggle('short', v === 's'); el.classList.toggle('none', v === 'n');
     const L = v === 'f' ? lw.f : lw.s;
-    el.firstChild.style.transform = `translateX(${Math.max(0, Math.min(M - a, w - L - 16)).toFixed(1)}px)`;
+    const tx = run ? Math.max(lo, Math.min(Math.max(a, M), re - L - 16)) - a : Math.max(0, Math.min(M - a, w - L - 16));
+    if (run && v !== 'n') rowEnd[c.tier] = a + tx + L + 16;
+    el.firstChild.style.transform = `translateX(${tx.toFixed(1)}px)`;
   });
   /* employer logos: one chip each, centred over the visible part of its span */
   if (lgKey !== stage.className) { lgKey = stage.className; lgEls.forEach((el, i) => { el.style.maxWidth = 'none'; el.style.width = ''; el.classList.remove('cmp', 'only'); lgW[i] = el.offsetWidth; el.classList.add('cmp'); lgC[i] = el.offsetWidth; el.classList.replace('cmp', 'only'); lgI[i] = el.offsetWidth; el.classList.remove('only'); }); }
@@ -1282,6 +1316,7 @@ function fitTitles() {
   const need = [];
   bxEls.forEach((el, i) => {
     const sp = el.querySelector('.bx-s'), r = ROLES[i];
+    if (el.classList.contains('thin') || el.classList.contains('slim')) { el.querySelectorAll('.bx-t,.bx-s,.bx-g').forEach(x => x.style.removeProperty('font-size')); return; }
     if (sp.dataset.alt) { sp.innerHTML = shy(esc(r.short)); delete sp.dataset.alt; }
     el.querySelectorAll('.bx-t,.bx-s,.bx-g').forEach(x => x.style.removeProperty('font-size'));
     const t = [...el.querySelectorAll('.bx-t,.bx-s,.bx-g')].find(x => getComputedStyle(x).display !== 'none');
@@ -1291,13 +1326,23 @@ function fitTitles() {
       for (let k = 0; k < 14 && over() && fs > 9; k++) { fs -= 0.5; t.style.setProperty('font-size', fs + 'px', 'important'); } return fs; };
     let fs = fit();
     if (t === sp && fs < base - 1 && r.tag && r.tag !== r.short) { sp.innerHTML = shy(esc(r.tag)); sp.dataset.alt = 1; fs = fit(); }
+    /* v87: to scale, a title that still won't fit its narrow box runs up the box instead */
+    if (SCALE && t.scrollWidth > t.clientWidth + 1) { el.dataset.ft = U; el.classList.add('thin'); t.style.removeProperty('font-size'); return; }
     need.push([t, base, fs]);
   });
   /* pass 2: one type size for every card on screen, so the row reads evenly */
+  /* v87: to scale, box widths differ a lot, so each title keeps the size its own box allows */
   const m = Math.min(...need.map(n => n[2]));
-  need.forEach(([t, base]) => { if (m < base) t.style.setProperty('font-size', m + 'px', 'important'); else t.style.removeProperty('font-size'); });
+  need.forEach(([t, base, fs]) => { const k = SCALE ? fs : m; if (k < base) t.style.setProperty('font-size', k + 'px', 'important'); else t.style.removeProperty('font-size'); });
 }
-const settled = () => { markDim(true); syncZoomUI(); fitHL(); fitTitles(); };
+/* v87: the role type chips share one height, so their tops and bottoms line up across the row */
+function evenChips() {
+  const ds = [...document.querySelectorAll('.bx:not(.thin):not(.slim) .bx-d')];
+  ds.forEach(d => d.style.removeProperty('min-height'));
+  const vis = ds.filter(d => d.offsetHeight > 0), h = Math.max(0, ...vis.map(d => d.offsetHeight));
+  vis.forEach(d => d.style.setProperty('min-height', h + 'px'));
+}
+const settled = () => { markDim(true); syncZoomUI(); fitHL(); fitTitles(); evenChips(); };
 
 /* one animation at a time: tween U (in log space) and u0 */
 let anim = null;
@@ -1834,11 +1879,15 @@ orderBtn.addEventListener('click', () => {
   REV = !REV; try { localStorage.setItem('mf-tl-order', REV ? 'newest' : 'oldest'); } catch (e) {}
   paintOrder(); VT.build(); setLens(lens, false); render();
 });
+scaleBtn.addEventListener('click', () => {
+  stopAnim(); SCALE = !SCALE; paintScale(); layoutSlots(); GM_START = SLOT.traverse.s; LAST_E = ROLES[ROLES.length - 1].e;
+  measure(); buildZoomSeg(); U = levels[0].U; u0 = candidates()[0]; render(); settled();
+});
 measure(); buildZoomSeg(); measureLabels(); U = levels[0].U; u0 = candidates()[0]; render(); settled();
 let rt = 0;
 addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => {
   const k = levelIndex(), mid = u0 + spanU() / 2; measure(); buildZoomSeg(); U = levels[Math.min(k, levels.length - 1)].U; u0 = nearest(mid - spanU() / 2); render(); settled(); }, 120); });
-if (document.fonts) document.fonts.ready.then(() => { measureLabels(); render(); });
+if (document.fonts) document.fonts.ready.then(() => { measureLabels(); render(); fitTitles(); evenChips(); });
 const h0 = location.hash.slice(1);
 if (known(h0)) openModal(h0);
 </script>
