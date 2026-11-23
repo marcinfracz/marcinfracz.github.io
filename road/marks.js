@@ -126,7 +126,7 @@ export function drawMark(ctx, w, h, spec, col) {
   return drawTypeMark(ctx, w, h, spec, col);
 }
 /* round 18: the real SAIC-GM, PATAC and SAIC-GM-Wuling logos keep their own colours, on a white plate */
-const FULL_COLOR = new Set(['sgm', 'patac', 'sgmw', 'kettering-seal']);
+const FULL_COLOR = new Set(['sgm', 'patac', 'sgmw', 'kettering-seal', 'onstar']);
 function drawLogoMark(ctx, w, h, { name, sub = '', logo }, col, L) {
   ctx.clearRect(0, 0, w, h);
   if (FULL_COLOR.has(logo)) col = { bg: '#ffffff', fg: '#1e2733' };

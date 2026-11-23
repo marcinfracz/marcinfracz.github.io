@@ -1193,3 +1193,5 @@ html.touring .card.start .st-dm { display: none; }
   .st-foot .kbd { min-width: 16px; height: 16px; padding: 0 3px; font-size: 9.5px; }
   .st-foot .st-foot-l { margin-right: 3px; }
 }
+/* v86: the current OnStar mark is a solid blue badge; keep its colours in every theme */
+html[data-theme="dusk"] img[src*="logos/onstar.png"] { filter: none !important; opacity: 1 !important; }
