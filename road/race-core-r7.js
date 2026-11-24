@@ -215,7 +215,7 @@ export function makeRacer(T, cls, s, d, extra = {}) {
 export function stepRacer(T, R, inp, dt, ev) {
   const C = R.C;
   R.px = R.x; R.pz = R.z; R.py = R.y; R.pyaw = R.yaw;
-  if (R.holdT > 0) { R.holdT -= dt; inp = { gas: 0, brake: 1, steer: inp.steer, drift: false }; }
+  if (R.holdT > 0) { R.holdT -= dt; inp = { gas: 0, brake: 0, steer: inp.steer, drift: false }; const k = Math.exp(-dt * 10); R.vx *= k; R.vz *= k; }   // held at the line: no creep, no reverse
   let fx = Math.cos(R.yaw), fz = -Math.sin(R.yaw);
   let u = R.vx * fx + R.vz * fz;
   // surface
@@ -366,7 +366,7 @@ export const RIVALS = [
 ];
 export const DIFFS = {
   rookie: { name: 'Rookie', grip: 0.8, engine: 0.89, band: true },
-  pro: { name: 'Pro', grip: 0.9, engine: 0.96, band: false },
+  pro: { name: 'Pro', grip: 0.88, engine: 0.93, band: false },
   legend: { name: 'Legend', grip: 1.0, engine: 1.015, band: false }
 };
 

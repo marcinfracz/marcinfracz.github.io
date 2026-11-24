@@ -3,7 +3,7 @@
    reads the controls, runs the race and keeps the records. Free play, City Chase and Field notes are not touched. */
 import * as THREE from '../vendor/three.module.min.js';
 import { merge, bx, cy } from './core.js';
-import * as RC from './race-core-r7.js?v=1';
+import * as RC from './race-core-r7.js?v=2';
 import { createEUC } from './euc-next.js?v=1';
 import { createBike } from './bike-r6.js?v=1';
 
@@ -449,7 +449,8 @@ function start() {
   const pPos = new Float32Array(PN * 3), pCol = new Float32Array(PN * 3), pv = new Float32Array(PN * 3), pLife = new Float32Array(PN);
   for (let i = 0; i < PN; i++) pPos[i * 3 + 1] = -500;
   const pGeo = new THREE.BufferGeometry(); pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3)); pGeo.setAttribute('color', new THREE.BufferAttribute(pCol, 3));
-  const points = new THREE.Points(pGeo, new THREE.PointsMaterial({ size: 0.34, vertexColors: true, transparent: true, opacity: 0.95, depthWrite: false, sizeAttenuation: true }));
+  const dot = (() => { const c = document.createElement('canvas'); c.width = c.height = 32; const x = c.getContext('2d'); const g = x.createRadialGradient(16, 16, 0, 16, 16, 16); g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.45, 'rgba(255,255,255,.85)'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, 32, 32); return new THREE.CanvasTexture(c); })();
+  const points = new THREE.Points(pGeo, new THREE.PointsMaterial({ size: 0.16, map: dot, vertexColors: true, transparent: true, opacity: 0.95, depthWrite: false, sizeAttenuation: true }));
   points.frustumCulled = false; scene.add(points);
   let pNext = 0;
   const C_SPARK = { white: lin('#DDE3EA'), blue: lin('#4DA3FF'), orange: lin('#FF8A3D'), boost: lin('#FFC061'), grass: lin('#8FA07F') };
@@ -1041,11 +1042,12 @@ function start() {
         const near = camera.position.distanceToSquared(r.m.group.position) < 70 * 70;
         if (!near) continue;
         const back = r.m.kind === 'car' ? 2.0 : r.m.kind === 'kart' ? 0.95 : 0.35, side = r.m.kind === 'car' ? 0.85 : r.m.kind === 'kart' ? 0.62 : 0;
-        const rate = (R.drifting || r.sparks) ? 70 : 0;
-        if (rate && Math.random() < rate * dt * 2) {
-          const ch = R.drifting ? R.charge : 1.0;
+        const ai = r.isPlayer ? (R.finished || api.auto ? player.auto : null) : r.ai;
+        const rate = (R.drifting || r.sparks) ? 60 : 0;
+        if (rate && Math.random() < rate * dt) {
+          const ch = R.drifting ? R.charge : ai ? ai.turbo : 0;
           const col = ch >= RC.DRIFT_ORANGE ? C_SPARK.orange : ch >= RC.DRIFT_BLUE ? C_SPARK.blue : C_SPARK.white;
-          for (const s of side ? [-1, 1] : [0]) emit(R.x - fx * back + rx * side * s, R.y + 0.12, R.z - fz * back + rz * side * s, R.vx * 0.3 - fx * 2 + (Math.random() - 0.5) * 3, 1.5 + Math.random() * 2, R.vz * 0.3 - fz * 2 + (Math.random() - 0.5) * 3, col, 0.28 + Math.random() * 0.2);
+          for (const s of side ? [-1, 1] : [0]) for (let q = 0; q < 2; q++) emit(R.x - fx * back + rx * side * s, R.y + 0.08, R.z - fz * back + rz * side * s, R.vx * 0.55 + (Math.random() - 0.5) * 2.5, 1.2 + Math.random() * 1.6, R.vz * 0.55 + (Math.random() - 0.5) * 2.5, col, 0.22 + Math.random() * 0.16);
         }
         if (R.boostT > 0 && Math.random() < dt * 60) emit(R.x - fx * (back + 0.2), R.y + 0.35, R.z - fz * (back + 0.2), -fx * 6 + (Math.random() - 0.5) * 2, 0.6, -fz * 6 + (Math.random() - 0.5) * 2, C_SPARK.boost, 0.22);
         if (R.surface === 'grass' && Math.abs(R.u) > 4 && Math.random() < dt * 30) emit(R.x - fx * back, R.y + 0.15, R.z - fz * back, (Math.random() - 0.5) * 2, 1.8, (Math.random() - 0.5) * 2, C_SPARK.grass, 0.45);
@@ -1083,7 +1085,7 @@ function start() {
     } else drawLines(0);
     if (draw) renderer.render(scene, camera);
   }
-  requestAnimationFrame(t => { last = t; renderer.render(scene, camera); requestAnimationFrame(() => { veil.classList.remove('on'); startEl.hidden = false; setTimeout(() => { const b = ridesEl.querySelector('.rw-ride.on'); b && b.focus({ preventScroll: true }); }, 50); }); requestAnimationFrame(frame); });
+  requestAnimationFrame(t => { last = t; renderer.render(scene, camera); requestAnimationFrame(() => { veil.classList.remove('on'); if (state === 'menu') startEl.hidden = false; setTimeout(() => { const b = ridesEl.querySelector('.rw-ride.on'); b && b.focus({ preventScroll: true }); }, 50); }); requestAnimationFrame(frame); });
 
   // QA hooks (harmless for visitors)
   Object.defineProperties(api, { state: { get: () => state }, racers: { get: () => racers }, player: { get: () => player } });
