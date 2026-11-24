@@ -78,6 +78,14 @@
   .dv-gi { display: inline-flex; color: var(--accent-ink, var(--ink)); }
   .dv-gi svg { width: 22px; height: 22px; }
   .dv-sel .dv-groups { grid-template-columns: 1fr 1fr; }
+  /* Home on the mode menu: back to the desktop */
+  .dv-selhead { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: -6px 0 6px; }
+  .dv-selhead .dv-kick { margin: 0; }
+  .dv-selhome { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 14px 0 11px; border: 1.5px solid transparent; border-radius: 10px; flex: none;
+    font: 600 13px Inter, system-ui, sans-serif; text-decoration: none; color: var(--ink); background: var(--surface, #FAFAF7); box-shadow: 0 1px 2px rgba(0,0,0,.05); }
+  .dv-selhome:hover { border-color: color-mix(in srgb, var(--accent) 60%, transparent); }
+  .dv-selhome:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .dv-selhome svg { flex: none; }
   .dv-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
   .dv-tiles .dv-opt { margin: 0; padding: 14px 8px 12px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 2px; }
   .dv-ic { display: grid; place-items: center; width: 52px; height: 52px; margin-bottom: 6px; border-radius: 50%; color: var(--accent-ink, var(--ink));
@@ -157,7 +165,7 @@
 
 <section class="dv-intro" id="dv-intro" role="dialog" aria-labelledby="dv-intro-h">
   <div class="dv-intro-in dv-sel">
-    <p class="dv-kick">The Road · Drive mode</p>
+    <div class="dv-selhead"><p class="dv-kick">The Road · Drive mode</p><a class="dv-selhome" href="index.html" aria-label="Home"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 11 12 4l8.5 7"/><path d="M6 9.6V20h4.5v-5.5h3V20H18V9.6"/></svg><span>Home</span></a></div>
     <h1 id="dv-intro-h">Drive through Marcin's career, or just drive.</h1>
     <div class="dv-groups">
       <div class="dv-grp" role="group" aria-labelledby="g-road">
