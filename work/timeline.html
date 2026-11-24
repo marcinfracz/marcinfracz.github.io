@@ -85,7 +85,10 @@ html[data-theme="dark"] .sun,html:not([data-theme="dark"]) .moon{display:none}
 /* v88: a very narrow role keeps its title upright, one word under the other, in small type */
 .bx.thin>.bx-g{display:block!important;align-self:stretch;max-width:100%;font-size:10px!important;line-height:1.14!important;white-space:normal;overflow:hidden;letter-spacing:-.01em}
 .bx.thin{padding:8px 5px!important;justify-content:flex-start!important}
-.bx.slim>:not(.bx-g):not(.bx-y){display:none!important}
+.bx.slim>:not(.bx-g):not(.bx-y):not(.bx-d){display:none!important}
+/* v89: narrow to-scale roles keep their white role type box, so every box reads the same across the row */
+.z-m .bx.thin>.bx-d,.z-s.roomy .bx.thin>.bx-d,.z-m .bx.slim>.bx-d,.z-s.roomy .bx.slim>.bx-d{display:-webkit-box!important}
+.bx.thin>.bx-d{padding:3px 4px 2px}
 .bx.slim>.bx-g{display:-webkit-box!important;font-size:12px!important;line-height:1.2!important}
 /* v87: a tag longer than a narrow box wraps inside it */
 .bx .bx-tags li{max-width:100%;box-sizing:border-box;white-space:normal}
@@ -1137,7 +1140,8 @@ function paintOrder() {
 const scaleBtn = document.createElement('button'); scaleBtn.type = 'button'; scaleBtn.className = 'order-btn scale-btn'; scaleBtn.id = 'scale';
 scaleBtn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h18v8H3zM7 8v3M11 8v4M15 8v3M19 8v4"/></svg>To scale';
 const ordGrp = document.createElement('div'); ordGrp.className = 'ord-grp'; ordGrp.append(orderBtn, scaleBtn);
-function paintScale() { scaleBtn.classList.toggle('on', SCALE); scaleBtn.setAttribute('aria-pressed', SCALE); scaleBtn.setAttribute('aria-label', SCALE ? 'Showing roles to scale. Switch back to even widths' : 'Show roles to scale, every year the same length'); }
+/* v89: the switch names the view on screen, like Oldest first / Newest first */
+function paintScale() { scaleBtn.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h18v8H3zM7 8v3M11 8v4M15 8v3M19 8v4"/></svg>${SCALE ? 'To scale' : 'Not to scale'}`; scaleBtn.setAttribute('aria-label', SCALE ? 'Showing roles to scale. Switch to even widths' : 'Showing roles at even widths. Switch to scale'); }
 paintScale();
 function placeOrder() {
   const want = innerWidth >= 768 ? $('#dock') : $('#intro');
@@ -1336,12 +1340,18 @@ function fitHL() {
 }
 /* v50: every visible role title fits on two lines of whole words: shrink the type a little where needed */
 /* v88: to scale, a very narrow role shows its title upright, word under word; if a word still won't fit, the first word alone, else none */
+/* v89: a narrow role's title never runs past two lines: it falls back to a shorter form, else the space stays empty */
+const NBT = { chrysler: ['DRE'], 'customer-experience': ['Brand Strategy'], mexico: ['BDC'], onstar: ['Product Marketing'] };
 function fitThin(el, g, r) {
-  g.dataset.th = 1; g.style.removeProperty('display'); g.textContent = r.tag;
-  const ok = () => g.scrollWidth <= g.clientWidth + 1 && g.offsetTop + g.offsetHeight <= el.clientHeight - 6;
-  for (let fs = 10; fs >= 8.5; fs -= 0.5) { g.style.setProperty('font-size', fs + 'px', 'important'); if (ok()) return; }
-  g.textContent = r.tag.split(' ')[0]; if (ok()) return;
-  g.style.setProperty('display', 'none', 'important');
+  g.dataset.th = 1; g.style.removeProperty('display');
+  for (const txt of [r.tag, ...(NBT[r.id] || [])]) {
+    g.textContent = txt;
+    for (let fs = 10; fs >= 8.5; fs -= 0.5) {
+      g.style.setProperty('font-size', fs + 'px', 'important');
+      if (g.scrollWidth <= g.clientWidth + 1 && g.scrollHeight <= Math.ceil(2 * fs * 1.14) + 2) return;
+    }
+  }
+  g.textContent = ''; g.style.removeProperty('font-size');
 }
 function fitTitles() {
   /* pass 1: per card, the size its title needs for two lines; a long title falls back to its shorter form first */
@@ -1370,13 +1380,43 @@ function fitTitles() {
   need.forEach(([t, base, fs]) => { const k = SCALE ? fs : m; if (k < base) t.style.setProperty('font-size', k + 'px', 'important'); else t.style.removeProperty('font-size'); });
 }
 /* v87: the role type chips share one height, so their tops and bottoms line up across the row */
+/* v89: to scale, every chip counts, narrow roles too, and their tops line up even where titles differ */
 function evenChips() {
-  const ds = [...document.querySelectorAll('.bx:not(.thin):not(.slim) .bx-d')];
-  ds.forEach(d => d.style.removeProperty('min-height'));
+  const all = [...document.querySelectorAll('.bx-d')];
+  all.forEach(d => { d.style.removeProperty('min-height'); d.style.removeProperty('margin-top'); });
+  const ds = SCALE ? all : all.filter(d => !d.closest('.thin,.slim'));
   const vis = ds.filter(d => d.offsetHeight > 0), h = Math.max(0, ...vis.map(d => d.offsetHeight));
   vis.forEach(d => d.style.setProperty('min-height', h + 'px'));
+  if (SCALE && vis.length) { const y = vis.map(d => d.getBoundingClientRect().top), top = Math.max(...y); vis.forEach((d, i) => { const k = top - y[i]; if (k > 0.1) d.style.marginTop = (5 + k).toFixed(2) + 'px'; }); }
 }
-const settled = () => { markDim(true); syncZoomUI(); fitHL(); fitTitles(); evenChips(); };
+/* v89: to scale, role type text takes two lines at most, one size across the row; a box too narrow for it keeps the box, empty */
+function fitChips() {
+  const all = [...document.querySelectorAll('.bx-d')];
+  all.forEach(d => { if (d.dataset.ct != null) { d.textContent = d.dataset.ct; delete d.dataset.ct; } d.style.removeProperty('font-size'); d.style.removeProperty('-webkit-line-clamp'); d.style.removeProperty('min-height'); d.style.removeProperty('margin-top'); });
+  if (!SCALE) return;
+  const vis = all.filter(d => d.offsetHeight > 0);
+  /* the largest size, 8.5 down to 7.5, at which the text sits on two lines of whole words; a long type drops its first word if that helps */
+  const size = d => {
+    d.style.setProperty('display', 'block', 'important'); d.style.setProperty('-webkit-line-clamp', 'none', 'important');
+    const cs = getComputedStyle(d), pad = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+    let ok = null;
+    for (let fs = 8.5; fs >= 7.5; fs -= 0.5) { d.style.setProperty('font-size', fs + 'px', 'important'); if (d.scrollWidth <= d.clientWidth && d.scrollHeight - pad <= 2 * fs * 1.25 + 1.5) { ok = fs; break; } }
+    d.style.removeProperty('font-size'); d.style.removeProperty('display'); d.style.removeProperty('-webkit-line-clamp'); return ok;
+  };
+  const best = vis.map(d => {
+    let ok = size(d);
+    const w = d.textContent.split(' ');
+    if (ok == null && w.length > 2 && !d.closest('.thin,.slim')) { d.dataset.ct = d.textContent; d.textContent = w.slice(1).join(' '); d.textContent = d.textContent[0].toUpperCase() + d.textContent.slice(1); ok = size(d); if (ok == null) { d.textContent = d.dataset.ct; delete d.dataset.ct; } }
+    return ok;
+  });
+  const got = best.filter((x, i) => x != null && !vis[i].closest('.thin,.slim')), fs = got.length ? Math.min(...got) : 8.5;
+  vis.forEach((d, i) => {
+    d.style.setProperty('font-size', fs + 'px', 'important');
+    if (best[i] != null && (best[i] >= fs || !d.closest('.thin,.slim'))) { d.style.setProperty('-webkit-line-clamp', '2', 'important'); return; }
+    if (d.closest('.thin,.slim')) { d.dataset.ct = d.textContent; d.textContent = ''; }
+  });
+}
+const settled = () => { markDim(true); syncZoomUI(); fitHL(); fitTitles(); fitChips(); evenChips(); };
 
 /* one animation at a time: tween U (in log space) and u0 */
 let anim = null;
@@ -1921,7 +1961,7 @@ measure(); buildZoomSeg(); measureLabels(); U = levels[0].U; u0 = candidates()[0
 let rt = 0;
 addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => {
   const k = levelIndex(), mid = u0 + spanU() / 2; measure(); buildZoomSeg(); U = levels[Math.min(k, levels.length - 1)].U; u0 = nearest(mid - spanU() / 2); render(); settled(); }, 120); });
-if (document.fonts) document.fonts.ready.then(() => { measureLabels(); render(); fitTitles(); evenChips(); });
+if (document.fonts) document.fonts.ready.then(() => { measureLabels(); render(); fitTitles(); fitChips(); evenChips(); });
 const h0 = location.hash.slice(1);
 if (known(h0)) openModal(h0);
 </script>
