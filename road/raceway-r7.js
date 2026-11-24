@@ -435,7 +435,9 @@ function start() {
   }
   function tagSprite(name, color) {
     const c = document.createElement('canvas'); c.width = 320; c.height = 72; const x = c.getContext('2d');
-    x.font = '700 30px Inter, system-ui, sans-serif'; const w = Math.min(300, x.measureText(name).width + 66);
+    let fs = 30; x.font = '700 30px Inter, system-ui, sans-serif';
+    while (fs > 18 && x.measureText(name).width + 66 > 312) { fs -= 1; x.font = `700 ${fs}px Inter, system-ui, sans-serif`; }
+    const w = Math.min(316, x.measureText(name).width + 66);
     x.fillStyle = 'rgba(22,26,32,.78)'; x.beginPath(); x.roundRect((320 - w) / 2, 10, w, 52, 26); x.fill();
     x.fillStyle = color; x.beginPath(); x.arc((320 - w) / 2 + 26, 36, 10, 0, Math.PI * 2); x.fill();
     x.fillStyle = '#F4F4F1'; x.textBaseline = 'middle'; x.fillText(name, (320 - w) / 2 + 46, 37);
@@ -686,8 +688,8 @@ function start() {
       const me = RC.progress(T, R), v = Math.max(R.u, 12);
       const ahead = ord[pos - 2], behind = ord[pos];
       let h = '';
-      if (ahead && !ahead.R.finished) h += `<b>${((RC.progress(T, ahead.R) - me) / v).toFixed(1)} s</b> to ${esc(ahead.name)}<br>`;
-      if (behind && !behind.R.finished) h += `${esc(behind.name)} <b>${((me - RC.progress(T, behind.R)) / v).toFixed(1)} s</b> back`;
+      if (ahead && !ahead.R.finished) h += `<b>${((RC.progress(T, ahead.R) - me) / v).toFixed(1)}&nbsp;s</b> to ${esc(ahead.name)}<br>`;
+      if (behind && !behind.R.finished) h += `${esc(behind.name)} <b>${((me - RC.progress(T, behind.R)) / v).toFixed(1)}&nbsp;s</b>&nbsp;back`;
       setHTML(el.gap, h);
     } else setHTML(el.gap, '');
     drawMap();
@@ -773,6 +775,20 @@ function start() {
       const d = camera.position.distanceTo(r.tag.position);
       r.tag.visible = state !== 'menu' && d > 7 && d < 48;
       r.tag.material.opacity = Math.min(clamp((48 - d) / 14, 0, 1), clamp((d - 7) / 5, 0, 1));
+    }
+  }
+
+  // nearer name tags win: a farther tag that would overlap on screen fades out
+  const tagP = new THREE.Vector3();
+  function declutterTags() {
+    camera.updateMatrixWorld();
+    const shown = [];
+    const list = racers.filter(r => r.tag && r.tag.visible).map(r => ({ r, d: camera.position.distanceTo(r.tag.position) })).sort((a, b) => a.d - b.d);
+    for (const o of list) {
+      tagP.copy(o.r.tag.position).project(camera);
+      const hw = 1.9 / o.d, hh = 0.5 / o.d; // rough half size in clip units
+      if (tagP.z > 1 || shown.some(q => Math.abs(q.x - tagP.x) < q.hw + hw && Math.abs(q.y - tagP.y) < (q.hh + hh) * 1.8)) { o.r.tag.visible = false; continue; }
+      shown.push({ x: tagP.x, y: tagP.y, hw, hh });
     }
   }
 
@@ -1063,6 +1079,7 @@ function start() {
       camPos.lerpVectors(a, camPos, e); camLook.lerpVectors(la, camLook, e); camera.fov = lerp(52, 70, e);
     } else chaseCam(paused ? 0 : dt, (state === 'race' || state === 'done') ? alpha : 1, false);
     camera.position.copy(camPos); camera.lookAt(camLook); camera.updateProjectionMatrix();
+    declutterTags();
     // shadows follow the action
     const focus = state === 'menu' ? tmpV.set(40, 0, -5) : tmpV.set(player.R.x, player.R.y, player.R.z);
     if (state === 'menu') { sc.left = -260; sc.right = 260; sc.top = 260; sc.bottom = -260; sc.far = 600; }
