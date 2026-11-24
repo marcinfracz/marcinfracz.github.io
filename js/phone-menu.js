@@ -30,9 +30,9 @@
     ' .pm-sheet .pm-apps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}' +
     ' .pm-sheet .pm-apps button,.pm-sheet .pm-apps a{flex-direction:column;justify-content:center;gap:6px;min-height:72px;padding:6px 2px;font-weight:600;font-size:12px;line-height:1.15;font-family:inherit;text-align:center}' +
     ' .pm-sheet .pm-apps svg{width:24px;height:24px}' +
-    /* v83: Meet Marcin keeps its label in line with the other rows; the play button sits at the row's end */
-    ' .pm-sheet .pm-play{margin-left:auto;flex:none;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:currentColor}' +
-    ' .pm-sheet .pm-play svg{width:14px;height:14px;margin-left:2px;fill:var(--pm-bg,#fff)}' +
+    /* v90: a small play icon right after the words "Meet Marcin", not at the row's end next to the current-page dot */
+    ' .pm-sheet .pm-play{margin-left:-4px;flex:none;display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;border:1.5px solid currentColor;box-sizing:border-box;opacity:.75}' +
+    ' .pm-sheet .pm-play svg{width:8px;height:8px;margin-left:1px;fill:currentColor}' +
     ' .pm-shade{position:fixed;inset:0;z-index:10055;background:rgba(0,0,0,.18)}' +
     ' .pm-shade[hidden]{display:none}' +
     '}';
@@ -58,7 +58,7 @@
   var navByLabel = {};
   [].forEach.call(nav.querySelectorAll('a, button[data-action="contact"]'), function (a) {
     var c = a.cloneNode(true);
-    c.removeAttribute('id'); c.removeAttribute('data-action'); c.className = '';
+    c.removeAttribute('id'); c.removeAttribute('data-action'); c.removeAttribute('data-reel-name'); c.className = '';
     var label = (a.textContent || '').trim() || a.getAttribute('aria-label') || '';
     if (/desktop/i.test(a.getAttribute('aria-label') || '') && !/desktop/i.test(label)) label = 'Desktop';
     c.textContent = label;
@@ -114,7 +114,8 @@
         t = document.createElement('button'); t.type = 'button';
         t.addEventListener('click', function () { close(); src.click(); });
       } else {
-        if (src) { t = src.cloneNode(false); t.removeAttribute('id'); t.removeAttribute('aria-current'); t.className = ''; }
+        /* v90: drop data-reel-name too, or the reel script adds the name a second time under the tile */
+        if (src) { t = src.cloneNode(false); t.removeAttribute('id'); t.removeAttribute('aria-current'); t.removeAttribute('data-reel-name'); t.className = ''; }
         else {
           t = document.createElement('a');
           if (/^https?:/.test(app[1])) { t.href = app[1]; t.target = '_blank'; t.rel = 'noopener'; t.setAttribute('data-ext', '1'); }
