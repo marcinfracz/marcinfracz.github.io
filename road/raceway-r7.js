@@ -858,7 +858,7 @@ function start() {
     lamps.forEach(m => m.color.set('#2A3038'));
     canvas.focus && canvas.focus();
   }
-  function startCountdown() { state = 'count'; countT = 0; lightsEl.hidden = false; gasDownAt = -1; }
+  function startCountdown() { state = 'count'; countT = 0; litN = 0; lightsEl.hidden = false; gasDownAt = -1; }
   function goRace() {
     state = 'race'; raceT = 0;
     bigMsg('Go', 800);
@@ -992,15 +992,19 @@ function start() {
 
   function frame(now) {
     requestAnimationFrame(frame);
-    let dt = Math.min(0.1, (now - last) / 1000); last = now; wall += dt;
+    const dt = Math.min(0.1, (now - last) / 1000); last = now;
+    tick(dt, true);
+  }
+  let litN = 0;
+  function tick(dt, draw) {
+    wall += dt;
     if (!paused) {
       readInput(dt);
       const sdt = dt * api.timeScale;
       if (state === 'intro') { introT += dt; if (introT > 1.7) startCountdown(); }
       if (state === 'count') {
-        const before = countT;
-        simAcc += sdt; let k = 0; while (simAcc >= STEP && k < 40) { sim(STEP); simAcc -= STEP; k++; }
-        for (let i = 0; i < 3; i++) if (before < i && countT >= i) { lightsEl.querySelectorAll('i')[i].classList.add('on'); lamps[i].color.set('#E5484D'); audio.blip(440, 0.25, 'square', 0.1); }
+        simAcc += sdt; let k = 0; while (simAcc >= STEP && k < 40 * Math.max(1, api.timeScale)) { sim(STEP); simAcc -= STEP; k++; }
+        while (litN < 3 && countT >= litN) { lightsEl.querySelectorAll('i')[litN].classList.add('on'); lamps[litN].color.set('#E5484D'); audio.blip(440, 0.25, 'square', 0.1); litN++; }
         if (countT >= 3.0) goRace();
       } else if (state === 'race' || state === 'done') {
         simAcc += sdt; let k = 0; const cap = 12 * Math.max(1, api.timeScale);
@@ -1066,7 +1070,7 @@ function start() {
     if (state === 'menu') sun.position.set(focus.x - 150, 260, focus.z + 160);
     padTex.offset.x = -(wall * 1.6 % 1);
     // HUD and sound
-    if (state === 'race' || state === 'done' || state === 'count') {
+    if (state === 'race' || state === 'done' || state === 'count' || state === 'intro') {
       updateHUD(dt);
       const R = player.R;
       if (state === 'race' && !paused) {
@@ -1077,13 +1081,16 @@ function start() {
       drawLines(reduce ? 0 : clamp((f - 0.8) / 0.25, 0, 1) * 0.8 + (R.boostT > 0 ? 0.35 : 0) + (R.tow ? 0.25 : 0), R.tow && R.boostT <= 0);
       if (!paused) audio.set(R, input.gas, state === 'race' || state === 'done');
     } else drawLines(0);
-    renderer.render(scene, camera);
+    if (draw) renderer.render(scene, camera);
   }
   requestAnimationFrame(t => { last = t; renderer.render(scene, camera); requestAnimationFrame(() => { veil.classList.remove('on'); startEl.hidden = false; setTimeout(() => { const b = ridesEl.querySelector('.rw-ride.on'); b && b.focus({ preventScroll: true }); }, 50); }); requestAnimationFrame(frame); });
 
   // QA hooks (harmless for visitors)
+  Object.defineProperties(api, { state: { get: () => state }, racers: { get: () => racers }, player: { get: () => player } });
   Object.assign(api, {
-    get state() { return state; }, T, get racers() { return racers; }, get player() { return player; }, renderer,
+    T, renderer,
+    advance: (sec, step = 1 / 30) => { for (let t = 0; t < sec; t += step) tick(step, false); renderer.render(scene, camera); return api.info(); },
+    input,
     info: () => ({ state, raceT: +raceT.toFixed(2), calls: renderer.info.render.calls, tris: renderer.info.render.triangles, order: order().map(r => r.name), lap: player.R.lap, u: +player.R.u.toFixed(2) }),
     begin: () => beginRace(), menu: () => toMenu()
   });
