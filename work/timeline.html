@@ -82,8 +82,9 @@ html[data-theme="dark"] .sun,html:not([data-theme="dark"]) .moon{display:none}
 .scale-btn.on{background:var(--ink);border-color:var(--ink);color:var(--surface)}
 @media (max-width:767px){.scale-btn{display:none!important}}
 .bx.thin>*{display:none!important}
-.bx.thin>.bx-g{display:block!important;writing-mode:vertical-rl;transform:rotate(180deg);align-self:flex-start;max-height:100%;font-size:10px!important;line-height:1.15!important;white-space:normal;overflow:hidden;letter-spacing:0}
-.bx.thin{padding:8px 4px!important;justify-content:flex-start!important}
+/* v88: a very narrow role keeps its title upright, one word under the other, in small type */
+.bx.thin>.bx-g{display:block!important;align-self:stretch;max-width:100%;font-size:10px!important;line-height:1.14!important;white-space:normal;overflow:hidden;letter-spacing:-.01em}
+.bx.thin{padding:8px 5px!important;justify-content:flex-start!important}
 .bx.slim>:not(.bx-g):not(.bx-y){display:none!important}
 .bx.slim>.bx-g{display:-webkit-box!important;font-size:12px!important;line-height:1.2!important}
 /* v87: a tag longer than a narrow box wraps inside it */
@@ -747,6 +748,29 @@ html[data-theme="dark"] .tile.keep img,html[data-theme="dark"] .lg.keep img,html
   .dock .zseg{display:none!important}
   .dock #zlabel{display:block;min-width:76px}
 }
+/* v88: the footer reads as one menu in three groups: view (order, to scale), highlight, zoom.
+   Each group sits in its own soft tray, and every button in it has the same pill size. */
+@media (min-width:768px){
+  .dock{column-gap:14px}
+  .dock>.ord-grp,.dock>.lenses,.dock>.zoom{pointer-events:auto;background:var(--glass);border:1px solid var(--glass-line);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:20px;padding:4px!important;box-shadow:0 8px 20px -16px rgba(10,16,28,.5)}
+  .dock>.ord-grp{gap:4px}
+  .dock>.lenses{gap:4px!important}
+  .dock>.lenses .lens-lt{margin:0 4px 0 8px}
+  .dock>.zoom .dk-l{margin-left:8px}
+  .dock .lens,.dock .order-btn{border:0;background:none;backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none}
+  .dock .order-btn{height:32px;padding:0 13px 0 11px;gap:7px;font:700 12.5px var(--font);color:var(--ink2)}
+  .dock .order-btn svg{width:15px;height:15px}
+  .dock .lens:hover,.dock .order-btn:hover{color:var(--ink);box-shadow:0 0 0 1px var(--ink2) inset}
+  .dock .lens.on,.dock .scale-btn.on{background:var(--ink);color:var(--surface);box-shadow:none}
+}
+@media (min-width:768px) and (max-height:760px),(min-width:768px) and (max-width:1100px){
+  .dock{align-items:center!important}
+  .dock>.ord-grp,.dock>.lenses,.dock>.zoom{padding:3px!important;border-radius:17px}
+  .dock>.lenses{gap:3px!important}
+  .dock>.zoom{height:auto}
+  .dock .order-btn{height:26px;font-size:11px;padding:0 9px 0 8px;gap:5px}
+  .dock .order-btn svg{width:12px;height:12px}
+}
 </style>
 <!-- Owner switch: ?me=1 keeps this browser out of analytics, ?me=0 turns it back on -->
 <script>
@@ -1311,12 +1335,22 @@ function fitHL() {
     for (let k = li.length - 1; k >= 0 && ul.scrollHeight > ul.clientHeight + 1; k--) li[k].hidden = true; });
 }
 /* v50: every visible role title fits on two lines of whole words: shrink the type a little where needed */
+/* v88: to scale, a very narrow role shows its title upright, word under word; if a word still won't fit, the first word alone, else none */
+function fitThin(el, g, r) {
+  g.dataset.th = 1; g.style.removeProperty('display'); g.textContent = r.tag;
+  const ok = () => g.scrollWidth <= g.clientWidth + 1 && g.offsetTop + g.offsetHeight <= el.clientHeight - 6;
+  for (let fs = 10; fs >= 8.5; fs -= 0.5) { g.style.setProperty('font-size', fs + 'px', 'important'); if (ok()) return; }
+  g.textContent = r.tag.split(' ')[0]; if (ok()) return;
+  g.style.setProperty('display', 'none', 'important');
+}
 function fitTitles() {
   /* pass 1: per card, the size its title needs for two lines; a long title falls back to its shorter form first */
   const need = [];
   bxEls.forEach((el, i) => {
     const sp = el.querySelector('.bx-s'), r = ROLES[i];
-    if (el.classList.contains('thin') || el.classList.contains('slim')) { el.querySelectorAll('.bx-t,.bx-s,.bx-g').forEach(x => x.style.removeProperty('font-size')); return; }
+    const g0 = el.querySelector('.bx-g');
+    if (g0 && g0.dataset.th) { g0.innerHTML = shy(esc(r.tag)); delete g0.dataset.th; g0.style.removeProperty('display'); }
+    if (el.classList.contains('thin') || el.classList.contains('slim')) { el.querySelectorAll('.bx-t,.bx-s,.bx-g').forEach(x => x.style.removeProperty('font-size')); if (el.classList.contains('thin') && g0) fitThin(el, g0, r); return; }
     if (sp.dataset.alt) { sp.innerHTML = shy(esc(r.short)); delete sp.dataset.alt; }
     el.querySelectorAll('.bx-t,.bx-s,.bx-g').forEach(x => x.style.removeProperty('font-size'));
     const t = [...el.querySelectorAll('.bx-t,.bx-s,.bx-g')].find(x => getComputedStyle(x).display !== 'none');
@@ -1327,7 +1361,7 @@ function fitTitles() {
     let fs = fit();
     if (t === sp && fs < base - 1 && r.tag && r.tag !== r.short) { sp.innerHTML = shy(esc(r.tag)); sp.dataset.alt = 1; fs = fit(); }
     /* v87: to scale, a title that still won't fit its narrow box runs up the box instead */
-    if (SCALE && t.scrollWidth > t.clientWidth + 1) { el.dataset.ft = U; el.classList.add('thin'); t.style.removeProperty('font-size'); return; }
+    if (SCALE && t.scrollWidth > t.clientWidth + 1) { el.dataset.ft = U; el.classList.add('thin'); t.style.removeProperty('font-size'); if (g0) fitThin(el, g0, r); return; }
     need.push([t, base, fs]);
   });
   /* pass 2: one type size for every card on screen, so the row reads evenly */
