@@ -771,8 +771,8 @@ function start() {
     if (r.tag) {
       r.tag.position.set(x, y + m.tagY, z);
       const d = camera.position.distanceTo(r.tag.position);
-      r.tag.visible = state !== 'menu' && d > 3 && d < 48;
-      r.tag.material.opacity = clamp((48 - d) / 14, 0, 1);
+      r.tag.visible = state !== 'menu' && d > 7 && d < 48;
+      r.tag.material.opacity = Math.min(clamp((48 - d) / 14, 0, 1), clamp((d - 7) / 5, 0, 1));
     }
   }
 
